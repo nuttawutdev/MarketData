@@ -22,7 +22,11 @@ namespace MarketData.Controllers
         {
             return View();
         }
-
+       
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();
