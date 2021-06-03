@@ -27,7 +27,7 @@ namespace MarketData.Controllers
         {
             return View();
         }
-        public IActionResult Privacy()
+        public IActionResult Profile()
         {
             return View();
         }

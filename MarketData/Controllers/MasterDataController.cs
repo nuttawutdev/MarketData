@@ -15,6 +15,45 @@ namespace MarketData.Controllers
             return View();
         }
 
+        public ActionResult Band()
+        {
+            return View();
+        }
+
+        public ActionResult BandGroup()
+        {
+            return View();
+        }
+
+        public ActionResult BrandType()
+        {
+            return View();
+        }
+
+        public ActionResult BrandSegment()
+        {
+            return View();
+        }
+
+        public ActionResult RetailerGroup()
+        {
+            return View();
+        }
+
+        public ActionResult DistributionChannels()
+        {
+            return View();
+        }
+
+        public ActionResult DepartmentStore()
+        {
+            return View();
+        }
+        public ActionResult Counter()
+        {
+            return View();
+        }
+  
         // GET: MasterDataController/Details/5
         public ActionResult Details(int id)
         {
