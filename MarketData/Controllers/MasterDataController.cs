@@ -36,7 +36,10 @@ namespace MarketData.Controllers
         {
             return View();
         }
-
+        public ActionResult BrandType_Edit()
+        {
+            return View();
+        }
         public ActionResult BrandSegment()
         {
             return View();
