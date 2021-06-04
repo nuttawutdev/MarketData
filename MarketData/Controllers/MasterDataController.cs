@@ -41,18 +41,31 @@ namespace MarketData.Controllers
         {
             return View();
         }
-
+        public ActionResult BrandSegment_Edit()
+        {
+            return View();
+        }
         public ActionResult RetailerGroup()
         {
             return View();
         }
-
+        public ActionResult RetailerGroup_Edit()
+        {
+            return View();
+        }
         public ActionResult DistributionChannels()
         {
             return View();
         }
-
+        public ActionResult DistributionChannels_Edit()
+        {
+            return View();
+        }
         public ActionResult DepartmentStore()
+        {
+            return View();
+        }
+        public ActionResult DepartmentStore_Edit()
         {
             return View();
         }
@@ -60,7 +73,11 @@ namespace MarketData.Controllers
         {
             return View();
         }
-  
+        public ActionResult Counter_Edit()
+        {
+            return View();
+        }
+
         // GET: MasterDataController/Details/5
         public ActionResult Details(int id)
         {
