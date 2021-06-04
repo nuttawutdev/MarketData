@@ -15,16 +15,19 @@ namespace MarketData.Controllers
             return View();
         }
 
-        public ActionResult Band()
+        public ActionResult Brand()
         {
             return View();
         }
 
-        public ActionResult BandGroup()
+        public ActionResult BrandGroup()
         {
             return View();
         }
-
+        public ActionResult BrandGroup_Edit()
+        {
+            return View();
+        }
         public ActionResult BrandType()
         {
             return View();
