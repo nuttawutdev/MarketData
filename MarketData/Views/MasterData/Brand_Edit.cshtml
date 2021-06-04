@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Add Brand";
+}
+
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<br />
+
+<form>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Name	</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Short Name	</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Group</label>
+            <select class="form-control">
+                <option>Please select</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Segment</label>
+            <select class="form-control">
+                <option>Please select</option>
+            </select>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Type</label>
+            <select class="form-control">
+                <option>Please select</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Color</label>
+            <input type="color"  class="textbox-color" />
+        </div>
+    </div>
+
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Type</label>
+            <input type="number" class="form-control input-sm" />
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Active
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="Brand" class="btn btn-danger">Add</a>
+        <a href="Brand" class="btn btn-outline-danger">Cancel</a>
+
+    </div>
+</form>

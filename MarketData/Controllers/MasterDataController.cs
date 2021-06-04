@@ -19,6 +19,10 @@ namespace MarketData.Controllers
         {
             return View();
         }
+        public ActionResult Brand_Edit()
+        {
+            return View();
+        }
 
         public ActionResult BrandGroup()
         {
