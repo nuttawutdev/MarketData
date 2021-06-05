@@ -27,6 +27,10 @@ namespace MarketData.Controllers
         {
             return View();
         }
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
         public IActionResult Profile()
         {
             return View();

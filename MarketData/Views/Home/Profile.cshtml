@@ -6,36 +6,24 @@
 <hr />
 
 <div class="parentDivClass">
+    <div id="profile">
+        <div class="nav">
 
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("Brand", "MasterData")'">
-        Brand 
-    </button>
+            <div class="li" onclick="location.href='@Url.Action("Brand", "MasterData")'">Brand</div>
+            <div class="li" onclick="location.href='@Url.Action("BrandGroup", "MasterData")'">Brand Group</div>
+            <div class="li" onclick="location.href='@Url.Action("BrandGroup", "MasterData")'">Brand Type</div>
+            <div class="li" onclick="location.href='@Url.Action("BrandType","MasterData")'">Brand Segment</div>
 
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("BrandGroup", "MasterData")'" >
-        Brand Group
-    </button>
+            <div class="li" onclick="location.href='@Url.Action("RetailerGroup", "MasterData")'">Retailer Group</div>
+            <div class="li" onclick="location.href='@Url.Action("DistributionChannels", "MasterData")'"><small>Distribution Channels</small></div>
+            <div class="li" onclick="location.href='@Url.Action("DepartmentStore", "MasterData")'">Department Store</div>
+            <div class="li" onclick="location.href='@Url.Action("Counter","MasterData")'">Counter</div>
+        </div>
+    </div>
+    <div>
 
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("BrandType","MasterData")'" >
-        Brand Type
-    </button>
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("BrandSegment","MasterData")'" >
-        Brand Segment
-    </button>
-
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("RetailerGroup", "MasterData")'">
-        Retailer Group
-    </button>
-
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("DistributionChannels", "MasterData")'" >
-        Distribution Channels
-    </button>
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("DepartmentStore", "MasterData")'" >
-        Department Store
-    </button>
-
-    <button type="button" class="btn btn-info btn-profile" onclick="location.href='@Url.Action("Counter", "MasterData")'">
-        Counter
-    </button>
+    </div>
+ 
 
 
 </div>
