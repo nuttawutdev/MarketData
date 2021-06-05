@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Add Department Store";
+}
+
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<br />
+
+<form>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Name	</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Retailer group</label>
+            <select class="form-control">
+                <option>Please select</option>
+            </select>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Region</label>
+            <select class="form-control">
+                <option>Please select</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Rank</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+    </div>
+
+    <div class="row col-md-12 col-sm-12">
+  
+        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Active
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="DepartmentStore" class="btn btn-danger">Add</a>
+        <a href="DepartmentStore" class="btn btn-outline-danger">Cancel</a>
+
+    </div>
+</form>
