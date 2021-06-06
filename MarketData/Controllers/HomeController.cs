@@ -31,7 +31,7 @@ namespace MarketData.Controllers
         {
             return View();
         }
-        public IActionResult Profile()
+        public IActionResult MasterData()
         {
             return View();
         }

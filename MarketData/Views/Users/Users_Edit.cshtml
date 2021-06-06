@@ -1,0 +1,197 @@
+﻿@{
+    ViewData["Title"] = "Add Users";
+}
+
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<br />
+
+<form>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Email	</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Display Name	</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">First Name</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Last Name</label>
+            <input type="text" class="form-control input-sm" id="name" placeholder="">
+        </div>
+
+    </div>
+    <div class="row col-md-12 col-sm-12">
+
+        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Active
+            </label>
+        </div>
+        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Validated Email
+            </label>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="col-md-12 col-sm-12">
+            <h6>Permission</h6>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+
+        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                View Master
+            </label>
+        </div>
+        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Edit Master
+            </label>
+        </div>
+        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Edit Users
+            </label>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+
+        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                View Data
+            </label>
+        </div>
+        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Key-in Data
+            </label>
+        </div>
+        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                Approve data
+            </label>
+        </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label for="pincode">
+                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                View Report
+            </label>
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12 ">
+        <div class=" col-md-12 col-sm-12">
+            <a href="Users" class="btn btn-danger btn-sm">Resend welcome email</a>
+            <a href="Users" class="btn btn-danger btn-sm">Reset password</a>
+        </div>
+    </div><br />
+    <div class="row col-md-12 col-sm-12">
+
+        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+            <label>Department Store</label>
+            <select class="form-control">
+                <option>Please select</option>
+                <option>Central Bangna</option>
+                <option>The Mall Bangkae</option>
+                <option>Robinson Bangrak</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <label>Brand</label>
+            <select class="form-control">
+                <option>Please select</option>
+                <option>LOREAL</option>
+                <option>SHISEDO</option>
+                <option>Lux Asia</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3 col-sm-3">
+            <label>Distribution Chanels</label>
+            <select class="form-control">
+                <option>Please select</option>
+                <option>Counter</option>
+                <option>Boutique</option>
+                <option>Online</option>
+            </select>
+        </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+            <a href="Users" class="btn btn-danger">Add</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div class="table-wrapper">
+
+            <table class="table table-striped table-hover ">
+                <thead class="table-secondary">
+                    <tr class="row m-0">
+                        <th class="col-4 text-center">Department Store</th>
+                        <th class="col-4 text-center">Brand</th>
+                        <th class="col-2 text-center">Distribution Chanels</th>
+                        <th class="col-2 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row m-0">
+                        <td class="col-4">
+                            Central Ladprao
+                        </td>
+                        <td class="col-4">
+                            SHU
+                        </td>
+                        <td class="col-2 ">
+                            Couter
+                        </td>
+                        <td class="col-2 text-center">
+                            <a href="#deleteModal" class="btn btn-danger btn-sm" data-toggle="modal">
+                                <i class="ion-android-delete text-white"></i>
+                            </a>
+
+                        </td>
+                    </tr>
+                    <tr class="row m-0">
+                        <td class="col-4">
+                            Central Ladprao
+                        </td>
+                        <td class="col-4">
+                            LANCOME
+                        </td>
+                        <td class="col-2">
+                            Couter
+                        </td>
+                        <td class="col-2 text-center">
+                            <a href="#deleteModal" class="btn btn-danger btn-sm" data-toggle="modal">
+                                <i class="ion-android-delete text-white"></i>
+                            </a>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <a href="Users" class="btn btn-danger">Save</a>
+        <a href="Users" class="btn btn-outline-danger">Cancel</a>
+
+    </div>
+</form>
