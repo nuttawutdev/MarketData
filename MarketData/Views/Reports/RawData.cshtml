@@ -1,0 +1,199 @@
+﻿@{
+    ViewData["Title"] = "Raw Data";
+}
+
+<style>
+    .row-filter {
+        padding-top: 20px;
+    }
+</style>
+<h2>
+    @ViewData["Title"]
+
+</h2>
+<hr />
+<br />
+<br />
+<div class="row">
+    <div class="table-filter" style="width: 100%; font-size: 13px;">
+
+        <div class="row row-filter">
+            <div class="col-sm-12 col-lg-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Rank
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Select Store
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+
+                <div class="filter-group">
+                    <label><b>Start <i class="ion-clock"></i></b>  Week</label>
+                    <select class="form-control" style="width:80px;height:40px">
+                        <option>1</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Month</label>
+                    <select class="form-control" style="width:80px;height:40px">
+                        <option>1</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Year</label>
+                    <select class="form-control" style="width:100px;height:40px">
+                        <option>2019</option>
+                        <option>2020</option>
+                    </select>
+                </div> <div class="filter-group">
+                    <label>Compare with year</label>
+                    <select class="form-control" style="width:100px;height:40px">
+                        <option>2019</option>
+                        <option>2020</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+        <div class="row row-filter">
+            <div class="col-sm-2">
+
+            </div>
+            <div class="col-lg-8 col-sm-12">
+
+                <div class="filter-group">
+                    <label><b>End &nbsp; <i class="ion-clock"></i></b>  Week</label>
+                    <select class="form-control" style="width:80px;height:40px">
+                        <option>1</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Month</label>
+                    <select class="form-control" style="width:80px;height:40px">
+                        <option>1</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Year</label>
+                    <select class="form-control" style="width:100px;height:40px">
+                        <option>2019</option>
+                        <option>2020</option>
+                    </select>
+                </div> <div class="filter-group">
+                    <label>Compare with year</label>
+                    <select class="form-control" style="width:100px;height:40px">
+                        <option>2019</option>
+                        <option>2020</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="w-100">
+            <div style="padding-top:20px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div>
+                            <header>
+                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Central</label></div>
+                            </header>
+                        </div>
+                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-9"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-8"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-7"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-6"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top:20px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div>
+                            <header>
+                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-10"><label class="form-check-label" for="formCheck-1">Central</label></div>
+                            </header>
+                        </div>
+                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-9"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-11"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-12"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-8"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-7"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-6"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-13"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top:20px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div>
+                            <header>
+                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-10"><label class="form-check-label" for="formCheck-1">Central</label></div>
+                            </header>
+                        </div>
+                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-14"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-15"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-16"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-17"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-11"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-12"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-18"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-19"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-20"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-13"><label class="form-check-label" for="formCheck-1">Label</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-filter" style="width: 100%; font-size: 13px;">
+
+
+            <div class="row row-filter" style=" justify-content: center;">
+
+               
+                <div class="filter-group">
+                    <div class="custom-file-upload">
+
+                        <label for="file-upload" class="custom-file-upload1">
+                            <i class="ion-android-document"></i> Export to Excel
+                        </label>
+                        <input id="file-upload" type="file" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="container-xl">
+        <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
+    </div>
