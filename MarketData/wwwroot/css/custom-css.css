@@ -25,12 +25,12 @@
         margin-left: 10px;
     }
 
-    .table-filter select, .table-filter input {
+    .table-filter select, .table-filter input[type="text"] {
         display: inline-block;
         margin-left: 5px;
     }
 
-    .table-filter input {
+    .table-filter input[type="text"] {
         width: 200px;
         display: inline-block;
     }
