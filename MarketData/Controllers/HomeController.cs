@@ -35,6 +35,10 @@ namespace MarketData.Controllers
         {
             return View();
         }
+        public IActionResult Reports()
+        {
+            return View();
+        }
         public IActionResult Login()
         {
             return View();

@@ -55,7 +55,9 @@
     width:100%;
     height:35px;
 }
-
+#profile .nav {
+    justify-content: center;
+}
 
 #profile .nav ul {
     padding: 0;
@@ -126,3 +128,63 @@
     background-color: #28a745;
     border-color: #28a745;
 }
+
+#reports .nav {
+    justify-content: center;
+}
+#reports .nav ul {
+    padding: 0;
+    list-style-type: none;
+    
+}
+
+#reports .nav .li {
+    width: 22rem;
+    height: 4rem;
+    font-size: 15px;
+    text-align: center;
+    line-height: 4rem;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    transition: 0.3s;
+    margin: 2.5rem;
+}
+
+    #reports .nav .li::before,
+    #reports .nav .li::after {
+        content: '';
+        position: absolute;
+        width: inherit;
+        height: inherit;
+        top: 0;
+        left: 0;
+        transition: 0.3s;
+    }
+
+    #reports .nav .li::before {
+        background-color: white;
+        z-index: -1;
+        box-shadow: 0.2rem 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+    }
+
+    #reports .nav .li::after {
+        background-color: goldenrod;
+        transform: translate(1.5rem, 1.5rem);
+        z-index: -2;
+    }
+
+    #reports .nav .li:hover {
+        transform: translate(1.5rem, 1.5rem);
+        color: white;
+    }
+
+        #reports .nav .li:hover::before {
+            background-color: goldenrod;
+        }
+
+        #reports .nav .li:hover::after {
+            background-color: white;
+            transform: translate(-1.5rem, -1.5rem);
+        }
