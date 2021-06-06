@@ -4,7 +4,7 @@
 }
 
 .table-filter input, .table-filter select {
-    height: 34px;
+    /*height: 34px;*/
     border-radius: 3px;
     border-color: #ddd;
     box-shadow: none;
@@ -16,10 +16,10 @@
     margin-bottom: 5px;
 }
 
-    .table-filter .btn {
+ /*   .table-filter .btn {
         height: 34px;
     }
-
+*/
     .table-filter label {
         font-weight: normal;
         margin-left: 10px;

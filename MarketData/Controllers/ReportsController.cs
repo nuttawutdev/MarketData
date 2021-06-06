@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MarketData.Controllers
 {
-    public class ReportsController1 : Controller
+    public class ReportsController : Controller
     {
         public IActionResult Index()
         {
