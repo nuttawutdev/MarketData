@@ -8,7 +8,11 @@ namespace MarketData.Controllers
 {
     public class ApproveController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Approve()
+        {
+            return View();
+        }
+        public IActionResult Approve_Edit()
         {
             return View();
         }
