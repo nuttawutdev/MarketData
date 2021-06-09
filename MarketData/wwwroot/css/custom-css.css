@@ -1,5 +1,5 @@
-﻿select {
-    font-size: 13px!important;
+﻿select, input {
+    font-size: 13px !important;
 }
 
 .table-filter .filter-group {
