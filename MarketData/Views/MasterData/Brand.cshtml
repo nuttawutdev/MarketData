@@ -2,6 +2,11 @@
     ViewData["Title"] = "Brand";
 }
 
+<style>
+   .font-band {
+       font-size:12px
+   }
+</style>
 
 <h2>
     @ViewData["Title"]
@@ -17,31 +22,31 @@
 
             <div class="col-sm-12">
 
-                <div class="filter-group">
+                <div class="filter-group ">
                     <label>Keyword(s) : </label>
                     <input type="text" class="form-control">
                 </div>
-                <div class="filter-group">
+                <div class="filter-group ">
                     <label>By : </label>
-                    <select class="form-control" style="width:160px">
+                    <select class="form-control font-band" style="width:160px">
                         <option>Name</option>
                         <option>Brand Group</option>
                         <option>Brand Segment</option>
                         <option>Brand Type</option>
                     </select>
                 </div>
-                <div class="filter-group">
+                <div class="filter-group ">
                     <label>Sort : </label>
-                    <select class="form-control" style="width:160px">
+                    <select class="form-control font-band" style="width:160px">
                         <option>Name</option>
                         <option>Brand Group</option>
                         <option>Brand Segment</option>
                         <option>Brand Type</option>
                     </select>
                 </div>
-                <div class="filter-group">
+                <div class="filter-group ">
                     <label>Active</label>
-                    <select class="form-control">
+                    <select class="form-control font-band">
                         <option>All</option>
                         <option>Y</option>
                         <option>N</option>
@@ -62,35 +67,33 @@
                 <thead class="table-secondary">
                     <tr class="row m-0">
 
-                        <th class="col-3 text-center">Name</th>
-                        <th class="col-4 text-center">Detail</th>
-                        <th class="col-1 text-center">Loreal brand rank</th>
-                        <th class="col-1 text-center">Color</th>
-                        <th class="col-1 text-center">Active</th>
-                        <th class="col-2 text-center">Action</th>
+                        @*<th class="col-3 text-center">Name</th>
+                            <th class="col-4 text-center">Detail</th>
+                            <th class="col-1 text-center">Loreal brand rank</th>
+                            <th class="col-1 text-center">Color</th>
+                            <th class="col-1 text-center">Active</th>
+                            <th class="col-2 text-center">Action</th>*@
+
+
+                        <th class="col-2 ">Brand Name</th>
+                        <th class="col-2 ">Brand Group</th>
+                        <th class="col-2 ">Type Group</th>
+                        <th class="col-1 text-center ">Universe</th>
+                        <th class="col-1 text-center ">Brand Birth</th>
+                        <th class="col-1 text-center ">Color</th>
+                        <th class="col-1 text-center ">Active</th>
+                        <th class="col-2 text-center ">Action</th>
                     </tr>
                 </thead>
                 <tbody>
 
                     <tr class="row m-0">
-                        <td class="col-3">LOREAL<br /><small>LO</small></td>
-                        <td class="col-4" style="font-size:small">
-
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Group : </b></div>
-                                <div class="col-7">Loreal</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                                <div class="col-7">Mainstream</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Type : </b></div>
-                                <div class="col-7">ASIA</div>
-                            </div>
-                        </td>
-                        <td class="col-1 text-center">1</td>
-                        <td class="col-1"><input type="color" value="#f8aaaa" class="textbox-color" disabled /></td>
+                        <td class="col-2 ">Lancome</td>
+                        <td class="col-2 ">LOREAL</td>
+                        <td class="col-2 ">International</td>
+                        <td class="col-1 text-center ">LPD</td>
+                        <td class="col-1 text-center ">09/06/2021</td>
+                        <td class="col-1 text-center"><input type="color" value="#f8aaaa" class="textbox-color text-center" disabled /></td>
                         <td class="col-1 text-center">
                             <span class="custom-checkbox">
                                 <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
@@ -111,26 +114,12 @@
                         </td>
                     </tr>
                     <tr class="row m-0">
-                        <td class="col-3">Lux Asia<br /><small>Lu</small></td>
-                        <td class="col-4" style="font-size:small">
-
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Group : </b></div>
-                                <div class="col-7">ELCA</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                                <div class="col-7">Couture</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Type : </b></div>
-                                <div class="col-7">ASIA</div>
-                            </div>
-                        </td>
-                        <td class="col-1 text-center"></td>
-                        <td class="col-1">
-                            @*<input type="color" value="#b0cbd0" class="textbox-color" disabled/>*@
-                        </td>
+                        <td class="col-2 ">Biotherm</td>
+                        <td class="col-2 ">LOREAL</td>
+                        <td class="col-2 ">International</td>
+                        <td class="col-1 text-center ">LPD</td>
+                        <td class="col-1 text-center ">09/06/2021</td>
+                        <td class="col-1 text-center"><input type="color" value="#b0cbd0" class="textbox-color text-center" disabled /></td>
                         <td class="col-1 text-center">
                             <span class="custom-checkbox">
                                 <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
@@ -151,26 +140,12 @@
                         </td>
                     </tr>
                     <tr class="row m-0">
-                        <td class="col-3">SHISEDO<br /><small>LO</small></td>
-                        <td class="col-4" style="font-size:small">
-
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Group : </b></div>
-                                <div class="col-7">ELCA</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                                <div class="col-7">Make-up Artist</div>
-                            </div>
-                            <div class="row">
-                                <div class="text-right col-5"><b>Brand Type : </b></div>
-                                <div class="col-7">Make up</div>
-                            </div>
-                        </td>
+                        <td class="col-2 ">Shiseido</td>
+                        <td class="col-2 ">SHISEIDO</td>
+                        <td class="col-2 ">ASIA</td>
+                        <td class="col-1 text-center ">LPD</td>
+                        <td class="col-1 text-center ">09/06/2021</td>
                         <td class="col-1 text-center"></td>
-                        <td class="col-1">
-                            @*<input type="color" value="#dc3545" class="textbox-color" disabled/>*@
-                        </td>
                         <td class="col-1 text-center">
                             <span class="custom-checkbox">
                                 <input disabled type="checkbox" id="checkbox1" name="options[]" value="1">
@@ -190,6 +165,124 @@
 
                         </td>
                     </tr>
+                    <!--<tr class="row m-0">
+        <td class="col-3">LOREAL<br /><small>LO</small></td>
+        <td class="col-4" style="font-size:small">
+
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Group : </b></div>
+                <div class="col-7">Loreal</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                <div class="col-7">Mainstream</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Type : </b></div>
+                <div class="col-7">ASIA</div>
+            </div>
+        </td>
+        <td class="col-1 text-center">1</td>
+        <td class="col-1"><input type="color" value="#f8aaaa" class="textbox-color" disabled /></td>
+        <td class="col-1 text-center">
+            <span class="custom-checkbox">
+                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
+                <label for="checkbox1"></label>
+            </span>
+        </td>
+        <td class="col-2 text-center">
+            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                <i class="ion-eye text-white"></i>
+            </a>
+            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                <i class="ion-edit text-white"></i>
+            </a>
+            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                <i class="ion-android-delete text-white"></i>
+            </a>
+
+        </td>
+    </tr>
+    <tr class="row m-0">
+        <td class="col-3">Lux Asia<br /><small>Lu</small></td>
+        <td class="col-4" style="font-size:small">
+
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Group : </b></div>
+                <div class="col-7">ELCA</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                <div class="col-7">Couture</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Type : </b></div>
+                <div class="col-7">ASIA</div>
+            </div>
+        </td>
+        <td class="col-1 text-center"></td>
+        <td class="col-1">-->
+                    @*<input type="color" value="#b0cbd0" class="textbox-color" disabled/>*@
+                    <!--</td>
+        <td class="col-1 text-center">
+            <span class="custom-checkbox">
+                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
+                <label for="checkbox1"></label>
+            </span>
+        </td>
+        <td class="col-2 text-center">
+            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                <i class="ion-eye text-white"></i>
+            </a>
+            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                <i class="ion-edit text-white"></i>
+            </a>
+            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                <i class="ion-android-delete text-white"></i>
+            </a>
+
+        </td>
+    </tr>
+    <tr class="row m-0">
+        <td class="col-3">SHISEDO<br /><small>LO</small></td>
+        <td class="col-4" style="font-size:small">
+
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Group : </b></div>
+                <div class="col-7">ELCA</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                <div class="col-7">Make-up Artist</div>
+            </div>
+            <div class="row">
+                <div class="text-right col-5"><b>Brand Type : </b></div>
+                <div class="col-7">Make up</div>
+            </div>
+        </td>
+        <td class="col-1 text-center"></td>
+        <td class="col-1">-->
+                    @*<input type="color" value="#dc3545" class="textbox-color" disabled/>*@
+                    <!--</td>
+        <td class="col-1 text-center">
+            <span class="custom-checkbox">
+                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1">
+                <label for="checkbox1"></label>
+            </span>
+        </td>
+        <td class="col-2 text-center">
+            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                <i class="ion-eye text-white"></i>
+            </a>
+            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                <i class="ion-edit text-white"></i>
+            </a>
+            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                <i class="ion-android-delete text-white"></i>
+            </a>
+
+        </td>
+    </tr>-->
                 </tbody>
             </table>
 

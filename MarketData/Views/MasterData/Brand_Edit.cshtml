@@ -2,6 +2,11 @@
     ViewData["Title"] = "Add Brand";
 }
 
+<style>
+    .font-band {
+        font-size: 12px
+    }
+</style>
 
 <h2>@ViewData["Title"]</h2>
 <hr />
@@ -11,7 +16,7 @@
 <form>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Name	</label>
+            <label for="name">Brand Name	</label>
             <input type="text" class="form-control input-sm" id="name" placeholder="">
         </div>
         <div class="form-group col-md-6 col-sm-6">
@@ -22,16 +27,16 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Group</label>
-            <select class="form-control">
+            <select class="form-control font-band">
                 <option>Please select</option>
-                <option>Loreal</option>
+                <option>LOREAL</option>
                 <option>ELCA</option>
             </select>
         </div>
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Segment</label>
-            <select class="form-control">
+            <select class="form-control font-band">
                 <option>Please select</option>
                 <option>Mainstream</option>
                 <option>Couture</option>
@@ -42,7 +47,7 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Type</label>
-            <select class="form-control">
+            <select class="form-control font-band">
                 <option>Please select</option>
                 <option>ASIA</option>
                 <option>Make up</option>
@@ -52,7 +57,7 @@
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Color</label>
-            <input type="color"  class="textbox-color" />
+            <input type="color" class="textbox-color" />
         </div>
     </div>
 
@@ -63,11 +68,25 @@
         </div>
 
         <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="name">Universe</label>
+            <select class="form-control font-band">
+                <option>Please select</option>
+                <option>LPD</option>>
+            </select>
+            @*<label for="pincode">
+                    <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+                    Active
+                </label>*@
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
             <label for="pincode">
                 <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
                 Active
             </label>
         </div>
+
     </div>
     <div class="modal-footer">
         <a href="Brand" class="btn btn-danger">Save</a>
