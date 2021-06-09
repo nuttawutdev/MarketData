@@ -1,4 +1,8 @@
-﻿.table-filter .filter-group {
+﻿select {
+    font-size: 13px!important;
+}
+
+.table-filter .filter-group {
     float: left;
     margin-left: 15px;
 }
