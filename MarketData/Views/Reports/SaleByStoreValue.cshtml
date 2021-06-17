@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Details sales by brand";
+    ViewData["Title"] = "Sale by Store (Value)";
 }
 
 <style>
@@ -16,7 +16,6 @@
 <br />
 <div class="row">
     <div class="table-filter" style="width: 100%; font-size: 13px;">
-
         <div class="row">
             <div class="col-sm-2 d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-group mb-3">
@@ -112,14 +111,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3 d-flex align-items-md-start" style="padding:0px;">
-                <label class="form-label d-md-flex align-items-md-start">Brand</label>
+
+            <div class="col-sm-3 d-flex flex-wrap align-items-md-start" style="padding:0px;">
+                <label class="form-label d-md-flex align-items-md-start">Compare with year</label>
                 <div class="form-group mb-3">
                     <select class="form-control" style="width:100px;">
-                        <option>All</option>
-                        <option>LOREAL</option>
-                        <option>Lux Asia</option>
-                        <option>SHISEDO</option>
+                        <option>2019</option>
+                        <option>2020</option>
                     </select>
                 </div>
             </div>
@@ -199,6 +197,31 @@
             </div>
         </div>
 
+        <div class="row row-filter" style="justify-content:center">
+            <div class="filter-group">
+                <label>Brand Rank : </label>
+                <input type="text" class="form-control" style="width:100px;">
+            </div>
+            <div class="filter-group">
+                <input type="text" class="form-control" style="width:100px;">
+               
+            </div>
+            <div class="filter-group">
+                <label>Universe : </label>
+                <select class="form-control" style="width:100px;">
+                    <option>LPD</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Sales : </label>
+                <select class="form-control" style="width:120px;">
+                    <option>Amount</option>
+                    <option>Whole</option>
+                    <option>Net</option>
+                </select>
+            </div>
+        </div>
+
         <div class="table-filter" style="width: 100%; font-size: 13px;">
 
 
@@ -221,6 +244,6 @@
         </div>
     </div>
 </div>
-    <div class="container-xl">
-        <img src="~/img/DetailsSales.PNG"  style="width:100%"/>
-    </div>
+<div class="container-xl">
+    <img src="~/img/SaleByStoreValue.JPG" style="width:100%" />
+</div>

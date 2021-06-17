@@ -32,5 +32,15 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
+        public IActionResult SaleByStoreZone()
+        {
+            return View();
+        }
+
+        public IActionResult SaleByStoreValue()
+        {
+            return View();
+        }
     }
 }
