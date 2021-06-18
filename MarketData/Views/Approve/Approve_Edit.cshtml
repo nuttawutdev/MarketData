@@ -7,6 +7,7 @@
         display: inline-flex !important;
         width: 70px;
     }
+
     table {
         border-collapse: collapse;
         border-spacing: 0;
@@ -17,7 +18,6 @@
     th, td {
         text-align: left;
         padding: 8px;
-
     }
 
     .tdFlex {
@@ -27,11 +27,11 @@
     }
 
 
-  /*  tr:nth-child(even) {
+    /*  tr:nth-child(even) {
         background-color: #f2f2f2
     }*/
 </style>
-<div style="padding:20px">
+<div class="container" style="padding:20px">
     <h3>
         @ViewData["Title"]
 
@@ -87,77 +87,97 @@
 
     </div>
 
-    <div style="overflow-x:auto; padding-top:30px">
-        <table class="table table-striped table-hover">
-            <tr>
+</div>
 
-                <th class="">Brand</th>
-                <th class="">Amt. 2019</th>
-                <th class="text-center">LC-<br />Amt.Sales</th>
-                <th class="text-center">LC-<br />Rank</th>
-                <th class="text-center">BIO-<br />Amt.Sales</th>
-                <th class="text-center">BIO-<br />Rank</th>
-                <th class="text-center">SHU-<br />Amt.Sales</th>
-                <th class="text-center">SHU-<br />Rank</th>
-                <th class="text-center">Adj.<br />Amt.Sales</th>
-                <th class="text-center">Adj.<br />Whole Sales</th>
-                <th class="text-center">Rank</th>
-                <th class="">SK</th>
-                <th class="">MU</th>
-                <th class="">FG</th>
-                <th class="">OT</th>
-                <th class="">%Growth</th>
 
-            </tr>
+<div style="overflow-x:auto; padding-top:30px;padding-left:20px;padding-right:20px">
+    <table class="table table-striped table-hover">
+        <tr>
+            <th class="">Brand</th>
+            <th class="">Amt. 2019</th>
+            <th class="text-center">LC-<br />Amt.Sales</th>
+            <th class="text-center">LC-<br />Rank</th>
+            <th class="text-center">BIO-<br />Amt.Sales</th>
+            <th class="text-center">BIO-<br />Rank</th>
+            <th class="text-center">SHU-<br />Amt.Sales</th>
+            <th class="text-center">SHU-<br />Rank</th>
+            <th class="text-center">Adj.<br />Amt.Sales</th>
+            <th class="text-center">Adj.<br />Whole Sales</th>
+            <th class="text-center">Rank</th>
+            <th class="text-center">SK</th>
+            <th class="text-center">MU</th>
+            <th class="text-center">FG</th>
+            <th class="text-center">OT</th>
+            <th class="text-center">%Growth</th>
 
-            <tr>
-                <td class="">Aesop</td>
-                <td class="">1,200,000</td>
-                <td class="">1,200,000</td>
-                <td class="">1</td>
-                <td class="">900,000</td>
-                <td class="">1</td>
-                <td class="">900,000</td>
-                <td class="">1</td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td>-50%</td>
+        </tr>
 
-            </tr>
-            <tr >
-                <td class="">AIGNER</td>
-                <td class="">500,000</td>
-                <td class="">500,000</td>
-                <td class="">2</td>
-                <td class="">200,000</td>
-                <td class="">4</td>
-                <td class="">200,000</td>
-                <td class="">4</td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class=""><input type="text" class="buttonInline"></td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
-                <td>-50%</td>
+        <tr>
+            <td class="">Aesop</td>
+            <td class="">1,200,000</td>
+            <td class="text-center">1,200,000</td>
+            <td class="text-center">1</td>
+            <td class="text-center">900,000</td>
+            <td class="text-center">1</td>
+            <td class="text-center">900,000</td>
+            <td class="text-center">1</td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center">-50%</td>
 
-            </tr>
-        </table>
-    </div>
+        </tr>
+        <tr>
+            <td class="">AIGNER</td>
+            <td class="">500,000</td>
+            <td class="text-center">500,000</td>
+            <td class="text-center">2</td>
+            <td class="text-center">200,000</td>
+            <td class="text-center">4</td>
+            <td class="text-center">200,000</td>
+            <td class="text-center">4</td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"></td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center"><input type="text" class="buttonInline"> %</td>
+            <td class="text-center">-50%</td>
 
-    <div class="container-xl" style="padding-top:20px">
-        <div class="modal-footer">
+        </tr>
+        <tr>
+            <td style="font-weight:bold" class="">Total</td>
+            <td style="font-weight:bold" class="">1,700,000</td>
+            <td style="font-weight:bold" class="text-center">1,700,000</td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center">1,100,000</td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center">1,100,000</td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center"></td>
+            <td style="font-weight:bold" class="text-center">-100%</td>
 
-            <a href="#approveModal" data-toggle="modal" class="btn btn-danger">Approve</a>
-            <a href="#rejectModal" data-toggle="modal" class="btn btn-outline-danger">Reject</a>
-            <a href="" #adjustModal" data-toggle="modal" class="btn btn-outline-primary">Adjust</a>
-        </div>
+        </tr>
+    </table>
+</div>
+
+<div class="container-xl" style="padding-top:20px">
+    <div class="modal-footer">
+
+        <a href="#approveModal" data-toggle="modal" class="btn btn-danger">Approve</a>
+        <a href="#rejectModal" data-toggle="modal" class="btn btn-outline-danger">Reject</a>
+        <a href="" #adjustModal" data-toggle="modal" class="btn btn-outline-primary">Adjust</a>
     </div>
 </div>
 <!-- approveModal Modal HTML -->
@@ -259,7 +279,7 @@
                     </div>
                     <div class="row col-sm-12" style="padding-top:20px">
                         <div class="col-sm-12">
-                           เหตุผล
+                            เหตุผล
                         </div>
                     </div>
                     <div class="row col-sm-12">
@@ -279,6 +299,6 @@
 
 <script>
     $(document).ready(function () {
-        $("div").removeClass("container");
+        $("#container").removeClass("container");
     });
 </script>
