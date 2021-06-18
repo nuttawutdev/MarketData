@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/fonts/ionicons.min.css">
     <link rel="stylesheet" href="~/css/custom-css.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"/>
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 
 <body>
@@ -52,17 +54,14 @@
             </div>
         </nav>
     </header>
-    <div class="container" style="font-size:12px">
+    <div class="container" style="font-size:12px" id="divMain">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
    
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+   
     @RenderSection("Scripts", required: false)
 </body>
 </html>

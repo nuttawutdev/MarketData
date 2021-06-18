@@ -2,132 +2,164 @@
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
 }
 
+<style>
+    .buttonInline {
+        display: inline-flex !important;
+        width: 70px;
+    }
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
 
-<h3>
-    @ViewData["Title"]
+    th, td {
+        text-align: left;
+        padding: 8px;
 
-</h3>
+    }
 
-
-<hr />
-<br />
-<br />
-
-<div class="row">
-    <div style="width: 100%; font-size: 13px;">
-        <div class="row col-sm-12">
-
-            <div class="col-sm-2">
-                <label><b>Department Store</b></label><br />
-                <label>
-                    Siam Paragon
-                </label>
-
-
-            </div>
-            <div class="col-sm-2">
-                <label><b>Distribution Channel</b></label><br />
-                <label>
-                    Couter
-                </label>
+    .tdFlex {
+        /*display: inline-flex !important;*/
+        width: 250px;
+        align-items: center;
+    }
 
 
-            </div>
-            <div class="col-sm-1">
-                <label><b>Year</b></label><br />
-                <label>
-                    2020
-                </label>
-            </div>
-            <div class="col-sm-1">
-                <label><b>Month</b></label><br />
-                <label>
-                    September
-                </label>
-            </div>
-            <div class="col-sm-1">
-                <label><b>Week</b></label><br />
-                <label>
-                    3
-                </label>
-            </div>
-            <div class="col-sm-2">
-                <label><b>Status</b></label><br />
-                <label>
-                    Save
-                </label>
-            </div>
-        </div>
-    </div>
+  /*  tr:nth-child(even) {
+        background-color: #f2f2f2
+    }*/
+</style>
+<div style="padding:20px">
+    <h3>
+        @ViewData["Title"]
 
-</div>
-<div class="container-xl" style="padding-top:20px">
-    <div class="table-responsive table-sm">
-        <div class="table-wrapper">
-            <div style=" overflow-x: auto;">
-                <table class="table table-striped table-hover ">
-                    <thead class="table-secondary">
-                        <tr class="row m-0">
+    </h3>
+    <hr />
+    <br />
+    <br />
 
-                            <th class="col-1">Brand</th>
-                            <th class="col-1">LC-amt. sales</th>
-                            <th class="col-1">LC rank</th>
-                            <th class="col-1">BIO-amt. sales</th>
-                            <th class="col-1">BIO-rank</th>
-                            <th class="col-1">Adj. amt. sales</th>
-                            <th class="col-1">Adj. Whole sales</th>
-                            <th class="col-1">Rank</th>
-                            <th class="col-1">SK</th>
-                            <th class="col-1">MU</th>
-                            <th class="col-1">FG</th>
-                            <th class="col-1">OT</th>
+    <div class="row">
+        <div style="width: 100%; font-size: 13px;">
+            <div class="row col-sm-12">
+                <div class="col-sm-2">
+                    <label><b>Department Store</b></label><br />
+                    <label>
+                        Siam Paragon
+                    </label>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="row m-0">
-                            <td class="col-1">Aesop</td>
-                            <td class="col-1">1,200,000</td>
-                            <td class="col-1">1</td>
-                            <td class="col-1">900,000</td>
-                            <td class="col-1">1</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
+                </div>
+                <div class="col-sm-2">
+                    <label><b>Distribution Channel</b></label><br />
+                    <label>
+                        Couter
+                    </label>
 
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="col-1">AIGNER</td>
-                            <td class="col-1">500,000</td>
-                            <td class="col-1">2</td>
-                            <td class="col-1">200,000</td>
-                            <td class="col-1">4</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
 
-                        </tr>
-                    </tbody>
-                </table>
+                </div>
+                <div class="col-sm-1">
+                    <label><b>Year</b></label><br />
+                    <label>
+                        2020
+                    </label>
+                </div>
+                <div class="col-sm-1">
+                    <label><b>Month</b></label><br />
+                    <label>
+                        September
+                    </label>
+                </div>
+                <div class="col-sm-1">
+                    <label><b>Week</b></label><br />
+                    <label>
+                        3
+                    </label>
+                </div>
+                <div class="col-sm-2">
+                    <label><b>Status</b></label><br />
+                    <label>
+                        Save
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="modal-footer">
 
-        <a href="#approveModal" data-toggle="modal" class="btn btn-danger">Approve</a>
-        <a href="#rejectModal" data-toggle="modal" class="btn btn-outline-danger">Reject</a>
-        <a href=""#adjustModal" data-toggle="modal" class="btn btn-outline-primary">Adjust</a>
+    </div>
+
+    <div style="overflow-x:auto; padding-top:30px">
+        <table class="table table-striped table-hover">
+            <tr>
+
+                <th class="">Brand</th>
+                <th class="">Amt. 2019</th>
+                <th class="text-center">LC-<br />Amt.Sales</th>
+                <th class="text-center">LC-<br />Rank</th>
+                <th class="text-center">BIO-<br />Amt.Sales</th>
+                <th class="text-center">BIO-<br />Rank</th>
+                <th class="text-center">SHU-<br />Amt.Sales</th>
+                <th class="text-center">SHU-<br />Rank</th>
+                <th class="text-center">Adj.<br />Amt.Sales</th>
+                <th class="text-center">Adj.<br />Whole Sales</th>
+                <th class="text-center">Rank</th>
+                <th class="">SK</th>
+                <th class="">MU</th>
+                <th class="">FG</th>
+                <th class="">OT</th>
+                <th class="">%Growth</th>
+
+            </tr>
+
+            <tr>
+                <td class="">Aesop</td>
+                <td class="">1,200,000</td>
+                <td class="">1,200,000</td>
+                <td class="">1</td>
+                <td class="">900,000</td>
+                <td class="">1</td>
+                <td class="">900,000</td>
+                <td class="">1</td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td>-50%</td>
+
+            </tr>
+            <tr >
+                <td class="">AIGNER</td>
+                <td class="">500,000</td>
+                <td class="">500,000</td>
+                <td class="">2</td>
+                <td class="">200,000</td>
+                <td class="">4</td>
+                <td class="">200,000</td>
+                <td class="">4</td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class=""><input type="text" class="buttonInline"></td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td class="tdFlex"><input type="text" class="buttonInline"> %</td>
+                <td>-50%</td>
+
+            </tr>
+        </table>
+    </div>
+
+    <div class="container-xl" style="padding-top:20px">
+        <div class="modal-footer">
+
+            <a href="#approveModal" data-toggle="modal" class="btn btn-danger">Approve</a>
+            <a href="#rejectModal" data-toggle="modal" class="btn btn-outline-danger">Reject</a>
+            <a href="" #adjustModal" data-toggle="modal" class="btn btn-outline-primary">Adjust</a>
+        </div>
     </div>
 </div>
-
 <!-- approveModal Modal HTML -->
 <div id="approveModal" class="modal fade">
     <div class="modal-dialog">
@@ -244,3 +276,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("div").removeClass("container");
+    });
+</script>
