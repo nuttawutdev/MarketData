@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarketData.Helper\MarketData.Helper.csproj" />
+    <ProjectReference Include="..\MarketData.Model\MarketData.Model.csproj" />
+    <ProjectReference Include="..\MarketData.Repositories\MarketData.Repositories.csproj" />
+  </ItemGroup>
+
+</Project>

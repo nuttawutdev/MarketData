@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MarketData.Processes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,14 @@ namespace MarketData.Controllers
 {
     public class MasterDataController : Controller
     {
+        private readonly Process process;
+
+        public MasterDataController(Process process)
+        {
+            this.process = process;
+        }
+
+
         // GET: MasterDataController
         public ActionResult Index()
         {
