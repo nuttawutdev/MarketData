@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMBrand
     {
+        [Key]
         public Guid Brand_ID { get; set; }
         public string Brand_Name { get; set; }
         public string Brand_Short_Name { get; set; }

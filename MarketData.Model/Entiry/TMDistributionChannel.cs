@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMDistributionChannel
     {
+        [Key]
         public Guid Distribution_Channel_ID { get; set; }
         public string Distribution_Channel_Name { get; set; }
         public bool Active_Flag { get; set; }

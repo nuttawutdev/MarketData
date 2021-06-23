@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMDepartmentStore
     {
+        [Key]
         public Guid Department_Store_ID { get; set; }
         public string Department_Store_Name { get; set; }
         public Guid Retailer_Group_ID { get; set; }

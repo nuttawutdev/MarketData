@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMCounter
     {
+        [Key]
         public Guid Counter_ID { get; set; }
         public Guid Department_Store_ID { get; set; }
         public Guid Brand_ID { get; set; }

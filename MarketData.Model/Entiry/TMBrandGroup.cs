@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMBrandGroup
     {
+        [Key]
         public Guid Brand_Group_ID { get; set; }
         public string Brand_Group_Name { get; set; }
         public bool Is_Loreal_Brand { get; set; }

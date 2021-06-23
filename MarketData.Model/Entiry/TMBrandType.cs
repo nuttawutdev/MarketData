@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Entiry
 {
     public class TMBrandType
     {
+        [Key]
         public Guid Brand_Type_ID { get; set; }
         public string Brand_Type_Name { get; set; }
         public bool Active_Flag { get; set; }
