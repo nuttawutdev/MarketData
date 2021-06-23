@@ -1,9 +1,11 @@
-﻿using MarketData.Model.Entiry;
+﻿using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Request;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -54,6 +56,62 @@ namespace MarketData.Repositories.Repo
                   .Take(request.pageSize).ToList();
 
                 return (searchDataList, searchData.Count());
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool SaveBrandType(SaveBrandTypeRequest request)
+        {
+            try
+            {
+                if (request.brandTypeID == null)
+                {
+                    TMBrandType insertBrandType = new TMBrandType
+                    {
+                        Brand_Type_ID = Guid.NewGuid(),
+                        Brand_Type_Name = request.brandTypeName,
+                        Active_Flag = request.active,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMBrandType.Add(insertBrandType);
+                }
+                else
+                {
+                    var brandTypeUpdate = _dbContext.TMBrandType.Find(request.brandTypeID);
+
+                    if (brandTypeUpdate != null)
+                    {
+                        brandTypeUpdate.Brand_Type_Name = request.brandTypeName;
+                        brandTypeUpdate.Active_Flag = request.active;
+                        brandTypeUpdate.Updated_By = request.userID;
+                        brandTypeUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMBrandType.Update(brandTypeUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return  _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMBrandType FindBrandTypeBy(Expression<Func<TMBrandType, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMBrandType.Where(expression).FirstOrDefault();     
             }
             catch (Exception ex)
             {

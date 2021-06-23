@@ -29,9 +29,9 @@ namespace MarketData
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddScoped<Process>();
             services.AddScoped<Repository>();
-            services.AddDbContext<MarketDataDBContext>((option) =>
+            services.AddDbContext<MarketDataDBContext>(options =>
             {
-                option.UseSqlServer(Configuration["ConnectionStrings:MARKETDATADB"]);
+                options.UseSqlServer(Configuration["ConnectionStrings:MARKETDATADB"]);
             });
         }
 

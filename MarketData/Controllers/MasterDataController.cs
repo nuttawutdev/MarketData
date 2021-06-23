@@ -44,14 +44,6 @@ namespace MarketData.Controllers
         }
         public ActionResult BrandType()
         {
-            GetBrandTypeListRequest request = new GetBrandTypeListRequest
-            {
-                pageNo = 1,
-                pageSize = 10,
-                active = "All"
-            };
-
-            var brandType = process.masterData.GetBrandTypeList(request);
             return View();
         }
         public ActionResult BrandType_Edit()

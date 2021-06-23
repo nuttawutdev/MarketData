@@ -4,10 +4,8 @@ using System.Text;
 
 namespace MarketData.Model.Response
 {
-    public class BaseGetDataListResponse
+    public class BaseResponse
     {
-        public int totalRecord { get; set; }
-        public int totalPage { get; set; }
         public string responseError { get; set; }
     }
 }
