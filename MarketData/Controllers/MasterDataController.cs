@@ -1,4 +1,7 @@
 ﻿using MarketData.Model.Request;
+using MarketData.Model.Request.MasterData;
+using MarketData.Model.Response;
+using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +45,7 @@ namespace MarketData.Controllers
         {
             return View();
         }
-        public ActionResult BrandType()
+        public IActionResult BrandType()
         {
             return View();
         }
@@ -91,73 +94,95 @@ namespace MarketData.Controllers
             return View();
         }
 
-        // GET: MasterDataController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: MasterDataController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: MasterDataController/Create
+        #region BrandType Function
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult GetBrandTypeList([FromBody] GetBrandTypeListRequest request)
         {
-            try
+            BrandTypeListViewModel brandTypeListView = new BrandTypeListViewModel();
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                var response = process.masterData.GetBrandTypeList(request);
+
+                if (response.data.Any())
+                {
+                    brandTypeListView.brandTypeList = response.data.Select(c => new BrandTypeViewModel
+                    {
+                        brandTypeID = c.brandTypeID,
+                        brandTypeName = c.brandTypeName,
+                        active = c.active,
+                        createdDate = c.createdDate
+                    }).ToList();
+                }
+                else
+                {
+                    brandTypeListView.brandTypeList = new List<BrandTypeViewModel>();
+                }
+
+                return Json(brandTypeListView);
             }
-            catch
+            else
             {
-                return View();
+                return Json(brandTypeListView);
             }
         }
 
-        // GET: MasterDataController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult GetBrandTypeDetail(Guid brandTypeID)
         {
-            return View();
+            var response = process.masterData.GetBrandTypeDetail(brandTypeID);
+            BrandTypeViewModel brandTypeData = new BrandTypeViewModel();
+
+            if (response != null)
+            {
+                brandTypeData.brandTypeID = response.brandTypeID;
+                brandTypeData.brandTypeName = response.brandTypeName;
+                brandTypeData.active = response.active;
+                brandTypeData.createdDate = response.createdDate;             
+            }
+
+            return Json(brandTypeData);
         }
 
-        // POST: MasterDataController/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult SaveBrandType([FromBody] SaveBrandTypeRequest request)
         {
-            try
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                response = process.masterData.SaveBrandType(request);
+                return Json(response);
             }
-            catch
+            else
             {
-                return View();
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
             }
         }
 
-        // GET: MasterDataController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: MasterDataController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteBrandType([FromBody] DeleteBrandTypeRequest request)
         {
-            try
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                response = process.masterData.DeleteBrandType(request);
+                return Json(response);
             }
-            catch
+            else
             {
-                return View();
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
             }
         }
+        #endregion
     }
 }

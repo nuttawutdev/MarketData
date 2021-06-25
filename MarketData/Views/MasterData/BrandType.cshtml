@@ -23,7 +23,7 @@
                     <label>Keyword(s) : </label>
                     <input type="text" class="form-control">
                 </div>
-     
+
                 <div class="filter-group">
                     <label>Active</label>
                     <select class="form-control">
@@ -53,11 +53,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                
+
                     <tr class="row m-0">
                         <td class="col-8 ">ASIA</td>
 
-                     
+
                         <td class="col-2 text-center">
                             <span class="custom-checkbox">
                                 <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled>
@@ -148,3 +148,27 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+               var getBrandType = {
+                     pageNo:1,
+                     pageSize:  10,
+                     active:  'All'
+                    };
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("GetBrandTypeList", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(getBrandType),
+                datatype: "json",
+                success: function (data) {
+                    console.log(data,'data')
+                },
+                error: function () {
+                }
+            });
+    });
+</script>

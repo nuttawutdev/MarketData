@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MarketData.Model.Response
+namespace MarketData.Model.Response.MasterData
 {
     public class GetBrandTypeListResponse : BaseGetDataListResponse
     {

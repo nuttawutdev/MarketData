@@ -1,7 +1,9 @@
 ﻿using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request;
+using MarketData.Model.Request.MasterData;
 using MarketData.Model.Response;
+using MarketData.Model.Response.MasterData;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace MarketData.Processes.Processes
         }
 
         #region Brand Type
-       
+
         public GetBrandTypeListResponse GetBrandTypeList(GetBrandTypeListRequest request)
         {
             GetBrandTypeListResponse response = new GetBrandTypeListResponse();
@@ -55,6 +57,30 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public BrandTypeData GetBrandTypeDetail(Guid brandTypeID)
+        {
+            BrandTypeData response = new BrandTypeData();
+
+            try
+            {
+                var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandTypeID);
+
+                if (brandTypeData != null)
+                {
+                    response.brandTypeID = brandTypeData.Brand_Type_ID;
+                    response.brandTypeName = brandTypeData.Brand_Type_Name;
+                    response.active = brandTypeData.Active_Flag;
+                    response.createdDate = brandTypeData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
         public SaveDataResponse SaveBrandType(SaveBrandTypeRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
@@ -83,6 +109,132 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public SaveDataResponse DeleteBrandType(DeleteBrandTypeRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = repository.masterData.DeleteBrandType(request);
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
         #endregion
+
+        #region Brand Segment
+
+        public GetBrandSegmentListResponse GetBrandSegmentList(GetBrandSegmentListRequest request)
+        {
+            GetBrandSegmentListResponse response = new GetBrandSegmentListResponse();
+
+            try
+            {
+                (List<TMBrandSegment> dataList, int totalRecord) = repository.masterData.GetBrandSegmentList(request);
+
+                if (dataList.Any())
+                {
+                    response.data = dataList.Select(c => new BrandSegmentData
+                    {
+                        brandSegmentID = c.Brand_Segment_ID,
+                        brandSegmentName = c.Brand_Segment_Name,
+                        active = c.Active_Flag,
+                        createdDate = c.Created_Date
+                    }).ToList();
+                    response.totalRecord = totalRecord;
+                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
+                }
+                else
+                {
+                    response.data = new List<BrandSegmentData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public BrandSegmentData GetBrandSegmentDetail(Guid brandSegmentID)
+        {
+            BrandSegmentData response = new BrandSegmentData();
+
+            try
+            {
+                var brandSegmentData = repository.masterData.FindBrandSegmentBy(c => c.Brand_Segment_ID == brandSegmentID);
+
+                if (brandSegmentData != null)
+                {
+                    response.brandSegmentID = brandSegmentData.Brand_Segment_ID;
+                    response.brandSegmentName = brandSegmentData.Brand_Segment_Name;
+                    response.active = brandSegmentData.Active_Flag;
+                    response.createdDate = brandSegmentData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse SaveBrandSegment(SaveBrandSegmentRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var brandSegmentByName = repository.masterData.FindBrandSegmentBy(c => c.Brand_Segment_Name.ToLower() == request.brandSegmentName.ToLower());
+
+                // Brand segment name not exist Or Update old Brand segment
+                if (brandSegmentByName == null || (brandSegmentByName != null && brandSegmentByName.Brand_Segment_ID == request.brandSegmentID))
+                {
+                    response.isSuccess = repository.masterData.SaveBrandSegment(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse DeleteBrandSegment(DeleteBrandSegmentRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = repository.masterData.DeleteBrandSegment(request);
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
+
     }
 }
