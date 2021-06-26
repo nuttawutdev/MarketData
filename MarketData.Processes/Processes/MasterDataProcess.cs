@@ -236,5 +236,140 @@ namespace MarketData.Processes.Processes
 
         #endregion
 
+        #region Brand Group
+
+        public GetBrandGroupListResponse GetBrandGroupList(GetBrandGroupListRequest request)
+        {
+            GetBrandGroupListResponse response = new GetBrandGroupListResponse();
+
+            try
+            {
+                (List<TMBrandGroup> dataList, int totalRecord) = repository.masterData.GetBrandGroupList(request);
+
+                if (dataList.Any())
+                {
+                    response.data = dataList.Select(c => new BrandGroupData
+                    {
+                        brandGroupID = c.Brand_Group_ID,
+                        brandGroupName = c.Brand_Group_Name,
+                        isLoreal = c.Is_Loreal_Brand,
+                        active = c.Active_Flag,
+                        createdDate = c.Created_Date
+                    }).ToList();
+                    response.totalRecord = totalRecord;
+                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
+                }
+                else
+                {
+                    response.data = new List<BrandGroupData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public BrandGroupData GetBrandGroupDetail(Guid brandGroupID)
+        {
+            BrandGroupData response = new BrandGroupData();
+
+            try
+            {
+                var brandGroupData = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == brandGroupID);
+
+                if (brandGroupData != null)
+                {
+                    response.brandGroupID = brandGroupData.Brand_Group_ID;
+                    response.brandGroupName = brandGroupData.Brand_Group_Name;
+                    response.isLoreal = brandGroupData.Is_Loreal_Brand;
+                    response.active = brandGroupData.Active_Flag;
+                    response.createdDate = brandGroupData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse SaveBrandGroup(SaveBrandGroupRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var brandGroupByName = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_Name.ToLower() == request.brandGroupName.ToLower());
+
+                // Brand group name not exist Or Update old Brand group
+                if (brandGroupByName == null || (brandGroupByName != null && brandGroupByName.Brand_Group_ID == request.brandGroupID))
+                {
+                    response.isSuccess = repository.masterData.SaveBrandGroup(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse DeleteBrandGroup(DeleteBrandGroupRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = repository.masterData.DeleteBrandGroup(request);
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
+
+        public GetBrandListResponse GetBrandList(GetBrandListRequest request)
+        {
+            GetBrandListResponse response = new GetBrandListResponse();
+
+            try
+            {
+                (List<BrandData> dataList, int totalRecord) = repository.masterData.GetBrandList(request);
+
+                if (dataList.Any())
+                {
+                    response.data = dataList;
+                    response.totalRecord = totalRecord;
+                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
+                }
+                else
+                {
+                    response.data = new List<BrandData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }

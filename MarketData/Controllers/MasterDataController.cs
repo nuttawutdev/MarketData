@@ -30,6 +30,13 @@ namespace MarketData.Controllers
 
         public ActionResult Brand()
         {
+            GetBrandListRequest re = new GetBrandListRequest
+            {
+                pageNo = 1,
+                pageSize = 10,
+                active = "All"
+            };
+            var brandData = process.masterData.GetBrandList(re);
             return View();
         }
         public ActionResult Brand_Edit()
@@ -95,6 +102,7 @@ namespace MarketData.Controllers
         }
 
         #region BrandType Function
+
         [HttpPost]
         public IActionResult GetBrandTypeList([FromBody] GetBrandTypeListRequest request)
         {
@@ -183,6 +191,7 @@ namespace MarketData.Controllers
                 return Json(response);
             }
         }
+
         #endregion
     }
 }
