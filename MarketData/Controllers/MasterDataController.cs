@@ -47,6 +47,7 @@ namespace MarketData.Controllers
         }
         public IActionResult BrandType()
         {
+            var brandType = process.masterData.GetBrandTypeList();
             return View();
         }
         public ActionResult BrandType_Edit()
@@ -97,13 +98,13 @@ namespace MarketData.Controllers
         #region BrandType Function
 
         [HttpPost]
-        public IActionResult GetBrandTypeList([FromBody] GetBrandTypeListRequest request)
+        public IActionResult GetBrandTypeList()
         {
             BrandTypeListViewModel brandTypeListView = new BrandTypeListViewModel();
 
             if (ModelState.IsValid)
             {
-                var response = process.masterData.GetBrandTypeList(request);
+                var response = process.masterData.GetBrandTypeList();
 
                 if (response.data.Any())
                 {

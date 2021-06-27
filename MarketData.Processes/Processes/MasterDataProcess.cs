@@ -26,13 +26,13 @@ namespace MarketData.Processes.Processes
 
         #region Brand Type
 
-        public GetBrandTypeListResponse GetBrandTypeList(GetBrandTypeListRequest request)
+        public GetBrandTypeListResponse GetBrandTypeList()
         {
             GetBrandTypeListResponse response = new GetBrandTypeListResponse();
 
             try
             {
-                (List<TMBrandType> dataList, int totalRecord) = repository.masterData.GetBrandTypeList(request);
+                (List<TMBrandType> dataList, int totalRecord) = repository.masterData.GetBrandTypeList();
 
                 if (dataList.Any())
                 {
@@ -43,8 +43,8 @@ namespace MarketData.Processes.Processes
                         active = c.Active_Flag,
                         createdDate = c.Created_Date
                     }).ToList();
-                    response.totalRecord = totalRecord;
-                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
+                    //response.totalRecord = totalRecord;
+                    //response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
                 }
                 else
                 {
