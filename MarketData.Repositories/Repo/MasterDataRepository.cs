@@ -110,6 +110,34 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public TMBrandType CreateBrandType(SaveBrandTypeRequest request)
+        {
+            try
+            {
+                TMBrandType insertBrandType = new TMBrandType
+                {
+                    Brand_Type_ID = Guid.NewGuid(),
+                    Brand_Type_Name = request.brandTypeName,
+                    Active_Flag = request.active,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now
+                };
+
+                if (_dbContext.SaveChanges() > 0)
+                {
+                    return insertBrandType;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMBrandType FindBrandTypeBy(Expression<Func<TMBrandType, bool>> expression)
         {
             try
@@ -231,6 +259,36 @@ namespace MarketData.Repositories.Repo
                 }
 
                 return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMBrandSegment CreateBrandSegment(SaveBrandSegmentRequest request)
+        {
+            try
+            {
+                TMBrandSegment insertBrandSegment = new TMBrandSegment
+                {
+                    Brand_Segment_ID = Guid.NewGuid(),
+                    Brand_Segment_Name = request.brandSegmentName,
+                    Active_Flag = request.active,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now
+                };
+
+                _dbContext.TMBrandSegment.Add(insertBrandSegment);
+
+                if (_dbContext.SaveChanges() > 0)
+                {
+                    return insertBrandSegment;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -367,6 +425,37 @@ namespace MarketData.Repositories.Repo
                 }
 
                 return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMBrandGroup CreateBrandGroup(SaveBrandGroupRequest request)
+        {
+            try
+            {
+                TMBrandGroup insertBrandGroup = new TMBrandGroup
+                {
+                    Brand_Group_ID = Guid.NewGuid(),
+                    Brand_Group_Name = request.brandGroupName,
+                    Is_Loreal_Brand = request.isLoreal,
+                    Active_Flag = request.active,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now
+                };
+
+                _dbContext.TMBrandGroup.Add(insertBrandGroup);
+
+                if (_dbContext.SaveChanges() > 0)
+                {
+                    return insertBrandGroup;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -564,7 +653,7 @@ namespace MarketData.Repositories.Repo
                         Delete_Flag = false,
                         Loreal_Brand_Rank = request.lorealBrandRank,
                         Universe = request.universe,
-                        Brand_Group_ID = Guid.NewGuid(),                    
+                        Brand_Group_ID = Guid.NewGuid(),
                         Active_Flag = request.active,
                         Created_By = request.userID,
                         Created_Date = DateTime.Now

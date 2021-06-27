@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MarketData.Helper\MarketData.Helper.csproj" />
     <ProjectReference Include="..\MarketData.Model\MarketData.Model.csproj" />
     <ProjectReference Include="..\MarketData.Repositories\MarketData.Repositories.csproj" />

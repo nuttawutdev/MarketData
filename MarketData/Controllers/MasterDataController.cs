@@ -29,14 +29,7 @@ namespace MarketData.Controllers
         }
 
         public ActionResult Brand()
-        {
-            GetBrandListRequest re = new GetBrandListRequest
-            {
-                pageNo = 1,
-                pageSize = 10,
-                active = "All"
-            };
-            var brandData = process.masterData.GetBrandList(re);
+        { 
             return View();
         }
         public ActionResult Brand_Edit()
