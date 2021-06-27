@@ -2,6 +2,9 @@
     ViewData["Title"] = "Brand Type";
 }
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
 
 <h3>
     @ViewData["Title"]
@@ -13,119 +16,10 @@
 <hr />
 <br />
 <br />
-<div class="row">
-    <div class="table-filter" style="width: 100%; font-size: 13px;">
-        <div class="row">
 
-            <div class="col-sm-12">
-
-                <div class="filter-group">
-                    <label>Keyword(s) : </label>
-                    <input type="text" class="form-control">
-                </div>
-
-                <div class="filter-group">
-                    <label>Active</label>
-                    <select class="form-control">
-                        <option>All</option>
-                        <option>Y</option>
-                        <option>N</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="container-xl">
-    <div class="table-responsive">
-        <div class="table-wrapper">
+    <table id="tableData" class="display" width="100%"></table>
 
-            <table class="table table-striped table-hover ">
-                <thead class="table-secondary">
-                    <tr class="row m-0">
-
-                        <th class="col-8 ">Brand Type Name</th>
-                        <th class="col-2 text-center">Active</th>
-                        <th class="col-2 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    <tr class="row m-0">
-                        <td class="col-8 ">ASIA</td>
-
-
-                        <td class="col-2 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="BrandType_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="BrandType_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
-
-                        </td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="col-8 ">Make up</td>
-
-                        <td class="col-2 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled checked>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="BrandType_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="BrandType_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
-
-                        </td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="col-8 ">Fragrances</td>
-
-                        <td class="col-2 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled checked>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="BrandType_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="BrandType_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
-
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </div>
-    </div>
 </div>
 
 <!-- Delete Modal HTML -->
@@ -151,24 +45,44 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
-               var getBrandType = {
-                     pageNo:1,
-                     pageSize:  10,
-                     active:  'All'
-                    };
 
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("GetBrandTypeList", "MasterData")',
+    $(document).ready(function () {
+
+        $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetBrandTypeList", "MasterData")',
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(getBrandType),
-                datatype: "json",
-                success: function (data) {
-                    console.log(data,'data')
-                },
-                error: function () {
+                dataSrc: function (result) {
+                    return result.brandTypeList;
                 }
-            });
+            },
+            "columns": [
+                { data: "brandTypeID", visible: false, searchable: false },
+                { data: "brandTypeName", title: "Brand Type Name", width: "70%"},
+                {
+                    data: "active",
+                    title: "Active",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" id="checkbox1" name="options[]" value="1" disabled ' + checkStatus + '>';
+                    }, width: "10%",
+                    className: "text-center",
+                },
+                { data: "createdDate", visible: false, searchable: false },
+                {
+                    width: "20%",
+                    className: "text-center",
+                    data: function () {
+                        return '<a href="BrandType_Edit" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="BrandType_Edit" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
+                            '<a href="#deleteModal" class="buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                }}
+            ]
+        });
     });
+
+
+
+
 </script>
