@@ -371,5 +371,102 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public GetBrandDetailResponse GetBrandDetail(Guid brandID)
+        {
+
+            GetBrandDetailResponse response = null;
+
+            try
+            {
+                var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == brandID);
+
+                if (brandData != null)
+                {
+                    response = new GetBrandDetailResponse
+                    {
+                        brandID = brandData.Brand_ID,
+                        brandName = brandData.Brand_Name,
+                        brandShortName = brandData.Brand_Short_Name,
+                        brandGroupID = brandData.Brand_Group_ID,
+                        brandSegmentID = brandData.Brand_Segment_ID,
+                        brandColor = brandData.Brand_Color,
+                        active = brandData.Active_Flag,
+                        brandTypeID = brandData.Brand_Type_ID,
+                        lorealBrandRank = brandData.Loreal_Brand_Rank,
+                        universe = brandData.Universe
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse SaveBrand(SaveBrandRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower());
+                var branGroupData = repository.masterData.FindBrandGroupBy(e => e.Brand_Group_ID == request.brandGroupID);
+
+                // Brand name not exist Or Update old Brand
+                if (brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
+                {
+                    if (branGroupData != null && branGroupData.Is_Loreal_Brand)
+                    {
+                        var brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower());
+
+                        if (brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID))
+                        {
+                            response.isSuccess = repository.masterData.SaveBrand(request);
+                        }
+                        else
+                        {
+                            response.isSuccess = false;
+                            response.isDuplicated = true;
+                        }
+                    }
+                    else
+                    {
+                        response.isSuccess = repository.masterData.SaveBrand(request);
+                    }
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse DeleteBrand(DeleteBrandRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = repository.masterData.DeleteBrand(request);
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }

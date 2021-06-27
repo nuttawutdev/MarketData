@@ -534,5 +534,101 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public TMBrand FindBrandBy(Expression<Func<TMBrand, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMBrand.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool SaveBrand(SaveBrandRequest request)
+        {
+            try
+            {
+                if (request.brandID == null)
+                {
+                    TMBrand insertBrand = new TMBrand
+                    {
+                        Brand_ID = Guid.NewGuid(),
+                        Brand_Name = request.brandName,
+                        Brand_Short_Name = request.brandShortName,
+                        Brand_Color = request.brandColor,
+                        Brand_Segment_ID = request.brandSegmentID,
+                        Brand_Type_ID = request.brandTypeID,
+                        Delete_Flag = false,
+                        Loreal_Brand_Rank = request.lorealBrandRank,
+                        Universe = request.universe,
+                        Brand_Group_ID = Guid.NewGuid(),                    
+                        Active_Flag = request.active,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMBrand.Add(insertBrand);
+                }
+                else
+                {
+                    var brandUpdate = _dbContext.TMBrand.Find(request.brandID);
+
+                    if (brandUpdate != null)
+                    {
+                        brandUpdate.Brand_Name = request.brandName;
+                        brandUpdate.Brand_Short_Name = request.brandShortName;
+                        brandUpdate.Brand_Color = request.brandColor;
+                        brandUpdate.Brand_Segment_ID = request.brandSegmentID;
+                        brandUpdate.Brand_Group_ID = request.brandGroupID;
+                        brandUpdate.Brand_Type_ID = request.brandTypeID;
+                        brandUpdate.Loreal_Brand_Rank = request.lorealBrandRank;
+                        brandUpdate.Universe = request.universe;
+                        brandUpdate.Active_Flag = request.active;
+                        brandUpdate.Updated_By = request.userID;
+                        brandUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMBrand.Update(brandUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool DeleteBrand(DeleteBrandRequest request)
+        {
+            try
+            {
+                var brandUpdate = _dbContext.TMBrand.Find(request.brandID);
+
+                if (brandUpdate != null)
+                {
+                    brandUpdate.Active_Flag = false;
+                    brandUpdate.Delete_Flag = true;
+                    brandUpdate.Updated_By = request.userID;
+                    brandUpdate.Updated_Date = DateTime.Now;
+
+                    _dbContext.TMBrand.Update(brandUpdate);
+                }
+
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
+
 }
