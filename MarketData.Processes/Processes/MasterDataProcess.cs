@@ -847,5 +847,114 @@ namespace MarketData.Processes.Processes
         }
 
         #endregion
+
+        public GetDepartmentStoreListResponse GetDepartmentStoreList()
+        {
+            GetDepartmentStoreListResponse response = new GetDepartmentStoreListResponse();
+
+            try
+            {
+                var dataList = repository.masterData.GetDepartmentStoreList();
+
+                if (dataList.Any())
+                {
+                    response.data = dataList.Select(c => new DepartmentStoreData
+                    {
+                        departmentStoreID = c.departmentStoreID,
+                        departmentStoreName = c.departmentStoreName,
+                        distributionChannelName = c.distributionChannelName,
+                        retailerGroupName = c.retailerGroupName,
+                        rank = c.rank,
+                        active = c.active,
+                        region = c.region
+                    }).ToList();
+                }
+                else
+                {
+                    response.data = new List<DepartmentStoreData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public DepartmentStoreData GetDepartmentStoreDetail(Guid departmentStoreID)
+        {
+            DepartmentStoreData response = new DepartmentStoreData();
+
+            try
+            {
+                var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == departmentStoreID);
+
+                if (departmentStoreData != null)
+                {
+                    response.departmentStoreID = departmentStoreData.Department_Store_ID;
+                    response.departmentStoreName = departmentStoreData.Department_Store_Name;
+                    response.retailerGroupID = departmentStoreData.Retailer_Group_ID;
+                    response.distributionChannelID = departmentStoreData.Distribution_Channel_ID;
+                    response.regionID = departmentStoreData.Region_ID;
+                    response.rank = departmentStoreData.Rank;
+                    response.active = departmentStoreData.Active_Flag;
+                    response.createdDate = departmentStoreData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> SaveDepartmentStore(SaveDepsrtmentStoreRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower());
+
+                // Department Store name not exist Or Update old Department Store
+                if (departmentStoreByName == null ||
+                    (departmentStoreByName != null && departmentStoreByName.Department_Store_ID == request.departmentStoreID))
+                {
+                    response.isSuccess = await repository.masterData.SaveDepartmentStore(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                    response.responseError = "Department Store name is duplicated";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> DeleteDepartmentStore(DeleteDepartmentStoreRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = await repository.masterData.DeleteDepartmentStore(request);
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }

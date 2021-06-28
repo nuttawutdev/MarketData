@@ -860,7 +860,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool DeleteDepartmentStore(DeleteDepartmentStoreRequest request)
+        public async Task<bool> DeleteDepartmentStore(DeleteDepartmentStoreRequest request)
         {
             try
             {
@@ -876,7 +876,7 @@ namespace MarketData.Repositories.Repo
                     _dbContext.TMDepartmentStore.Update(departmentStoreUpdate);
                 }
 
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
