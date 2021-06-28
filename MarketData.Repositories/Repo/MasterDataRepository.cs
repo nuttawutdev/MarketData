@@ -78,6 +78,7 @@ namespace MarketData.Repositories.Repo
                         Brand_Type_ID = Guid.NewGuid(),
                         Brand_Type_Name = request.brandTypeName,
                         Active_Flag = request.active,
+                        Delete_Flag = false,
                         Created_By = request.userID,
                         Created_Date = DateTime.Now
                     };
@@ -120,9 +121,12 @@ namespace MarketData.Repositories.Repo
                     Brand_Type_ID = Guid.NewGuid(),
                     Brand_Type_Name = request.brandTypeName,
                     Active_Flag = request.active,
+                    Delete_Flag = false,
                     Created_By = request.userID,
                     Created_Date = DateTime.Now
                 };
+
+                _dbContext.TMBrandType.Add(insertBrandType);
 
                 if (_dbContext.SaveChanges() > 0)
                 {
@@ -276,6 +280,7 @@ namespace MarketData.Repositories.Repo
                     Brand_Segment_ID = Guid.NewGuid(),
                     Brand_Segment_Name = request.brandSegmentName,
                     Active_Flag = request.active,
+                    Delete_Flag = false,
                     Created_By = request.userID,
                     Created_Date = DateTime.Now
                 };
@@ -443,6 +448,7 @@ namespace MarketData.Repositories.Repo
                     Brand_Group_Name = request.brandGroupName,
                     Is_Loreal_Brand = request.isLoreal,
                     Active_Flag = request.active,
+                    Delete_Flag = false,
                     Created_By = request.userID,
                     Created_Date = DateTime.Now
                 };

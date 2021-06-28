@@ -473,18 +473,17 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public ImportBrandDataResponse ImportDataBrand(ImportBrandDataRequest request)
+        public ImportBrandDataResponse ImportBrandData(ImportBrandDataRequest request)
         {
             ImportBrandDataResponse response = new ImportBrandDataResponse();
 
             try
             {
-                var fileName = "C:\\Users\\Nuttawut\\Downloads\\Brand.xlsx";
                 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
                 List<SaveBrandRequest> saveBrandList = new List<SaveBrandRequest>();
 
-                using (var stream = System.IO.File.Open(fileName, FileMode.Open, FileAccess.Read))
+                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
                 {
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
                     {
@@ -501,11 +500,11 @@ namespace MarketData.Processes.Processes
                                 string column6 = reader.GetValue(5)?.ToString();
 
                                 if (column1 != "Name" ||
-                                    column2 != "Short Name" ||
-                                    column3 != "Brand Group" ||
+                                    column2 != "Short name" ||
+                                    column3 != "Brand_Group" ||
                                     column4 != "Segment" ||
                                     column5 != "Type" ||
-                                    column6 != "Brand Color")
+                                    column6 != "BrandColor")
                                 {
                                     response.isSuccess = false;
                                     response.wrongFormatFile = true;
@@ -622,9 +621,16 @@ namespace MarketData.Processes.Processes
 
                 foreach (var saveBrandRequest in saveBrandList)
                 {
+                    saveBrandRequest.brandGroupID = brandGroupData.FirstOrDefault(c => c.Key == saveBrandRequest.brandGroupName).Value;
+                    saveBrandRequest.brandSegmentID = brandSegmentData.FirstOrDefault(c => c.Key == saveBrandRequest.brandSegmentName).Value;
+                    saveBrandRequest.brandTypeID = brandTypeData.FirstOrDefault(c => c.Key == saveBrandRequest.brandTypeName).Value;
+                    saveBrandRequest.active = true;
+                    saveBrandRequest.userID = request.userID;
 
+                    SaveBrand(saveBrandRequest);
                 }
 
+                response.isSuccess = true;
             }
             catch (Exception ex)
             {
