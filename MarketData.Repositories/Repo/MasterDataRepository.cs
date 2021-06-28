@@ -613,6 +613,37 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<TMRetailerGroup> CreateRetailerGroup(SaveRetailerGroupRequest request)
+        {
+            try
+            {
+                TMRetailerGroup insertRetailerGroup = new TMRetailerGroup
+                {
+                    Retailer_Group_ID = Guid.NewGuid(),
+                    Retailer_Group_Name = request.retailerGroupName,
+                    Active_Flag = request.active,
+                    Delete_Flag = false,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now
+                };
+
+                _dbContext.TMRetailerGroup.Add(insertRetailerGroup);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return insertRetailerGroup;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMRetailerGroup FindRetailerGroupBy(Expression<Func<TMRetailerGroup, bool>> expression)
         {
             try
@@ -712,6 +743,37 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<TMDistributionChannel> CreateDistributionChannel(SaveDistributionChannelRequest request)
+        {
+            try
+            {
+                TMDistributionChannel insertChannel = new TMDistributionChannel
+                {
+                    Distribution_Channel_ID = Guid.NewGuid(),
+                    Distribution_Channel_Name = request.distributionChannelName,
+                    Active_Flag = request.active,
+                    Delete_Flag = false,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now
+                };
+
+                _dbContext.TMDistributionChannel.Add(insertChannel);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return insertChannel;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMDistributionChannel FindDistributionChannelBy(Expression<Func<TMDistributionChannel, bool>> expression)
         {
             try
@@ -754,6 +816,7 @@ namespace MarketData.Repositories.Repo
 
         #endregion
 
+        #region Department Store
 
         public List<DepartmentStoreData> GetDepartmentStoreList()
         {
@@ -883,5 +946,7 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        #endregion
     }
 }

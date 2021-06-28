@@ -467,9 +467,9 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<ImportBrandDataResponse> ImportBrandData(ImportBrandDataRequest request)
+        public async Task<ImportDataResponse> ImportBrandData(ImportDataRequest request)
         {
-            ImportBrandDataResponse response = new ImportBrandDataResponse();
+            ImportDataResponse response = new ImportDataResponse();
 
             try
             {
@@ -848,6 +848,8 @@ namespace MarketData.Processes.Processes
 
         #endregion
 
+        #region Department Store
+
         public GetDepartmentStoreListResponse GetDepartmentStoreList()
         {
             GetDepartmentStoreListResponse response = new GetDepartmentStoreListResponse();
@@ -956,5 +958,149 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public async Task<ImportDataResponse> ImportDepartmentStoreData(ImportDataRequest request)
+        {
+            ImportDataResponse response = new ImportDataResponse();
+
+            try
+            {
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+                List<SaveDepsrtmentStoreRequest> saveDepartmentStoreList = new List<SaveDepsrtmentStoreRequest>();
+
+                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        while (reader.Read()) //Each row of the file
+                        {
+                            // Validate Column File
+                            if (reader.Depth == 0)
+                            {
+                                string column1 = reader.GetValue(0)?.ToString();
+                                string column2 = reader.GetValue(1)?.ToString();
+                                string column3 = reader.GetValue(2)?.ToString();
+                                string column4 = reader.GetValue(3)?.ToString();
+                                string column5 = reader.GetValue(4)?.ToString();
+
+                                if (column1 != "DepartmentStores" ||
+                                    column2 != "Regions" ||
+                                    column3 != "DepartmentStores_Group" ||
+                                    column4 != "Rank" ||
+                                    column5 != "Distribution_Channels")
+                                {
+                                    response.isSuccess = false;
+                                    response.wrongFormatFile = true;
+                                }
+                            }
+
+                            if (reader.Depth != 0)
+                            {
+                                SaveDepsrtmentStoreRequest saveStore = new SaveDepsrtmentStoreRequest
+                                {
+                                    departmentStoreName = reader.GetValue(0)?.ToString(),
+                                    region = reader.GetValue(1)?.ToString(),
+                                    retailerGroupName = reader.GetValue(2)?.ToString(),
+                                    distributionChannelName = reader.GetValue(4)?.ToString()
+                                };
+
+                                int rank = 0;
+                                int.TryParse(reader.GetValue(3)?.ToString(), out rank);
+
+                                if (rank != 0)
+                                {
+                                    saveStore.rank = rank;
+                                }
+
+                                saveDepartmentStoreList.Add(saveStore);
+                            }
+                        }
+                    }
+                }
+
+                var groupByRetailerGroup = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.retailerGroupName))
+                    .GroupBy(c => c.retailerGroupName);
+
+                var groupByDistrubution = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
+                   .GroupBy(c => c.distributionChannelName);
+
+                var retailerGroupData = new Dictionary<string, Guid>();
+                var distributionChannelData = new Dictionary<string, Guid>();
+
+                foreach (var itemRetailerGroup in groupByRetailerGroup)
+                {
+                    var retailerGroupByName = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_Name.ToLower() == itemRetailerGroup.Key.ToLower());
+
+                    if (retailerGroupByName == null)
+                    {
+                        SaveRetailerGroupRequest saveRetailerGroupRequest = new SaveRetailerGroupRequest
+                        {
+                            retailerGroupName = itemRetailerGroup.Key,
+                            active = true,
+                            userID = request.userID
+                        };
+
+                        var createRetailerGroupResult = await repository.masterData.CreateRetailerGroup(saveRetailerGroupRequest);
+
+                        if (createRetailerGroupResult != null)
+                        {
+                            retailerGroupData.Add(itemRetailerGroup.Key, createRetailerGroupResult.Retailer_Group_ID);
+                        }
+                    }
+                    else
+                    {
+                        retailerGroupData.Add(itemRetailerGroup.Key, retailerGroupByName.Retailer_Group_ID);
+                    }
+                }
+
+                foreach (var itemChannel in groupByDistrubution)
+                {
+                    var channelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower());
+
+                    if (channelByName == null)
+                    {
+                        SaveDistributionChannelRequest saveChannelRequest = new SaveDistributionChannelRequest
+                        {
+                            distributionChannelName = itemChannel.Key,
+                            active = true,
+                            userID = request.userID
+                        };
+
+                        var createChannelResult = await repository.masterData.CreateDistributionChannel(saveChannelRequest);
+
+                        if (createChannelResult != null)
+                        {
+                            distributionChannelData.Add(itemChannel.Key, createChannelResult.Distribution_Channel_ID);
+                        }
+                    }
+                    else
+                    {
+                        distributionChannelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
+                    }
+                }
+
+                foreach (var saveDepartmentStoreRequest in saveDepartmentStoreList)
+                {
+                    saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.departmentStoreName).Value;
+                    saveDepartmentStoreRequest.distributionChannelID = distributionChannelData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.distributionChannelName).Value;
+                    saveDepartmentStoreRequest.active = true;
+                    saveDepartmentStoreRequest.userID = request.userID;
+
+                    await SaveDepartmentStore(saveDepartmentStoreRequest);
+                }
+
+                response.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
     }
 }

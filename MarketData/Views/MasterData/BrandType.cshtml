@@ -7,6 +7,16 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
 
 <h3>
+    <div class="btn-group submitter-group float-right">
+        <div class="input-group-prepend">
+            <div class="input-group-text">Status</div>
+        </div>
+        <select class="form-control status-dropdown">
+            <option value="">All</option>
+            <option value=true>Y</option>
+            <option value="false">N</option>
+        </select>
+    </div>
     @ViewData["Title"]
     <a href="BrandType_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
 
@@ -59,15 +69,18 @@
             },
             "columns": [
                 { data: "brandTypeID", visible: false, searchable: false },
-                { data: "brandTypeName", title: "Brand Type Name", width: "70%"},
+                { data: "brandTypeName", title: "Brand Type Name", width: "70%" },
+                { data: "active", title: "active", visible: false},
                 {
                     data: "active",
                     title: "Active",
                     render: function (data, type, row) {
                         var checkStatus = data ? "checked" : "";
-                        return '<input type="checkbox" id="checkbox1" name="options[]" value="1" disabled ' + checkStatus + '>';
+                        return '<input type="checkbox" id="checkbox1" name="options[]" value="true" disabled ' + checkStatus + '>';
                     }, width: "10%",
                     className: "text-center",
+                    visible: true,
+                    searchable: true
                 },
                 { data: "createdDate", visible: false, searchable: false },
                 {
@@ -80,9 +93,18 @@
                 }}
             ]
         });
+
+        $('.status-dropdown').on('change', function (e) {
+            var status = $(this).val();
+            $('.status-dropdown').val(status)
+            console.log(status)
+            var dataTable = $("#tableData").DataTable();
+
+            dataTable.column(2).search(status).draw();
+        });
     });
 
 
 
-
 </script>
+
