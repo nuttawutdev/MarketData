@@ -32,7 +32,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                (List<TMBrandType> dataList, int totalRecord) = repository.masterData.GetBrandTypeList();
+                List<TMBrandType> dataList = repository.masterData.GetBrandTypeList();
 
                 if (dataList.Any())
                 {
@@ -43,8 +43,6 @@ namespace MarketData.Processes.Processes
                         active = c.Active_Flag,
                         createdDate = c.Created_Date
                     }).ToList();
-                    //response.totalRecord = totalRecord;
-                    //response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
                 }
                 else
                 {
@@ -133,13 +131,13 @@ namespace MarketData.Processes.Processes
 
         #region Brand Segment
 
-        public GetBrandSegmentListResponse GetBrandSegmentList(GetBrandSegmentListRequest request)
+        public GetBrandSegmentListResponse GetBrandSegmentList()
         {
             GetBrandSegmentListResponse response = new GetBrandSegmentListResponse();
 
             try
             {
-                (List<TMBrandSegment> dataList, int totalRecord) = repository.masterData.GetBrandSegmentList(request);
+                List<TMBrandSegment> dataList = repository.masterData.GetBrandSegmentList();
 
                 if (dataList.Any())
                 {
@@ -150,8 +148,6 @@ namespace MarketData.Processes.Processes
                         active = c.Active_Flag,
                         createdDate = c.Created_Date
                     }).ToList();
-                    response.totalRecord = totalRecord;
-                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
                 }
                 else
                 {
@@ -240,13 +236,13 @@ namespace MarketData.Processes.Processes
 
         #region Brand Group
 
-        public GetBrandGroupListResponse GetBrandGroupList(GetBrandGroupListRequest request)
+        public GetBrandGroupListResponse GetBrandGroupList()
         {
             GetBrandGroupListResponse response = new GetBrandGroupListResponse();
 
             try
             {
-                (List<TMBrandGroup> dataList, int totalRecord) = repository.masterData.GetBrandGroupList(request);
+                List<TMBrandGroup> dataList = repository.masterData.GetBrandGroupList();
 
                 if (dataList.Any())
                 {
@@ -258,8 +254,6 @@ namespace MarketData.Processes.Processes
                         active = c.Active_Flag,
                         createdDate = c.Created_Date
                     }).ToList();
-                    response.totalRecord = totalRecord;
-                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
                 }
                 else
                 {
@@ -349,19 +343,17 @@ namespace MarketData.Processes.Processes
 
         #region Brand
 
-        public GetBrandListResponse GetBrandList(GetBrandListRequest request)
+        public GetBrandListResponse GetBrandList()
         {
             GetBrandListResponse response = new GetBrandListResponse();
 
             try
             {
-                (List<BrandData> dataList, int totalRecord) = repository.masterData.GetBrandList(request);
+                List<BrandData> dataList = repository.masterData.GetBrandList();
 
                 if (dataList.Any())
                 {
                     response.data = dataList;
-                    response.totalRecord = totalRecord;
-                    response.totalPage = totalRecord != 0 ? Convert.ToInt32(Math.Ceiling((double)totalRecord / request.pageSize)) : 0;
                 }
                 else
                 {
@@ -474,7 +466,7 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
-        
+
         public async Task<ImportBrandDataResponse> ImportBrandData(ImportBrandDataRequest request)
         {
             ImportBrandDataResponse response = new ImportBrandDataResponse();
@@ -653,7 +645,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-               var dataList = repository.masterData.GetRetailerGroupList();
+                var dataList = repository.masterData.GetRetailerGroupList();
 
                 if (dataList.Any())
                 {
@@ -663,7 +655,7 @@ namespace MarketData.Processes.Processes
                         retailerGroupName = c.Retailer_Group_Name,
                         active = c.Active_Flag,
                         createdDate = c.Created_Date
-                    }).ToList();             
+                    }).ToList();
                 }
                 else
                 {
@@ -750,6 +742,8 @@ namespace MarketData.Processes.Processes
 
         #endregion
 
+        #region Distribution Channel
+
         public GetDistributionChannelListResponse GetDistributionChannelList()
         {
             GetDistributionChannelListResponse response = new GetDistributionChannelListResponse();
@@ -814,7 +808,7 @@ namespace MarketData.Processes.Processes
                 var distributionChannelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == request.distributionChannelName.ToLower());
 
                 // Channel name not exist Or Update old Channel
-                if (distributionChannelByName == null || 
+                if (distributionChannelByName == null ||
                     (distributionChannelByName != null && distributionChannelByName.Distribution_Channel_ID == request.distributionChannelID))
                 {
                     response.isSuccess = await repository.masterData.SaveDistributionChannel(request);
@@ -851,5 +845,7 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        #endregion
     }
 }

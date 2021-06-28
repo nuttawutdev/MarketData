@@ -22,45 +22,13 @@ namespace MarketData.Repositories.Repo
 
         #region Brand Type
 
-        public (List<TMBrandType>, int) GetBrandTypeList()
+        public List<TMBrandType> GetBrandTypeList()
         {
             try
             {
-                var searchData = _dbContext.TMBrandType.Where(
-                    c => c.Delete_Flag != true
-                    //&& (string.IsNullOrWhiteSpace(request.textSearch) || c.Brand_Type_Name.ToLower().Contains(request.textSearch.ToLower()))
-                    ).AsNoTracking();
-
-                //if (request.active != "All")
-                //{
-                //    bool activeFilter = request.active == "Y";
-                //    searchData = searchData.Where(e => e.Active_Flag == activeFilter);
-                //}
-
-                //if (!string.IsNullOrEmpty(request.sortColumn) && !string.IsNullOrEmpty(request.sortBy))
-                //{
-                //    switch (request.sortColumn.ToLower())
-                //    {
-                //        case "brandtypename":
-                //            {
-                //                searchData = request.sortBy == "desc"
-                //                    ? searchData.OrderByDescending(x => x.Brand_Type_Name)
-                //                    : searchData.OrderBy(x => x.Brand_Type_Name);
-                //                break;
-                //            }
-                //    }
-                //}
-                //else
-                //{
-                //    searchData = searchData.OrderByDescending(x => x.Created_Date);
-                //}
-
-                //var searchDataList = searchData
-                //  .Skip((request.pageNo - 1) * request.pageSize)
-                //  .Take(request.pageSize).ToList();
-
-                searchData = searchData.OrderByDescending(x => x.Brand_Type_Name);
-                return (searchData.ToList(), searchData.Count());
+                var searchData = _dbContext.TMBrandType.Where(c => c.Delete_Flag != true).AsNoTracking();
+                searchData = searchData.OrderBy(x => x.Brand_Type_Name);
+                return searchData.ToList();
             }
             catch (Exception ex)
             {
@@ -184,43 +152,13 @@ namespace MarketData.Repositories.Repo
 
         #region Brand Segment
 
-        public (List<TMBrandSegment>, int) GetBrandSegmentList(GetBrandSegmentListRequest request)
+        public List<TMBrandSegment> GetBrandSegmentList()
         {
             try
             {
-                var searchData = _dbContext.TMBrandSegment.Where(
-                    c => c.Delete_Flag != true && (string.IsNullOrWhiteSpace(request.textSearch) || c.Brand_Segment_Name.ToLower().Contains(request.textSearch.ToLower())))
-                    .AsNoTracking();
-
-                if (request.active != "All")
-                {
-                    bool activeFilter = request.active == "Y";
-                    searchData = searchData.Where(e => e.Active_Flag == activeFilter);
-                }
-
-                if (!string.IsNullOrEmpty(request.sortColumn) && !string.IsNullOrEmpty(request.sortBy))
-                {
-                    switch (request.sortColumn.ToLower())
-                    {
-                        case "brandsegmentname":
-                            {
-                                searchData = request.sortBy == "desc"
-                                    ? searchData.OrderByDescending(x => x.Brand_Segment_Name)
-                                    : searchData.OrderBy(x => x.Brand_Segment_Name);
-                                break;
-                            }
-                    }
-                }
-                else
-                {
-                    searchData = searchData.OrderByDescending(x => x.Created_Date);
-                }
-
-                var searchDataList = searchData
-                  .Skip((request.pageNo - 1) * request.pageSize)
-                  .Take(request.pageSize).ToList();
-
-                return (searchDataList, searchData.Count());
+                var searchData = _dbContext.TMBrandSegment.Where(c => c.Delete_Flag != true).AsNoTracking();
+                searchData = searchData.OrderBy(c => c.Brand_Segment_Name);
+                return searchData.ToList();
             }
             catch (Exception ex)
             {
@@ -343,49 +281,13 @@ namespace MarketData.Repositories.Repo
 
         #region Brand Group
 
-        public (List<TMBrandGroup>, int) GetBrandGroupList(GetBrandGroupListRequest request)
+        public List<TMBrandGroup> GetBrandGroupList()
         {
             try
             {
-                var searchData = _dbContext.TMBrandGroup.Where(
-                    c => c.Delete_Flag != true && (string.IsNullOrWhiteSpace(request.textSearch) || c.Brand_Group_Name.ToLower().Contains(request.textSearch.ToLower())))
-                    .AsNoTracking();
-
-                if (request.active != "All")
-                {
-                    bool activeFilter = request.active == "Y";
-                    searchData = searchData.Where(e => e.Active_Flag == activeFilter);
-                }
-
-                if (request.isLoreal != "All")
-                {
-                    bool isLorealFilter = request.isLoreal == "Y";
-                    searchData = searchData.Where(e => e.Is_Loreal_Brand == isLorealFilter);
-                }
-
-                if (!string.IsNullOrEmpty(request.sortColumn) && !string.IsNullOrEmpty(request.sortBy))
-                {
-                    switch (request.sortColumn.ToLower())
-                    {
-                        case "brandgroupname":
-                            {
-                                searchData = request.sortBy == "desc"
-                                    ? searchData.OrderByDescending(x => x.Brand_Group_Name)
-                                    : searchData.OrderBy(x => x.Brand_Group_Name);
-                                break;
-                            }
-                    }
-                }
-                else
-                {
-                    searchData = searchData.OrderByDescending(x => x.Created_Date);
-                }
-
-                var searchDataList = searchData
-                  .Skip((request.pageNo - 1) * request.pageSize)
-                  .Take(request.pageSize).ToList();
-
-                return (searchDataList, searchData.Count());
+                var searchData = _dbContext.TMBrandGroup.Where(c => c.Delete_Flag != true).AsNoTracking();
+                searchData = searchData.OrderBy(c => c.Brand_Group_Name);
+                return searchData.ToList();
             }
             catch (Exception ex)
             {
@@ -510,47 +412,11 @@ namespace MarketData.Repositories.Repo
         #endregion
 
         #region Brand
-        public (List<BrandData>, int) GetBrandList(GetBrandListRequest request)
+        public List<BrandData> GetBrandList()
         {
             try
             {
                 var searchData = _dbContext.TMBrand.Where(c => c.Delete_Flag != true).AsNoTracking();
-
-                if (request.active != "All")
-                {
-                    bool activeFilter = request.active == "Y";
-                    searchData = searchData.Where(e => e.Active_Flag == activeFilter);
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.textSearch))
-                {
-                    switch (request.searchBy)
-                    {
-                        case "Brand Name":
-                            {
-                                searchData = searchData.Where(c => c.Brand_Name.ToLower().Contains(request.textSearch));
-                                break;
-                            }
-                        case "Brand Group":
-                            {
-                                var brandGroupIDFilter = _dbContext.TMBrandGroup.Where(g => g.Brand_Group_Name.ToLower().Contains(request.textSearch.ToLower())).Select(c => c.Brand_Group_ID);
-                                searchData = searchData.Where(c => brandGroupIDFilter.Contains(c.Brand_Group_ID));
-                                break;
-                            }
-                        case "Brand Segment":
-                            {
-                                var brandSegmentIDFilter = _dbContext.TMBrandSegment.Where(g => g.Brand_Segment_Name.ToLower().Contains(request.textSearch.ToLower())).Select(c => c.Brand_Segment_ID);
-                                searchData = searchData.Where(c => brandSegmentIDFilter.Contains(c.Brand_Segment_ID));
-                                break;
-                            }
-                        case "Brand Type":
-                            {
-                                var brandTypeIDFilter = _dbContext.TMBrandType.Where(g => g.Brand_Type_Name.ToLower().Contains(request.textSearch.ToLower())).Select(c => c.Brand_Type_ID);
-                                searchData = searchData.Where(c => brandTypeIDFilter.Contains(c.Brand_Type_ID));
-                                break;
-                            }
-                    }
-                }
 
                 var brandList = (
                    from e in searchData
@@ -580,51 +446,8 @@ namespace MarketData.Repositories.Repo
                        isLorealBrand = groups != null ? groups.Is_Loreal_Brand : false
                    });
 
-
-                if (!string.IsNullOrEmpty(request.sortColumn) && !string.IsNullOrEmpty(request.sortBy))
-                {
-                    switch (request.sortColumn)
-                    {
-                        case "Brand Name":
-                            {
-                                brandList = request.sortBy == "desc"
-                                    ? brandList.OrderByDescending(x => x.brandName)
-                                    : brandList.OrderBy(x => x.brandName);
-                                break;
-                            }
-                        case "Brand Group":
-                            {
-                                brandList = request.sortBy == "desc"
-                                    ? brandList.OrderByDescending(x => x.brandGroupName)
-                                    : brandList.OrderBy(x => x.brandGroupName);
-                                break;
-                            }
-                        case "Brand Segment":
-                            {
-                                brandList = request.sortBy == "desc"
-                                    ? brandList.OrderByDescending(x => x.brandSegmentName)
-                                    : brandList.OrderBy(x => x.brandSegmentName);
-                                break;
-                            }
-                        case "Brand Type":
-                            {
-                                brandList = request.sortBy == "desc"
-                                    ? brandList.OrderByDescending(x => x.brandTypeName)
-                                    : brandList.OrderBy(x => x.brandTypeName);
-                                break;
-                            }
-                    }
-                }
-                else
-                {
-                    brandList = brandList.OrderBy(x => x.brandName);
-                }
-
-                var brandPaging = brandList
-                  .Skip((request.pageNo - 1) * request.pageSize)
-                  .Take(request.pageSize).ToList();
-
-                return (brandPaging, brandList.Count());
+                brandList = brandList.OrderBy(x => x.brandName);
+                return brandList.ToList();
 
             }
             catch (Exception ex)
@@ -662,7 +485,7 @@ namespace MarketData.Repositories.Repo
                         Delete_Flag = false,
                         Loreal_Brand_Rank = request.lorealBrandRank,
                         Universe = request.universe,
-                        Brand_Group_ID = Guid.NewGuid(),
+                        Brand_Group_ID = request.brandGroupID,
                         Active_Flag = request.active,
                         Created_By = request.userID,
                         Created_Date = DateTime.Now
@@ -828,6 +651,8 @@ namespace MarketData.Repositories.Repo
 
         #endregion
 
+        #region Distribution Channel
+
         public List<TMDistributionChannel> GetDistributionChannelList()
         {
             try
@@ -903,7 +728,6 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-
                 var channelUpdate = _dbContext.TMDistributionChannel.Find(request.distributionChannelID);
 
                 if (channelUpdate != null)
@@ -927,6 +751,137 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
-    }
 
+        #endregion
+
+
+        public List<DepartmentStoreData> GetDepartmentStoreList()
+        {
+            try
+            {
+                var searchData = _dbContext.TMDepartmentStore.Where(c => c.Delete_Flag != true).AsNoTracking();
+
+                var departmentStoreList = (
+                   from e in searchData
+                   join r in _dbContext.TMRetailerGroup
+                       on e.Region_ID equals r.Retailer_Group_ID
+                       into joinRetailer
+                   from retailer in joinRetailer.DefaultIfEmpty()
+                   join d in _dbContext.TMDistributionChannel
+                       on e.Distribution_Channel_ID equals d.Distribution_Channel_ID
+                       into joinChannel
+                   from channel in joinChannel.DefaultIfEmpty()
+                   join re in _dbContext.TMRegion
+                       on e.Region_ID equals re.Region_ID
+                       into joinRegion
+                   from region in joinRegion.DefaultIfEmpty()
+                   select new DepartmentStoreData
+                   {
+                       departmentStoreID = e.Department_Store_ID,
+                       departmentStoreName = e.Department_Store_Name,
+                       distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
+                       retailerGroupName = retailer != null ? retailer.Retailer_Group_Name : string.Empty,
+                       region = region != null ? region.Region_Name : string.Empty,
+                       active = e.Active_Flag,
+                       rank = e.Rank
+                   }).OrderBy(c => c.departmentStoreName).ToList();
+
+                return departmentStoreList;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMDepartmentStore FindDepartmentStoreBy(Expression<Func<TMDepartmentStore, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMDepartmentStore.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> SaveDepartmentStore(SaveDepsrtmentStoreRequest request)
+        {
+            try
+            {
+                if (request.departmentStoreID == null)
+                {
+                    TMDepartmentStore insertDepartmentStore = new TMDepartmentStore
+                    {
+                        Department_Store_ID = Guid.NewGuid(),
+                        Department_Store_Name = request.departmentStoreName,
+                        Distribution_Channel_ID = request.distributionChannelID,
+                        Retailer_Group_ID = request.retailerGroupID,
+                        Region_ID = request.regionID,
+                        Rank = request.rank,
+                        Delete_Flag = false,
+                        Active_Flag = request.active,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMDepartmentStore.Add(insertDepartmentStore);
+                }
+                else
+                {
+                    var departmentStoreUpdate = _dbContext.TMDepartmentStore.Find(request.departmentStoreID);
+
+                    if (departmentStoreUpdate != null)
+                    {
+                        departmentStoreUpdate.Department_Store_Name = request.departmentStoreName;
+                        departmentStoreUpdate.Distribution_Channel_ID = request.distributionChannelID;
+                        departmentStoreUpdate.Retailer_Group_ID = request.retailerGroupID;
+                        departmentStoreUpdate.Region_ID = request.regionID;
+                        departmentStoreUpdate.Rank = request.rank;
+                        departmentStoreUpdate.Active_Flag = request.active;
+                        departmentStoreUpdate.Updated_By = request.userID;
+                        departmentStoreUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMDepartmentStore.Update(departmentStoreUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool DeleteDepartmentStore(DeleteDepartmentStoreRequest request)
+        {
+            try
+            {
+                var departmentStoreUpdate = _dbContext.TMDepartmentStore.Find(request.departmentStoreID);
+
+                if (departmentStoreUpdate != null)
+                {
+                    departmentStoreUpdate.Active_Flag = false;
+                    departmentStoreUpdate.Delete_Flag = true;
+                    departmentStoreUpdate.Updated_By = request.userID;
+                    departmentStoreUpdate.Updated_Date = DateTime.Now;
+
+                    _dbContext.TMDepartmentStore.Update(departmentStoreUpdate);
+                }
+
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+    }
 }

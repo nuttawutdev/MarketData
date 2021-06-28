@@ -5,8 +5,8 @@ using System.Text;
 
 namespace MarketData.Model.Response.MasterData
 {
-    public class GetBrandGroupListResponse : BaseResponse
+    public class GetDepartmentStoreListResponse : BaseResponse
     {
-        public List<BrandGroupData> data { get; set; }
+        public List<DepartmentStoreData> data { get; set; }
     }
 }
