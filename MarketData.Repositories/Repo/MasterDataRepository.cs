@@ -27,9 +27,9 @@ namespace MarketData.Repositories.Repo
             try
             {
                 var searchData = _dbContext.TMBrandType.Where(
-                    c => c.Delete_Flag != true 
+                    c => c.Delete_Flag != true
                     //&& (string.IsNullOrWhiteSpace(request.textSearch) || c.Brand_Type_Name.ToLower().Contains(request.textSearch.ToLower()))
-                    ) .AsNoTracking();
+                    ).AsNoTracking();
 
                 //if (request.active != "All")
                 //{
@@ -59,6 +59,7 @@ namespace MarketData.Repositories.Repo
                 //  .Skip((request.pageNo - 1) * request.pageSize)
                 //  .Take(request.pageSize).ToList();
 
+                searchData = searchData.OrderByDescending(x => x.Brand_Type_Name);
                 return (searchData.ToList(), searchData.Count());
             }
             catch (Exception ex)
@@ -508,6 +509,7 @@ namespace MarketData.Repositories.Repo
 
         #endregion
 
+        #region Brand
         public (List<BrandData>, int) GetBrandList(GetBrandListRequest request)
         {
             try
@@ -643,7 +645,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool SaveBrand(SaveBrandRequest request)
+        public async Task<bool> SaveBrand(SaveBrandRequest request)
         {
             try
             {
@@ -694,7 +696,7 @@ namespace MarketData.Repositories.Repo
                     }
                 }
 
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
@@ -719,6 +721,206 @@ namespace MarketData.Repositories.Repo
                 }
 
                 return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region Retailer Group
+
+        public List<TMRetailerGroup> GetRetailerGroupList()
+        {
+            try
+            {
+                var searchData = _dbContext.TMRetailerGroup.Where(c => c.Delete_Flag != true).AsNoTracking();
+                searchData = searchData.OrderByDescending(x => x.Retailer_Group_Name);
+                return searchData.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> SaveRetailerGroup(SaveRetailerGroupRequest request)
+        {
+            try
+            {
+                if (request.retailerGroupID == null)
+                {
+                    TMRetailerGroup insertRetailerGroup = new TMRetailerGroup
+                    {
+                        Retailer_Group_ID = Guid.NewGuid(),
+                        Retailer_Group_Name = request.retailerGroupName,
+                        Active_Flag = request.active,
+                        Delete_Flag = false,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMRetailerGroup.Add(insertRetailerGroup);
+                }
+                else
+                {
+                    var retailerGroupUpdate = _dbContext.TMRetailerGroup.Find(request.retailerGroupID);
+
+                    if (retailerGroupUpdate != null)
+                    {
+                        retailerGroupUpdate.Retailer_Group_Name = request.retailerGroupName;
+                        retailerGroupUpdate.Active_Flag = request.active;
+                        retailerGroupUpdate.Updated_By = request.userID;
+                        retailerGroupUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMRetailerGroup.Update(retailerGroupUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMRetailerGroup FindRetailerGroupBy(Expression<Func<TMRetailerGroup, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMRetailerGroup.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool DeleteRetailerGroup(DeleteRetailerGroupRequest request)
+        {
+            try
+            {
+                var retailerGroupUpdate = _dbContext.TMRetailerGroup.Find(request.retailerGroupID);
+
+                if (retailerGroupUpdate != null)
+                {
+                    retailerGroupUpdate.Active_Flag = false;
+                    retailerGroupUpdate.Delete_Flag = true;
+                    retailerGroupUpdate.Updated_By = request.userID;
+                    retailerGroupUpdate.Updated_Date = DateTime.Now;
+
+                    _dbContext.TMRetailerGroup.Update(retailerGroupUpdate);
+                }
+
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        public List<TMDistributionChannel> GetDistributionChannelList()
+        {
+            try
+            {
+                var searchData = _dbContext.TMDistributionChannel.Where(c => c.Delete_Flag != true).AsNoTracking();
+                searchData = searchData.OrderByDescending(x => x.Distribution_Channel_Name);
+                return searchData.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> SaveDistributionChannel(SaveDistributionChannelRequest request)
+        {
+            try
+            {
+                if (request.distributionChannelID == null)
+                {
+                    TMDistributionChannel insertChannel = new TMDistributionChannel
+                    {
+                        Distribution_Channel_ID = Guid.NewGuid(),
+                        Distribution_Channel_Name = request.distributionChannelName,
+                        Active_Flag = request.active,
+                        Delete_Flag = false,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMDistributionChannel.Add(insertChannel);
+                }
+                else
+                {
+                    var channelUpdate = _dbContext.TMDistributionChannel.Find(request.distributionChannelID);
+
+                    if (channelUpdate != null)
+                    {
+                        channelUpdate.Distribution_Channel_Name = request.distributionChannelName;
+                        channelUpdate.Active_Flag = request.active;
+                        channelUpdate.Updated_By = request.userID;
+                        channelUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMDistributionChannel.Update(channelUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMDistributionChannel FindDistributionChannelBy(Expression<Func<TMDistributionChannel, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMDistributionChannel.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> DeleteDistributionChannel(DeleteDistributionChannelRequest request)
+        {
+            try
+            {
+
+                var channelUpdate = _dbContext.TMDistributionChannel.Find(request.distributionChannelID);
+
+                if (channelUpdate != null)
+                {
+                    channelUpdate.Active_Flag = true;
+                    channelUpdate.Delete_Flag = true;
+                    channelUpdate.Updated_By = request.userID;
+                    channelUpdate.Updated_Date = DateTime.Now;
+
+                    _dbContext.TMDistributionChannel.Update(channelUpdate);
+                }
+                else
+                {
+                    return false;
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

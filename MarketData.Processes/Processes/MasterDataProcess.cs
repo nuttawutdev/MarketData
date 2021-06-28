@@ -347,6 +347,8 @@ namespace MarketData.Processes.Processes
 
         #endregion
 
+        #region Brand
+
         public GetBrandListResponse GetBrandList(GetBrandListRequest request)
         {
             GetBrandListResponse response = new GetBrandListResponse();
@@ -408,7 +410,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SaveBrand(SaveBrandRequest request)
+        public async Task<SaveDataResponse> SaveBrand(SaveBrandRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -428,7 +430,7 @@ namespace MarketData.Processes.Processes
                         if ((brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID)) ||
                             (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
                         {
-                            response.isSuccess = repository.masterData.SaveBrand(request);
+                            response.isSuccess = await repository.masterData.SaveBrand(request);
                         }
                         else
                         {
@@ -438,7 +440,7 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        response.isSuccess = repository.masterData.SaveBrand(request);
+                        response.isSuccess = await repository.masterData.SaveBrand(request);
                     }
                 }
                 else
@@ -472,8 +474,8 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
-
-        public ImportBrandDataResponse ImportBrandData(ImportBrandDataRequest request)
+        
+        public async Task<ImportBrandDataResponse> ImportBrandData(ImportBrandDataRequest request)
         {
             ImportBrandDataResponse response = new ImportBrandDataResponse();
 
@@ -627,10 +629,219 @@ namespace MarketData.Processes.Processes
                     saveBrandRequest.active = true;
                     saveBrandRequest.userID = request.userID;
 
-                    SaveBrand(saveBrandRequest);
+                    await SaveBrand(saveBrandRequest);
                 }
 
                 response.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
+
+        #region Retailer Group
+
+        public GetRetailerGroupListResponse GetRetailerGroupList()
+        {
+            GetRetailerGroupListResponse response = new GetRetailerGroupListResponse();
+
+            try
+            {
+               var dataList = repository.masterData.GetRetailerGroupList();
+
+                if (dataList.Any())
+                {
+                    response.data = dataList.Select(c => new RetailerGroupData
+                    {
+                        retailerGroupID = c.Retailer_Group_ID,
+                        retailerGroupName = c.Retailer_Group_Name,
+                        active = c.Active_Flag,
+                        createdDate = c.Created_Date
+                    }).ToList();             
+                }
+                else
+                {
+                    response.data = new List<RetailerGroupData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public RetailerGroupData GetRetailerGroupDetail(Guid retailerGroupID)
+        {
+            RetailerGroupData response = new RetailerGroupData();
+
+            try
+            {
+                var retailGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == retailerGroupID);
+
+                if (retailGroupData != null)
+                {
+                    response.retailerGroupID = retailGroupData.Retailer_Group_ID;
+                    response.retailerGroupName = retailGroupData.Retailer_Group_Name;
+                    response.active = retailGroupData.Active_Flag;
+                    response.createdDate = retailGroupData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> SaveRetailerGroup(SaveRetailerGroupRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var retailerGroupByName = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_Name.ToLower() == request.retailerGroupName.ToLower());
+
+                // Retailer group name not exist Or Update old Retailer group
+                if (retailerGroupByName == null || (retailerGroupByName != null && retailerGroupByName.Retailer_Group_ID == request.retailerGroupID))
+                {
+                    response.isSuccess = await repository.masterData.SaveRetailerGroup(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                    response.responseError = "Retailer group name is duplicated";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse DeleteRetailerGroup(DeleteRetailerGroupRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = repository.masterData.DeleteRetailerGroup(request);
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
+
+        public GetDistributionChannelListResponse GetDistributionChannelList()
+        {
+            GetDistributionChannelListResponse response = new GetDistributionChannelListResponse();
+
+            try
+            {
+                var dataList = repository.masterData.GetDistributionChannelList();
+
+                if (dataList.Any())
+                {
+                    response.data = dataList.Select(c => new DistributionChannelData
+                    {
+                        distributionChannelID = c.Distribution_Channel_ID,
+                        distributionChannelName = c.Distribution_Channel_Name,
+                        active = c.Active_Flag,
+                        createdDate = c.Created_Date
+                    }).ToList();
+                }
+                else
+                {
+                    response.data = new List<DistributionChannelData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public DistributionChannelData GetDistributionChannelDetail(Guid distributionChannelD)
+        {
+            DistributionChannelData response = new DistributionChannelData();
+
+            try
+            {
+                var retailGroupData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == distributionChannelD);
+
+                if (retailGroupData != null)
+                {
+                    response.distributionChannelID = retailGroupData.Distribution_Channel_ID;
+                    response.distributionChannelName = retailGroupData.Distribution_Channel_Name;
+                    response.active = retailGroupData.Active_Flag;
+                    response.createdDate = retailGroupData.Created_Date;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> SaveDistributionChannel(SaveDistributionChannelRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var distributionChannelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == request.distributionChannelName.ToLower());
+
+                // Channel name not exist Or Update old Channel
+                if (distributionChannelByName == null || 
+                    (distributionChannelByName != null && distributionChannelByName.Distribution_Channel_ID == request.distributionChannelID))
+                {
+                    response.isSuccess = await repository.masterData.SaveDistributionChannel(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                    response.responseError = "Distribution channel name is duplicated";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> DeleteDistributionChannel(DeleteDistributionChannelRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = await repository.masterData.DeleteDistributionChannel(request);
             }
             catch (Exception ex)
             {

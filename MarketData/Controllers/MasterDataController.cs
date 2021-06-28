@@ -106,7 +106,7 @@ namespace MarketData.Controllers
             {
                 var response = process.masterData.GetBrandTypeList();
 
-                if (response.data.Any())
+                if (response != null && response.data != null && response.data.Any())
                 {
                     brandTypeListView.brandTypeList = response.data.Select(c => new BrandTypeViewModel
                     {
@@ -140,7 +140,7 @@ namespace MarketData.Controllers
                 brandTypeData.brandTypeID = response.brandTypeID;
                 brandTypeData.brandTypeName = response.brandTypeName;
                 brandTypeData.active = response.active;
-                brandTypeData.createdDate = response.createdDate;             
+                brandTypeData.createdDate = response.createdDate;
             }
 
             return Json(brandTypeData);
