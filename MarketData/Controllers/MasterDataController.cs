@@ -30,11 +30,6 @@ namespace MarketData.Controllers
 
         public ActionResult Brand()
         {
-            ImportBrandDataRequest request = new ImportBrandDataRequest
-            {
-
-            };
-            process.masterData.ImportBrandData(request);
             return View();
         }
         public ActionResult Brand_Edit()
