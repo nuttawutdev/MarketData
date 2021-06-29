@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MarketData.Models.BrandTypeViewModel
+
+@{
     ViewData["Title"] = "Add Brand Type";
 }
 
@@ -8,25 +10,32 @@
 
 <br />
 
-<form>
+<form asp-action="SaveBrandType">
     <div class="col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Type Name	</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
+            <input hidden asp-for="brandTypeID" class="form-control input-sm" />
+            <label asp-for="brandTypeName">Brand Type Name</label>
+            <input asp-for="brandTypeName" class="form-control input-sm" />
+            @*<label for="name">Brand Type Name	</label>
+        <input type="text" value="@Model.brandTypeName" class="form-control input-sm" id="name" placeholder="">*@
         </div>
     </div>
     <div class="col-md-12 col-sm-12">
- 
+
         <div class="form-group col-md-5 col-sm-5">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle">
-                Active
+            <label>
+                <input asp-for="active" type="checkbox">Active
             </label>
+            @*<label for="pincode">
+                <input value="@Model.active" type="checkbox" checked data-toggle="toggle">
+                Active
+            </label>*@
         </div>
     </div>
 
     <div class="modal-footer">
-        <a href="BrandType" class="btn btn-danger">Save</a>
+        <button class="btn btn-danger" type="submit">Save</button>
+        @*<a href="BrandType" class="btn btn-danger">Save</a>*@
         <a href="BrandType" class="btn btn-outline-danger">Cancel</a>
 
     </div>

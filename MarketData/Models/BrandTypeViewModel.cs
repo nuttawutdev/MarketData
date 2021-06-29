@@ -7,9 +7,10 @@ namespace MarketData.Models
 {
     public class BrandTypeViewModel
     {
-        public Guid brandTypeID { get; set; }
+        public Guid? brandTypeID { get; set; }
         public string brandTypeName { get; set; }
         public bool active { get; set; }
         public DateTime? createdDate { get; set; }
+        public string userID { get; set; }
     }
 }

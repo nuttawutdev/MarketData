@@ -1102,5 +1102,247 @@ namespace MarketData.Processes.Processes
         }
 
         #endregion
+
+        #region Counter
+
+        public GetCounterListResponse GetCounterList()
+        {
+            GetCounterListResponse response = new GetCounterListResponse();
+
+            try
+            {
+                var dataList = repository.masterData.GetCounterList();
+
+                if (dataList.Any())
+                {
+                    response.data = dataList;
+                }
+                else
+                {
+                    response.data = new List<CounterData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public CounterData GetCounterDetail(Guid counterID)
+        {
+            CounterData response = new CounterData();
+
+            try
+            {
+                var counterData = repository.masterData.FindCounterBy(c => c.Counter_ID == counterID);
+
+                if (counterData != null)
+                {
+                    response.counterID = counterData.Counter_ID;
+                    response.brandID = counterData.Brand_ID;
+                    response.departmentStoreID = counterData.Department_Store_ID;
+                    response.distributionChannelID = counterData.Distribution_Channel_ID;
+                    response.active = counterData.Active_Flag;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> SaveCounter(SaveCounterRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var counterExist = repository.masterData.FindCounterBy(
+                    c => c.Brand_ID == request.brandID 
+                    && c.Department_Store_ID == request.departmentStoreID
+                    && c.Distribution_Channel_ID == request.distributionChannelID);
+
+                // Counter not exist Or Update old Counter
+                if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
+                {
+                    response.isSuccess = await repository.masterData.SaveCounter(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                    response.responseError = "Counter is exist";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> DeleteCounter(DeleteCounterRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response.isSuccess = await repository.masterData.DeleteCounter(request);
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<ImportDataResponse> ImportCounterData(ImportDataRequest request)
+        {
+            ImportDataResponse response = new ImportDataResponse();
+
+            try
+            {
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+                List<SaveCounterRequest> saveCounterList = new List<SaveCounterRequest>();
+
+                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        while (reader.Read()) //Each row of the file
+                        {
+                            // Validate Column File
+                            if (reader.Depth == 0)
+                            {
+                                string column1 = reader.GetValue(0)?.ToString();
+                                string column2 = reader.GetValue(1)?.ToString();
+                                string column3 = reader.GetValue(2)?.ToString();
+
+                                if (column1 != "Brand" ||
+                                    column2 != "Department Store" ||
+                                    column3 != "Distribution Channel")
+                                {
+                                    response.isSuccess = false;
+                                    response.wrongFormatFile = true;
+                                }
+                            }
+
+                            if (reader.Depth != 0)
+                            {
+                                saveCounterList.Add(new SaveCounterRequest
+                                {
+                                    brandName = reader.GetValue(0)?.ToString(),
+                                    departmentStoreName = reader.GetValue(1)?.ToString(),
+                                    distributionChannelName = reader.GetValue(2)?.ToString(),
+                                });
+                            }
+                        }
+                    }
+                }
+
+                var groupByBrandName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.brandName))
+                    .GroupBy(c => c.brandName);
+
+                var groupByDepartmentStoreName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.departmentStoreName))
+                   .GroupBy(c => c.departmentStoreName);
+
+                var groupByChannel = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
+                   .GroupBy(c => c.distributionChannelName);
+
+                var brandNameData = new Dictionary<string, Guid>();
+                var departmentStoreData = new Dictionary<string, Guid>();
+                var channelData = new Dictionary<string, Guid>();
+
+                foreach (var itemBrandName in groupByBrandName)
+                {
+                    var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == itemBrandName.Key.ToLower());
+
+                    if (brandByName != null)
+                    {
+                        brandNameData.Add(itemBrandName.Key, brandByName.Brand_ID);
+                    }
+                }
+
+                foreach (var itemDepartment in groupByDepartmentStoreName)
+                {
+                    var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_Name.ToLower() == itemDepartment.Key.ToLower());
+
+                    if (departmentStoreByName != null)
+                    {
+                        departmentStoreData.Add(itemDepartment.Key, departmentStoreByName.Department_Store_ID);
+                    }
+                }
+
+                foreach (var itemChannel in groupByChannel)
+                {
+                    var channelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower());
+
+                    if (channelByName != null)
+                    {
+                        channelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
+                    }
+                }
+
+                foreach (var saveCounterRequest in saveCounterList)
+                {
+                    saveCounterRequest.brandID = brandNameData.FirstOrDefault(c => c.Key == saveCounterRequest.brandName).Value;
+                    saveCounterRequest.departmentStoreID = departmentStoreData.FirstOrDefault(c => c.Key == saveCounterRequest.departmentStoreName).Value;
+                    saveCounterRequest.distributionChannelID = channelData.FirstOrDefault(c => c.Key == saveCounterRequest.distributionChannelName).Value;
+                    saveCounterRequest.active = true;
+                    saveCounterRequest.userID = request.userID;
+
+                    await SaveCounter(saveCounterRequest);
+                }
+
+                response.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        #endregion
+
+        public GetRegionListResponse GetRegion()
+        {
+            GetRegionListResponse response = new GetRegionListResponse();
+
+            try
+            {
+                var searchData = repository.masterData.GetRegionList();
+
+                if(searchData != null && searchData.Any())
+                {
+                    response.data = searchData.Select(c => new RegionData
+                    {
+                        regionID = c.Region_ID,
+                        regionName = c.Region_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response.data = new List<RegionData>();
+                }              
+            }
+            catch(Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }

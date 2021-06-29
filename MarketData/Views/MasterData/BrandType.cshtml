@@ -80,15 +80,18 @@
                     }, width: "10%",
                     className: "text-center",
                     visible: true,
-                    searchable: true
+                    searchable: true,
+                    orderable: false,
                 },
                 { data: "createdDate", visible: false, searchable: false },
                 {
+                    orderable: false,
+                    title: "Action",
                     width: "20%",
                     className: "text-center",
-                    data: function () {
-                        return '<a href="BrandType_Edit" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="BrandType_Edit" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
+                    render: function (data, type, row) {
+                        return '<a  href="BrandType_Edit?brandTypeID=' + row.brandTypeID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
                             '<a href="#deleteModal" class="buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
                 }}
             ]
