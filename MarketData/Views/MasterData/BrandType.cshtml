@@ -42,18 +42,7 @@
 
 
     $(document).ready(function () {
-        //$("#tableData").one("preInit.dt", function () {
-
-        //    $button = $('<select class="form-control status-dropdown">'+
-        //    '    <option value="">All</option>            '+
-        //    '    <option value=true>Y</option>            '+
-        //    '    <option value="false">N</option>         '+
-        //        '</select >');
-        //    $($button).insertBefore("#tableData_filter label");
-        //    //$("#tableData_filter label").append($button);
-        //    //$button.button();
-
-        //});
+   
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
@@ -119,7 +108,7 @@
                  success: function (data) {
                      if (data.isSuccess) {
 
-                         dttable.ajax.reload();
+                         dataTable.ajax.reload();
                          $('#confirmModal').modal('hide');
                      } else {
                         $('#myModalConfirmResult').text('Delete data failed');
