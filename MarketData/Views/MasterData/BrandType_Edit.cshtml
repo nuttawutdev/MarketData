@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Add Brand Type";
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 
@@ -28,8 +30,7 @@
     </div>
 
     <div class="modal-footer">
-        @*<button class="btn btn-danger" type="submit">Save</button>*@
-        <a id="save" class="btn btn-danger">Save</a>
+        <button id="save" class="btn btn-danger " type="button">Save</button>
         <a href="BrandType" class="btn btn-outline-danger">Cancel</a>
 
     </div>
@@ -48,7 +49,6 @@
                  active: $("#flagactive").prop("checked")
              };
 
-            console.log(frmdata, 'frmdata');
 
             $.ajax({
                  type: "POST",
@@ -57,7 +57,17 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
-
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "BrandType");
+                        $('#successModal').modal('show');
+                    } else if (data.isDuplicated) {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Duplicate data!');
+                    } else {
+                        $('#myModalFailedResult').text('Save data failed');
+                     }
+                    $('#confirmID').val('');
+                    $('#myModalFailedResult').val('');
                 },
                 error: function () {
                 }

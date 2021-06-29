@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Brand Type";
+    Html.RenderPartial("_ConfirmModal");
 }
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
@@ -7,9 +8,18 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
 
 <h3>
-    <div class="btn-group submitter-group float-right">
-        <div class="input-group-prepend">
-            <div class="input-group-text">Status</div>
+
+    @ViewData["Title"]
+    <a href="BrandType_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+
+</h3>
+
+
+<hr />    
+<div style="padding-bottom:40px;">
+    <div class="btn-group submitter-group float-right" style=" align-items: center">
+        <div class="input-group-prepend" style="width: 70px;">
+            <label>Status: </label>
         </div>
         <select class="form-control status-dropdown">
             <option value="">All</option>
@@ -17,48 +27,34 @@
             <option value="false">N</option>
         </select>
     </div>
-    @ViewData["Title"]
-    <a href="BrandType_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
-
-</h3>
-
-
-<hr />
-<br />
-<br />
+</div>
 
 <div class="container-xl">
+
+
     <table id="tableData" class="display" width="100%"></table>
 
+
 </div>
 
-<!-- Delete Modal HTML -->
-<div id="deleteModal" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form>
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete these Records?</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input type="submit" class="btn btn-danger" value="Delete">
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript">
 
 
     $(document).ready(function () {
+        //$("#tableData").one("preInit.dt", function () {
 
-        $('#tableData').DataTable({
+        //    $button = $('<select class="form-control status-dropdown">'+
+        //    '    <option value="">All</option>            '+
+        //    '    <option value=true>Y</option>            '+
+        //    '    <option value="false">N</option>         '+
+        //        '</select >');
+        //    $($button).insertBefore("#tableData_filter label");
+        //    //$("#tableData_filter label").append($button);
+        //    //$button.button();
+
+        //});
+        var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
                 url: '@Url.Action("GetBrandTypeList", "MasterData")',
@@ -70,7 +66,7 @@
             "columns": [
                 { data: "brandTypeID", visible: false, searchable: false },
                 { data: "brandTypeName", title: "Brand Type Name", width: "70%" },
-                { data: "active", title: "active", visible: false},
+                { data: "active", title: "active", visible: false },
                 {
                     data: "active",
                     title: "Active",
@@ -90,24 +86,56 @@
                     width: "20%",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a  href="BrandType_Edit?brandTypeID=' + row.brandTypeID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                        return '<a href="BrandType_Edit?isView=1&brandTypeID=' + row.brandTypeID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
-                            '<a href="#deleteModal" class="buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                            '<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
                 }}
             ]
         });
 
         $('.status-dropdown').on('change', function (e) {
             var status = $(this).val();
-            $('.status-dropdown').val(status)
-            console.log(status)
-            var dataTable = $("#tableData").DataTable();
-
+            $('.status-dropdown').val(status);
             dataTable.column(2).search(status).draw();
         });
+
+        $(document).on('click', '.delete-click', function () {
+            var id = $(this).attr('data-id');
+            $('#confirmID').val(id);
+        });
+
+        $(".btnConfirmModal").click(function () {
+                   var frmdata = {
+                       brandTypeID: $('#confirmID').val(),
+                       userID: null
+            };
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("DeleteBrandType", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                 success: function (data) {
+                     if (data.isSuccess) {
+
+                         dttable.ajax.reload();
+                         $('#confirmModal').modal('hide');
+                     } else {
+                        $('#myModalConfirmResult').text('Delete data failed');
+
+                 }
+
+                     $('#confirmID').val('');
+                     $('#myModalConfirmResult').val('');
+                },
+                error: function () {
+                }
+            });
+        });
+
     });
 
 
 
 </script>
-
