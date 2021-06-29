@@ -424,10 +424,15 @@ namespace MarketData.Processes.Processes
                 {
                     if (branGroupData != null && branGroupData.Is_Loreal_Brand)
                     {
-                        var brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
-                        && c.Delete_Flag != true);
+                        TMBrand brandByShortName = null;
 
-                        var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color == request.brandColor && c.Delete_Flag != true);
+                        if (request.brandShortName != null)
+                        {
+                            brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name != null && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
+                        && c.Delete_Flag != true);
+                        }
+
+                        var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color != null && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
 
                         if ((brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID)) ||
                             (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
@@ -501,15 +506,16 @@ namespace MarketData.Processes.Processes
                             string column5 = reader.GetValue(4)?.ToString();
                             string column6 = reader.GetValue(5)?.ToString();
 
-                            if (column1 != "Name" ||
-                                column2 != "Short name" ||
-                                column3 != "Brand_Group" ||
-                                column4 != "Segment" ||
-                                column5 != "Type" ||
-                                column6 != "BrandColor")
+                            if ((column1 != null && column1.ToLower() != "name") ||
+                                (column2 != null && column2.ToLower() != "short name") ||
+                                (column3 != null && column3.ToLower() != "brand_group") ||
+                                (column4 != null && column4.ToLower() != "segment") ||
+                                (column5 != null && column5.ToLower() != "type") ||
+                                (column6 != null && column6.ToLower() != "brand color"))
                             {
                                 response.isSuccess = false;
                                 response.wrongFormatFile = true;
+                                return response;
                             }
                         }
 
@@ -983,61 +989,62 @@ namespace MarketData.Processes.Processes
 
                 List<SaveDepsrtmentStoreRequest> saveDepartmentStoreList = new List<SaveDepsrtmentStoreRequest>();
 
-                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
+                using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    while (reader.Read()) //Each row of the file
                     {
-                        while (reader.Read()) //Each row of the file
+                        // Validate Column File
+                        if (reader.Depth == 0)
                         {
-                            // Validate Column File
-                            if (reader.Depth == 0)
-                            {
-                                string column1 = reader.GetValue(0)?.ToString();
-                                string column2 = reader.GetValue(1)?.ToString();
-                                string column3 = reader.GetValue(2)?.ToString();
-                                string column4 = reader.GetValue(3)?.ToString();
-                                string column5 = reader.GetValue(4)?.ToString();
+                            string column1 = reader.GetValue(0)?.ToString();
+                            string column2 = reader.GetValue(1)?.ToString();
+                            string column3 = reader.GetValue(2)?.ToString();
+                            string column4 = reader.GetValue(3)?.ToString();
+                            string column5 = reader.GetValue(4)?.ToString();
 
-                                if (column1 != "DepartmentStores" ||
-                                    column2 != "Regions" ||
-                                    column3 != "DepartmentStores_Group" ||
-                                    column4 != "Rank" ||
-                                    column5 != "Distribution_Channels")
-                                {
-                                    response.isSuccess = false;
-                                    response.wrongFormatFile = true;
-                                }
+                            if ((column1 != null && column1.ToLower() != "departmentstores") ||
+                                (column2 != null && column2.ToLower() != "regions") ||
+                                (column3 != null && column3.ToLower() != "departmentstores_group") ||
+                                (column4 != null && column4.ToLower() != "rank") ||
+                                (column5 != null && column5.ToLower() != "distribution_channels"))
+                            {
+                                response.isSuccess = false;
+                                response.wrongFormatFile = true;
+                                return response;
+                            }
+                        }
+
+                        if (reader.Depth != 0)
+                        {
+                            SaveDepsrtmentStoreRequest saveStore = new SaveDepsrtmentStoreRequest
+                            {
+                                departmentStoreName = reader.GetValue(0)?.ToString(),
+                                region = reader.GetValue(1)?.ToString(),
+                                retailerGroupName = reader.GetValue(2)?.ToString(),
+                                distributionChannelName = reader.GetValue(4)?.ToString()
+                            };
+
+                            int rank = 0;
+                            int.TryParse(reader.GetValue(3)?.ToString(), out rank);
+
+                            if (rank != 0)
+                            {
+                                saveStore.rank = rank;
                             }
 
-                            if (reader.Depth != 0)
-                            {
-                                SaveDepsrtmentStoreRequest saveStore = new SaveDepsrtmentStoreRequest
-                                {
-                                    departmentStoreName = reader.GetValue(0)?.ToString(),
-                                    region = reader.GetValue(1)?.ToString(),
-                                    retailerGroupName = reader.GetValue(2)?.ToString(),
-                                    distributionChannelName = reader.GetValue(4)?.ToString()
-                                };
-
-                                int rank = 0;
-                                int.TryParse(reader.GetValue(3)?.ToString(), out rank);
-
-                                if (rank != 0)
-                                {
-                                    saveStore.rank = rank;
-                                }
-
-                                saveDepartmentStoreList.Add(saveStore);
-                            }
+                            saveDepartmentStoreList.Add(saveStore);
                         }
                     }
                 }
+
 
                 var groupByRetailerGroup = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.retailerGroupName))
                     .GroupBy(c => c.retailerGroupName);
 
                 var groupByDistrubution = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
                    .GroupBy(c => c.distributionChannelName);
+
+                var regionData = repository.masterData.GetRegionList();
 
                 var retailerGroupData = new Dictionary<string, Guid>();
                 var distributionChannelData = new Dictionary<string, Guid>();
@@ -1096,7 +1103,8 @@ namespace MarketData.Processes.Processes
 
                 foreach (var saveDepartmentStoreRequest in saveDepartmentStoreList)
                 {
-                    saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.departmentStoreName).Value;
+                    saveDepartmentStoreRequest.regionID = regionData.FirstOrDefault(c => c.Region_Name == saveDepartmentStoreRequest.region)?.Region_ID;
+                    saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.retailerGroupName).Value;
                     saveDepartmentStoreRequest.distributionChannelID = distributionChannelData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.distributionChannelName).Value;
                     saveDepartmentStoreRequest.active = true;
                     saveDepartmentStoreRequest.userID = request.userID;
@@ -1228,37 +1236,35 @@ namespace MarketData.Processes.Processes
 
                 List<SaveCounterRequest> saveCounterList = new List<SaveCounterRequest>();
 
-                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
+                using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    while (reader.Read()) //Each row of the file
                     {
-                        while (reader.Read()) //Each row of the file
+                        // Validate Column File
+                        if (reader.Depth == 0)
                         {
-                            // Validate Column File
-                            if (reader.Depth == 0)
-                            {
-                                string column1 = reader.GetValue(0)?.ToString();
-                                string column2 = reader.GetValue(1)?.ToString();
-                                string column3 = reader.GetValue(2)?.ToString();
+                            string column1 = reader.GetValue(0)?.ToString();
+                            string column2 = reader.GetValue(1)?.ToString();
+                            string column3 = reader.GetValue(2)?.ToString();
 
-                                if (column1 != "Brand" ||
-                                    column2 != "Department Store" ||
-                                    column3 != "Distribution Channel")
-                                {
-                                    response.isSuccess = false;
-                                    response.wrongFormatFile = true;
-                                }
-                            }
-
-                            if (reader.Depth != 0)
+                            if ((column1 != null && column1.ToLower() != "brand") ||
+                                (column2 != null && column2.ToLower() != "department store") ||
+                                (column3 != null && column3.ToLower() != "distribution channel"))
                             {
-                                saveCounterList.Add(new SaveCounterRequest
-                                {
-                                    brandName = reader.GetValue(0)?.ToString(),
-                                    departmentStoreName = reader.GetValue(1)?.ToString(),
-                                    distributionChannelName = reader.GetValue(2)?.ToString(),
-                                });
+                                response.isSuccess = false;
+                                response.wrongFormatFile = true;
+                                return response;
                             }
+                        }
+
+                        if (reader.Depth != 0)
+                        {
+                            saveCounterList.Add(new SaveCounterRequest
+                            {
+                                brandName = reader.GetValue(0)?.ToString(),
+                                departmentStoreName = reader.GetValue(1)?.ToString(),
+                                distributionChannelName = reader.GetValue(2)?.ToString(),
+                            });
                         }
                     }
                 }
@@ -1308,13 +1314,21 @@ namespace MarketData.Processes.Processes
 
                 foreach (var saveCounterRequest in saveCounterList)
                 {
-                    saveCounterRequest.brandID = brandNameData.FirstOrDefault(c => c.Key == saveCounterRequest.brandName).Value;
-                    saveCounterRequest.departmentStoreID = departmentStoreData.FirstOrDefault(c => c.Key == saveCounterRequest.departmentStoreName).Value;
-                    saveCounterRequest.distributionChannelID = channelData.FirstOrDefault(c => c.Key == saveCounterRequest.distributionChannelName).Value;
-                    saveCounterRequest.active = true;
-                    saveCounterRequest.userID = request.userID;
+                    var brandData = brandNameData.FirstOrDefault(c => c.Key == saveCounterRequest.brandName);
+                    var departmentStore = departmentStoreData.FirstOrDefault(c => c.Key == saveCounterRequest.departmentStoreName);
+                    var channel = channelData.FirstOrDefault(c => c.Key == saveCounterRequest.distributionChannelName);
 
-                    await SaveCounter(saveCounterRequest);
+                    if (brandData.Key != null && departmentStore.Key != null && channel.Key != null)
+                    {
+                        saveCounterRequest.brandID = brandData.Value;
+                        saveCounterRequest.departmentStoreID = departmentStore.Value;
+                        saveCounterRequest.distributionChannelID = channel.Value;
+                        saveCounterRequest.active = true;
+                        saveCounterRequest.userID = request.userID;
+
+                        await SaveCounter(saveCounterRequest);
+                    }
+
                 }
 
                 response.isSuccess = true;
