@@ -424,41 +424,24 @@ namespace MarketData.Processes.Processes
                 var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower()
                 && c.Delete_Flag != true);
 
-                var branGroupData = repository.masterData.FindBrandGroupBy(e => e.Brand_Group_ID == request.brandGroupID
-                    && e.Delete_Flag != true);
+                TMBrand brandByShortName = null;
+
+                if (request.brandShortName != null)
+                {
+                    request.brandShortName = request.brandShortName.Trim();
+
+                    brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name != null && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
+                                        && c.Delete_Flag != true);
+                }
+
+                var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color != null && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
 
                 // Brand name not exist Or Update old Brand
-                if (brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
+                if ((brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
+                    && (brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID))
+                    && (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
                 {
-                    if (branGroupData != null && branGroupData.Is_Loreal_Brand)
-                    {
-                        TMBrand brandByShortName = null;
-
-                        if (request.brandShortName != null)
-                        {
-                            request.brandShortName = request.brandShortName.Trim();
-
-                            brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name != null && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
-                        && c.Delete_Flag != true);
-                        }
-
-                        var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color != null && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
-
-                        if ((brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID)) ||
-                            (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
-                        {
-                            response.isSuccess = await repository.masterData.SaveBrand(request);
-                        }
-                        else
-                        {
-                            response.isSuccess = false;
-                            response.isDuplicated = true;
-                        }
-                    }
-                    else
-                    {
-                        response.isSuccess = await repository.masterData.SaveBrand(request);
-                    }
+                    response.isSuccess = await repository.masterData.SaveBrand(request);
                 }
                 else
                 {
