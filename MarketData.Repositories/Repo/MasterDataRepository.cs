@@ -948,5 +948,146 @@ namespace MarketData.Repositories.Repo
         }
 
         #endregion
+
+        #region Counter
+
+        public List<CounterData> GetCounterList()
+        {
+            try
+            {
+                var searchData = _dbContext.TMCounter.Where(c => c.Delete_Flag != true).AsNoTracking();
+
+                var counterList = (
+                   from e in searchData
+                   join d in _dbContext.TMDepartmentStore
+                       on e.Department_Store_ID equals d.Department_Store_ID
+                       into joinDepartment
+                   from department in joinDepartment.DefaultIfEmpty()
+                   join b in _dbContext.TMBrand
+                       on e.Brand_ID equals b.Brand_ID
+                       into joinBrand
+                   from brand in joinBrand.DefaultIfEmpty()
+                   join c in _dbContext.TMDistributionChannel
+                       on e.Distribution_Channel_ID equals c.Distribution_Channel_ID
+                       into joinChannel
+                   from channel in joinChannel.DefaultIfEmpty()
+                   select new CounterData
+                   {
+                       counterID = e.Counter_ID,
+                       departmentStoreID = department.Department_Store_ID,
+                       departmentStoreName = department.Department_Store_Name,
+                       brandID = brand.Brand_ID,
+                       brandName = brand.Brand_Name,
+                       distributionChannelID = channel.Distribution_Channel_ID,
+                       distributionChannelName = channel.Distribution_Channel_Name
+                   }).OrderBy(c => c.departmentStoreName).ToList();
+
+                return counterList;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMCounter FindCounterBy(Expression<Func<TMCounter, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMCounter.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> SaveCounter(SaveCounterRequest request)
+        {
+            try
+            {
+                if (request.counterID == null)
+                {
+                    TMCounter insertCounter = new TMCounter
+                    {
+                        Counter_ID = Guid.NewGuid(),
+                        Brand_ID = request.brandID,
+                        Distribution_Channel_ID = request.distributionChannelID,
+                        Department_Store_ID = request.departmentStoreID,
+                        Delete_Flag = false,
+                        Active_Flag = request.active,
+                        Created_By = request.userID,
+                        Created_Date = DateTime.Now
+                    };
+
+                    _dbContext.TMCounter.Add(insertCounter);
+                }
+                else
+                {
+                    var counterUpdate = _dbContext.TMCounter.Find(request.counterID);
+
+                    if (counterUpdate != null)
+                    {
+                        counterUpdate.Brand_ID = request.brandID;
+                        counterUpdate.Distribution_Channel_ID = request.distributionChannelID;
+                        counterUpdate.Department_Store_ID = request.departmentStoreID;
+                        counterUpdate.Active_Flag = request.active;
+                        counterUpdate.Updated_By = request.userID;
+                        counterUpdate.Updated_Date = DateTime.Now;
+
+                        _dbContext.TMCounter.Update(counterUpdate);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> DeleteCounter(DeleteCounterRequest request)
+        {
+            try
+            {
+                var counterUpdate = _dbContext.TMCounter.Find(request.counterID);
+
+                if (counterUpdate != null)
+                {
+                    counterUpdate.Active_Flag = false;
+                    counterUpdate.Delete_Flag = true;
+                    counterUpdate.Updated_By = request.userID;
+                    counterUpdate.Updated_Date = DateTime.Now;
+
+                    _dbContext.TMCounter.Update(counterUpdate);
+                }
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        public List<TMRegion> GetRegionList()
+        {
+            try
+            {
+                return _dbContext.TMRegion.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
