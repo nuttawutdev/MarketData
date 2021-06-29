@@ -158,21 +158,14 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveBrandType(BrandTypeViewModel request)
+        public IActionResult SaveBrandType([FromBody] SaveBrandTypeRequest request)
         {
             SaveDataResponse response;
 
             if (ModelState.IsValid)
             {
-                SaveBrandTypeRequest saveBrandTypeRequest = new SaveBrandTypeRequest
-                {
-                    brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID,
-                    active = request.active,
-                    brandTypeName = request.brandTypeName
-                };
-
-                response = process.masterData.SaveBrandType(saveBrandTypeRequest);
-                //return RedirectToAction("BrandType", "MasterData");
+                request.brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID;
+                response = process.masterData.SaveBrandType(request);
                 return Json(response);
             }
             else
