@@ -36,7 +36,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool SaveBrandType(SaveBrandTypeRequest request)
+        public async Task<bool> SaveBrandType(SaveBrandTypeRequest request)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace MarketData.Repositories.Repo
                     }
                 }
 
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

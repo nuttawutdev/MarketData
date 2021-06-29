@@ -1,12 +1,14 @@
 ﻿using MarketData.Model.Request;
 using MarketData.Model.Request.MasterData;
 using MarketData.Model.Response;
+using MarketData.Model.Response.MasterData;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -158,14 +160,14 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveBrandType([FromBody] SaveBrandTypeRequest request)
+        public async Task<IActionResult> SaveBrandType([FromBody] SaveBrandTypeRequest request)
         {
             SaveDataResponse response;
 
             if (ModelState.IsValid)
             {
                 request.brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID;
-                response = process.masterData.SaveBrandType(request);
+                response = await process.masterData.SaveBrandType(request);
                 return Json(response);
             }
             else
@@ -177,6 +179,7 @@ namespace MarketData.Controllers
                 return Json(response);
             }
         }
+
 
         [HttpPost]
         public IActionResult DeleteBrandType([FromBody] DeleteBrandTypeRequest request)
@@ -199,5 +202,53 @@ namespace MarketData.Controllers
         }
 
         #endregion
+
+        [HttpPost]
+        public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            ImportDataResponse response = new ImportDataResponse();
+
+            using (var stream = new MemoryStream())
+            {
+                excelFile.CopyTo(stream);
+                stream.Position = 0;
+
+                ImportDataRequest request = new ImportDataRequest
+                {
+                    fileStream = stream,
+                    filePath = excelFile.FileName,
+                    userID = userID,
+                };
+
+                response = await process.masterData.ImportBrandData(request);
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportDepartmentStore(string userID, IFormFile excelFile)
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            ImportDataResponse response = new ImportDataResponse();
+
+            using (var stream = new MemoryStream())
+            {
+                excelFile.CopyTo(stream);
+                stream.Position = 0;
+
+                ImportDataRequest request = new ImportDataRequest
+                {
+                    fileStream = stream,
+                    filePath = excelFile.FileName,
+                    userID = userID,
+                };
+
+                response = await process.masterData.ImportBrandData(request);
+            }
+
+            return Json(response);
+        }
     }
 }

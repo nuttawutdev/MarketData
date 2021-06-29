@@ -81,18 +81,19 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SaveBrandType(SaveBrandTypeRequest request)
+        public async Task<SaveDataResponse> SaveBrandType(SaveBrandTypeRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
             try
             {
-                var brandTypeByName = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_Name.ToLower() == request.brandTypeName.ToLower());
+                var brandTypeByName = repository.masterData.FindBrandTypeBy(c =>
+                c.Brand_Type_Name.ToLower() == request.brandTypeName.ToLower() && c.Delete_Flag != true);
 
                 // Brand type name not exist Or Update old Brand type
                 if (brandTypeByName == null || (brandTypeByName != null && brandTypeByName.Brand_Type_ID == request.brandTypeID))
                 {
-                    response.isSuccess = repository.masterData.SaveBrandType(request);
+                    response.isSuccess = await repository.masterData.SaveBrandType(request);
                 }
                 else
                 {
@@ -192,7 +193,9 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var brandSegmentByName = repository.masterData.FindBrandSegmentBy(c => c.Brand_Segment_Name.ToLower() == request.brandSegmentName.ToLower());
+                var brandSegmentByName = repository.masterData.FindBrandSegmentBy(c =>
+                c.Brand_Segment_Name.ToLower() == request.brandSegmentName.ToLower()
+                && c.Delete_Flag != true);
 
                 // Brand segment name not exist Or Update old Brand segment
                 if (brandSegmentByName == null || (brandSegmentByName != null && brandSegmentByName.Brand_Segment_ID == request.brandSegmentID))
@@ -299,7 +302,9 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var brandGroupByName = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_Name.ToLower() == request.brandGroupName.ToLower());
+                var brandGroupByName = repository.masterData.FindBrandGroupBy
+                    (c => c.Brand_Group_Name.ToLower() == request.brandGroupName.ToLower()
+                    && c.Delete_Flag != true);
 
                 // Brand group name not exist Or Update old Brand group
                 if (brandGroupByName == null || (brandGroupByName != null && brandGroupByName.Brand_Group_ID == request.brandGroupID))
@@ -408,16 +413,21 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower());
-                var branGroupData = repository.masterData.FindBrandGroupBy(e => e.Brand_Group_ID == request.brandGroupID);
+                var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower()
+                && c.Delete_Flag != true);
+
+                var branGroupData = repository.masterData.FindBrandGroupBy(e => e.Brand_Group_ID == request.brandGroupID
+                    && e.Delete_Flag != true);
 
                 // Brand name not exist Or Update old Brand
                 if (brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
                 {
                     if (branGroupData != null && branGroupData.Is_Loreal_Brand)
                     {
-                        var brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower());
-                        var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color == request.brandColor);
+                        var brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
+                        && c.Delete_Flag != true);
+
+                        var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color == request.brandColor && c.Delete_Flag != true);
 
                         if ((brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID)) ||
                             (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
@@ -477,49 +487,47 @@ namespace MarketData.Processes.Processes
 
                 List<SaveBrandRequest> saveBrandList = new List<SaveBrandRequest>();
 
-                using (var stream = System.IO.File.Open(request.filePath, FileMode.Open, FileAccess.Read))
+                using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    while (reader.Read()) //Each row of the file
                     {
-                        while (reader.Read()) //Each row of the file
+                        // Validate Column File
+                        if (reader.Depth == 0)
                         {
-                            // Validate Column File
-                            if (reader.Depth == 0)
-                            {
-                                string column1 = reader.GetValue(0)?.ToString();
-                                string column2 = reader.GetValue(1)?.ToString();
-                                string column3 = reader.GetValue(2)?.ToString();
-                                string column4 = reader.GetValue(3)?.ToString();
-                                string column5 = reader.GetValue(4)?.ToString();
-                                string column6 = reader.GetValue(5)?.ToString();
+                            string column1 = reader.GetValue(0)?.ToString();
+                            string column2 = reader.GetValue(1)?.ToString();
+                            string column3 = reader.GetValue(2)?.ToString();
+                            string column4 = reader.GetValue(3)?.ToString();
+                            string column5 = reader.GetValue(4)?.ToString();
+                            string column6 = reader.GetValue(5)?.ToString();
 
-                                if (column1 != "Name" ||
-                                    column2 != "Short name" ||
-                                    column3 != "Brand_Group" ||
-                                    column4 != "Segment" ||
-                                    column5 != "Type" ||
-                                    column6 != "BrandColor")
-                                {
-                                    response.isSuccess = false;
-                                    response.wrongFormatFile = true;
-                                }
-                            }
-
-                            if (reader.Depth != 0)
+                            if (column1 != "Name" ||
+                                column2 != "Short name" ||
+                                column3 != "Brand_Group" ||
+                                column4 != "Segment" ||
+                                column5 != "Type" ||
+                                column6 != "BrandColor")
                             {
-                                saveBrandList.Add(new SaveBrandRequest
-                                {
-                                    brandName = reader.GetValue(0)?.ToString(),
-                                    brandShortName = reader.GetValue(1)?.ToString(),
-                                    brandGroupName = reader.GetValue(2)?.ToString(),
-                                    brandSegmentName = reader.GetValue(3)?.ToString(),
-                                    brandTypeName = reader.GetValue(4)?.ToString(),
-                                    brandColor = reader.GetValue(5)?.ToString()
-                                });
+                                response.isSuccess = false;
+                                response.wrongFormatFile = true;
                             }
+                        }
+
+                        if (reader.Depth != 0)
+                        {
+                            saveBrandList.Add(new SaveBrandRequest
+                            {
+                                brandName = reader.GetValue(0)?.ToString(),
+                                brandShortName = reader.GetValue(1)?.ToString(),
+                                brandGroupName = reader.GetValue(2)?.ToString(),
+                                brandSegmentName = reader.GetValue(3)?.ToString(),
+                                brandTypeName = reader.GetValue(4)?.ToString(),
+                                brandColor = reader.GetValue(5)?.ToString()
+                            });
                         }
                     }
                 }
+
 
                 var groupByBrandGroup = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandGroupName))
                     .GroupBy(c => c.brandGroupName);
@@ -700,7 +708,9 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var retailerGroupByName = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_Name.ToLower() == request.retailerGroupName.ToLower());
+                var retailerGroupByName = repository.masterData.FindRetailerGroupBy(
+                    c => c.Retailer_Group_Name.ToLower() == request.retailerGroupName.ToLower()
+                    && c.Delete_Flag != true);
 
                 // Retailer group name not exist Or Update old Retailer group
                 if (retailerGroupByName == null || (retailerGroupByName != null && retailerGroupByName.Retailer_Group_ID == request.retailerGroupID))
@@ -805,7 +815,9 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var distributionChannelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == request.distributionChannelName.ToLower());
+                var distributionChannelByName = repository.masterData.FindDistributionChannelBy(
+                    c => c.Distribution_Channel_Name.ToLower() == request.distributionChannelName.ToLower()
+                    && c.Delete_Flag != true);
 
                 // Channel name not exist Or Update old Channel
                 if (distributionChannelByName == null ||
@@ -918,7 +930,9 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower());
+                var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
+                    c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower()
+                    && c.Delete_Flag != true);
 
                 // Department Store name not exist Or Update old Department Store
                 if (departmentStoreByName == null ||
@@ -1162,7 +1176,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var counterExist = repository.masterData.FindCounterBy(
-                    c => c.Brand_ID == request.brandID 
+                    c => c.Brand_ID == request.brandID
                     && c.Department_Store_ID == request.departmentStoreID
                     && c.Distribution_Channel_ID == request.distributionChannelID);
 
@@ -1324,7 +1338,7 @@ namespace MarketData.Processes.Processes
             {
                 var searchData = repository.masterData.GetRegionList();
 
-                if(searchData != null && searchData.Any())
+                if (searchData != null && searchData.Any())
                 {
                     response.data = searchData.Select(c => new RegionData
                     {
@@ -1335,9 +1349,9 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.data = new List<RegionData>();
-                }              
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
