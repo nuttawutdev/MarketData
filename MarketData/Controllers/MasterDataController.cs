@@ -245,7 +245,31 @@ namespace MarketData.Controllers
                     userID = userID,
                 };
 
-                response = await process.masterData.ImportBrandData(request);
+                response = await process.masterData.ImportDepartmentStoreData(request);
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportCounter(string userID, IFormFile excelFile)
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            ImportDataResponse response = new ImportDataResponse();
+
+            using (var stream = new MemoryStream())
+            {
+                excelFile.CopyTo(stream);
+                stream.Position = 0;
+
+                ImportDataRequest request = new ImportDataRequest
+                {
+                    fileStream = stream,
+                    filePath = excelFile.FileName,
+                    userID = userID,
+                };
+
+                response = await process.masterData.ImportCounterData(request);
             }
 
             return Json(response);
