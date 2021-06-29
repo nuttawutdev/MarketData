@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace MarketData.Models
 {
-    public class BrandTypeListViewModel
+    public class BrandSegmentListViewModel
     {
-        public List<BrandTypeViewModel> brandTypeList { get; set; }
+        public List<BrandSegmentViewModel> brandSegmentList { get; set; }
     }
 }

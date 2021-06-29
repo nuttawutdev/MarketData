@@ -218,6 +218,101 @@ namespace MarketData.Controllers
 
         #endregion
 
+        #region Brand Segment Function
+
+        [HttpPost]
+        public IActionResult GetBrandSegmentList()
+        {
+            BrandSegmentListViewModel brandSegmentListView = new BrandSegmentListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetBrandSegmentList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    brandSegmentListView.brandSegmentList = response.data.Select(c => new BrandSegmentViewModel
+                    {
+                        brandSegmentID = c.brandSegmentID,
+                        brandSegmentName = c.brandSegmentName,
+                        active = c.active,
+                        createdDate = c.createdDate
+                    }).ToList();
+                }
+                else
+                {
+                    brandSegmentListView.brandSegmentList = new List<BrandSegmentViewModel>();
+                }
+
+                return Json(brandSegmentListView);
+            }
+            else
+            {
+                return Json(brandSegmentListView);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetBrandSegmentDetail(Guid brandSegmentID)
+        {
+            var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
+            BrandSegmentViewModel brandSegmentData = new BrandSegmentViewModel();
+
+            if (response != null)
+            {
+                brandSegmentData.brandSegmentID = response.brandSegmentID;
+                brandSegmentData.brandSegmentName = response.brandSegmentName;
+                brandSegmentData.active = response.active;
+                brandSegmentData.createdDate = response.createdDate;
+            }
+
+            return Json(brandSegmentData);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveBrandSegment([FromBody] SaveBrandSegmentRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.brandSegmentID = request.brandSegmentID == Guid.Empty ? null : request.brandSegmentID;
+                response = await process.masterData.SaveBrandSegment(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+
+        [HttpPost]
+        public IActionResult DeleteBrandSegment([FromBody] DeleteBrandSegmentRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = process.masterData.DeleteBrandSegment(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        #endregion
+
         [HttpPost]
         public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)
         {

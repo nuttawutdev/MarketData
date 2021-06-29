@@ -189,7 +189,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SaveBrandSegment(SaveBrandSegmentRequest request)
+        public async Task<SaveDataResponse> SaveBrandSegment(SaveBrandSegmentRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -204,7 +204,7 @@ namespace MarketData.Processes.Processes
                 // Brand segment name not exist Or Update old Brand segment
                 if (brandSegmentByName == null || (brandSegmentByName != null && brandSegmentByName.Brand_Segment_ID == request.brandSegmentID))
                 {
-                    response.isSuccess = repository.masterData.SaveBrandSegment(request);
+                    response.isSuccess = await repository.masterData.SaveBrandSegment(request);
                 }
                 else
                 {
@@ -379,10 +379,10 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public GetBrandDetailResponse GetBrandDetail(Guid brandID)
+        public BrandData GetBrandDetail(Guid brandID)
         {
 
-            GetBrandDetailResponse response = null;
+            BrandData response = null;
 
             try
             {
@@ -390,14 +390,14 @@ namespace MarketData.Processes.Processes
 
                 if (brandData != null)
                 {
-                    response = new GetBrandDetailResponse
+                    response = new BrandData
                     {
                         brandID = brandData.Brand_ID,
                         brandName = brandData.Brand_Name,
                         brandShortName = brandData.Brand_Short_Name,
                         brandGroupID = brandData.Brand_Group_ID,
                         brandSegmentID = brandData.Brand_Segment_ID,
-                        brandColor = brandData.Brand_Color,
+                        color = brandData.Brand_Color,
                         active = brandData.Active_Flag,
                         brandTypeID = brandData.Brand_Type_ID,
                         lorealBrandRank = brandData.Loreal_Brand_Rank,

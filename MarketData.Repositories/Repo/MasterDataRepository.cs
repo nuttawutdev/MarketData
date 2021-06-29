@@ -166,7 +166,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool SaveBrandSegment(SaveBrandSegmentRequest request)
+        public async  Task<bool> SaveBrandSegment(SaveBrandSegmentRequest request)
         {
             try
             {
@@ -202,7 +202,7 @@ namespace MarketData.Repositories.Repo
                     }
                 }
 
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
