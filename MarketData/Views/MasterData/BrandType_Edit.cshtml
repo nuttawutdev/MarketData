@@ -1,7 +1,7 @@
 ﻿@model MarketData.Models.BrandTypeViewModel
 
 @{
-    ViewData["Title"] = "Add Brand Type";
+    ViewData["Title"] = Model.brandTypeName == null ? "Add Brand Type" : "Edit Brand Type";
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
 }
@@ -23,7 +23,15 @@
 
         <div class="form-group col-md-5 col-sm-5">
             <label for="pincode">
-                <input value="" id="flagactive" type="checkbox" checked data-toggle="toggle">
+                @if(Model.active)
+                {
+                    <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+                }
+
                 Active
             </label>
         </div>
