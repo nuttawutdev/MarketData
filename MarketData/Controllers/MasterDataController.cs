@@ -47,12 +47,22 @@ namespace MarketData.Controllers
         }
         public IActionResult BrandType()
         {
-            var brandType = process.masterData.GetBrandTypeList();
             return View();
         }
-        public ActionResult BrandType_Edit()
+        [HttpGet]
+        public ActionResult BrandType_Edit(Guid brandTypeID)
         {
-            return View();
+            var response = process.masterData.GetBrandTypeDetail(brandTypeID);
+            BrandTypeViewModel brandTypeData = new BrandTypeViewModel();
+
+            if (response != null)
+            {
+                brandTypeData.brandTypeID = response.brandTypeID;
+                brandTypeData.brandTypeName = response.brandTypeName;
+                brandTypeData.active = response.active;
+                brandTypeData.createdDate = response.createdDate;
+            }
+            return View(brandTypeData);
         }
         public ActionResult BrandSegment()
         {
@@ -94,6 +104,7 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
 
         #region BrandType Function
 
@@ -147,13 +158,21 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveBrandType([FromBody] SaveBrandTypeRequest request)
+        public IActionResult SaveBrandType(BrandTypeViewModel request)
         {
             SaveDataResponse response;
 
             if (ModelState.IsValid)
             {
-                response = process.masterData.SaveBrandType(request);
+                SaveBrandTypeRequest saveBrandTypeRequest = new SaveBrandTypeRequest
+                {
+                    brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID,
+                    active = request.active,
+                    brandTypeName = request.brandTypeName
+                };
+
+                response = process.masterData.SaveBrandType(saveBrandTypeRequest);
+                //return RedirectToAction("BrandType", "MasterData");
                 return Json(response);
             }
             else
