@@ -12,7 +12,7 @@ namespace MarketData.Model.Request.MasterData
         public string retailerGroupName { get; set; }
         public Guid distributionChannelID { get; set; }
         public string distributionChannelName { get; set; }
-        public Guid regionID { get; set; }
+        public Guid? regionID { get; set; }
         public string region { get; set; }
         public int? rank { get; set; }
         public bool active { get; set; }

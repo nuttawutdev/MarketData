@@ -882,7 +882,7 @@ namespace MarketData.Repositories.Repo
                         Department_Store_Name = request.departmentStoreName,
                         Distribution_Channel_ID = request.distributionChannelID,
                         Retailer_Group_ID = request.retailerGroupID,
-                        Region_ID = request.regionID,
+                        Region_ID = request.regionID.GetValueOrDefault(),
                         Rank = request.rank,
                         Delete_Flag = false,
                         Active_Flag = request.active,
@@ -901,7 +901,7 @@ namespace MarketData.Repositories.Repo
                         departmentStoreUpdate.Department_Store_Name = request.departmentStoreName;
                         departmentStoreUpdate.Distribution_Channel_ID = request.distributionChannelID;
                         departmentStoreUpdate.Retailer_Group_ID = request.retailerGroupID;
-                        departmentStoreUpdate.Region_ID = request.regionID;
+                        departmentStoreUpdate.Region_ID = request.regionID.GetValueOrDefault();
                         departmentStoreUpdate.Rank = request.rank;
                         departmentStoreUpdate.Active_Flag = request.active;
                         departmentStoreUpdate.Updated_By = request.userID;

@@ -48,7 +48,22 @@
                     <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i></button>
                 </div>
             </div>
-            <div class="col-sm-2">
+            <form id="uploadFile" action="@Url.Action("ImportCounter", "MasterData")" method="post" enctype="multipart/form-data">
+
+                <div class="filter-group">
+                    <div class="custom-file-upload">
+
+                        <label for="file-upload" class="custom-file-upload1">
+                            <i class="ion-android-document"></i> Import by Excel
+                        </label>
+                        <input type="text" id="userID" name="userID" value="DDD" hidden />
+                        <input id="file-upload" type="file" name="excelFile" />
+                        <input type="submit" id="btnSubmit" value="Import" hidden />
+                    </div>
+                </div>
+            </form>
+
+            @*<div class="col-sm-2">
                 <div class="custom-file-upload">
 
                     <label for="file-upload" class="custom-file-upload1">
@@ -56,7 +71,7 @@
                     </label>
                     <input id="file-upload" type="file" />
                 </div>
-            </div>
+            </div>*@
         </div>
     </div>
 </div>
@@ -154,3 +169,15 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#file-upload").change(function () {
+            console.log('aa')
+            document.getElementById("uploadFile").submit();
+        });
+
+ });
+</script>
