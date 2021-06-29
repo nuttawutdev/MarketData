@@ -123,6 +123,51 @@ namespace MarketData.Controllers
         }
 
 
+        #region Brand Function
+
+        [HttpPost]
+        public IActionResult GetBrandList()
+        {
+            BrandListViewModel brandListView = new BrandListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetBrandList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    brandListView.brandList = response.data.Select(c => new BrandViewModel
+                    {
+                        brandID = c.brandID,
+                        brandName = c.brandName,
+                        //brandShortName = c.brandShortName,
+                        //brandGroupID = c.brandGroupID,
+                        brandGroupName = c.brandGroupName,
+                        //brandSegmentID = c.brandSegmentID,
+                        brandSegmentName = c.brandSegmentName,
+                        //brandTypeID = c.brandTypeID,
+                        brandTypeName = c.brandTypeName,
+                        universe = c.universe,
+                        brandBirth = c.brandBirth,
+                        color = c.color,
+                        isLorealBrand = c.isLorealBrand,
+                        //lorealBrandRank = c.lorealBrandRank,
+                        active = c.active
+                    }).ToList();
+                }
+                else
+                {
+                    brandListView.brandList = new List<BrandViewModel>();
+                }
+
+                return Json(brandListView);
+            }
+            else
+            {
+                return Json(brandListView);
+            }
+        }
+        #endregion
         #region BrandType Function
 
         [HttpPost]

@@ -3,9 +3,9 @@
 }
 
 <style>
-   .font-band {
-       font-size:12px
-   }
+    .font-band {
+        font-size: 12px
+    }
 </style>
 
 <h3>
@@ -56,14 +56,15 @@
                 <div class="filter-group">
                     <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i></button>
                 </div>
-                <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post" enctype="multipart/form-data">
+                <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                      enctype="multipart/form-data">
                     <div class="filter-group ">
                         <div class="custom-file-upload">
 
                             <label for="file-upload" class="custom-file-upload1">
                                 <i class="ion-android-document"></i> Import by Excel
                             </label>
-                            <input type="text" id="userID" name="userID" value="DDD" hidden/>
+                            <input type="text" id="userID" name="userID" value="DDD" hidden />
                             <input id="file-upload" type="file" name="excelFile" />
                             <input type="submit" id="btnSubmit" value="Import" hidden />
                         </div>
@@ -80,13 +81,6 @@
             <table class="table table-striped table-hover ">
                 <thead class="table-secondary">
                     <tr class="row m-0">
-
-                        @*<th class="col-3 text-center">Name</th>
-        <th class="col-4 text-center">Detail</th>
-        <th class="col-1 text-center">Loreal brand rank</th>
-        <th class="col-1 text-center">Color</th>
-        <th class="col-1 text-center">Active</th>
-        <th class="col-2 text-center">Action</th>*@
 
 
                         <th class="col-2 ">Brand Name</th>
@@ -184,123 +178,123 @@
                         </td>
                     </tr>
                     <!--<tr class="row m-0">
-        <td class="col-3">LOREAL<br /><small>LO</small></td>
-        <td class="col-4" style="font-size:small">
+                        <td class="col-3">LOREAL<br /><small>LO</small></td>
+                        <td class="col-4" style="font-size:small">
 
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Group : </b></div>
-                <div class="col-7">Loreal</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                <div class="col-7">Mainstream</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Type : </b></div>
-                <div class="col-7">ASIA</div>
-            </div>
-        </td>
-        <td class="col-1 text-center">1</td>
-        <td class="col-1"><input type="color" value="#f8aaaa" class="textbox-color" disabled /></td>
-        <td class="col-1 text-center">
-            <span class="custom-checkbox">
-                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
-                <label for="checkbox1"></label>
-            </span>
-        </td>
-        <td class="col-2 text-center">
-            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                <i class="ion-eye text-white"></i>
-            </a>
-            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                <i class="ion-edit text-white"></i>
-            </a>
-            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                <i class="ion-android-delete text-white"></i>
-            </a>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Group : </b></div>
+                                <div class="col-7">Loreal</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                                <div class="col-7">Mainstream</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Type : </b></div>
+                                <div class="col-7">ASIA</div>
+                            </div>
+                        </td>
+                        <td class="col-1 text-center">1</td>
+                        <td class="col-1"><input type="color" value="#f8aaaa" class="textbox-color" disabled /></td>
+                        <td class="col-1 text-center">
+                            <span class="custom-checkbox">
+                                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
+                                <label for="checkbox1"></label>
+                            </span>
+                        </td>
+                        <td class="col-2 text-center">
+                            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-eye text-white"></i>
+                            </a>
+                            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-edit text-white"></i>
+                            </a>
+                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                                <i class="ion-android-delete text-white"></i>
+                            </a>
 
-        </td>
-    </tr>
-    <tr class="row m-0">
-        <td class="col-3">Lux Asia<br /><small>Lu</small></td>
-        <td class="col-4" style="font-size:small">
+                        </td>
+                    </tr>
+                    <tr class="row m-0">
+                        <td class="col-3">Lux Asia<br /><small>Lu</small></td>
+                        <td class="col-4" style="font-size:small">
 
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Group : </b></div>
-                <div class="col-7">ELCA</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                <div class="col-7">Couture</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Type : </b></div>
-                <div class="col-7">ASIA</div>
-            </div>
-        </td>
-        <td class="col-1 text-center"></td>
-        <td class="col-1">-->
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Group : </b></div>
+                                <div class="col-7">ELCA</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                                <div class="col-7">Couture</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Type : </b></div>
+                                <div class="col-7">ASIA</div>
+                            </div>
+                        </td>
+                        <td class="col-1 text-center"></td>
+                        <td class="col-1">-->
                     @*<input type="color" value="#b0cbd0" class="textbox-color" disabled/>*@
                     <!--</td>
-        <td class="col-1 text-center">
-            <span class="custom-checkbox">
-                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
-                <label for="checkbox1"></label>
-            </span>
-        </td>
-        <td class="col-2 text-center">
-            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                <i class="ion-eye text-white"></i>
-            </a>
-            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                <i class="ion-edit text-white"></i>
-            </a>
-            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                <i class="ion-android-delete text-white"></i>
-            </a>
+                        <td class="col-1 text-center">
+                            <span class="custom-checkbox">
+                                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1" checked>
+                                <label for="checkbox1"></label>
+                            </span>
+                        </td>
+                        <td class="col-2 text-center">
+                            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-eye text-white"></i>
+                            </a>
+                            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-edit text-white"></i>
+                            </a>
+                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                                <i class="ion-android-delete text-white"></i>
+                            </a>
 
-        </td>
-    </tr>
-    <tr class="row m-0">
-        <td class="col-3">SHISEDO<br /><small>LO</small></td>
-        <td class="col-4" style="font-size:small">
+                        </td>
+                    </tr>
+                    <tr class="row m-0">
+                        <td class="col-3">SHISEDO<br /><small>LO</small></td>
+                        <td class="col-4" style="font-size:small">
 
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Group : </b></div>
-                <div class="col-7">ELCA</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Segment : </b></div>
-                <div class="col-7">Make-up Artist</div>
-            </div>
-            <div class="row">
-                <div class="text-right col-5"><b>Brand Type : </b></div>
-                <div class="col-7">Make up</div>
-            </div>
-        </td>
-        <td class="col-1 text-center"></td>
-        <td class="col-1">-->
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Group : </b></div>
+                                <div class="col-7">ELCA</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Segment : </b></div>
+                                <div class="col-7">Make-up Artist</div>
+                            </div>
+                            <div class="row">
+                                <div class="text-right col-5"><b>Brand Type : </b></div>
+                                <div class="col-7">Make up</div>
+                            </div>
+                        </td>
+                        <td class="col-1 text-center"></td>
+                        <td class="col-1">-->
                     @*<input type="color" value="#dc3545" class="textbox-color" disabled/>*@
                     <!--</td>
-        <td class="col-1 text-center">
-            <span class="custom-checkbox">
-                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1">
-                <label for="checkbox1"></label>
-            </span>
-        </td>
-        <td class="col-2 text-center">
-            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                <i class="ion-eye text-white"></i>
-            </a>
-            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                <i class="ion-edit text-white"></i>
-            </a>
-            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                <i class="ion-android-delete text-white"></i>
-            </a>
+                        <td class="col-1 text-center">
+                            <span class="custom-checkbox">
+                                <input disabled type="checkbox" id="checkbox1" name="options[]" value="1">
+                                <label for="checkbox1"></label>
+                            </span>
+                        </td>
+                        <td class="col-2 text-center">
+                            <a href="Brand_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-eye text-white"></i>
+                            </a>
+                            <a href="Brand_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
+                                <i class="ion-edit text-white"></i>
+                            </a>
+                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
+                                <i class="ion-android-delete text-white"></i>
+                            </a>
 
-        </td>
-    </tr>-->
+                        </td>
+                    </tr>-->
                 </tbody>
             </table>
 
@@ -338,5 +332,127 @@
             document.getElementById("uploadFile").submit();
         });
 
- });
+    });
+</script>
+
+
+<hr />
+<div style="padding-bottom:40px;">
+    <div class="btn-group submitter-group float-right" style=" align-items: center">
+        <div class="input-group-prepend" style="width: 70px;">
+            <label>Status: </label>
+        </div>
+        <select class="form-control status-dropdown">
+            <option value="">All</option>
+            <option value=true>Y</option>
+            <option value="false">N</option>
+        </select>
+    </div>
+</div>
+
+<div class="container-xl">
+
+
+    <table id="tableData" class="display" width="100%"></table>
+
+
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetBrandList", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.brandList;
+                }
+            },
+            "columns": [
+                { data: "brandID", visible: false, searchable: false },
+                { data: "brandName", title: "Brand Name", width: "10%" },
+                { data: "brandGroupName", title: "Brand Group", width: "10%" },
+                { data: "brandSegmentName", title: "Brand Segment", width: "10%" },
+                { data: "brandTypeName", title: "Brand Type", width: "10%" },
+                { data: "universe", title: "Universe" },
+                { data: "brandBirth", title: "Brand Birth" },
+                { data: "color", title: "Color" },
+                { data: "isLorealBrand", title: "isLorealBrand", visible: false },
+                { data: "active", title: "active", visible: false },
+                {
+                    data: "active",
+                    title: "Active",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" id="checkbox1" name="options[]" value="true" disabled ' + checkStatus + '>';
+                    },
+                    width: "10%",
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                {
+                    orderable: false,
+                    title: "Action",
+                    width: "10%",
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return '<a href="Brand_Edit_View?brandTypeID=' + row.brandTypeID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="Brand_Edit?brandTypeID=' + row.brandTypeID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
+                            '<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                }}
+            ]
+        });
+
+        $('.status-dropdown').on('change', function (e) {
+            var status = $(this).val();
+            $('.status-dropdown').val(status);
+            dataTable.column(2).search(status).draw();
+        });
+
+        $(document).on('click', '.delete-click', function () {
+            var id = $(this).attr('data-id');
+            $('#confirmID').val(id);
+        });
+
+        $(".btnConfirmModal").click(function () {
+                   var frmdata = {
+                       brandTypeID: $('#confirmID').val(),
+                       userID: null
+            };
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("DeleteBrandType", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                 success: function (data) {
+                     if (data.isSuccess) {
+
+                         dataTable.ajax.reload();
+                         $('#confirmModal').modal('hide');
+                     } else {
+                        $('#myModalConfirmResult').text('Delete data failed');
+
+                 }
+
+                     $('#confirmID').val('');
+                     $('#myModalConfirmResult').val('');
+                },
+                error: function () {
+                }
+            });
+        });
+
+    });
+
+
+
 </script>
