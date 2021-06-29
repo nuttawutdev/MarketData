@@ -560,7 +560,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandGroup in groupByBrandGroup)
                 {
-                    var brandGroupByName = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_Name.ToLower() == itemBrandGroup.Key.ToLower());
+                    var brandGroupByName = repository.masterData.FindBrandGroupBy(
+                        c => c.Brand_Group_Name.ToLower() == itemBrandGroup.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (brandGroupByName == null)
                     {
@@ -587,7 +589,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandSegment in groupByBrandSegment)
                 {
-                    var brandSegmentByName = repository.masterData.FindBrandSegmentBy(c => c.Brand_Segment_Name.ToLower() == itemBrandSegment.Key.ToLower());
+                    var brandSegmentByName = repository.masterData.FindBrandSegmentBy(
+                        c => c.Brand_Segment_Name.ToLower() == itemBrandSegment.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (brandSegmentByName == null)
                     {
@@ -613,7 +617,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandType in groupByBrandType)
                 {
-                    var brandTypetByName = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_Name.ToLower() == itemBrandType.Key.ToLower());
+                    var brandTypetByName = repository.masterData.FindBrandTypeBy(
+                        c => c.Brand_Type_Name.ToLower() == itemBrandType.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (brandTypetByName == null)
                     {
@@ -1067,7 +1073,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemRetailerGroup in groupByRetailerGroup)
                 {
-                    var retailerGroupByName = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_Name.ToLower() == itemRetailerGroup.Key.ToLower());
+                    var retailerGroupByName = repository.masterData.FindRetailerGroupBy(
+                        c => c.Retailer_Group_Name.ToLower() == itemRetailerGroup.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (retailerGroupByName == null)
                     {
@@ -1093,7 +1101,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemChannel in groupByDistrubution)
                 {
-                    var channelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower());
+                    var channelByName = repository.masterData.FindDistributionChannelBy(
+                        c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (channelByName == null)
                     {
@@ -1300,7 +1310,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandName in groupByBrandName)
                 {
-                    var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == itemBrandName.Key.ToLower());
+                    var brandByName = repository.masterData.FindBrandBy(
+                        c => c.Brand_Name.ToLower() == itemBrandName.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (brandByName != null)
                     {
@@ -1310,7 +1322,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemDepartment in groupByDepartmentStoreName)
                 {
-                    var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_Name.ToLower() == itemDepartment.Key.ToLower());
+                    var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
+                        c => c.Department_Store_Name.ToLower() == itemDepartment.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (departmentStoreByName != null)
                     {
@@ -1320,7 +1334,9 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemChannel in groupByChannel)
                 {
-                    var channelByName = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower());
+                    var channelByName = repository.masterData.FindDistributionChannelBy(
+                        c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
+                        && c.Delete_Flag != true);
 
                     if (channelByName != null)
                     {
