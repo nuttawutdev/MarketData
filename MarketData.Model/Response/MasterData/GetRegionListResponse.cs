@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MarketData.Model.Response.MasterData
 {
-    public class GetRegionListResponse
+    public class GetRegionListResponse : BaseResponse
     {
         public List<RegionData> data { get; set; }
     }
