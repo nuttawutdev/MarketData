@@ -87,6 +87,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.brandTypeName = request.brandTypeName.Trim();
+
                 var brandTypeByName = repository.masterData.FindBrandTypeBy(c =>
                 c.Brand_Type_Name.ToLower() == request.brandTypeName.ToLower() && c.Delete_Flag != true);
 
@@ -193,6 +195,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.brandSegmentName = request.brandSegmentName.Trim();
+
                 var brandSegmentByName = repository.masterData.FindBrandSegmentBy(c =>
                 c.Brand_Segment_Name.ToLower() == request.brandSegmentName.ToLower()
                 && c.Delete_Flag != true);
@@ -302,6 +306,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.brandGroupName = request.brandGroupName.Trim();
+
                 var brandGroupByName = repository.masterData.FindBrandGroupBy
                     (c => c.Brand_Group_Name.ToLower() == request.brandGroupName.ToLower()
                     && c.Delete_Flag != true);
@@ -413,6 +419,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.brandName = request.brandName.Trim();
+
                 var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower()
                 && c.Delete_Flag != true);
 
@@ -428,6 +436,8 @@ namespace MarketData.Processes.Processes
 
                         if (request.brandShortName != null)
                         {
+                            request.brandShortName = request.brandShortName.Trim();
+
                             brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name != null && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
                         && c.Delete_Flag != true);
                         }
@@ -714,6 +724,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.retailerGroupName = request.retailerGroupName.Trim();
+
                 var retailerGroupByName = repository.masterData.FindRetailerGroupBy(
                     c => c.Retailer_Group_Name.ToLower() == request.retailerGroupName.ToLower()
                     && c.Delete_Flag != true);
@@ -821,6 +833,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.distributionChannelName = request.distributionChannelName.Trim();
+
                 var distributionChannelByName = repository.masterData.FindDistributionChannelBy(
                     c => c.Distribution_Channel_Name.ToLower() == request.distributionChannelName.ToLower()
                     && c.Delete_Flag != true);
@@ -936,6 +950,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                request.departmentStoreName = request.departmentStoreName.Trim();
+
                 var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
                     c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower()
                     && c.Delete_Flag != true);
