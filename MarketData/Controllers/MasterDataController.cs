@@ -66,6 +66,21 @@ namespace MarketData.Controllers
             }
             return View(brandTypeData);
         }
+        [HttpGet]
+        public ActionResult BrandType_Edit_View(Guid brandTypeID)
+        {
+            var response = process.masterData.GetBrandTypeDetail(brandTypeID);
+            BrandTypeViewModel brandTypeData = new BrandTypeViewModel();
+
+            if (response != null)
+            {
+                brandTypeData.brandTypeID = response.brandTypeID;
+                brandTypeData.brandTypeName = response.brandTypeName;
+                brandTypeData.active = response.active;
+                brandTypeData.createdDate = response.createdDate;
+            }
+            return View(brandTypeData);
+        }
         public ActionResult BrandSegment()
         {
             return View();
