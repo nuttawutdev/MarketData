@@ -35,6 +35,15 @@
 
 
     $(document).ready(function () {
+        $("#tableData").one("preInit.dt", function () {
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
+        });
 
         var dataTable=  $('#tableData').DataTable({
             "ajax": {

@@ -202,18 +202,13 @@ namespace MarketData.Controllers
                     {
                         brandID = c.brandID,
                         brandName = c.brandName,
-                        //brandShortName = c.brandShortName,
-                        //brandGroupID = c.brandGroupID,
                         brandGroupName = c.brandGroupName,
-                        //brandSegmentID = c.brandSegmentID,
                         brandSegmentName = c.brandSegmentName,
-                        //brandTypeID = c.brandTypeID,
                         brandTypeName = c.brandTypeName,
                         universe = c.universe,
                         brandBirth = c.brandBirth,
                         color = c.color,
                         isLorealBrand = c.isLorealBrand,
-                        //lorealBrandRank = c.lorealBrandRank,
                         active = c.active
                     }).ToList();
                 }
@@ -234,12 +229,29 @@ namespace MarketData.Controllers
         {
             var response = process.masterData.GetBrandDetail(brandID);
             BrandViewModel data = new BrandViewModel();
+            var brandTypeList = process.masterData.GetBrandTypeList();
+            var brandGroupList = process.masterData.GetBrandGroupList();
+            var brandSegmentList = process.masterData.GetBrandSegmentList();
+            data.brandTypeList = brandTypeList != null && brandTypeList.data != null ? brandTypeList.data.Where(c => c.active).Select(e => new BrandTypeViewModel
+            {
+                brandTypeID = e.brandTypeID,
+                brandTypeName = e.brandTypeName
+            }).ToList() : new List<BrandTypeViewModel>();
+            data.brandGroupList = brandGroupList != null && brandGroupList.data != null ? brandGroupList.data.Where(c => c.active).Select(e => new BrandGroupViewModel
+            {
+                brandGroupID = e.brandGroupID,
+                brandGroupName = e.brandGroupName,
+                isLoreal = e.isLoreal
+            }).ToList() : new List<BrandGroupViewModel>();
+            data.brandSegmentList = brandSegmentList != null && brandSegmentList.data != null ? brandSegmentList.data.Where(c => c.active).Select(e => new BrandSegmentViewModel
+            {
+                brandSegmentID = e.brandSegmentID,
+                brandSegmentName = e.brandSegmentName
+            }).ToList() : new List<BrandSegmentViewModel>();
 
             if (response != null)
             {
-                var brandTypeList = process.masterData.GetBrandTypeList();
-                var brandGroupList = process.masterData.GetBrandGroupList();
-                var brandSegmentList = process.masterData.GetBrandSegmentList();
+         
 
                 data.brandID = response.brandID;
                 data.brandName = response.brandName;
@@ -252,22 +264,7 @@ namespace MarketData.Controllers
                 data.lorealBrandRank = response.lorealBrandRank;
                 data.universe = response.universe;
                 data.active = response.active;
-                data.brandTypeList = brandTypeList != null && brandTypeList.data != null ? brandTypeList.data.Where(c => c.active).Select(e => new BrandTypeViewModel
-                {
-                    brandTypeID = e.brandTypeID,
-                    brandTypeName = e.brandTypeName
-                }).ToList() : new List<BrandTypeViewModel>();
-                data.brandGroupList = brandGroupList != null && brandGroupList.data != null ? brandGroupList.data.Where(c => c.active).Select(e => new BrandGroupViewModel
-                {
-                    brandGroupID = e.brandGroupID,
-                    brandGroupName = e.brandGroupName,
-                    isLoreal = e.isLoreal
-                }).ToList() : new List<BrandGroupViewModel>();
-                data.brandSegmentList = brandSegmentList != null && brandSegmentList.data != null ? brandSegmentList.data.Where(c => c.active).Select(e => new BrandSegmentViewModel
-                {
-                    brandSegmentID = e.brandSegmentID,
-                    brandSegmentName = e.brandSegmentName
-                }).ToList() : new List<BrandSegmentViewModel>();
+                
             }
 
             return data;

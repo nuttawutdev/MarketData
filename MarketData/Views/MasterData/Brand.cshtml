@@ -27,8 +27,8 @@
             </select>
             <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
                   enctype="multipart/form-data">
-                <div class="filter-group " >
-                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px; margin-right: 10px; ">
+                <div class="filter-group ">
+                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
                         <label for="file-upload" class="custom-file-upload1">
                             <i class="ion-android-document"></i> Import by Excel
@@ -39,8 +39,7 @@
                     </div>
                 </div>
             </form>
-            <button class="btn btn-primary btn-sm btnReresh" type="button" style="width:100px!important"><i class="ion-refresh text-white"></i> Refresh</button>
-
+           
         </div>
     </div>
 
@@ -60,9 +59,18 @@
 
     $(document).ready(function () {
         $("#file-upload").change(function () {
-            console.log('aa')
             document.getElementById("uploadFile").submit();
         });
+
+
+        $("#tableData").one("preInit.dt", function () {
+
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
@@ -84,12 +92,11 @@
                 {
                     data: "color",
                     title: "Color",
-                    render: function (data, type, row) {
-                        return '<input type="color" value="' + data ? data:""+'" class="textbox-color text-center" disabled />';
+                    render: function (color) {
+                        return '<input type="textbox" class="form-control input-sm" style="width: 80px;background-color:' + color + ';" readonly/> ';
                     },
                     className: "text-center",
                     visible: true,
-                    searchable: true,
                     orderable: false,
                 },
                 { data: "isLorealBrand", title: "isLorealBrand", visible: false },
@@ -131,6 +138,10 @@
         $(document).on('click', '.delete-click', function () {
             var id = $(this).attr('data-id');
             $('#confirmID').val(id);
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
         });
 
         $(".btnConfirmModal").click(function () {

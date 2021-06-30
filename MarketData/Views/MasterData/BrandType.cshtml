@@ -17,13 +17,11 @@
     <div class="row">
         <div class="col text-end d-flex justify-content-end align-items-center">
             <label class="form-label">Active: </label>
-            <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
+            <select class="form-control status-dropdown" style="width:70px!important">
                 <option value="">All</option>
                 <option value=true>Y</option>
                 <option value="false">N</option>
             </select>
-            <button class="btn btn-primary btn-sm btnReresh" type="button" style="width:100px!important"><i class="ion-refresh text-white"></i> Refresh</button>
-
         </div>
     </div>
 
@@ -41,7 +39,13 @@
 
 
     $(document).ready(function () {
+        $("#tableData").one("preInit.dt", function () {
 
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
