@@ -35,9 +35,10 @@ namespace MarketData.Controllers
             return View();
         }
 
-        public ActionResult Brand_Edit()
+        public ActionResult Brand_Edit(Guid brandID)
         {
-            return View();
+            var viewData = GetBrandDetail(brandID);
+            return View(viewData);
         }
 
         public ActionResult BrandGroup()
@@ -228,6 +229,51 @@ namespace MarketData.Controllers
                 return Json(brandListView);
             }
         }
+
+        public BrandViewModel GetBrandDetail(Guid brandID)
+        {
+            var response = process.masterData.GetBrandDetail(brandID);
+            BrandViewModel data = new BrandViewModel();
+
+            if (response != null)
+            {
+                var brandTypeList = process.masterData.GetBrandTypeList();
+                var brandGroupList = process.masterData.GetBrandGroupList();
+                var brandSegmentList = process.masterData.GetBrandSegmentList();
+
+                data.brandID = response.brandID;
+                data.brandName = response.brandName;
+                data.brandShortName = response.brandShortName;
+                data.brandGroupID = response.brandGroupID;
+                data.brandSegmentID = response.brandSegmentID;
+                data.brandTypeID = response.brandTypeID;
+                data.brandTypeName = response.brandTypeName;
+                data.color = response.color;
+                data.lorealBrandRank = response.lorealBrandRank;
+                data.universe = response.universe;
+                data.active = response.active;
+                data.brandTypeList = brandTypeList != null && brandTypeList.data != null ? brandTypeList.data.Where(c => c.active).Select(e => new BrandTypeViewModel
+                {
+                    brandTypeID = e.brandTypeID,
+                    brandTypeName = e.brandTypeName
+                }).ToList() : new List<BrandTypeViewModel>();
+                data.brandGroupList = brandGroupList != null && brandGroupList.data != null ? brandGroupList.data.Where(c => c.active).Select(e => new BrandGroupViewModel
+                {
+                    brandGroupID = e.brandGroupID,
+                    brandGroupName = e.brandGroupName,
+                    isLoreal = e.isLoreal
+                }).ToList() : new List<BrandGroupViewModel>();
+                data.brandSegmentList = brandSegmentList != null && brandSegmentList.data != null ? brandSegmentList.data.Where(c => c.active).Select(e => new BrandSegmentViewModel
+                {
+                    brandSegmentID = e.brandSegmentID,
+                    brandSegmentName = e.brandSegmentName
+                }).ToList() : new List<BrandSegmentViewModel>();
+            }
+
+            return data;
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveBrand([FromBody] SaveBrandRequest request)
         {
@@ -530,7 +576,7 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveChannel ([FromBody] SaveDistributionChannelRequest request)
+        public async Task<IActionResult> SaveChannel([FromBody] SaveDistributionChannelRequest request)
         {
             SaveDataResponse response;
 

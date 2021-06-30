@@ -23,6 +23,8 @@ namespace MarketData.Models
         public int? lorealBrandRank { get; set; }
         public bool active { get; set; }
         public string userID { get; set; }
-
+        public List<BrandTypeViewModel> brandTypeList { get; set; }
+        public List<BrandGroupViewModel> brandGroupList { get; set; }
+        public List<BrandSegmentViewModel> brandSegmentList { get; set; }
     }
 }
