@@ -85,9 +85,20 @@ namespace MarketData.Controllers
         {
             return View();
         }
-        public ActionResult BrandSegment_Edit()
+
+        public ActionResult BrandSegment_Edit(Guid brandSegmentID)
         {
-            return View();
+            var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
+            BrandSegmentViewModel brandSegmentData = new BrandSegmentViewModel();
+
+            if (response != null)
+            {
+                brandSegmentData.brandSegmentID = response.brandSegmentID;
+                brandSegmentData.brandSegmentName = response.brandSegmentName;
+                brandSegmentData.active = response.active;
+            }
+
+            return Json(brandSegmentData);
         }
         public ActionResult RetailerGroup()
         {
@@ -231,17 +242,16 @@ namespace MarketData.Controllers
 
                 if (response != null && response.data != null && response.data.Any())
                 {
-                    brandSegmentListView.brandSegmentList = response.data.Select(c => new BrandSegmentViewModel
+                    brandSegmentListView.data = response.data.Select(c => new BrandSegmentViewModel
                     {
                         brandSegmentID = c.brandSegmentID,
                         brandSegmentName = c.brandSegmentName,
-                        active = c.active,
-                        createdDate = c.createdDate
+                        active = c.active
                     }).ToList();
                 }
                 else
                 {
-                    brandSegmentListView.brandSegmentList = new List<BrandSegmentViewModel>();
+                    brandSegmentListView.data = new List<BrandSegmentViewModel>();
                 }
 
                 return Json(brandSegmentListView);
@@ -263,7 +273,6 @@ namespace MarketData.Controllers
                 brandSegmentData.brandSegmentID = response.brandSegmentID;
                 brandSegmentData.brandSegmentName = response.brandSegmentName;
                 brandSegmentData.active = response.active;
-                brandSegmentData.createdDate = response.createdDate;
             }
 
             return Json(brandSegmentData);

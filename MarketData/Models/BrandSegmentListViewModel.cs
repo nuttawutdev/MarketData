@@ -7,6 +7,6 @@ namespace MarketData.Models
 {
     public class BrandSegmentListViewModel
     {
-        public List<BrandSegmentViewModel> brandSegmentList { get; set; }
+        public List<BrandSegmentViewModel> data { get; set; }
     }
 }
