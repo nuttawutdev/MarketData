@@ -66,6 +66,7 @@ namespace MarketData.Controllers
             }
             return View(brandTypeData);
         }
+
         [HttpGet]
         public ActionResult BrandType_Edit_View(Guid brandTypeID)
         {
@@ -100,6 +101,22 @@ namespace MarketData.Controllers
 
             return View(brandSegmentData);
         }
+
+        public ActionResult BrandSegment_View(Guid brandSegmentID)
+        {
+            var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
+            BrandSegmentViewModel brandSegmentData = new BrandSegmentViewModel();
+
+            if (response != null)
+            {
+                brandSegmentData.brandSegmentID = response.brandSegmentID;
+                brandSegmentData.brandSegmentName = response.brandSegmentName;
+                brandSegmentData.active = response.active;
+            }
+
+            return View(brandSegmentData);
+        }
+
         public ActionResult RetailerGroup()
         {
             return View();
