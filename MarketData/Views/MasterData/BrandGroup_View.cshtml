@@ -52,51 +52,11 @@
     </div>
 
     <div class="modal-footer">
-        <button id="save" class="btn btn-danger " type="button">Save</button>
-        <a href="BrandGroup" class="btn btn-outline-danger">Cancel</a>
+        <a href="BrandGroup" class="btn btn-outline-danger">Back</a>
 
     </div>
 </form>
 
 <script type="text/javascript">
-
-    $(document).ready(function () {
-
-        $("#save").click(function () {
-            var model = @Html.Raw(Json.Serialize(Model));
-
-             var frmdata = {
-                 brandGroupID: model.brandGroupID,
-                 brandGroupName: $('#groupname').val(),
-                 active: $("#flagactive").prop("checked"),
-                 isLoreal: $("#flagloreal").prop("checked")
-             };
-
-
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBrandGroup", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "BrandGroup");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                }
-            });
-        });
-
- });
+ $("form :input").attr("disabled", "disabled");
 </script>
