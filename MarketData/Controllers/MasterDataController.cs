@@ -34,6 +34,7 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
         public ActionResult Brand_Edit()
         {
             return View();
@@ -43,14 +44,17 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
         public ActionResult BrandGroup_Edit()
         {
             return View();
         }
+
         public IActionResult BrandType()
         {
             return View();
         }
+
         [HttpGet]
         public ActionResult BrandType_Edit(Guid brandTypeID)
         {
@@ -82,6 +86,7 @@ namespace MarketData.Controllers
             }
             return View(brandTypeData);
         }
+
         public ActionResult BrandSegment()
         {
             return View();
@@ -121,30 +126,51 @@ namespace MarketData.Controllers
         {
             return View();
         }
-        public ActionResult RetailerGroup_Edit()
+
+        public ActionResult RetailerGroup_Edit(Guid retailerGroupID)
         {
-            return View();
+            var viewData = GetRetailerGroupDetail(retailerGroupID);
+            return View(viewData);
         }
+
+        public ActionResult RetailerGroup_View(Guid retailerGroupID)
+        {
+            var viewData = GetRetailerGroupDetail(retailerGroupID);
+            return View(viewData);
+        }
+
         public ActionResult DistributionChannels()
         {
             return View();
         }
-        public ActionResult DistributionChannels_Edit()
+
+        public ActionResult DistributionChannels_Edit(Guid channelID)
         {
-            return View();
+            var viewData = GetChannelDetail(channelID);
+            return View(viewData);
         }
+
+        public ActionResult DistributionChannels_View(Guid channelID)
+        {
+            var viewData = GetChannelDetail(channelID);
+            return View(viewData);
+        }
+
         public ActionResult DepartmentStore()
         {
             return View();
         }
+
         public ActionResult DepartmentStore_Edit()
         {
             return View();
         }
+
         public ActionResult Counter()
         {
             return View();
         }
+
         public ActionResult Counter_Edit()
         {
             return View();
@@ -231,23 +257,6 @@ namespace MarketData.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetBrandTypeDetail(Guid brandTypeID)
-        {
-            var response = process.masterData.GetBrandTypeDetail(brandTypeID);
-            BrandTypeViewModel brandTypeData = new BrandTypeViewModel();
-
-            if (response != null)
-            {
-                brandTypeData.brandTypeID = response.brandTypeID;
-                brandTypeData.brandTypeName = response.brandTypeName;
-                brandTypeData.active = response.active;
-                brandTypeData.createdDate = response.createdDate;
-            }
-
-            return Json(brandTypeData);
-        }
-
         [HttpPost]
         public async Task<IActionResult> SaveBrandType([FromBody] SaveBrandTypeRequest request)
         {
@@ -268,7 +277,6 @@ namespace MarketData.Controllers
                 return Json(response);
             }
         }
-
 
         [HttpPost]
         public IActionResult DeleteBrandType([FromBody] DeleteBrandTypeRequest request)
@@ -325,22 +333,6 @@ namespace MarketData.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetBrandSegmentDetail(Guid brandSegmentID)
-        {
-            var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
-            BrandSegmentViewModel brandSegmentData = new BrandSegmentViewModel();
-
-            if (response != null)
-            {
-                brandSegmentData.brandSegmentID = response.brandSegmentID;
-                brandSegmentData.brandSegmentName = response.brandSegmentName;
-                brandSegmentData.active = response.active;
-            }
-
-            return Json(brandSegmentData);
-        }
-
         [HttpPost]
         public async Task<IActionResult> SaveBrandSegment([FromBody] SaveBrandSegmentRequest request)
         {
@@ -362,7 +354,6 @@ namespace MarketData.Controllers
             }
         }
 
-
         [HttpPost]
         public IActionResult DeleteBrandSegment([FromBody] DeleteBrandSegmentRequest request)
         {
@@ -381,6 +372,150 @@ namespace MarketData.Controllers
                 };
                 return Json(response);
             }
+        }
+
+        #endregion
+
+        #region Retailer Group Function
+
+        [HttpPost]
+        public IActionResult GetRetailerGroupList()
+        {
+            RetailerGroupListViewModel viewData = new RetailerGroupListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetRetailerGroupList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    viewData.data = response.data.Select(c => new RetailerGroupViewModel
+                    {
+                        retailerGroupID = c.retailerGroupID,
+                        retailerGroupName = c.retailerGroupName,
+                        active = c.active
+                    }).ToList();
+                }
+                else
+                {
+                    viewData.data = new List<RetailerGroupViewModel>();
+                }
+
+                return Json(viewData);
+            }
+            else
+            {
+                return Json(viewData);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveRetailerGroup([FromBody] SaveRetailerGroupRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.retailerGroupID = request.retailerGroupID == Guid.Empty ? null : request.retailerGroupID;
+                response = await process.masterData.SaveRetailerGroup(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        public RetailerGroupViewModel GetRetailerGroupDetail(Guid retailerGroupID)
+        {
+            var response = process.masterData.GetRetailerGroupDetail(retailerGroupID);
+            RetailerGroupViewModel data = new RetailerGroupViewModel();
+
+            if (response != null)
+            {
+                data.retailerGroupID = response.retailerGroupID;
+                data.retailerGroupName = response.retailerGroupName;
+                data.active = response.active;
+            }
+
+            return data;
+
+        }
+
+        #endregion
+
+        #region Distribution Channel Function
+
+        [HttpPost]
+        public IActionResult GetChannelList()
+        {
+            DistributionChannelListViewModel viewData = new DistributionChannelListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetDistributionChannelList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    viewData.data = response.data.Select(c => new DistributionChannelViewModel
+                    {
+                        distributionChannelID = c.distributionChannelID,
+                        distributionChannelName = c.distributionChannelName,
+                        active = c.active
+                    }).ToList();
+                }
+                else
+                {
+                    viewData.data = new List<DistributionChannelViewModel>();
+                }
+
+                return Json(viewData);
+            }
+            else
+            {
+                return Json(viewData);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveChannel ([FromBody] SaveDistributionChannelRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.distributionChannelID = request.distributionChannelID == Guid.Empty ? null : request.distributionChannelID;
+                response = await process.masterData.SaveDistributionChannel(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        public DistributionChannelViewModel GetChannelDetail(Guid channelID)
+        {
+            var response = process.masterData.GetDistributionChannelDetail(channelID);
+            DistributionChannelViewModel data = new DistributionChannelViewModel();
+
+            if (response != null)
+            {
+                data.distributionChannelID = response.distributionChannelID;
+                data.distributionChannelName = response.distributionChannelName;
+                data.active = response.active;
+            }
+
+            return data;
+
         }
 
         #endregion
