@@ -1,0 +1,46 @@
+﻿@model MarketData.Models.RetailerGroupViewModel
+
+@{
+    ViewData["Title"] = "View Retailer Group";
+}
+
+
+<h3>@ViewData["Title"]</h3>
+<hr />
+
+<br />
+
+<form>
+    <div class="col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Retailer Group Name</label>
+            <input type="text" value="@Model.retailerGroupName" class="form-control input-sm" id="retailname" placeholder="">
+        </div>
+    </div>
+    <div class="col-md-12 col-sm-12">
+
+        <div class="form-group col-md-5 col-sm-5">
+            <label for="pincode">
+                @if (Model.active)
+                {
+                    <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+                }
+
+                Active
+            </label>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <a href="RetailerGroup" class="btn btn-outline-danger">Back</a>
+
+    </div>
+</form>
+
+<script type="text/javascript">
+    $("form :input").attr("disabled", "disabled");
+</script>

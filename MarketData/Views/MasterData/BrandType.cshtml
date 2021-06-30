@@ -16,7 +16,7 @@
 <div style="padding-bottom:40px;">
     <div class="btn-group submitter-group float-right" style=" align-items: center">
         <div class="input-group-prepend" style="width: 70px;">
-            <label>Status: </label>
+            <label>Active: </label>
         </div>
         <select class="form-control status-dropdown">
             <option value="">All</option>
@@ -72,9 +72,9 @@
                     width: "20%",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
-                            '<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                        return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                            /*'<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
                 }}
             ]
         });
