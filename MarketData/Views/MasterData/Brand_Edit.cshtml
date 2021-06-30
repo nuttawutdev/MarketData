@@ -1,5 +1,9 @@
-﻿@{
-    ViewData["Title"] = "Add Brand";
+﻿@model MarketData.Models.BrandViewModel
+
+@{
+    ViewData["Title"] = Model.brandName == null ? "Add Brand" : "Edit Brand";
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 <style>
@@ -17,11 +21,11 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Name	</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
+            <input type="text" value="@Model.brandName" class="form-control input-sm" id="name" placeholder="">
         </div>
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Short Name	</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
+            <input type="text" value="@Model.brandShortName" class="form-control input-sm" id="shortname" placeholder="">
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
@@ -73,10 +77,6 @@
                 <option>Please select</option>
                 <option>LPD</option>>
             </select>
-            @*<label for="pincode">
-                    <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                    Active
-                </label>*@
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
@@ -89,8 +89,51 @@
 
     </div>
     <div class="modal-footer">
-        <a href="Brand" class="btn btn-danger">Save</a>
+        <button id="save" class="btn btn-danger " type="button">Save</button>
         <a href="Brand" class="btn btn-outline-danger">Cancel</a>
 
     </div>
 </form>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#save").click(function () {
+            var model = @Html.Raw(Json.Serialize(Model));
+
+             var frmdata = {
+                 brandID: model.brandID,
+                 brandTypeName: $('#typename').val(),
+                 active: $("#flagactive").prop("checked")
+             };
+
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("SaveBrand", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                success: function (data) {
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "BrandType");
+                        $('#successModal').modal('show');
+                    } else if (data.isDuplicated) {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Duplicate data!');
+                    } else {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Save data failed');
+                     }
+                    $('#confirmID').val('');
+                    $('#myModalFailedResult').val('');
+                },
+                error: function () {
+                }
+            });
+        });
+
+ });
+</script>

@@ -76,7 +76,6 @@
                     render: function (data, type, row) {
                         return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                            /*'<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
                 }}
             ]
         });
@@ -91,40 +90,6 @@
             dataTable.column(2).search(status).draw();
         });
 
-        $(document).on('click', '.delete-click', function () {
-            var id = $(this).attr('data-id');
-            $('#confirmID').val(id);
-        });
-
-        $(".btnConfirmModal").click(function () {
-                   var frmdata = {
-                       brandTypeID: $('#confirmID').val(),
-                       userID: null
-            };
-
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("DeleteBrandType", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                 success: function (data) {
-                     if (data.isSuccess) {
-
-                         dataTable.ajax.reload();
-                         $('#confirmModal').modal('hide');
-                     } else {
-                        $('#myModalConfirmResult').text('Delete data failed');
-
-                 }
-
-                     $('#confirmID').val('');
-                     $('#myModalConfirmResult').val('');
-                },
-                error: function () {
-                }
-            });
-        });
 
     });
 
