@@ -13,19 +13,21 @@
 
 
 <hr />
-<div style="padding-bottom:40px;">
-    <div class="btn-group submitter-group float-right" style=" align-items: center">
-        <div class="input-group-prepend" style="width: 70px;">
-            <label>Active: </label>
-        </div>
-        <select class="form-control status-dropdown">
-            <option value="">All</option>
-            <option value=true>Y</option>
-            <option value="false">N</option>
-        </select>
-    </div>
-</div>
+<div style="padding-bottom:10px;">
+    <div class="row">
+        <div class="col text-end d-flex justify-content-end align-items-center">
+            <label class="form-label">Active: </label>
+            <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
+                <option value="">All</option>
+                <option value=true>Y</option>
+                <option value="false">N</option>
+            </select>
+            <button class="btn btn-primary btn-sm btnReresh" type="button" style="width:100px!important"><i class="ion-refresh text-white"></i> Refresh</button>
 
+        </div>
+    </div>
+
+</div>
 <div class="container-xl">
 
 
@@ -77,6 +79,10 @@
                             /*'<a href="#confirmModal" data-id="' + row.brandTypeID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
                 }}
             ]
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
         });
 
         $('.status-dropdown').on('change', function (e) {
