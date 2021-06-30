@@ -45,9 +45,16 @@ namespace MarketData.Controllers
             return View();
         }
 
-        public ActionResult BrandGroup_Edit()
+        public ActionResult BrandGroup_Edit(Guid brandGroupID)
         {
-            return View();
+            var viewData = GetBrandGroupDetail(brandGroupID);
+            return View(viewData);
+        }
+
+        public ActionResult BrandGroup_View(Guid brandGroupID)
+        {
+            var viewData = GetBrandGroupDetail(brandGroupID);
+            return View(viewData);
         }
 
         public IActionResult BrandType()
@@ -519,6 +526,81 @@ namespace MarketData.Controllers
         }
 
         #endregion
+
+
+        #region Brand Group Function
+        [HttpPost]
+        public IActionResult GetBrandGroupList()
+        {
+            BrandGroupListViewModel viewData = new BrandGroupListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetBrandGroupList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    viewData.data = response.data.Select(c => new BrandGroupViewModel
+                    {
+                        brandGroupID = c.brandGroupID,
+                        brandGroupName = c.brandGroupName,
+                        isLoreal = c.isLoreal,
+                        active = c.active
+                    }).ToList();
+                }
+                else
+                {
+                    viewData.data = new List<BrandGroupViewModel>();
+                }
+
+                return Json(viewData);
+            }
+            else
+            {
+                return Json(viewData);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveBrandGroup([FromBody] SaveBrandGroupRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.brandGroupID = request.brandGroupID == Guid.Empty ? null : request.brandGroupID;
+                response = await process.masterData.SaveBrandGroup(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        public BrandGroupViewModel GetBrandGroupDetail(Guid brandGroupID)
+        {
+            var response = process.masterData.GetBrandGroupDetail(brandGroupID);
+            BrandGroupViewModel data = new BrandGroupViewModel();
+
+            if (response != null)
+            {
+                data.brandGroupID = response.brandGroupID;
+                data.brandGroupName = response.brandGroupName;
+                data.isLoreal = response.isLoreal;
+                data.active = response.active;
+            }
+
+            return data;
+
+        }
+
+        #endregion
+
 
         [HttpPost]
         public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)

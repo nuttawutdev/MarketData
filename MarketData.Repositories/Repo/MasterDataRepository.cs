@@ -295,7 +295,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool SaveBrandGroup(SaveBrandGroupRequest request)
+        public async Task<bool> SaveBrandGroup(SaveBrandGroupRequest request)
         {
             try
             {
@@ -333,7 +333,7 @@ namespace MarketData.Repositories.Repo
                     }
                 }
 
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

@@ -300,7 +300,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SaveBrandGroup(SaveBrandGroupRequest request)
+        public async Task<SaveDataResponse> SaveBrandGroup(SaveBrandGroupRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -315,7 +315,7 @@ namespace MarketData.Processes.Processes
                 // Brand group name not exist Or Update old Brand group
                 if (brandGroupByName == null || (brandGroupByName != null && brandGroupByName.Brand_Group_ID == request.brandGroupID))
                 {
-                    response.isSuccess = repository.masterData.SaveBrandGroup(request);
+                    response.isSuccess = await repository.masterData.SaveBrandGroup(request);
                 }
                 else
                 {
