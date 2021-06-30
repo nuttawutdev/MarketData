@@ -98,7 +98,7 @@ namespace MarketData.Controllers
                 brandSegmentData.active = response.active;
             }
 
-            return Json(brandSegmentData);
+            return View(brandSegmentData);
         }
         public ActionResult RetailerGroup()
         {
@@ -179,6 +179,7 @@ namespace MarketData.Controllers
             }
         }
         #endregion
+     
         #region BrandType Function
 
         [HttpPost]
