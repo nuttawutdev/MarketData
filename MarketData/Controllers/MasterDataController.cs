@@ -228,8 +228,49 @@ namespace MarketData.Controllers
                 return Json(brandListView);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> SaveBrand([FromBody] SaveBrandRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
+                response = await process.masterData.SaveBrand(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteBrand([FromBody] DeleteBrandRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = process.masterData.DeleteBrand(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
         #endregion
-     
+
         #region BrandType Function
 
         [HttpPost]
