@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Request.MasterData
@@ -7,6 +8,7 @@ namespace MarketData.Model.Request.MasterData
     public class SaveDepsrtmentStoreRequest
     {
         public Guid? departmentStoreID { get; set; }
+        [Required]
         public string departmentStoreName { get; set; }
         public Guid retailerGroupID { get; set; }
         public string retailerGroupName { get; set; }
