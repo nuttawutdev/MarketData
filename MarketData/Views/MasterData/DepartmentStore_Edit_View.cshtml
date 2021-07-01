@@ -1,4 +1,8 @@
-﻿@{
+﻿
+
+@model MarketData.Models.DepartmentStoreViewModel
+
+@{
     ViewData["Title"] = "Department Store";
 }
 
@@ -12,63 +16,58 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Department Store Name</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
+            <input type="text" class="form-control input-sm" id="departmentStoreName" placeholder="" value="@Model.departmentStoreName">
         </div>
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Retailer group</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Central</option>
-                <option>The Mall</option>
-                <option>Robinson</option>
-            </select>
+            @Html.DropDownListFor(n => n.retailerGroupID, new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName", 1), "Please select", new { id = "retailerGroupList", @class = "form-control " })
+
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Region</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Bangkok</option>
-                <option>North</option>
-                <option>South</option>
-                <option>East</option>
-                <option>West</option>
-                <option>Northeast</option>
-                <option>Central</option>
-            </select>
+            @Html.DropDownListFor(n => n.regionID, new SelectList(Model.regionList, "regionID", "regionName", 1), "Please select", new { id = "regionList", @class = "form-control " })
+
         </div>
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Distribution Channels </label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Counter</option>
-                <option>Botique</option>
-                <option>Online</option>
-            </select>
+            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
+
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Rank</label>
-            <input type="number" class="form-control input-sm" id="name" placeholder="">
+            <input type="number" class="form-control input-sm" id="rank" placeholder="" value="@Model.rank">
         </div>
     </div>
 
     <div class="row col-md-12 col-sm-12">
 
         <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
+            <label>
+                @if (Model.active)
+                {
+                    <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+                }
                 Active
             </label>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="DepartmentStore" class="btn btn-danger">Save</a>
+        <button id="save" class="btn btn-danger " type="button">Save</button>
         <a href="DepartmentStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
 </form>
+
+<script type="text/javascript">
+    $("form :input").attr("disabled", "disabled");
+</script>

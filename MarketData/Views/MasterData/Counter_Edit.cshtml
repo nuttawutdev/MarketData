@@ -1,5 +1,10 @@
-﻿@{
-    ViewData["Title"] = "Add Counter";
+﻿
+@*@model MarketData.Models.co*@
+
+@{
+    ViewData["Title"] = Model.brandName == null ? "Add Counter" : "Edit Counter";
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 

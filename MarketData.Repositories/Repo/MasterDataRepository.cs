@@ -827,7 +827,7 @@ namespace MarketData.Repositories.Repo
                 var departmentStoreList = (
                    from e in searchData
                    join r in _dbContext.TMRetailerGroup
-                       on e.Region_ID equals r.Retailer_Group_ID
+                       on e.Retailer_Group_ID equals r.Retailer_Group_ID
                        into joinRetailer
                    from retailer in joinRetailer.DefaultIfEmpty()
                    join d in _dbContext.TMDistributionChannel

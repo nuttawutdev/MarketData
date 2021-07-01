@@ -63,7 +63,7 @@
                     title: "Active",
                     render: function (data, type, row) {
                         var checkStatus = data ? "checked" : "";
-                        return '<input type="checkbox" id="checkbox1" name="options[]" value="true" disabled ' + checkStatus + '>';
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
                     }, width: "10%",
                     className: "text-center",
                     visible: true,
@@ -78,8 +78,9 @@
                     render: function (data, type, row) {
                         return '<a href="DistributionChannels_View?channelID=' + row.distributionChannelID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="DistributionChannels_Edit?channelID=' + row.distributionChannelID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                            /*'<a href="#confirmModal" data-id="' + row.brandSegmentID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
-                }}
+
+                    }
+                }
             ]
         });
 

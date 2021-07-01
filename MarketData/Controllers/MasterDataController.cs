@@ -49,7 +49,6 @@ namespace MarketData.Controllers
         {
             return View();
         }
-
         public ActionResult BrandGroup_Edit(Guid brandGroupID)
         {
             var viewData = GetBrandGroupDetail(brandGroupID);
@@ -708,11 +707,12 @@ namespace MarketData.Controllers
                 if (response != null && response.data != null && response.data.Any())
                 {
                     listView.data = response.data.Select(c => new DepartmentStoreViewModel
-                    {
-                        departmentStoreID = c.departmentStoreID,
+                    {tStoreID = c.departmentStoreID,
+                        departmen
                         departmentStoreName = c.departmentStoreName,
                         retailerGroupName = c.retailerGroupName,
                         distributionChannelName = c.distributionChannelName,
+                        region = c.region,
                         rank = c.rank,
                         active = c.active
                     }).ToList();
@@ -779,6 +779,25 @@ namespace MarketData.Controllers
             {
                 request.departmentStoreID = request.departmentStoreID == Guid.Empty ? null : request.departmentStoreID;
                 response = await process.masterData.SaveDepartmentStore(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+        [HttpPost]
+        public IActionResult DeleteBrand([FromBody] DeleteDepartmentStoreRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = process.masterData.DeleteDepartmentStore(request);
                 return Json(response);
             }
             else

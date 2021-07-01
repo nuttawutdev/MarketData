@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Department Store";
+    Html.RenderPartial("_ConfirmModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 
@@ -9,34 +11,21 @@
 
 </h3>
 <hr />
-<br />
-<br />
-<div class="row">
-    <div class="table-filter" style="width: 100%; font-size: 13px;">
-        <div class="row">
 
-            <div class="col-sm-10">
 
-                <div class="filter-group">
-                    <label>Keyword(s) : </label>
-                    <input type="text" class="form-control">
-                </div>
-
-                <div class="filter-group">
-                    <label>Active</label>
-                    <select class="form-control">
-                        <option>All</option>
-                        <option>Y</option>
-                        <option>N</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i></button>
-                </div>
-            </div>
-            <form id="uploadFile" action="@Url.Action("ImportDepartmentStore", "MasterData")" method="post" enctype="multipart/form-data">
-                <div class="filter-group">
-                    <div class="custom-file-upload">
+<div style="padding-bottom:10px;">
+    <div class="row">
+        <div class="col text-end d-flex justify-content-end align-items-center">
+            <label class="form-label">Active:&nbsp;</label>
+            <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
+                <option value="">All</option>
+                <option value=true>Y</option>
+                <option value="false">N</option>
+            </select>
+            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                  enctype="multipart/form-data">
+                <div class="filter-group ">
+                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
                         <label for="file-upload" class="custom-file-upload1">
                             <i class="ion-android-document"></i> Import by Excel
@@ -47,142 +36,163 @@
                     </div>
                 </div>
             </form>
-         
+
         </div>
     </div>
+
 </div>
+
 <div class="container-xl">
-    <div class="table-responsive">
-        <div class="table-wrapper">
 
-            <table class="table table-striped table-hover ">
-                <thead class="table-secondary">
-                    <tr class="row m-0">
 
-                        <th class="col-3">Department Store Name</th>
-                        <th class="col-2">Retailer group</th>
-                        <th class="col-2">Distribution Channels </th>
-                        <th class="col-1 text-center">Region</th>
-                        <th class="col-1 text-center">Rank</th>
-                        <th class="col-1 text-center">Active</th>
-                        <th class="col-2 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+    <table id="tableData" class="display" width="100%"></table>
 
-                    <tr class="row m-0">
-                        <td class="col-3">
-                            Central Bangna
-                        </td>
-                        <td class="col-2">Central</td>
-                        <td class="col-2">Counter</td>
-                        <td class="col-1 text-center">Bangkok</td>
-                        <td class="col-1 text-center">7</td>
-                        <td class="col-1 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled checked>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="DepartmentStore_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="DepartmentStore_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
 
-                        </td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="col-3">The Mall Bangkae</td>
-                        <td class="col-2">The Mall</td>
-                        <td class="col-2">Counter</td>
-                        <td class="col-1 text-center">Bangkok</td>
-                        <td class="col-1 text-center">5</td>
-                        <td class="col-1 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled checked>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="DepartmentStore_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="DepartmentStore_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
-
-                        </td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="col-3">Robinson Bangrak</td>
-                        <td class="col-2">Robinson</td>
-                        <td class="col-2">Botique</td>
-                        <td class="col-1 text-center">Bangkok</td>
-                        <td class="col-1 text-center"></td>
-                        <td class="col-1 text-center">
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" disabled checked>
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="DepartmentStore_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-eye text-white"></i>
-                            </a>
-                            <a href="DepartmentStore_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
-                                <i class="ion-edit text-white"></i>
-                            </a>
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
-
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </div>
-    </div>
 </div>
 
-<!-- Delete Modal HTML -->
-<div id="deleteModal" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form>
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete these Records?</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input type="submit" class="btn btn-danger" value="Delete">
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
 
+    $(document).ready(function () {
         $("#file-upload").change(function () {
-            console.log('aa')
-            document.getElementById("uploadFile").submit();
+            $("#blocker").show();
+
+            var fd = new FormData();
+            var files = $('#file-upload')[0].files;
+
+            fd.append('userID', 'Test');
+
+            // Check file selected or not
+            if (files.length > 0) {
+                fd.append('excelFile', files[0]);
+            }
+
+            $.ajax(
+                {
+                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    type: "POST",
+                    success: function (data) {
+                        $("#blocker").hide();
+
+                        if (data.isSuccess) {
+                            dataTable.ajax.reload();
+                        }
+                        else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Import data failed');
+                         }
+                    }
+                }
+            );
         });
 
- });
+
+        $("#tableData").one("preInit.dt", function () {
+
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
+        var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetDepartmentStoreList", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.data;
+                }
+            },
+            "columns": [
+                { data: "departmentStoreID", visible: false, searchable: false },
+                { data: "departmentStoreName", title: "Department Store Name"},
+                { data: "retailerGroupName", title: "Retailer group" },
+                { data: "distributionChannelName", title: "Distribution Channels" },
+                { data: "region", title: "Region" },
+                { data: "rank", title: "Rank" },
+
+                { data: "active", title: "active", visible: false },
+                {
+                    data: "active",
+                    title: "Active",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
+                    },
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                {
+                    orderable: false,
+                    title: "Action",
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return '<a href="DepartmentStore_Edit_View?departmentStoreID=' + row.departmentStoreID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="DepartmentStore_Edit?departmentStoreID=' + row.departmentStoreID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
+                            '<a href="#confirmModal" data-id="' + row.departmentStoreID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                }}
+            ]
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
+        });
+
+        $('.status-dropdown').on('change', function (e) {
+            var status = $(this).val();
+            $('.status-dropdown').val(status);
+            dataTable.column(6).search(status).draw();
+        });
+
+        $(document).on('click', '.delete-click', function () {
+            var id = $(this).attr('data-id');
+            $('#confirmID').val(id);
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
+        });
+
+        $(".btnConfirmModal").click(function () {
+
+                   var frmdata = {
+                       brandID: $('#confirmID').val(),
+                       userID: null
+            };
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("DeleteDepartmentStore", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                 success: function (data) {
+                     if (data.isSuccess) {
+
+                         dataTable.ajax.reload();
+                         $('#confirmModal').modal('hide');
+                     } else {
+                        $('#myModalConfirmResult').text('Delete data failed');
+
+                 }
+
+                     $('#confirmID').val('');
+                     $('#myModalConfirmResult').val('');
+                },
+                error: function () {
+                }
+            });
+        });
+
+    });
+
+
+
 </script>
