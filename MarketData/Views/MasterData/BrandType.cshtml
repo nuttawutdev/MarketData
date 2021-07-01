@@ -46,7 +46,7 @@
             $button.button();
 
         });
-        var dataTable=  $('#tableData').DataTable({
+        var dataTable = $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
                 url: '@Url.Action("GetBrandTypeList", "MasterData")',
@@ -85,7 +85,11 @@
         });
 
         $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
             dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('.status-dropdown').on('change', function (e) {
