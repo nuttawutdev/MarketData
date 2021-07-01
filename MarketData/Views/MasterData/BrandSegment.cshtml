@@ -41,9 +41,7 @@
             $button.button();
 
         });
-        $('.btnReresh').on('click', function (e) {
-            dataTable.ajax.reload();
-        });
+
 
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
@@ -88,6 +86,14 @@
             var status = $(this).val();
             $('.status-dropdown').val(status);
             dataTable.column(2).search(status).draw();
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $(document).on('click', '.delete-click', function () {

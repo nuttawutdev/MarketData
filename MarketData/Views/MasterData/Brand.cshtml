@@ -2,6 +2,7 @@
     ViewData["Title"] = "Brand";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_SuccessModal");
 }
 
 <style>
@@ -81,9 +82,12 @@
                     type: "POST",
                     success: function (data) {
                         $("#blocker").hide();
-
                         if (data.isSuccess) {
-                            dataTable.ajax.reload();
+                           // dataTable.ajax.reload();
+                            $('#successModalHref').attr("href", "Brand");
+                            $('#myResult').text('Import data success');
+                            $('#successModal').modal('show');
+                           
                         }
                         else {
                             $('#failedModal').modal('show');
@@ -158,7 +162,11 @@
         });
 
         $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
             dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('.status-dropdown').on('change', function (e) {

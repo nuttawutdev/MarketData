@@ -41,9 +41,6 @@
             $button.button();
 
         });
-        $('.btnReresh').on('click', function (e) {
-            dataTable.ajax.reload();
-        });
 
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
@@ -82,6 +79,14 @@
                     }
                 }
             ]
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('.status-dropdown').on('change', function (e) {

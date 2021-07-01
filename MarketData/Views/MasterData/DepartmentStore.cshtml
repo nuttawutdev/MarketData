@@ -2,6 +2,7 @@
     ViewData["Title"] = "Department Store";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_SuccessModal");
 }
 
 
@@ -70,21 +71,22 @@
 
             $.ajax(
                 {
-                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    url: '@Url.Action("ImportDepartmentStore", "MasterData")',
                     data: fd,
                     processData: false,
                     contentType: false,
                     type: "POST",
                     success: function (data) {
                         $("#blocker").hide();
-
                         if (data.isSuccess) {
-                            dataTable.ajax.reload();
+                            $('#successModalHref').attr("href", "DepartmentStore");
+                            $('#myResult').text('Import data success');
+                            $('#successModal').modal('show');
                         }
                         else {
                             $('#failedModal').modal('show');
                             $('#myModalFailedResult').text('Import data failed');
-                         }
+                        }
                     }
                 }
             );
@@ -141,7 +143,11 @@
         });
 
         $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
             dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('.status-dropdown').on('change', function (e) {

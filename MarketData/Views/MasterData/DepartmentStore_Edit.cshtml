@@ -76,6 +76,7 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
+            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
 
              var frmdata = {
@@ -99,6 +100,7 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
+                    $("#blocker").hide();
                     if (data.isSuccess) {
                         $('#successModalHref').attr("href", "DepartmentStore");
                         $('#successModal').modal('show');
@@ -113,6 +115,7 @@
                     $('#myModalFailedResult').val('');
                 },
                 error: function () {
+                    $("#blocker").hide();
                 }
             });
         });

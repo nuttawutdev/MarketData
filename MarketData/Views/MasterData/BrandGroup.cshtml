@@ -101,7 +101,11 @@
 
       
         $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
             dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('.status-dropdown').on('change', function (e) {
