@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MarketData.Models.CounterViewModel
+
+@{
     ViewData["Title"] = "Counter";
 }
 
@@ -11,47 +13,50 @@
 <form>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Department Store</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Central Bangna</option>
-                <option>The Mall Bangkae</option>
-                <option>Robinson Bangrak</option>
-            </select>
+            <label>Department Store</label>
+            @Html.DropDownListFor(n => n.departmentStoreID, new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName", 1), "Please select", new { id = "departmentStoreList", @class = "form-control " })
+
         </div>
 
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>LOREAL</option>
-                <option>SHISEDO</option>
-                <option>Lux Asia</option>
-            </select>
+            <label>Brand</label>
+            @Html.DropDownListFor(n => n.brandID, new SelectList(Model.brandList, "brandID", "brandName", 1), "Please select", new { id = "brandList", @class = "form-control " })
+
         </div>
 
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Distribution Channels</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Counter</option>
-                <option>Boutique</option>
-                <option>Online</option>
-            </select>
+            <label>Distribution Channels</label>
+            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
+
         </div>
 
     </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label>
+                @if (Model.active)
+                {
+                    <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+                }
+                Active
+            </label>
+        </div>
 
+    </div>
     <div class="modal-footer">
-        <a href="Counter" class="btn btn-danger">Save</a>
-        <a href="Counter" class="btn btn-outline-danger">Cancel</a>
+        <a href="Counter" class="btn btn-outline-danger">Back</a>
 
     </div>
 </form>
+
 
 
 <script type="text/javascript">

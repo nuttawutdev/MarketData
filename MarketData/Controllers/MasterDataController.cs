@@ -187,7 +187,31 @@ namespace MarketData.Controllers
 
         public ActionResult Counter()
         {
-            return View();
+            CounterListViewModel listView = new CounterListViewModel();
+
+
+            var departmentStoreList = process.masterData.GetDepartmentStoreList();
+            var brandList = process.masterData.GetBrandList();
+            var channelList = process.masterData.GetDistributionChannelList();
+
+            listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
+            {
+                departmentStoreID = e.departmentStoreID,
+                departmentStoreName = e.departmentStoreName
+            }).ToList() : new List<DepartmentStoreViewModel>();
+            listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+            {
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
+            }).ToList() : new List<DistributionChannelViewModel>();
+            listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
+            {
+                brandID = e.brandID,
+                brandName = e.brandName
+            }).ToList() : new List<BrandViewModel>();
+
+            return View(listView);
+
         }
 
         public ActionResult Counter_Edit(Guid counterID)
@@ -196,7 +220,7 @@ namespace MarketData.Controllers
             return View(viewData);
         }
 
-        public ActionResult Counter_View(Guid counterID)
+        public ActionResult Counter_Edit_View(Guid counterID)
         {
             var viewData = GetCounterDetail(counterID);
             return View(viewData);
