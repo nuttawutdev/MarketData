@@ -426,7 +426,7 @@ namespace MarketData.Processes.Processes
 
                 TMBrand brandByShortName = null;
 
-                if (request.brandShortName != null)
+                if (!string.IsNullOrWhiteSpace(request.brandShortName))
                 {
                     request.brandShortName = request.brandShortName.Trim();
 
@@ -527,117 +527,137 @@ namespace MarketData.Processes.Processes
                     }
                 }
 
-
-                var groupByBrandGroup = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandGroupName))
-                    .GroupBy(c => c.brandGroupName);
-
-                var groupByBrandSegment = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandSegmentName))
-                   .GroupBy(c => c.brandSegmentName);
-
-                var groupByBrandType = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandTypeName))
-                   .GroupBy(c => c.brandTypeName);
-
-                var brandGroupData = new Dictionary<string, Guid>();
-                var brandSegmentData = new Dictionary<string, Guid>();
-                var brandTypeData = new Dictionary<string, Guid>();
-
-                foreach (var itemBrandGroup in groupByBrandGroup)
+                if (saveBrandList.Any())
                 {
-                    var brandGroupByName = repository.masterData.FindBrandGroupBy(
-                        c => c.Brand_Group_Name.ToLower() == itemBrandGroup.Key.ToLower()
-                        && c.Delete_Flag != true);
+                    var groupByBrandGroup = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandGroupName))
+                                    .GroupBy(c => c.brandGroupName);
 
-                    if (brandGroupByName == null)
+                    var groupByBrandSegment = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandSegmentName))
+                       .GroupBy(c => c.brandSegmentName);
+
+                    var groupByBrandType = saveBrandList.Where(e => !string.IsNullOrWhiteSpace(e.brandTypeName))
+                       .GroupBy(c => c.brandTypeName);
+
+                    var brandGroupData = new Dictionary<string, Guid>();
+                    var brandSegmentData = new Dictionary<string, Guid>();
+                    var brandTypeData = new Dictionary<string, Guid>();
+
+                    foreach (var itemBrandGroup in groupByBrandGroup)
                     {
-                        SaveBrandGroupRequest saveBrandGroupRequest = new SaveBrandGroupRequest
-                        {
-                            brandGroupName = itemBrandGroup.Key,
-                            active = true,
-                            isLoreal = !string.IsNullOrWhiteSpace(itemBrandGroup.FirstOrDefault().brandColor),
-                            userID = request.userID
-                        };
+                        var brandGroupByName = repository.masterData.FindBrandGroupBy(
+                            c => c.Brand_Group_Name.ToLower() == itemBrandGroup.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                        var createBrandGroupResult = repository.masterData.CreateBrandGroup(saveBrandGroupRequest);
-
-                        if (createBrandGroupResult != null)
+                        if (brandGroupByName == null)
                         {
-                            brandGroupData.Add(itemBrandGroup.Key, createBrandGroupResult.Brand_Group_ID);
+                            SaveBrandGroupRequest saveBrandGroupRequest = new SaveBrandGroupRequest
+                            {
+                                brandGroupName = itemBrandGroup.Key,
+                                active = true,
+                                isLoreal = !string.IsNullOrWhiteSpace(itemBrandGroup.FirstOrDefault().brandColor),
+                                userID = request.userID
+                            };
+
+                            var createBrandGroupResult = repository.masterData.CreateBrandGroup(saveBrandGroupRequest);
+
+                            if (createBrandGroupResult != null)
+                            {
+                                brandGroupData.Add(itemBrandGroup.Key, createBrandGroupResult.Brand_Group_ID);
+                            }
+                        }
+                        else
+                        {
+                            brandGroupData.Add(itemBrandGroup.Key, brandGroupByName.Brand_Group_ID);
                         }
                     }
-                    else
+
+                    foreach (var itemBrandSegment in groupByBrandSegment)
                     {
-                        brandGroupData.Add(itemBrandGroup.Key, brandGroupByName.Brand_Group_ID);
-                    }
-                }
+                        var brandSegmentByName = repository.masterData.FindBrandSegmentBy(
+                            c => c.Brand_Segment_Name.ToLower() == itemBrandSegment.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                foreach (var itemBrandSegment in groupByBrandSegment)
-                {
-                    var brandSegmentByName = repository.masterData.FindBrandSegmentBy(
-                        c => c.Brand_Segment_Name.ToLower() == itemBrandSegment.Key.ToLower()
-                        && c.Delete_Flag != true);
-
-                    if (brandSegmentByName == null)
-                    {
-                        SaveBrandSegmentRequest saveBrandSegmentRequest = new SaveBrandSegmentRequest
+                        if (brandSegmentByName == null)
                         {
-                            brandSegmentName = itemBrandSegment.Key,
-                            active = true,
-                            userID = request.userID
-                        };
+                            SaveBrandSegmentRequest saveBrandSegmentRequest = new SaveBrandSegmentRequest
+                            {
+                                brandSegmentName = itemBrandSegment.Key,
+                                active = true,
+                                userID = request.userID
+                            };
 
-                        var createBrandSegmentResult = repository.masterData.CreateBrandSegment(saveBrandSegmentRequest);
+                            var createBrandSegmentResult = repository.masterData.CreateBrandSegment(saveBrandSegmentRequest);
 
-                        if (createBrandSegmentResult != null)
+                            if (createBrandSegmentResult != null)
+                            {
+                                brandSegmentData.Add(itemBrandSegment.Key, createBrandSegmentResult.Brand_Segment_ID);
+                            }
+                        }
+                        else
                         {
-                            brandSegmentData.Add(itemBrandSegment.Key, createBrandSegmentResult.Brand_Segment_ID);
+                            brandSegmentData.Add(itemBrandSegment.Key, brandSegmentByName.Brand_Segment_ID);
                         }
                     }
-                    else
+
+                    foreach (var itemBrandType in groupByBrandType)
                     {
-                        brandSegmentData.Add(itemBrandSegment.Key, brandSegmentByName.Brand_Segment_ID);
-                    }
-                }
+                        var brandTypetByName = repository.masterData.FindBrandTypeBy(
+                            c => c.Brand_Type_Name.ToLower() == itemBrandType.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                foreach (var itemBrandType in groupByBrandType)
-                {
-                    var brandTypetByName = repository.masterData.FindBrandTypeBy(
-                        c => c.Brand_Type_Name.ToLower() == itemBrandType.Key.ToLower()
-                        && c.Delete_Flag != true);
-
-                    if (brandTypetByName == null)
-                    {
-                        SaveBrandTypeRequest saveBrandTypeRequest = new SaveBrandTypeRequest
+                        if (brandTypetByName == null)
                         {
-                            brandTypeName = itemBrandType.Key,
-                            active = true,
-                            userID = request.userID
-                        };
+                            SaveBrandTypeRequest saveBrandTypeRequest = new SaveBrandTypeRequest
+                            {
+                                brandTypeName = itemBrandType.Key,
+                                active = true,
+                                userID = request.userID
+                            };
 
-                        var createBrandTypeResult = repository.masterData.CreateBrandType(saveBrandTypeRequest);
+                            var createBrandTypeResult = repository.masterData.CreateBrandType(saveBrandTypeRequest);
 
-                        if (createBrandTypeResult != null)
+                            if (createBrandTypeResult != null)
+                            {
+                                brandTypeData.Add(itemBrandType.Key, createBrandTypeResult.Brand_Type_ID);
+                            }
+                        }
+                        else
                         {
-                            brandTypeData.Add(itemBrandType.Key, createBrandTypeResult.Brand_Type_ID);
+                            brandTypeData.Add(itemBrandType.Key, brandTypetByName.Brand_Type_ID);
                         }
                     }
-                    else
+
+                    foreach (var saveBrandRequest in saveBrandList)
                     {
-                        brandTypeData.Add(itemBrandType.Key, brandTypetByName.Brand_Type_ID);
+                        saveBrandRequest.brandGroupID = brandGroupData.FirstOrDefault(c => c.Key == saveBrandRequest.brandGroupName).Value;
+                        saveBrandRequest.brandSegmentID = brandSegmentData.FirstOrDefault(c => c.Key == saveBrandRequest.brandSegmentName).Value;
+                        saveBrandRequest.brandTypeID = brandTypeData.FirstOrDefault(c => c.Key == saveBrandRequest.brandTypeName).Value;
+                        saveBrandRequest.active = true;
+                        saveBrandRequest.userID = request.userID;
+
+                        if (!string.IsNullOrWhiteSpace(saveBrandRequest.brandName)
+                            && saveBrandRequest.brandGroupID != null
+                            && saveBrandRequest.brandSegmentID != null
+                            && saveBrandRequest.brandTypeID != null)
+                        {
+                            var result = await SaveBrand(saveBrandRequest);
+                            if (result.isSuccess)
+                            {
+                                response.countImportSuccess = response.countImportSuccess + 1;
+                            }
+                            else
+                            {
+                                response.countImportFailed = response.countImportFailed + 1;
+                            }                          
+                        }
                     }
-                }
 
-                foreach (var saveBrandRequest in saveBrandList)
+                    response.isSuccess = true;
+                }
+                else
                 {
-                    saveBrandRequest.brandGroupID = brandGroupData.FirstOrDefault(c => c.Key == saveBrandRequest.brandGroupName).Value;
-                    saveBrandRequest.brandSegmentID = brandSegmentData.FirstOrDefault(c => c.Key == saveBrandRequest.brandSegmentName).Value;
-                    saveBrandRequest.brandTypeID = brandTypeData.FirstOrDefault(c => c.Key == saveBrandRequest.brandTypeName).Value;
-                    saveBrandRequest.active = true;
-                    saveBrandRequest.userID = request.userID;
-
-                    await SaveBrand(saveBrandRequest);
+                    response.isSuccess = false;
                 }
-
-                response.isSuccess = true;
             }
             catch (Exception ex)
             {

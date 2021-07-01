@@ -8,5 +8,7 @@ namespace MarketData.Model.Response.MasterData
     {
         public bool isSuccess { get; set; }
         public bool wrongFormatFile { get; set; }
+        public int countImportSuccess { get; set; }
+        public int countImportFailed { get; set; }
     }
 }
