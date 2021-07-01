@@ -50,7 +50,6 @@ namespace MarketData.Controllers
         {
             return View();
         }
-
         public ActionResult BrandGroup_Edit(Guid brandGroupID)
         {
             var viewData = GetBrandGroupDetail(brandGroupID);
@@ -180,7 +179,7 @@ namespace MarketData.Controllers
             return View(viewData);
         }
 
-        public ActionResult DepartmentStore_View(Guid departmentStoreID)
+        public ActionResult DepartmentStore_Edit_View(Guid departmentStoreID)
         {
             var viewData = GetDepartStoreDetail(departmentStoreID);
             return View(viewData);
@@ -716,11 +715,12 @@ namespace MarketData.Controllers
                 if (response != null && response.data != null && response.data.Any())
                 {
                     listView.data = response.data.Select(c => new DepartmentStoreViewModel
-                    {
-                        departmentStoreID = c.departmentStoreID,
+                    {   departmentStoreID = c.departmentStoreID,
+                        
                         departmentStoreName = c.departmentStoreName,
                         retailerGroupName = c.retailerGroupName,
                         distributionChannelName = c.distributionChannelName,
+                        region = c.region,
                         rank = c.rank,
                         active = c.active
                     }).ToList();
@@ -798,7 +798,7 @@ namespace MarketData.Controllers
                 return Json(response);
             }
         }
-
+     
         #endregion
 
         #region Counter Function
