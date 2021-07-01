@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Brand";
     Html.RenderPartial("_ConfirmModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 <style>
@@ -39,7 +40,7 @@
                     </div>
                 </div>
             </form>
-           
+
         </div>
     </div>
 
@@ -59,7 +60,38 @@
 
     $(document).ready(function () {
         $("#file-upload").change(function () {
-            document.getElementById("uploadFile").submit();
+            $("#blocker").show();
+
+            var fd = new FormData();
+            var files = $('#file-upload')[0].files;
+
+            fd.append('userID', 'Test');
+
+            // Check file selected or not
+            if (files.length > 0) {
+                fd.append('excelFile', files[0]);
+            }
+
+            $.ajax(
+                {
+                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    type: "POST",
+                    success: function (data) {
+                        $("#blocker").hide();
+
+                        if (data.isSuccess) {
+                            dataTable.ajax.reload();
+                        }
+                        else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Import data failed');
+                         }
+                    }
+                }
+            );
         });
 
 
