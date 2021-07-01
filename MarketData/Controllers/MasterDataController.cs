@@ -45,6 +45,7 @@ namespace MarketData.Controllers
             var viewData = GetBrandDetail(brandID);
             return View(viewData);
         }
+
         public ActionResult BrandGroup()
         {
             return View();
@@ -190,9 +191,16 @@ namespace MarketData.Controllers
             return View();
         }
 
-        public ActionResult Counter_Edit()
+        public ActionResult Counter_Edit(Guid counterID)
         {
-            return View();
+            var viewData = GetCounterDetail(counterID);
+            return View(viewData);
+        }
+
+        public ActionResult Counter_View(Guid counterID)
+        {
+            var viewData = GetCounterDetail(counterID);
+            return View(viewData);
         }
 
 
@@ -262,7 +270,7 @@ namespace MarketData.Controllers
 
             if (response != null)
             {
-         
+
 
                 data.brandID = response.brandID;
                 data.brandName = response.brandName;
@@ -275,7 +283,7 @@ namespace MarketData.Controllers
                 data.lorealBrandRank = response.lorealBrandRank;
                 data.universe = response.universe;
                 data.active = response.active;
-                
+
             }
 
             return data;
@@ -793,7 +801,125 @@ namespace MarketData.Controllers
 
         #endregion
 
+        #region Counter Function
 
+        [HttpPost]
+        public IActionResult GetCounterList()
+        {
+            CounterListViewModel listView = new CounterListViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var response = process.masterData.GetCounterList();
+                var departmentStoreList = process.masterData.GetDepartmentStoreList();
+                var brandList = process.masterData.GetBrandList();
+                var channelList = process.masterData.GetDistributionChannelList();
+
+                if (response != null && response.data != null && response.data.Any())
+                {
+                    listView.data = response.data.Select(c => new CounterViewModel
+                    {
+                        counterID = c.counterID,
+                        distributionChannelID = c.distributionChannelID,
+                        distributionChannelName = c.distributionChannelName,
+                        departmentStoreID = c.departmentStoreID,
+                        departmentStoreName = c.departmentStoreName,
+                        brandID = c.brandID,
+                        brandName = c.brandName,
+                        active = c.active
+                    }).ToList();
+                    listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
+                    {
+                        departmentStoreID = e.departmentStoreID,
+                        departmentStoreName = e.departmentStoreName
+                    }).ToList() : new List<DepartmentStoreViewModel>();
+                    listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+                    {
+                        distributionChannelID = e.distributionChannelID,
+                        distributionChannelName = e.distributionChannelName
+                    }).ToList() : new List<DistributionChannelViewModel>();
+                    listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
+                    {
+                        brandID = e.brandID,
+                        brandName = e.brandName
+                    }).ToList() : new List<BrandViewModel>();
+                }
+                else
+                {
+                    listView.data = new List<CounterViewModel>();
+                }
+
+                return Json(listView);
+            }
+            else
+            {
+                return Json(listView);
+            }
+        }
+
+        public CounterViewModel GetCounterDetail(Guid counterID)
+        {
+            var response = process.masterData.GetCounterDetail(counterID);
+
+            CounterViewModel data = new CounterViewModel();
+            var departmentStoreList = process.masterData.GetDepartmentStoreList();
+            var brandList = process.masterData.GetBrandList();
+            var channelList = process.masterData.GetDistributionChannelList();
+
+            data.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
+            {
+                departmentStoreID = e.departmentStoreID,
+                departmentStoreName = e.departmentStoreName
+            }).ToList() : new List<DepartmentStoreViewModel>();
+            data.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+            {
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
+            }).ToList() : new List<DistributionChannelViewModel>();
+            data.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
+            {
+                brandID = e.brandID,
+                brandName = e.brandName
+            }).ToList() : new List<BrandViewModel>();
+
+            if (response != null)
+            {
+                data.departmentStoreID = response.departmentStoreID;
+                data.departmentStoreName = response.departmentStoreName;
+                data.counterID = response.counterID;
+                data.brandID = response.brandID;
+                data.brandName = response.brandName;
+                data.distributionChannelID = response.distributionChannelID;
+                data.distributionChannelName = response.distributionChannelName;
+                data.active = response.active;
+            }
+
+            return data;
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveCounter([FromBody] SaveCounterRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                request.counterID = request.counterID == Guid.Empty ? null : request.counterID;
+                response = await process.masterData.SaveCounter(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        #endregion
         [HttpPost]
         public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)
         {
