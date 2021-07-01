@@ -40,7 +40,11 @@ namespace MarketData.Controllers
             var viewData = GetBrandDetail(brandID);
             return View(viewData);
         }
-
+        public ActionResult Brand_Edit_View(Guid brandID)
+        {
+            var viewData = GetBrandDetail(brandID);
+            return View(viewData);
+        }
         public ActionResult BrandGroup()
         {
             return View();
@@ -270,7 +274,6 @@ namespace MarketData.Controllers
             return data;
 
         }
-
         [HttpPost]
         public async Task<IActionResult> SaveBrand([FromBody] SaveBrandRequest request)
         {

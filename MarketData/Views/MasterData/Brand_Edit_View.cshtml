@@ -1,0 +1,108 @@
+﻿@model MarketData.Models.BrandViewModel
+
+@{
+    ViewData["Title"] = "View Brand";
+}
+
+<style>
+    .font-band {
+        font-size: 12px
+    }
+</style>
+
+<h3>@ViewData["Title"]</h3>
+<hr />
+
+<br />
+
+<form>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Name	</label>
+            <input type="text" value="@Model.brandName" class="form-control input-sm" id="idbrandName" placeholder="">
+        </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Short Name	</label>
+            <input type="text" value="@Model.brandShortName" class="form-control input-sm" id="idbrandShortName" placeholder="">
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Group</label>
+
+            @Html.DropDownListFor(n => n.brandGroupID, new SelectList(Model.brandGroupList, "brandGroupID", "brandGroupName", 1), "Please select", new { id = "idbrandGroupList", @class = "form-control " })
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Segment</label>
+
+            @Html.DropDownListFor(n => n.brandSegmentID, new SelectList(Model.brandSegmentList, "brandSegmentID", "brandSegmentName", 1), "Please select", new { id = "idbrandSegmentList", @class = "form-control " })
+
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Type</label>
+            @Html.DropDownListFor(n => n.brandTypeID, new SelectList(Model.brandTypeList, "brandTypeID", "brandTypeName", 1), "Please select", new { id = "idbrandTypeList", @class = "form-control " })
+
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Brand Color</label>
+            <input type="color" class="textbox-color" value="@Model.color" id="idbrandColor" />
+        </div>
+    </div>
+
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label for="name">Loreal Brand Rank</label>
+            <input type="number" class="form-control input-sm" value="@Model.lorealBrandRank" id="idlorealBrandRank" />
+        </div>
+
+        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+            <label for="name">Universe</label>
+            @{
+                List<SelectListItem> listUniverse = new List<SelectListItem>();
+                listUniverse.Add(new SelectListItem
+                {
+                    Text = "CPD",
+                    Value = "CPD"
+                });
+                listUniverse.Add(new SelectListItem
+                {
+                    Text = "LPD",
+                    Value = "LPD",
+
+                });
+
+                @Html.DropDownListFor(n => n.universe, new SelectList(listUniverse, "Value", "Text", 1), "Please select", new { id = "iduniverseList", @class = "form-control " })
+
+            }
+
+        </div>
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label>
+                @if (Model.active)
+                {
+                    <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+                }
+                Active
+            </label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <a href="Brand" class="btn btn-outline-danger">Back</a>
+
+    </div>
+</form>
+
+<script type="text/javascript">
+    $("form :input").attr("disabled", "disabled");
+</script>
