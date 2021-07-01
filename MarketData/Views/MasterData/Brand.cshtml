@@ -164,7 +164,7 @@
         $('.status-dropdown').on('change', function (e) {
             var status = $(this).val();
             $('.status-dropdown').val(status);
-            dataTable.column(2).search(status).draw();
+            dataTable.column(10).search(status).draw();
         });
 
         $(document).on('click', '.delete-click', function () {
