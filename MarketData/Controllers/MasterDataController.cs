@@ -327,7 +327,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -404,7 +405,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -480,7 +482,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -556,7 +559,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -628,7 +632,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -700,7 +705,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -817,7 +823,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -937,7 +944,8 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
+                    responseError = "Please input required field."
                 };
                 return Json(response);
             }
@@ -957,7 +965,7 @@ namespace MarketData.Controllers
             {
                 response = new SaveDataResponse
                 {
-                    isSuccess = false
+                    isSuccess = false,
                 };
                 return Json(response);
             }

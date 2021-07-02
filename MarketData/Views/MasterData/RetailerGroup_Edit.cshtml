@@ -75,7 +75,8 @@
                         $('#myModalFailedResult').text('Duplicate data!');
                     } else {
                         $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Save data failed');
+                        $('#myModalFailedResult').text(data.responseError != ""
+                            && data.responseError != null ? data.responseError : 'Save data failed');
                      }
                     $('#confirmID').val('');
                     $('#myModalFailedResult').val('');

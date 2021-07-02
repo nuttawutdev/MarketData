@@ -15,14 +15,14 @@
 <form>
     <div class="col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Type Name	</label>
+            <label for="name">Brand Type Name</label>
             <input type="text" value="@Model.brandTypeName" class="form-control input-sm" id="typename" placeholder="">
         </div>
     </div>
     <div class="col-md-12 col-sm-12">
 
         <div class="form-group col-md-5 col-sm-5">
-            <label >
+            <label>
                 @if (Model.active)
                 {
                     <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
@@ -75,7 +75,7 @@
                         $('#myModalFailedResult').text('Duplicate data!');
                     } else {
                         $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Save data failed');
+                        $('#myModalFailedResult').text(data.responseError != "" && data.responseError != null ? data.responseError : 'Save data failed');
                      }
                     $('#confirmID').val('');
                     $('#myModalFailedResult').val('');
