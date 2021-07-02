@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Counter";
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 <h3>
@@ -16,18 +18,38 @@
     <div class="row">
         <div class="col text-end d-flex  align-items-center">
             <label class="form-label">Distribution Channel:&nbsp;</label>
-            @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "Please select", new { id = "channelList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
 
             <label class="form-label">Department Store:&nbsp;</label>
-            @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Please select", new { id = "departmentStoreList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
 
             <label class="form-label">Brand:&nbsp;</label>
-            @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            <label class="form-label">Active:&nbsp;</label>
+            <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
+                <option value="">All</option>
+                <option value=true>Y</option>
+                <option value="false">N</option>
+            </select>
+            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                  enctype="multipart/form-data">
+                <div class="filter-group ">
+                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
+                        <label for="file-upload" class="custom-file-upload1">
+                            <i class="ion-android-document"></i> Import by Excel
+                        </label>
+                        <input type="text" id="userID" name="userID" value="DDD" hidden />
+                        <input id="file-upload" type="file" name="excelFile" />
+                        <input type="submit" id="btnSubmit" value="Import" hidden />
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class="row">
+    @*<div class="row">
+       
         <div class="col text-end d-flex justify-content-end align-items-center">
             <label class="form-label">Active:&nbsp;</label>
             <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
@@ -51,7 +73,7 @@
             </form>
 
         </div>
-    </div>
+    </div>*@
 
 </div>
 
@@ -77,21 +99,24 @@
 
             $.ajax(
                 {
-                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    url: '@Url.Action("ImportCounter", "MasterData")',
                     data: fd,
                     processData: false,
                     contentType: false,
                     type: "POST",
                     success: function (data) {
                         $("#blocker").hide();
-
                         if (data.isSuccess) {
-                            dataTable.ajax.reload();
+                            // dataTable.ajax.reload();
+                            $('#successModalHref').attr("href", "Counter");
+                            $('#myResult').text('Import data success');
+                            $('#successModal').modal('show');
+
                         }
                         else {
                             $('#failedModal').modal('show');
                             $('#myModalFailedResult').text('Import data failed');
-                         }
+                        }
                     }
                 }
             );
@@ -145,29 +170,49 @@
         });
 
         $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
             dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
         });
 
         $('#channelList').on('change', function (e) {
             var txtSearch = $('#channelList option:selected').text();
-            dataTable.column(1).search(txtSearch).draw();
+            console.log(txtSearch, 'txtSearch')
+            if (txtSearch != 'All') {
+                dataTable.column(1).search(txtSearch).draw();
+            }
+            else {
+                dataTable.column(1).search('').draw();
+            }
         });
 
         $('#departmentStoreList').on('change', function (e) {
             var txtSearch = $('#departmentStoreList option:selected').text();
-            dataTable.column(2).search(txtSearch).draw();
+            if (txtSearch != 'All') {
+                dataTable.column(2).search(txtSearch).draw();
+            }
+            else {
+                dataTable.column(2).search('').draw();
+            }
         });
 
         $('#brandList').on('change', function (e) {
             var txtSearch = $('#brandList option:selected').text();
-            dataTable.column(3).search(txtSearch).draw();
+            if (txtSearch != 'All') {
+                dataTable.column(3).search(txtSearch).draw();
+            }
+            else {
+                dataTable.column(3).search('').draw();
+            }
         });
 
 
         $('.status-dropdown').on('change', function (e) {
             var status = $(this).val();
             $('.status-dropdown').val(status);
-            dataTable.column(5).search(status).draw();
+            dataTable.column(4).search(status).draw();
         });
 
 

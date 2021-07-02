@@ -974,12 +974,12 @@ namespace MarketData.Repositories.Repo
                    select new CounterData
                    {
                        counterID = e.Counter_ID,
-                       departmentStoreID = department.Department_Store_ID,
-                       departmentStoreName = department.Department_Store_Name,
-                       brandID = brand.Brand_ID,
-                       brandName = brand.Brand_Name,
-                       distributionChannelID = channel.Distribution_Channel_ID,
-                       distributionChannelName = channel.Distribution_Channel_Name,
+                       departmentStoreID = department != null ? department.Department_Store_ID : Guid.Empty,
+                       departmentStoreName = department != null ? department.Department_Store_Name : string.Empty,
+                       brandID = brand != null ? brand.Brand_ID : Guid.Empty,
+                       brandName = brand != null ? brand.Brand_Name : string.Empty,
+                       distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,
+                       distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
                        active = e.Active_Flag
                    }).OrderBy(c => c.departmentStoreName).ToList();
 
