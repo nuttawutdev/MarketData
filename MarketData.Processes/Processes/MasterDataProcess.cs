@@ -648,7 +648,7 @@ namespace MarketData.Processes.Processes
                             else
                             {
                                 response.countImportFailed = response.countImportFailed + 1;
-                            }                          
+                            }
                         }
                     }
 
@@ -1063,85 +1063,105 @@ namespace MarketData.Processes.Processes
                 }
 
 
-                var groupByRetailerGroup = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.retailerGroupName))
-                    .GroupBy(c => c.retailerGroupName);
-
-                var groupByDistrubution = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
-                   .GroupBy(c => c.distributionChannelName);
-
-                var regionData = repository.masterData.GetRegionList();
-
-                var retailerGroupData = new Dictionary<string, Guid>();
-                var distributionChannelData = new Dictionary<string, Guid>();
-
-                foreach (var itemRetailerGroup in groupByRetailerGroup)
+                if (saveDepartmentStoreList.Any())
                 {
-                    var retailerGroupByName = repository.masterData.FindRetailerGroupBy(
-                        c => c.Retailer_Group_Name.ToLower() == itemRetailerGroup.Key.ToLower()
-                        && c.Delete_Flag != true);
+                    var groupByRetailerGroup = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.retailerGroupName))
+                        .GroupBy(c => c.retailerGroupName);
 
-                    if (retailerGroupByName == null)
+                    var groupByDistrubution = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
+                       .GroupBy(c => c.distributionChannelName);
+
+                    var regionData = repository.masterData.GetRegionList();
+
+                    var retailerGroupData = new Dictionary<string, Guid>();
+                    var distributionChannelData = new Dictionary<string, Guid>();
+
+                    foreach (var itemRetailerGroup in groupByRetailerGroup)
                     {
-                        SaveRetailerGroupRequest saveRetailerGroupRequest = new SaveRetailerGroupRequest
-                        {
-                            retailerGroupName = itemRetailerGroup.Key,
-                            active = true,
-                            userID = request.userID
-                        };
+                        var retailerGroupByName = repository.masterData.FindRetailerGroupBy(
+                            c => c.Retailer_Group_Name.ToLower() == itemRetailerGroup.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                        var createRetailerGroupResult = await repository.masterData.CreateRetailerGroup(saveRetailerGroupRequest);
-
-                        if (createRetailerGroupResult != null)
+                        if (retailerGroupByName == null)
                         {
-                            retailerGroupData.Add(itemRetailerGroup.Key, createRetailerGroupResult.Retailer_Group_ID);
+                            SaveRetailerGroupRequest saveRetailerGroupRequest = new SaveRetailerGroupRequest
+                            {
+                                retailerGroupName = itemRetailerGroup.Key,
+                                active = true,
+                                userID = request.userID
+                            };
+
+                            var createRetailerGroupResult = await repository.masterData.CreateRetailerGroup(saveRetailerGroupRequest);
+
+                            if (createRetailerGroupResult != null)
+                            {
+                                retailerGroupData.Add(itemRetailerGroup.Key, createRetailerGroupResult.Retailer_Group_ID);
+                            }
+                        }
+                        else
+                        {
+                            retailerGroupData.Add(itemRetailerGroup.Key, retailerGroupByName.Retailer_Group_ID);
                         }
                     }
-                    else
+
+                    foreach (var itemChannel in groupByDistrubution)
                     {
-                        retailerGroupData.Add(itemRetailerGroup.Key, retailerGroupByName.Retailer_Group_ID);
-                    }
-                }
+                        var channelByName = repository.masterData.FindDistributionChannelBy(
+                            c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                foreach (var itemChannel in groupByDistrubution)
-                {
-                    var channelByName = repository.masterData.FindDistributionChannelBy(
-                        c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
-                        && c.Delete_Flag != true);
-
-                    if (channelByName == null)
-                    {
-                        SaveDistributionChannelRequest saveChannelRequest = new SaveDistributionChannelRequest
+                        if (channelByName == null)
                         {
-                            distributionChannelName = itemChannel.Key,
-                            active = true,
-                            userID = request.userID
-                        };
+                            SaveDistributionChannelRequest saveChannelRequest = new SaveDistributionChannelRequest
+                            {
+                                distributionChannelName = itemChannel.Key,
+                                active = true,
+                                userID = request.userID
+                            };
 
-                        var createChannelResult = await repository.masterData.CreateDistributionChannel(saveChannelRequest);
+                            var createChannelResult = await repository.masterData.CreateDistributionChannel(saveChannelRequest);
 
-                        if (createChannelResult != null)
+                            if (createChannelResult != null)
+                            {
+                                distributionChannelData.Add(itemChannel.Key, createChannelResult.Distribution_Channel_ID);
+                            }
+                        }
+                        else
                         {
-                            distributionChannelData.Add(itemChannel.Key, createChannelResult.Distribution_Channel_ID);
+                            distributionChannelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
                         }
                     }
-                    else
+
+                    foreach (var saveDepartmentStoreRequest in saveDepartmentStoreList)
                     {
-                        distributionChannelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
+                        saveDepartmentStoreRequest.regionID = regionData.FirstOrDefault(c => c.Region_Name == saveDepartmentStoreRequest.region)?.Region_ID;
+                        saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.retailerGroupName).Value;
+                        saveDepartmentStoreRequest.distributionChannelID = distributionChannelData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.distributionChannelName).Value;
+                        saveDepartmentStoreRequest.active = true;
+                        saveDepartmentStoreRequest.userID = request.userID;
+
+                        if (!string.IsNullOrWhiteSpace(saveDepartmentStoreRequest.departmentStoreName)
+                            && saveDepartmentStoreRequest.retailerGroupID != Guid.Empty
+                            && saveDepartmentStoreRequest.distributionChannelID != Guid.Empty)
+                        {
+                            var result = await SaveDepartmentStore(saveDepartmentStoreRequest);
+                            if (result.isSuccess)
+                            {
+                                response.countImportSuccess = response.countImportSuccess + 1;
+                            }
+                            else
+                            {
+                                response.countImportFailed = response.countImportFailed + 1;
+                            }
+                        }
                     }
-                }
 
-                foreach (var saveDepartmentStoreRequest in saveDepartmentStoreList)
+                    response.isSuccess = true;
+                }
+                else
                 {
-                    saveDepartmentStoreRequest.regionID = regionData.FirstOrDefault(c => c.Region_Name == saveDepartmentStoreRequest.region)?.Region_ID;
-                    saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.retailerGroupName).Value;
-                    saveDepartmentStoreRequest.distributionChannelID = distributionChannelData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.distributionChannelName).Value;
-                    saveDepartmentStoreRequest.active = true;
-                    saveDepartmentStoreRequest.userID = request.userID;
-
-                    await SaveDepartmentStore(saveDepartmentStoreRequest);
+                    response.isSuccess = false;
                 }
-
-                response.isSuccess = true;
             }
             catch (Exception ex)
             {
@@ -1298,75 +1318,94 @@ namespace MarketData.Processes.Processes
                     }
                 }
 
-                var groupByBrandName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.brandName))
-                    .GroupBy(c => c.brandName);
-
-                var groupByDepartmentStoreName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.departmentStoreName))
-                   .GroupBy(c => c.departmentStoreName);
-
-                var groupByChannel = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
-                   .GroupBy(c => c.distributionChannelName);
-
-                var brandNameData = new Dictionary<string, Guid>();
-                var departmentStoreData = new Dictionary<string, Guid>();
-                var channelData = new Dictionary<string, Guid>();
-
-                foreach (var itemBrandName in groupByBrandName)
+                if (saveCounterList.Any())
                 {
-                    var brandByName = repository.masterData.FindBrandBy(
-                        c => c.Brand_Name.ToLower() == itemBrandName.Key.ToLower()
-                        && c.Delete_Flag != true);
+                    var groupByBrandName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.brandName))
+                     .GroupBy(c => c.brandName);
 
-                    if (brandByName != null)
+                    var groupByDepartmentStoreName = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.departmentStoreName))
+                       .GroupBy(c => c.departmentStoreName);
+
+                    var groupByChannel = saveCounterList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
+                       .GroupBy(c => c.distributionChannelName);
+
+                    var brandNameData = new Dictionary<string, Guid>();
+                    var departmentStoreData = new Dictionary<string, Guid>();
+                    var channelData = new Dictionary<string, Guid>();
+
+                    foreach (var itemBrandName in groupByBrandName)
                     {
-                        brandNameData.Add(itemBrandName.Key, brandByName.Brand_ID);
-                    }
-                }
+                        var brandByName = repository.masterData.FindBrandBy(
+                            c => c.Brand_Name.ToLower() == itemBrandName.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                foreach (var itemDepartment in groupByDepartmentStoreName)
-                {
-                    var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
-                        c => c.Department_Store_Name.ToLower() == itemDepartment.Key.ToLower()
-                        && c.Delete_Flag != true);
-
-                    if (departmentStoreByName != null)
-                    {
-                        departmentStoreData.Add(itemDepartment.Key, departmentStoreByName.Department_Store_ID);
-                    }
-                }
-
-                foreach (var itemChannel in groupByChannel)
-                {
-                    var channelByName = repository.masterData.FindDistributionChannelBy(
-                        c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
-                        && c.Delete_Flag != true);
-
-                    if (channelByName != null)
-                    {
-                        channelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
-                    }
-                }
-
-                foreach (var saveCounterRequest in saveCounterList)
-                {
-                    var brandData = brandNameData.FirstOrDefault(c => c.Key == saveCounterRequest.brandName);
-                    var departmentStore = departmentStoreData.FirstOrDefault(c => c.Key == saveCounterRequest.departmentStoreName);
-                    var channel = channelData.FirstOrDefault(c => c.Key == saveCounterRequest.distributionChannelName);
-
-                    if (brandData.Key != null && departmentStore.Key != null && channel.Key != null)
-                    {
-                        saveCounterRequest.brandID = brandData.Value;
-                        saveCounterRequest.departmentStoreID = departmentStore.Value;
-                        saveCounterRequest.distributionChannelID = channel.Value;
-                        saveCounterRequest.active = true;
-                        saveCounterRequest.userID = request.userID;
-
-                        await SaveCounter(saveCounterRequest);
+                        if (brandByName != null)
+                        {
+                            brandNameData.Add(itemBrandName.Key, brandByName.Brand_ID);
+                        }
                     }
 
-                }
+                    foreach (var itemDepartment in groupByDepartmentStoreName)
+                    {
+                        var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
+                            c => c.Department_Store_Name.ToLower() == itemDepartment.Key.ToLower()
+                            && c.Delete_Flag != true);
 
-                response.isSuccess = true;
+                        if (departmentStoreByName != null)
+                        {
+                            departmentStoreData.Add(itemDepartment.Key, departmentStoreByName.Department_Store_ID);
+                        }
+                    }
+
+                    foreach (var itemChannel in groupByChannel)
+                    {
+                        var channelByName = repository.masterData.FindDistributionChannelBy(
+                            c => c.Distribution_Channel_Name.ToLower() == itemChannel.Key.ToLower()
+                            && c.Delete_Flag != true);
+
+                        if (channelByName != null)
+                        {
+                            channelData.Add(itemChannel.Key, channelByName.Distribution_Channel_ID);
+                        }
+                    }
+
+                    foreach (var saveCounterRequest in saveCounterList)
+                    {
+                        var brandData = brandNameData.FirstOrDefault(c => c.Key.ToLower() == saveCounterRequest.brandName.ToLower());
+                        var departmentStore = departmentStoreData.FirstOrDefault(c => c.Key.ToLower() == saveCounterRequest.departmentStoreName.ToLower());
+                        var channel = channelData.FirstOrDefault(c => c.Key.ToLower() == saveCounterRequest.distributionChannelName.ToLower());
+
+                        if (brandData.Key != null && departmentStore.Key != null && channel.Key != null)
+                        {
+                            saveCounterRequest.brandID = brandData.Value;
+                            saveCounterRequest.departmentStoreID = departmentStore.Value;
+                            saveCounterRequest.distributionChannelID = channel.Value;
+                            saveCounterRequest.active = true;
+                            saveCounterRequest.userID = request.userID;
+
+                            if (saveCounterRequest.brandID != Guid.Empty
+                                && saveCounterRequest.departmentStoreID != Guid.Empty
+                                && saveCounterRequest.distributionChannelID != Guid.Empty)
+                            {
+                                var result = await SaveCounter(saveCounterRequest);
+                                if (result.isSuccess)
+                                {
+                                    response.countImportSuccess = response.countImportSuccess + 1;
+                                }
+                                else
+                                {
+                                    response.countImportFailed = response.countImportFailed + 1;
+                                }
+                            }
+                        }
+                    }
+
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
             }
             catch (Exception ex)
             {
