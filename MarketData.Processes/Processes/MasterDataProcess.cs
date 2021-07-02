@@ -424,6 +424,26 @@ namespace MarketData.Processes.Processes
                 var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower()
                 && c.Delete_Flag != true);
 
+                var brrandGroupSelect = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == request.brandGroupID);
+
+                if(brrandGroupSelect.Is_Loreal_Brand)
+                {
+                    if (string.IsNullOrWhiteSpace(request.brandShortName))
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "Short name is required on Loreal Brand group.";
+                        return response;
+                    }
+
+                    if (!request.lorealBrandRank.HasValue)
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "Loreal brand rank is required on Loreal Brand group.";
+                        return response;
+                    }
+                }
+
+
                 TMBrand brandByShortName = null;
 
                 if (!string.IsNullOrWhiteSpace(request.brandShortName))
