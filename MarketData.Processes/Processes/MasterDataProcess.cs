@@ -1235,7 +1235,8 @@ namespace MarketData.Processes.Processes
                 var counterExist = repository.masterData.FindCounterBy(
                     c => c.Brand_ID == request.brandID
                     && c.Department_Store_ID == request.departmentStoreID
-                    && c.Distribution_Channel_ID == request.distributionChannelID);
+                    && c.Distribution_Channel_ID == request.distributionChannelID
+                    && c.Delete_Flag != true);
 
                 // Counter not exist Or Update old Counter
                 if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))

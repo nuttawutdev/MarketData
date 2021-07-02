@@ -1,7 +1,7 @@
 ﻿@model MarketData.Models.CounterViewModel
 
 @{
-    ViewData["Title"] = Model.departmentStoreID == null ? "Add Counter" : "Edit Counter";
+    ViewData["Title"] = Model.departmentStoreID == Guid.Empty ? "Add Counter" : "Edit Counter";
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
 }

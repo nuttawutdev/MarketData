@@ -943,6 +943,26 @@ namespace MarketData.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteCounter([FromBody] DeleteCounterRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = await process.masterData.DeleteCounter(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
         #endregion
         [HttpPost]
         public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)
