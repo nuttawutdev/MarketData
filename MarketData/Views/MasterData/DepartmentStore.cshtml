@@ -84,9 +84,18 @@
                             $('#successModal').modal('show');
                         }
                         else {
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Import data failed!');
                             $('#failedModal').modal('show');
-                            $('#myModalFailedResult').text('Import data failed');
                         }
+
+                        $("#file-upload").val("");
+                    },
+                     error: function () {
+                         $("#blocker").hide();
+                         $('#myModalFailedResult').text('Import data failed!');
+                         $('#failedModal').modal('show');
+                         $("#file-upload").val("");
                     }
                 }
             );
@@ -165,7 +174,7 @@
             dataTable.ajax.reload();
         });
 
-       
+
 
     });
 

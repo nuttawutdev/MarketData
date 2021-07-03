@@ -528,7 +528,7 @@ namespace MarketData.Processes.Processes
                             {
                                 response.isSuccess = false;
                                 response.wrongFormatFile = true;
-                                response.responseError = "Wrong format file";
+                                response.responseError = "Wrong format file!";
                                 return response;
                             }
                         }
@@ -575,7 +575,6 @@ namespace MarketData.Processes.Processes
                             {
                                 brandGroupName = itemBrandGroup.Key,
                                 active = true,
-                                isLoreal = !string.IsNullOrWhiteSpace(itemBrandGroup.FirstOrDefault().brandColor),
                                 userID = request.userID
                             };
 
@@ -673,19 +672,20 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    response.isSuccess = true;
+                    if(response.countImportSuccess > 0)
+                    {
+                        response.isSuccess = true;
+                    }                    
                 }
                 else
                 {
                     response.isSuccess = false;
                     response.wrongFormatFile = true;
-                    response.responseError = "Wrong format file";
                 }
             }
             catch (Exception ex)
             {
                 response.isSuccess = false;
-                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;
@@ -1058,6 +1058,7 @@ namespace MarketData.Processes.Processes
                             {
                                 response.isSuccess = false;
                                 response.wrongFormatFile = true;
+                                response.responseError = "Wrong format file!";
                                 return response;
                             }
                         }
@@ -1179,17 +1180,20 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    response.isSuccess = true;
+                    if(response.countImportSuccess > 0)
+                    {
+                        response.isSuccess = true;
+                    }
                 }
                 else
                 {
                     response.isSuccess = false;
+                    response.wrongFormatFile = true;
                 }
             }
             catch (Exception ex)
             {
                 response.isSuccess = false;
-                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;
@@ -1424,17 +1428,21 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    response.isSuccess = true;
+                    if(response.countImportSuccess > 0)
+                    {
+                        response.isSuccess = true;
+                    }
+           
                 }
                 else
                 {
                     response.isSuccess = false;
+                    response.wrongFormatFile = true;
                 }
             }
             catch (Exception ex)
             {
                 response.isSuccess = false;
-                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;

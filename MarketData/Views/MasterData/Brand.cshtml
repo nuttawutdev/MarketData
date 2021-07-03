@@ -88,13 +88,21 @@
                             $('#successModalHref').attr("href", "Brand");
                             $('#txtResult').text('Import data success');
                             $('#successModal').modal('show');
-                           
+
                         }
                         else {
-                            $('#failedModal').modal('show');
                             $('#myModalFailedResult').text(data.responseError != ""
-                                && data.responseError != null ? data.responseError : 'Save data failed');
-                         }
+                                && data.responseError != null ? data.responseError : 'Import data failed!');
+                                $('#failedModal').modal('show');
+                        }
+
+                        $("#file-upload").val("");
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                        $('#myModalFailedResult').text('Import data failed!');
+                        $('#failedModal').modal('show');
+                        $("#file-upload").val("");
                     }
                 }
             );
