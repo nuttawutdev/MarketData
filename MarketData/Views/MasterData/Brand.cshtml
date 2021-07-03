@@ -81,6 +81,7 @@
                     contentType: false,
                     type: "POST",
                     success: function (data) {
+                        console.log(data,'data')
                         $("#blocker").hide();
                         if (data.isSuccess) {
                            // dataTable.ajax.reload();
@@ -91,7 +92,8 @@
                         }
                         else {
                             $('#failedModal').modal('show');
-                            $('#myModalFailedResult').text('Import data failed');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
                          }
                     }
                 }

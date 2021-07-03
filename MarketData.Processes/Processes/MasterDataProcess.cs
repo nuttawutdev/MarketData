@@ -528,6 +528,7 @@ namespace MarketData.Processes.Processes
                             {
                                 response.isSuccess = false;
                                 response.wrongFormatFile = true;
+                                response.responseError = "Wrong format file";
                                 return response;
                             }
                         }
@@ -677,6 +678,8 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
+                    response.wrongFormatFile = true;
+                    response.responseError = "Wrong format file";
                 }
             }
             catch (Exception ex)
