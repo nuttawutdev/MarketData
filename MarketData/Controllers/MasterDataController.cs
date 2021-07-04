@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Request;
+﻿using MarketData.Model.Data;
+using MarketData.Model.Request;
 using MarketData.Model.Request.MasterData;
 using MarketData.Model.Response;
 using MarketData.Model.Response.MasterData;
@@ -42,7 +43,7 @@ namespace MarketData.Controllers
         }
         public ActionResult Brand_Edit_View(Guid brandID)
         {
-            var viewData = GetBrandDetail(brandID);
+            var viewData = GetBrandDetail(brandID, true);
             return View(viewData);
         }
 
@@ -175,13 +176,13 @@ namespace MarketData.Controllers
 
         public ActionResult DepartmentStore_Edit(Guid departmentStoreID)
         {
-            var viewData = GetDepartStoreDetail(departmentStoreID);
+            var viewData = GetDepartmentStoreDetail(departmentStoreID);
             return View(viewData);
         }
 
         public ActionResult DepartmentStore_Edit_View(Guid departmentStoreID)
         {
-            var viewData = GetDepartStoreDetail(departmentStoreID);
+            var viewData = GetDepartmentStoreDetail(departmentStoreID, true);
             return View(viewData);
         }
 
@@ -267,41 +268,43 @@ namespace MarketData.Controllers
             }
         }
 
-        public BrandViewModel GetBrandDetail(Guid brandID)
+        public BrandViewModel GetBrandDetail(Guid brandID, bool viewOnly = false)
         {
             var response = process.masterData.GetBrandDetail(brandID);
             BrandViewModel data = new BrandViewModel();
             var brandTypeList = process.masterData.GetBrandTypeList();
             var brandGroupList = process.masterData.GetBrandGroupList();
             var brandSegmentList = process.masterData.GetBrandSegmentList();
-            data.brandTypeList = brandTypeList != null && brandTypeList.data != null ? brandTypeList.data.Where(c => c.active).Select(e => new BrandTypeViewModel
+
+            var brandTypeSelect = brandTypeList != null && brandTypeList.data != null ? viewOnly ? brandTypeList.data : brandTypeList.data.Where(c => c.active).ToList() : new List<BrandTypeData>();
+            var brandGroupSelect = brandGroupList != null && brandGroupList.data != null ? viewOnly ? brandGroupList.data : brandGroupList.data.Where(c => c.active).ToList() : new List<BrandGroupData>();
+            var brandSegmentSelect = brandSegmentList != null && brandSegmentList.data != null ? viewOnly ? brandSegmentList.data : brandSegmentList.data.Where(c => c.active).ToList() : new List<BrandSegmentData>();
+
+            data.brandTypeList = brandTypeSelect.Select(e => new BrandTypeViewModel
             {
                 brandTypeID = e.brandTypeID,
                 brandTypeName = e.brandTypeName
-            }).ToList() : new List<BrandTypeViewModel>();
-            data.brandGroupList = brandGroupList != null && brandGroupList.data != null ? brandGroupList.data.Where(c => c.active).Select(e => new BrandGroupViewModel
+            }).ToList();
+            data.brandGroupList = brandGroupSelect.Select(e => new BrandGroupViewModel
             {
                 brandGroupID = e.brandGroupID,
                 brandGroupName = e.brandGroupName,
                 isLoreal = e.isLoreal
-            }).ToList() : new List<BrandGroupViewModel>();
-            data.brandSegmentList = brandSegmentList != null && brandSegmentList.data != null ? brandSegmentList.data.Where(c => c.active).Select(e => new BrandSegmentViewModel
+            }).ToList();
+            data.brandSegmentList = brandSegmentSelect.Select(e => new BrandSegmentViewModel
             {
                 brandSegmentID = e.brandSegmentID,
                 brandSegmentName = e.brandSegmentName
-            }).ToList() : new List<BrandSegmentViewModel>();
+            }).ToList();
 
             if (response != null)
             {
-
-
                 data.brandID = response.brandID;
                 data.brandName = response.brandName;
                 data.brandShortName = response.brandShortName;
                 data.brandGroupID = response.brandGroupID;
                 data.brandSegmentID = response.brandSegmentID;
                 data.brandTypeID = response.brandTypeID;
-                data.brandTypeName = response.brandTypeName;
                 data.color = response.color;
                 data.lorealBrandRank = response.lorealBrandRank;
                 data.universe = response.universe;
@@ -312,6 +315,7 @@ namespace MarketData.Controllers
             return data;
 
         }
+
         [HttpPost]
         public async Task<IActionResult> SaveBrand([FromBody] SaveBrandRequest request)
         {
@@ -745,8 +749,9 @@ namespace MarketData.Controllers
                 if (response != null && response.data != null && response.data.Any())
                 {
                     listView.data = response.data.Select(c => new DepartmentStoreViewModel
-                    {   departmentStoreID = c.departmentStoreID,
-                        
+                    {
+                        departmentStoreID = c.departmentStoreID,
+
                         departmentStoreName = c.departmentStoreName,
                         retailerGroupName = c.retailerGroupName,
                         distributionChannelName = c.distributionChannelName,
@@ -768,7 +773,7 @@ namespace MarketData.Controllers
             }
         }
 
-        public DepartmentStoreViewModel GetDepartStoreDetail(Guid departmentStoreID)
+        public DepartmentStoreViewModel GetDepartmentStoreDetail(Guid departmentStoreID, bool viewOnly = false)
         {
             var response = process.masterData.GetDepartmentStoreDetail(departmentStoreID);
 
@@ -777,16 +782,19 @@ namespace MarketData.Controllers
             var channelList = process.masterData.GetDistributionChannelList();
             var regionList = process.masterData.GetRegion();
 
-            data.retailerGroupList = retailerGroupList != null && retailerGroupList.data != null ? retailerGroupList.data.Where(c => c.active).Select(e => new RetailerGroupViewModel
+            var retailerGroupSelect = retailerGroupList != null && retailerGroupList.data != null ? viewOnly ? retailerGroupList.data : retailerGroupList.data.Where(c => c.active).ToList() : new List<RetailerGroupData>();
+            var channelSelect = channelList != null && channelList.data != null ? viewOnly ? channelList.data : channelList.data.Where(c => c.active).ToList() : new List<DistributionChannelData>();
+
+            data.retailerGroupList = retailerGroupSelect.Select(e => new RetailerGroupViewModel
             {
                 retailerGroupID = e.retailerGroupID,
                 retailerGroupName = e.retailerGroupName
-            }).ToList() : new List<RetailerGroupViewModel>();
-            data.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+            }).ToList();
+            data.channelList = channelSelect.Select(e => new DistributionChannelViewModel
             {
                 distributionChannelID = e.distributionChannelID,
                 distributionChannelName = e.distributionChannelName
-            }).ToList() : new List<DistributionChannelViewModel>();
+            }).ToList();
             data.regionList = regionList != null && regionList.data != null ? regionList.data.Select(e => new RegionViewModel
             {
                 regionID = e.regionID,
@@ -829,7 +837,7 @@ namespace MarketData.Controllers
                 return Json(response);
             }
         }
-     
+
         #endregion
 
         #region Counter Function
@@ -888,7 +896,7 @@ namespace MarketData.Controllers
             }
         }
 
-        public CounterViewModel GetCounterDetail(Guid counterID)
+        public CounterViewModel GetCounterDetail(Guid counterID,bool viewOnly = false)
         {
             var response = process.masterData.GetCounterDetail(counterID);
 
@@ -897,21 +905,25 @@ namespace MarketData.Controllers
             var brandList = process.masterData.GetBrandList();
             var channelList = process.masterData.GetDistributionChannelList();
 
-            data.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
+            var departmentSelect = departmentStoreList != null && departmentStoreList.data != null ? viewOnly ? departmentStoreList.data : departmentStoreList.data.Where(c => c.active).ToList() : new List<DepartmentStoreData>();
+            var brandSelect = brandList != null && brandList.data != null ? viewOnly ? brandList.data : brandList.data.Where(c => c.active).ToList() : new List<BrandData>();
+            var channelSelect = channelList != null && channelList.data != null ? viewOnly ? channelList.data : channelList.data.Where(c => c.active).ToList() : new List<DistributionChannelData>();
+
+            data.departmentStoreList = departmentSelect.Select(e => new DepartmentStoreViewModel
             {
                 departmentStoreID = e.departmentStoreID,
                 departmentStoreName = e.departmentStoreName
-            }).ToList() : new List<DepartmentStoreViewModel>();
-            data.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+            }).ToList();
+            data.channelList = channelSelect.Select(e => new DistributionChannelViewModel
             {
                 distributionChannelID = e.distributionChannelID,
                 distributionChannelName = e.distributionChannelName
-            }).ToList() : new List<DistributionChannelViewModel>();
-            data.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
+            }).ToList();
+            data.brandList = brandSelect.Select(e => new BrandViewModel
             {
                 brandID = e.brandID,
                 brandName = e.brandName
-            }).ToList() : new List<BrandViewModel>();
+            }).ToList();
 
             if (response != null)
             {
@@ -972,6 +984,7 @@ namespace MarketData.Controllers
         }
 
         #endregion
+
         [HttpPost]
         public async Task<IActionResult> ImportBrand(string userID, IFormFile excelFile)
         {
