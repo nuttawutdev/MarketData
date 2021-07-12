@@ -11,5 +11,6 @@ namespace MarketData.Models
         public List<DepartmentStoreViewModel> departmentStoreList { get; set; }
         public List<BrandViewModel> brandList { get; set; }
         public List<DistributionChannelViewModel> channelList { get; set; }
+        public List<RetailerGroupViewModel> retailerGroupList { get; set; }
     }
 }
