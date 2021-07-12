@@ -843,6 +843,7 @@ namespace MarketData.Repositories.Repo
                        departmentStoreID = e.Department_Store_ID,
                        departmentStoreName = e.Department_Store_Name,
                        distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
+                       retailerGroupID = retailer != null ? retailer.Retailer_Group_ID : Guid.Empty,
                        retailerGroupName = retailer != null ? retailer.Retailer_Group_Name : string.Empty,
                        region = region != null ? region.Region_Name : string.Empty,
                        active = e.Active_Flag,
@@ -971,12 +972,17 @@ namespace MarketData.Repositories.Repo
                        on e.Distribution_Channel_ID equals c.Distribution_Channel_ID
                        into joinChannel
                    from channel in joinChannel.DefaultIfEmpty()
+                   join r in _dbContext.TMRetailerGroup
+                       on department.Retailer_Group_ID equals r.Retailer_Group_ID
+                       into joinRetailerGroup
+                   from retailer in joinRetailerGroup.DefaultIfEmpty()
                    select new CounterData
                    {
                        counterID = e.Counter_ID,
                        departmentStoreID = department != null ? department.Department_Store_ID : Guid.Empty,
                        departmentStoreName = department != null ? department.Department_Store_Name : string.Empty,
                        brandID = brand != null ? brand.Brand_ID : Guid.Empty,
+                       retailerGroupName = retailer.Retailer_Group_Name,
                        brandName = brand != null ? brand.Brand_Name : string.Empty,
                        distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,
                        distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,

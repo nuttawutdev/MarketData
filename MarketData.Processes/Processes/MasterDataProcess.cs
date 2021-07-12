@@ -930,6 +930,7 @@ namespace MarketData.Processes.Processes
                         departmentStoreName = c.departmentStoreName,
                         distributionChannelName = c.distributionChannelName,
                         retailerGroupName = c.retailerGroupName,
+                        retailerGroupID = c.retailerGroupID,
                         rank = c.rank,
                         active = c.active,
                         region = c.region
