@@ -426,7 +426,7 @@ namespace MarketData.Processes.Processes
 
                 var brrandGroupSelect = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == request.brandGroupID);
 
-                if(brrandGroupSelect.Is_Loreal_Brand)
+                if (brrandGroupSelect.Is_Loreal_Brand)
                 {
                     if (string.IsNullOrWhiteSpace(request.brandShortName))
                     {
@@ -445,6 +445,7 @@ namespace MarketData.Processes.Processes
 
 
                 TMBrand brandByShortName = null;
+                TMBrand brandByColor = null;
 
                 if (!string.IsNullOrWhiteSpace(request.brandShortName))
                 {
@@ -454,7 +455,10 @@ namespace MarketData.Processes.Processes
                                         && c.Delete_Flag != true);
                 }
 
-                var brandByColor = repository.masterData.FindBrandBy(c => c.Brand_Color != null && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
+                if (request.brandColor != "#ffffff" && !string.IsNullOrWhiteSpace(request.brandColor))
+                {
+                    brandByColor = repository.masterData.FindBrandBy(c => !string.IsNullOrWhiteSpace(c.Brand_Color) && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
+                }
 
                 // Brand name not exist Or Update old Brand
                 if ((brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
@@ -672,10 +676,10 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    if(response.countImportSuccess > 0)
+                    if (response.countImportSuccess > 0)
                     {
                         response.isSuccess = true;
-                    }                    
+                    }
                 }
                 else
                 {
@@ -1182,7 +1186,7 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    if(response.countImportSuccess > 0)
+                    if (response.countImportSuccess > 0)
                     {
                         response.isSuccess = true;
                     }
@@ -1430,11 +1434,11 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
-                    if(response.countImportSuccess > 0)
+                    if (response.countImportSuccess > 0)
                     {
                         response.isSuccess = true;
                     }
-           
+
                 }
                 else
                 {
