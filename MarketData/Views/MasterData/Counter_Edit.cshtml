@@ -21,14 +21,6 @@
         </div>
 
     </div>
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label>Retailer Group</label><label style="font-size:14px;color:red">*</label>
-            @Html.DropDownListFor(n => n.retailerGroupList, new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName", 1), "Please select", new { id = "retailerGroupList", @class = "form-control " })
-
-        </div>
-
-    </div>
 
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
@@ -128,7 +120,7 @@
 
 
         $('#retailerGroupList').on('change', function (e) {
- 
+
 
             getDepartmentStoreList()
 
@@ -138,14 +130,12 @@
             var retailerGroupID = $("#retailerGroupList").val();
             var distributionChannelID = $("#channelList").val();
 
-            var model = @Html.Raw(Json.Serialize(Model));
-            if (retailerGroupID != "") {
-                var departmentStoreList = model.departmentStoreList.filter(function (items) {
-                    return items.retailerGroupID == retailerGroupID
-                });
-            }
+              var model = @Html.Raw(Json.Serialize(Model));
+              var departmentStoreList = model.departmentStoreList;
+
+
             if (distributionChannelID != "") {
-                departmentStoreList = model.departmentStoreList.filter(function (items) {
+                departmentStoreList = departmentStoreList.filter(function (items) {
                     return items.distributionChannelID == $('#channelList').val()
                 });
             }
@@ -153,6 +143,7 @@
             var lengthSelect = $('#departmentStoreList');
 
             lengthSelect.empty();
+            lengthSelect.append("<option value='Please select'>Please select</option>")
             $.each(departmentStoreList, function (index, row) {
                 lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
             });

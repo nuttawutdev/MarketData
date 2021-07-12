@@ -232,24 +232,29 @@
             var distributionChannelID = $("#channelList").val();
 
             var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
             if (retailerGroupID != "") {
-                var departmentStoreList = model.departmentStoreList.filter(function (items) {
+                departmentStoreList = departmentStoreList.filter(function (items) {
                     return items.retailerGroupID == retailerGroupID
                 });
             }
+
             if (distributionChannelID != "") {
-                departmentStoreList = model.departmentStoreList.filter(function (items) {
+                departmentStoreList = departmentStoreList.filter(function (items) {
                     return items.distributionChannelID == $('#channelList').val()
                 });
             }
 
             var lengthSelect = $('#departmentStoreList');
-            //console.log(departmentStoreList)
 
             lengthSelect.empty();
+            lengthSelect.append("<option value='All'>All</option>")
             $.each(departmentStoreList, function (index, row) {
                 lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
             });
+
+            dataTable.column(3).search('').draw();
         }
 
         $('#departmentStoreList').on('change', function (e) {

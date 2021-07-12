@@ -139,7 +139,12 @@
                     data: "color",
                     title: "Color",
                     render: function (color) {
-                        return '<input type="textbox" class="form-control input-sm" style="width: 80px;background-color:' + color + ';" readonly/> ';
+                        if (color != null && color != "") {
+                            return '<input type="textbox" class="form-control input-sm" style="width: 80px;background-color:' + color + ';" readonly/> ';
+                        }
+                        else {
+                            return '<input type="textbox" class="form-control input-sm" style="width: 80px;background-color:white;" readonly/> ';
+                        }                      
                     },
                     className: "text-center",
                     visible: true,

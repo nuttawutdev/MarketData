@@ -1330,9 +1330,9 @@ namespace MarketData.Processes.Processes
                             string column2 = reader.GetValue(1)?.ToString();
                             string column3 = reader.GetValue(2)?.ToString();
 
-                            if ((column1 != null && column1.ToLower() != "brand") ||
+                            if ((column3 != null && column3.ToLower() != "brand") ||
                                 (column2 != null && column2.ToLower() != "department store") ||
-                                (column3 != null && column3.ToLower() != "distribution channel"))
+                                (column1 != null && column1.ToLower() != "distribution channel"))
                             {
                                 response.isSuccess = false;
                                 response.wrongFormatFile = true;
@@ -1344,9 +1344,9 @@ namespace MarketData.Processes.Processes
                         {
                             saveCounterList.Add(new SaveCounterRequest
                             {
-                                brandName = reader.GetValue(0)?.ToString(),
+                                distributionChannelName = reader.GetValue(0)?.ToString(),
                                 departmentStoreName = reader.GetValue(1)?.ToString(),
-                                distributionChannelName = reader.GetValue(2)?.ToString(),
+                                brandName = reader.GetValue(2)?.ToString(),
                             });
                         }
                     }

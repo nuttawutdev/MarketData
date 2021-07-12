@@ -110,10 +110,6 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        //$("#idbrandColor").change(function () {
-        //    //alert('55')
-        //    $("#idbrandColor").attr("data-value", $('#idbrandColor').val());
-        //})
         $("#save").click(function () {
             $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
@@ -128,7 +124,7 @@
                  brandSegmentName: $('#idbrandSegmentList option:selected').text(),
                  brandTypeID: $('#idbrandTypeList').val(),
                  brandTypeName: $('#idbrandTypeList option:selected').text(),
-                 brandColor: $("#idbrandColor").data('value'),
+                 brandColor: $("#idbrandColor").val(),
                  lorealBrandRank: parseInt($('#idlorealBrandRank').val()),
                  universe: $('#iduniverseList').val(),
                  active: $("#flagactive").prop("checked"),

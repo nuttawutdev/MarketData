@@ -928,7 +928,9 @@ namespace MarketData.Controllers
             data.departmentStoreList = departmentSelect.Select(e => new DepartmentStoreViewModel
             {
                 departmentStoreID = e.departmentStoreID,
-                departmentStoreName = e.departmentStoreName
+                departmentStoreName = e.departmentStoreName,
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
             }).ToList();
             data.channelList = channelSelect.Select(e => new DistributionChannelViewModel
             {
