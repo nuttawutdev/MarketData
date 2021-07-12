@@ -13,6 +13,14 @@
 <form>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
+            <label>Distribution Channels</label>
+            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
+
+        </div>
+
+    </div>
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
             <label>Department Store</label>
             @Html.DropDownListFor(n => n.departmentStoreID, new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName", 1), "Please select", new { id = "departmentStoreList", @class = "form-control " })
 
@@ -27,14 +35,7 @@
         </div>
 
     </div>
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label>Distribution Channels</label>
-            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
 
-        </div>
-
-    </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>

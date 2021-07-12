@@ -68,7 +68,7 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
+    $(document).ready(function () {          
 
         $("#save").click(function () {
             $("#blocker").show();
@@ -112,22 +112,13 @@
                 }
             });
         });
+
         $('#channelList').on('change', function (e) {
-
             getDepartmentStoreList()
-
         });
 
-
-        $('#retailerGroupList').on('change', function (e) {
-
-
-            getDepartmentStoreList()
-
-        });
 
            function getDepartmentStoreList() {
-            var retailerGroupID = $("#retailerGroupList").val();
             var distributionChannelID = $("#channelList").val();
 
               var model = @Html.Raw(Json.Serialize(Model));
