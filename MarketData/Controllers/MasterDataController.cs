@@ -200,7 +200,9 @@ namespace MarketData.Controllers
                 departmentStoreID = e.departmentStoreID,
                 departmentStoreName = e.departmentStoreName,
                 retailerGroupID = e.retailerGroupID,
-                retailerGroupName = e.retailerGroupName
+                retailerGroupName = e.retailerGroupName,
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
             }).ToList() : new List<DepartmentStoreViewModel>();
             listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
             {

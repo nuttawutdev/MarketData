@@ -928,6 +928,7 @@ namespace MarketData.Processes.Processes
                     {
                         departmentStoreID = c.departmentStoreID,
                         departmentStoreName = c.departmentStoreName,
+                        distributionChannelID = c.distributionChannelID,
                         distributionChannelName = c.distributionChannelName,
                         retailerGroupName = c.retailerGroupName,
                         retailerGroupID = c.retailerGroupID,

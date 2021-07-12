@@ -842,6 +842,7 @@ namespace MarketData.Repositories.Repo
                    {
                        departmentStoreID = e.Department_Store_ID,
                        departmentStoreName = e.Department_Store_Name,
+                       distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,
                        distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
                        retailerGroupID = retailer != null ? retailer.Retailer_Group_ID : Guid.Empty,
                        retailerGroupName = retailer != null ? retailer.Retailer_Group_Name : string.Empty,
