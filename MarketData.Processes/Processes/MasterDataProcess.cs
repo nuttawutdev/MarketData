@@ -660,9 +660,9 @@ namespace MarketData.Processes.Processes
                         saveBrandRequest.userID = request.userID;
 
                         if (!string.IsNullOrWhiteSpace(saveBrandRequest.brandName)
-                            && saveBrandRequest.brandGroupID != null
-                            && saveBrandRequest.brandSegmentID != null
-                            && saveBrandRequest.brandTypeID != null)
+                            && saveBrandRequest.brandGroupID != Guid.Empty
+                            && saveBrandRequest.brandSegmentID != Guid.Empty
+                            && saveBrandRequest.brandTypeID != Guid.Empty)
                         {
                             var result = await SaveBrand(saveBrandRequest);
                             if (result.isSuccess)
