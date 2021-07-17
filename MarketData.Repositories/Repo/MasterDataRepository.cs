@@ -5,6 +5,7 @@ using MarketData.Model.Request.MasterData;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -470,6 +471,11 @@ namespace MarketData.Repositories.Repo
 
         public async Task<bool> SaveBrand(SaveBrandRequest request)
         {
+            string today = DateTime.Now.ToString();
+            DateTime dateNow;
+            IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+            DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
             try
             {
                 if (request.brandID == null)
@@ -488,7 +494,7 @@ namespace MarketData.Repositories.Repo
                         Brand_Group_ID = request.brandGroupID,
                         Active_Flag = request.active,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = dateNow
                     };
 
                     _dbContext.TMBrand.Add(insertBrand);
