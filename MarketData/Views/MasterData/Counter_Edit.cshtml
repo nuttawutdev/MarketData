@@ -15,7 +15,16 @@
 <form>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label>Department Store</label>
+            <label>Distribution Channels</label><label style="font-size:14px;color:red">*</label>
+            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
+
+        </div>
+
+    </div>
+
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label>Department Store</label><label style="font-size:14px;color:red">*</label>
             @Html.DropDownListFor(n => n.departmentStoreID, new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName", 1), "Please select", new { id = "departmentStoreList", @class = "form-control " })
 
         </div>
@@ -23,20 +32,15 @@
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label>Brand</label>
+            <label>Brand</label><label style="font-size:14px;color:red">*</label>
             @Html.DropDownListFor(n => n.brandID, new SelectList(Model.brandList, "brandID", "brandName", 1), "Please select", new { id = "brandList", @class = "form-control " })
 
         </div>
 
     </div>
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label>Distribution Channels</label>
-            @Html.DropDownListFor(n => n.distributionChannelID, new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
 
-        </div>
 
-    </div>
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>
@@ -64,7 +68,7 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
+    $(document).ready(function () {          
 
         $("#save").click(function () {
             $("#blocker").show();
@@ -108,6 +112,33 @@
                 }
             });
         });
+
+        $('#channelList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
+
+
+           function getDepartmentStoreList() {
+            var distributionChannelID = $("#channelList").val();
+
+              var model = @Html.Raw(Json.Serialize(Model));
+              var departmentStoreList = model.departmentStoreList;
+
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value='Please select'>Please select</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+        }
 
  });
 </script>

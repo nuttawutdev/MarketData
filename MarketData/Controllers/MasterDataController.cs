@@ -190,15 +190,19 @@ namespace MarketData.Controllers
         {
             CounterListViewModel listView = new CounterListViewModel();
 
-
             var departmentStoreList = process.masterData.GetDepartmentStoreList();
             var brandList = process.masterData.GetBrandList();
             var channelList = process.masterData.GetDistributionChannelList();
+            var retailerGroupList = process.masterData.GetRetailerGroupList();
 
             listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
             {
                 departmentStoreID = e.departmentStoreID,
-                departmentStoreName = e.departmentStoreName
+                departmentStoreName = e.departmentStoreName,
+                retailerGroupID = e.retailerGroupID,
+                retailerGroupName = e.retailerGroupName,
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
             }).ToList() : new List<DepartmentStoreViewModel>();
             listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
             {
@@ -210,6 +214,11 @@ namespace MarketData.Controllers
                 brandID = e.brandID,
                 brandName = e.brandName
             }).ToList() : new List<BrandViewModel>();
+            listView.retailerGroupList = retailerGroupList != null && retailerGroupList.data != null ? retailerGroupList.data.Select(e => new RetailerGroupViewModel
+            {
+                retailerGroupID = e.retailerGroupID,
+                retailerGroupName = e.retailerGroupName
+            }).ToList() : new List<RetailerGroupViewModel>();
 
             return View(listView);
 
@@ -850,15 +859,17 @@ namespace MarketData.Controllers
             if (ModelState.IsValid)
             {
                 var response = process.masterData.GetCounterList();
-                var departmentStoreList = process.masterData.GetDepartmentStoreList();
-                var brandList = process.masterData.GetBrandList();
-                var channelList = process.masterData.GetDistributionChannelList();
+                //var departmentStoreList = process.masterData.GetDepartmentStoreList();
+                //var brandList = process.masterData.GetBrandList();
+                //var channelList = process.masterData.GetDistributionChannelList();
+                //var retailerGroupList = process.masterData.GetRetailerGroupList();
 
                 if (response != null && response.data != null && response.data.Any())
                 {
                     listView.data = response.data.Select(c => new CounterViewModel
                     {
                         counterID = c.counterID,
+                        retailerGroupName = c.retailerGroupName,
                         distributionChannelID = c.distributionChannelID,
                         distributionChannelName = c.distributionChannelName,
                         departmentStoreID = c.departmentStoreID,
@@ -867,21 +878,26 @@ namespace MarketData.Controllers
                         brandName = c.brandName,
                         active = c.active
                     }).ToList();
-                    listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
-                    {
-                        departmentStoreID = e.departmentStoreID,
-                        departmentStoreName = e.departmentStoreName
-                    }).ToList() : new List<DepartmentStoreViewModel>();
-                    listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
-                    {
-                        distributionChannelID = e.distributionChannelID,
-                        distributionChannelName = e.distributionChannelName
-                    }).ToList() : new List<DistributionChannelViewModel>();
-                    listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
-                    {
-                        brandID = e.brandID,
-                        brandName = e.brandName
-                    }).ToList() : new List<BrandViewModel>();
+                    //listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
+                    //{
+                    //    departmentStoreID = e.departmentStoreID,
+                    //    departmentStoreName = e.departmentStoreName
+                    //}).ToList() : new List<DepartmentStoreViewModel>();
+                    //listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
+                    //{
+                    //    distributionChannelID = e.distributionChannelID,
+                    //    distributionChannelName = e.distributionChannelName
+                    //}).ToList() : new List<DistributionChannelViewModel>();
+                    //listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
+                    //{
+                    //    brandID = e.brandID,
+                    //    brandName = e.brandName
+                    //}).ToList() : new List<BrandViewModel>();
+                    //listView.retailerGroupList = retailerGroupList != null && retailerGroupList.data != null ? retailerGroupList.data.Select(e => new RetailerGroupViewModel
+                    //{
+                    //    retailerGroupID = e.retailerGroupID,
+                    //    retailerGroupName = e.retailerGroupName
+                    //}).ToList() : new List<RetailerGroupViewModel>();
                 }
                 else
                 {
@@ -912,7 +928,9 @@ namespace MarketData.Controllers
             data.departmentStoreList = departmentSelect.Select(e => new DepartmentStoreViewModel
             {
                 departmentStoreID = e.departmentStoreID,
-                departmentStoreName = e.departmentStoreName
+                departmentStoreName = e.departmentStoreName,
+                distributionChannelID = e.distributionChannelID,
+                distributionChannelName = e.distributionChannelName
             }).ToList();
             data.channelList = channelSelect.Select(e => new DistributionChannelViewModel
             {

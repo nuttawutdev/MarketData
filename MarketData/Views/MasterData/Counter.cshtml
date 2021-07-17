@@ -16,43 +16,46 @@
 
 
 <div style="padding-bottom:10px;">
-    <div class="row">
+    <div class="row" style="padding-bottom:10px">
         <div class="col text-end d-flex  align-items-center">
-            <label class="form-label">Distribution Channel:&nbsp;</label>
-            @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            <label class="form-label">Distribution Channel :&nbsp;</label>
+            @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
 
-            <label class="form-label">Department Store:&nbsp;</label>
-            @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            <label class="form-label">Retailer Group :&nbsp;</label>
+            @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
 
-            <label class="form-label">Brand:&nbsp;</label>
-            @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:200px;margin-right: 5px;" })
+            <label class="form-label">Department Store :&nbsp;</label>
+            @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
+          
+            <label class="form-label">Brand :&nbsp;</label>
+            @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
             @*<label class="form-label">Active:&nbsp;</label>
-            <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
-                <option value="">All</option>
-                <option value=true>Y</option>
-                <option value="false">N</option>
-            </select>
-            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-                  enctype="multipart/form-data">
-                <div class="filter-group ">
-                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+        <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
+            <option value="">All</option>
+            <option value=true>Y</option>
+            <option value="false">N</option>
+        </select>
+        <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+              enctype="multipart/form-data">
+            <div class="filter-group ">
+                <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Import by Excel
-                        </label>
-                        <input type="text" id="userID" name="userID" value="DDD" hidden />
-                        <input id="file-upload" type="file" name="excelFile" />
-                        <input type="submit" id="btnSubmit" value="Import" hidden />
-                    </div>
+                    <label for="file-upload" class="custom-file-upload1">
+                        <i class="ion-android-document"></i> Import by Excel
+                    </label>
+                    <input type="text" id="userID" name="userID" value="DDD" hidden />
+                    <input id="file-upload" type="file" name="excelFile" />
+                    <input type="submit" id="btnSubmit" value="Import" hidden />
                 </div>
-            </form>*@
+            </div>
+        </form>*@
         </div>
     </div>
 
     <div class="row">
        
         <div class="col text-end d-flex justify-content-end align-items-center">
-            <label class="form-label">Active:&nbsp;</label>
+            <label class="form-label">Active :&nbsp;</label>
             <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
                 <option value="">All</option>
                 <option value=true>Y</option>
@@ -151,7 +154,8 @@
             },
             "columns": [
                 { data: "counterID", visible: false, searchable: false },
-                { data: "distributionChannelName", title: "Distribution Channel Name"},
+                { data: "distributionChannelName", title: "Distribution Channel Name" },
+                { data: "retailerGroupName", title: "Retailer Group Name" },
                 { data: "departmentStoreName", title: "Department Store Name" },
                 { data: "brandName", title: "Brand Name"},
                 { data: "active", title: "active", visible: false },
@@ -193,6 +197,7 @@
         });
 
         $('#channelList').on('change', function (e) {
+
             var txtSearch = $('#channelList option:selected').text();
             console.log(txtSearch, 'txtSearch')
             if (txtSearch != 'All') {
@@ -201,25 +206,75 @@
             else {
                 dataTable.column(1).search('').draw();
             }
+            getDepartmentStoreList()
+
         });
 
-        $('#departmentStoreList').on('change', function (e) {
-            var txtSearch = $('#departmentStoreList option:selected').text();
+
+        $('#retailerGroupList').on('change', function (e) {
+            var txtSearch = $('#retailerGroupList option:selected').text();
+
             if (txtSearch != 'All') {
                 dataTable.column(2).search(txtSearch).draw();
             }
             else {
                 dataTable.column(2).search('').draw();
             }
+
+            //debugger;
+
+            getDepartmentStoreList()
+
         });
 
-        $('#brandList').on('change', function (e) {
-            var txtSearch = $('#brandList option:selected').text();
+        function getDepartmentStoreList() {
+            var retailerGroupID = $("#retailerGroupList").val();
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (retailerGroupID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.retailerGroupID == retailerGroupID
+                });
+            }
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value='All'>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+
+            dataTable.column(3).search('').draw();
+        }
+
+        $('#departmentStoreList').on('change', function (e) {
+            var txtSearch = $('#departmentStoreList option:selected').text();
             if (txtSearch != 'All') {
                 dataTable.column(3).search(txtSearch).draw();
             }
             else {
                 dataTable.column(3).search('').draw();
+            }
+            
+        });
+
+        $('#brandList').on('change', function (e) {
+            var txtSearch = $('#brandList option:selected').text();
+            if (txtSearch != 'All') {
+                dataTable.column(4).search(txtSearch).draw();
+            }
+            else {
+                dataTable.column(4).search('').draw();
             }
         });
 
@@ -227,7 +282,7 @@
         $('.status-dropdown').on('change', function (e) {
             var status = $(this).val();
             $('.status-dropdown').val(status);
-            dataTable.column(4).search(status).draw();
+            dataTable.column(5).search(status).draw();
         });
 
 

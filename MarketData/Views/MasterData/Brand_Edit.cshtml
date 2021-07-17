@@ -20,23 +20,23 @@
 <form>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Name	</label>
+            <label for="name">Brand Name</label><label style="font-size:14px;color:red">*</label>
             <input type="text" value="@Model.brandName" class="form-control input-sm" id="idbrandName" placeholder="">
         </div>
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Short Name	</label>
+            <label for="name">Short Name</label>
             <input type="text" value="@Model.brandShortName" class="form-control input-sm" id="idbrandShortName" placeholder="">
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Group</label>
+            <label for="name">Brand Group</label><label style="font-size:14px;color:red">*</label>
      
             @Html.DropDownListFor(n => n.brandGroupID, new SelectList(Model.brandGroupList, "brandGroupID", "brandGroupName", 1), "Please select",new { id = "idbrandGroupList", @class= "form-control " })
         </div>
 
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Segment</label>
+            <label for="name">Brand Segment</label><label style="font-size:14px;color:red">*</label>
          
             @Html.DropDownListFor(n => n.brandSegmentID, new SelectList(Model.brandSegmentList, "brandSegmentID", "brandSegmentName", 1), "Please select", new { id = "idbrandSegmentList", @class = "form-control " })
 
@@ -44,14 +44,14 @@
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Brand Type</label>
+            <label for="name">Brand Type</label><label style="font-size:14px;color:red">*</label>
             @Html.DropDownListFor(n => n.brandTypeID, new SelectList(Model.brandTypeList, "brandTypeID", "brandTypeName", 1), "Please select", new { id = "idbrandTypeList", @class = "form-control " })
 
         </div>
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Color</label>
-            <input type="color" class="textbox-color" value="@Model.color" id="idbrandColor" />
+            <input type="color" class="textbox-color" value="@(Model.color==null?"#ffffff":Model.color)" id="idbrandColor" data-value="@Model.color" />
         </div>
     </div>
 
@@ -110,7 +110,6 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-
         $("#save").click(function () {
             $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
@@ -125,13 +124,13 @@
                  brandSegmentName: $('#idbrandSegmentList option:selected').text(),
                  brandTypeID: $('#idbrandTypeList').val(),
                  brandTypeName: $('#idbrandTypeList option:selected').text(),
-                 brandColor: $('#idbrandColor').val(),
+                 brandColor: $("#idbrandColor").val(),
                  lorealBrandRank: parseInt($('#idlorealBrandRank').val()),
                  universe: $('#iduniverseList').val(),
                  active: $("#flagactive").prop("checked"),
                  userID: $('#iduserID').val()
             };
-          
+            debugger;
             $.ajax({
                  type: "POST",
                  url: '@Url.Action("SaveBrand", "MasterData")',
