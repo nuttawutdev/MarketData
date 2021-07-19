@@ -2,7 +2,7 @@
     ViewData["Title"] = "Department Store";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
-    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_ImportDataResultModal");
 }
 
 
@@ -79,9 +79,25 @@
                     success: function (data) {
                         $("#blocker").hide();
                         if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "DepartmentStore");
-                            $('#txtResult').text('Import data success');
-                            $('#successModal').modal('show');
+                            // dataTable.ajax.reload();
+
+                            $('#importSuccess').text("Import Success : " + data.countImportSuccess);
+                            $('#importFailed').text("Import Failed : " + data.countImportFailed);
+
+                            if (data.importResult.length > 0) {
+
+                                for (var i = 0; i < data.importResult.length; i++) {
+                                    $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result + "</p>");
+                                }
+
+                                $('#importDataModalHref').attr("href", "DepartmentStore");
+                                $('#importDataModal').modal('show');
+
+                            }
+                            else {
+                                $('#importDataModalHref').attr("href", "DepartmentStore");
+                                $('#importDataModal').modal('show');
+                            }
                         }
                         else {
                             $('#myModalFailedResult').text(data.responseError != ""

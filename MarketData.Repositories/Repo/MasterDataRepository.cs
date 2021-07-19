@@ -1103,5 +1103,44 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public TMRegion FindRegionBy(Expression<Func<TMRegion, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMRegion.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<TMRegion> CreateRegion(string regionName)
+        {
+            try
+            {
+                TMRegion insertRegion = new TMRegion
+                {
+                    Region_ID = Guid.NewGuid(),
+                    Region_Name = regionName
+                };
+
+                _dbContext.TMRegion.Add(insertRegion);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return insertRegion;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

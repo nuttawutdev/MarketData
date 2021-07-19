@@ -4,7 +4,7 @@
     ViewData["Title"] = "Counter";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
-    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_ImportDataResultModal");
 }
 
 <h3>
@@ -112,9 +112,24 @@
                         $("#blocker").hide();
                         if (data.isSuccess) {
                             // dataTable.ajax.reload();
-                            $('#successModalHref').attr("href", "Counter");
-                            $('#txtResult').text('Import data success');
-                            $('#successModal').modal('show');
+
+                            $('#importSuccess').text("Import Success : " + data.countImportSuccess);
+                            $('#importFailed').text("Import Failed : " + data.countImportFailed);
+
+                            if (data.importResult.length > 0) {
+
+                                for (var i = 0; i < data.importResult.length; i++) {
+                                    $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result + "</p>");
+                                }
+
+                                $('#importDataModalHref').attr("href", "Counter");
+                                $('#importDataModal').modal('show');
+
+                            }
+                            else {
+                                $('#importDataModalHref').attr("href", "Counter");
+                                $('#importDataModal').modal('show');
+                            }
                         }
                         else {
                             $('#myModalFailedResult').text(data.responseError != ""

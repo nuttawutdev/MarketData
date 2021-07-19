@@ -1,0 +1,118 @@
+﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <!DOCTYPE html>
+
+    <link rel="stylesheet" href="~/fonts/ionicons.min.css">
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+        }
+
+        #importDataModal .modal-confirm {
+            color: #636363;
+            width: 600px;
+            font-size: 14px;
+        }
+
+            #importDataModal .modal-confirm .modal-content {
+                padding: 20px;
+                border-radius: 5px;
+                border: none;
+            }
+
+            #importDataModal .modal-confirm .modal-header {
+                border-bottom: none;
+                position: relative;
+            }
+
+            #importDataModal .modal-confirm h4 {
+                text-align: center;
+                font-size: 26px;
+                margin: 30px 0 -15px;
+            }
+
+            #importDataModal .modal-confirm .form-control, #importDataModal .modal-confirm .btn {
+                min-height: 40px;
+                border-radius: 3px;
+            }
+
+            #importDataModal .modal-confirm .close {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+            }
+
+            #importDataModal .modal-confirm .modal-footer {
+                border: none;
+                text-align: center;
+                border-radius: 5px;
+                font-size: 13px;
+            }
+
+            #importDataModal .modal-confirm .icon-box {
+                color: #fff;
+                position: absolute;
+                margin: 0 auto;
+                left: 0;
+                right: 0;
+                top: -70px;
+                width: 95px;
+                height: 95px;
+                border-radius: 50%;
+                z-index: 9;
+                background: #F78818;
+                padding: 15px;
+                text-align: center;
+                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+            }
+
+                #importDataModal .modal-confirm .icon-box i {
+                    font-size: 58px;
+                    position: relative;
+                    top: -8px;
+                }
+
+            #importDataModal .modal-confirm.modal-dialog {
+                margin-top: 80px;
+            }
+
+            #importDataModal .modal-confirm .btn {
+                color: #fff;
+                border-radius: 4px;
+                background: #82ce34;
+                text-decoration: none;
+                transition: all 0.4s;
+                line-height: normal;
+                border: none;
+            }
+
+                #importDataModal .modal-confirm .btn:hover, .modal-confirm .btn:focus {
+                    background: #6fb32b;
+                    outline: none;
+                }
+
+        #importDataModal .trigger-btn {
+            display: inline-block;
+            margin: 100px auto;
+        }
+    </style>
+
+
+<!-- Modal HTML -->
+<div id="importDataModal"  class="modal fade">
+	<div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="ion-android-warning text-white"></i>
+                </div>
+                <h4 class="modal-title w-100">Import Data Result!</h4>
+            </div>
+            <div><h5 id="importSuccess" class="text-center"></h5></div>
+            <div><h5 id="importFailed" class="text-center"></h5></div>
+            <div id="result-import" class="modal-body" style="overflow: auto;max-height:400px">
+            </div>
+            <div class="modal-footer">
+                <a id="importDataModalHref" href="#" class="btn btn-success btn-block btnSuccessModal" style="padding-top: 12px;">OK</a>
+            </div>
+        </div>
+	</div>
+</div>    

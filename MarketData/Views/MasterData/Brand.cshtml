@@ -2,7 +2,7 @@
     ViewData["Title"] = "Brand";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
-    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_ImportDataResultModal");
 }
 
 <style>
@@ -60,6 +60,9 @@
 
 
     $(document).ready(function () {
+        //$('#importDataModalHref').attr("href", "Brand");
+        //$('#importDataModal').modal('show');
+
         $("#file-upload").change(function () {
             $("#blocker").show();
 
@@ -85,10 +88,24 @@
                         $("#blocker").hide();
                         if (data.isSuccess) {
                            // dataTable.ajax.reload();
-                            $('#successModalHref').attr("href", "Brand");
-                            $('#txtResult').text('Import data success');
-                            $('#successModal').modal('show');
 
+                            $('#importSuccess').text("Import Success : " + data.countImportSuccess);
+                            $('#importFailed').text("Import Failed : " + data.countImportFailed);
+
+                            if (data.importResult.length > 0) {
+
+                                for (var i = 0; i < data.importResult.length; i++) {
+                                    $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result+"</p>");
+                                }
+
+                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModal').modal('show');
+
+                            }
+                            else {
+                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModal').modal('show');
+                            }
                         }
                         else {
                             $('#myModalFailedResult').text(data.responseError != ""
@@ -144,7 +161,7 @@
                         }
                         else {
                             return '<input type="textbox" class="form-control input-sm" style="width: 80px;background-color:white;" readonly/> ';
-                        }                      
+                        }
                     },
                     className: "text-center",
                     visible: true,
