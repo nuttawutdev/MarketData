@@ -19,5 +19,6 @@ namespace MarketData.Model.Request.MasterData
         public string brandName { get; set; }
         public string userID { get; set; }
         public bool active { get; set; }
+        public int row { get; set; }
     }
 }

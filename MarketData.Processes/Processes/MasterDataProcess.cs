@@ -573,7 +573,7 @@ namespace MarketData.Processes.Processes
                                     ImportResultByRowResponse resultImport = new ImportResultByRowResponse
                                     {
                                         row = reader.Depth + 1,
-                                        result = $"Row {row} required value in column "
+                                        result = $"Row {row} Required value in column "
                                     };
 
                                     if (string.IsNullOrWhiteSpace(brandNameValue))
@@ -729,11 +729,11 @@ namespace MarketData.Processes.Processes
 
                                 if (result.isDuplicated == true)
                                 {
-                                    resultImport.result = $"Row {saveBrandRequest.row} data is duplicate.";
+                                    resultImport.result = $"Row {saveBrandRequest.row} Data is duplicate.";
                                 }
                                 else
                                 {
-                                    resultImport.result = $"Row {saveBrandRequest.row} save data failed.";
+                                    resultImport.result = $"Row {saveBrandRequest.row} Save data failed.";
                                 }
 
                                 importResult.Add(resultImport);
@@ -747,7 +747,7 @@ namespace MarketData.Processes.Processes
                                 row = saveBrandRequest.row,
                             };
 
-                            resultImport.result = $"Row {saveBrandRequest.row} required value in column ";
+                            resultImport.result = $"Row {saveBrandRequest.row} Required value in column ";
 
                             if (string.IsNullOrWhiteSpace(saveBrandRequest.brandName))
                             {
@@ -1210,7 +1210,7 @@ namespace MarketData.Processes.Processes
                                     ImportResultByRowResponse resultImport = new ImportResultByRowResponse
                                     {
                                         row = reader.Depth + 1,
-                                        result = $"Row {row} required value in column "
+                                        result = $"Row {row} Required value in column "
                                     };
 
                                     if (string.IsNullOrWhiteSpace(departmentStoreName))
@@ -1363,11 +1363,11 @@ namespace MarketData.Processes.Processes
 
                                 if (result.isDuplicated == true)
                                 {
-                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} data is duplicate.";
+                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} Data is duplicate.";
                                 }
                                 else
                                 {
-                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} save data failed.";
+                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} Save data failed.";
                                 }
 
                                 importResult.Add(resultImport);
@@ -1379,7 +1379,7 @@ namespace MarketData.Processes.Processes
                             ImportResultByRowResponse resultImport = new ImportResultByRowResponse
                             {
                                 row = saveDepartmentStoreRequest.row,
-                                result = $"Row {saveDepartmentStoreRequest.row} required value in column "
+                                result = $"Row {saveDepartmentStoreRequest.row} Required value in column "
                             };
 
                             if (string.IsNullOrWhiteSpace(saveDepartmentStoreRequest.departmentStoreName))
@@ -1542,6 +1542,8 @@ namespace MarketData.Processes.Processes
 
                 List<SaveCounterRequest> saveCounterList = new List<SaveCounterRequest>();
 
+                List<ImportResultByRowResponse> importResult = new List<ImportResultByRowResponse>();
+
                 using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
                     while (reader.Read()) //Each row of the file
@@ -1565,12 +1567,53 @@ namespace MarketData.Processes.Processes
 
                         if (reader.Depth != 0)
                         {
-                            saveCounterList.Add(new SaveCounterRequest
+                            string distributionChannelName = reader.GetValue(0)?.ToString();
+                            string departmentStoreName = reader.GetValue(1)?.ToString();
+                            string brandName = reader.GetValue(2)?.ToString();
+
+                            if (!string.IsNullOrWhiteSpace(distributionChannelName) && !string.IsNullOrWhiteSpace(departmentStoreName)
+                                    && !string.IsNullOrWhiteSpace(brandName))
                             {
-                                distributionChannelName = reader.GetValue(0)?.ToString(),
-                                departmentStoreName = reader.GetValue(1)?.ToString(),
-                                brandName = reader.GetValue(2)?.ToString(),
-                            });
+                                saveCounterList.Add(new SaveCounterRequest
+                                {
+                                    distributionChannelName = distributionChannelName,
+                                    departmentStoreName = departmentStoreName,
+                                    brandName = brandName,
+                                    row = reader.Depth + 1
+                                });
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(distributionChannelName) || !string.IsNullOrWhiteSpace(departmentStoreName)
+                                   || !string.IsNullOrWhiteSpace(brandName))
+                                {
+                                    int row = reader.Depth + 1;
+                                    ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                    {
+                                        row = row,
+                                        result = $"Row {row} Required value in column "
+                                    };
+
+                                    if (string.IsNullOrWhiteSpace(distributionChannelName))
+                                    {
+                                        resultImport.result += "Distribution Channel, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(departmentStoreName))
+                                    {
+                                        resultImport.result += "Department Store, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(brandName))
+                                    {
+                                        resultImport.result += "Brand, ";
+                                    }
+
+                                    importResult.Add(resultImport);
+                                    response.countImportFailed = response.countImportFailed + 1;
+                                }
+                            }
+
                         }
                     }
                 }
@@ -1632,7 +1675,7 @@ namespace MarketData.Processes.Processes
                         var departmentStore = departmentStoreData.FirstOrDefault(c => c.Key.ToLower() == saveCounterRequest.departmentStoreName.ToLower());
                         var channel = channelData.FirstOrDefault(c => c.Key.ToLower() == saveCounterRequest.distributionChannelName.ToLower());
 
-                        if (brandData.Key != null && departmentStore.Key != null && channel.Key != null)
+                        if (brandData.Value != Guid.Empty && departmentStore.Value != Guid.Empty && channel.Value != Guid.Empty)
                         {
                             saveCounterRequest.brandID = brandData.Value;
                             saveCounterRequest.departmentStoreID = departmentStore.Value;
@@ -1640,28 +1683,61 @@ namespace MarketData.Processes.Processes
                             saveCounterRequest.active = true;
                             saveCounterRequest.userID = request.userID;
 
-                            if (saveCounterRequest.brandID != Guid.Empty
-                                && saveCounterRequest.departmentStoreID != Guid.Empty
-                                && saveCounterRequest.distributionChannelID != Guid.Empty)
+                            var result = await SaveCounter(saveCounterRequest);
+                            if (result.isSuccess)
                             {
-                                var result = await SaveCounter(saveCounterRequest);
-                                if (result.isSuccess)
+                                response.countImportSuccess = response.countImportSuccess + 1;
+                            }
+                            else
+                            {
+                                ImportResultByRowResponse resultImport = new ImportResultByRowResponse
                                 {
-                                    response.countImportSuccess = response.countImportSuccess + 1;
+                                    row = saveCounterRequest.row
+                                };
+
+                                if (result.isDuplicated == true)
+                                {
+                                    resultImport.result = $"Row {saveCounterRequest.row} Data is duplicate.";
                                 }
                                 else
                                 {
-                                    response.countImportFailed = response.countImportFailed + 1;
+                                    resultImport.result = $"Row {saveCounterRequest.row} Save data failed.";
                                 }
+
+                                importResult.Add(resultImport);
+                                response.countImportFailed = response.countImportFailed + 1;
                             }
+                        }
+                        else
+                        {
+                            ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                            {
+                                row = saveCounterRequest.row,
+                                result = $"Row {saveCounterRequest.row} Data value not exist in system column "
+                            };
+
+                            if (saveCounterRequest.distributionChannelID == Guid.Empty)
+                            {
+                                resultImport.result += "Distribution Channel, ";
+                            }
+
+                            if (saveCounterRequest.departmentStoreID == Guid.Empty)
+                            {
+                                resultImport.result += "Department Store, ";
+                            }
+
+                            if (saveCounterRequest.brandID == Guid.Empty)
+                            {
+                                resultImport.result += "Brand, ";
+                            }
+
+                            importResult.Add(resultImport);
+                            response.countImportFailed = response.countImportFailed + 1;
                         }
                     }
 
-                    if (response.countImportSuccess > 0)
-                    {
-                        response.isSuccess = true;
-                    }
-
+                    response.importResult = importResult.OrderBy(c => c.row).ToList();
+                    response.isSuccess = true;
                 }
                 else
                 {
