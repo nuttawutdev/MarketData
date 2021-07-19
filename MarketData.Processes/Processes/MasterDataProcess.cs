@@ -509,6 +509,8 @@ namespace MarketData.Processes.Processes
 
                 List<SaveBrandRequest> saveBrandList = new List<SaveBrandRequest>();
 
+                List<ImportResultByRowResponse> importResult = new List<ImportResultByRowResponse>();
+
                 using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
                     while (reader.Read()) //Each row of the file
@@ -539,15 +541,63 @@ namespace MarketData.Processes.Processes
 
                         if (reader.Depth != 0)
                         {
-                            saveBrandList.Add(new SaveBrandRequest
+                            string brandNameValue = reader.GetValue(0)?.ToString();
+                            string brandShortName = reader.GetValue(1)?.ToString();
+                            string brandGroupValue = reader.GetValue(2)?.ToString();
+                            string brandSegmentValue = reader.GetValue(3)?.ToString();
+                            string brandTypeValue = reader.GetValue(4)?.ToString();
+                            string brandColor = reader.GetValue(5)?.ToString();
+
+                            if (!string.IsNullOrWhiteSpace(brandNameValue) && !string.IsNullOrWhiteSpace(brandGroupValue)
+                                && !string.IsNullOrWhiteSpace(brandSegmentValue) && !string.IsNullOrWhiteSpace(brandTypeValue))
                             {
-                                brandName = reader.GetValue(0)?.ToString(),
-                                brandShortName = reader.GetValue(1)?.ToString(),
-                                brandGroupName = reader.GetValue(2)?.ToString(),
-                                brandSegmentName = reader.GetValue(3)?.ToString(),
-                                brandTypeName = reader.GetValue(4)?.ToString(),
-                                brandColor = reader.GetValue(5)?.ToString()
-                            });
+                                saveBrandList.Add(new SaveBrandRequest
+                                {
+                                    brandName = brandNameValue,
+                                    brandShortName = brandShortName,
+                                    brandGroupName = brandGroupValue,
+                                    brandSegmentName = brandSegmentValue,
+                                    brandTypeName = brandTypeValue,
+                                    brandColor = brandColor,
+                                    row = reader.Depth + 1
+                                });
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(brandNameValue) || !string.IsNullOrWhiteSpace(brandGroupValue)
+                                    || !string.IsNullOrWhiteSpace(brandSegmentValue) || !string.IsNullOrWhiteSpace(brandTypeValue)
+                                    || !string.IsNullOrWhiteSpace(brandShortName) || !string.IsNullOrWhiteSpace(brandColor))
+                                {
+
+                                    int row = reader.Depth + 1;
+                                    ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                    {
+                                        row = reader.Depth + 1,
+                                        result = $"Row {row} required value in column "
+                                    };
+
+                                    if (string.IsNullOrWhiteSpace(brandNameValue))
+                                    {
+                                        resultImport.result += "Name, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(brandGroupValue))
+                                    {
+                                        resultImport.result += "Brand_Group, ";
+                                    }
+                                    if (string.IsNullOrWhiteSpace(brandSegmentValue))
+                                    {
+                                        resultImport.result += "Segment, ";
+                                    }
+                                    if (string.IsNullOrWhiteSpace(brandTypeValue))
+                                    {
+                                        resultImport.result += "Type, ";
+                                    }
+
+                                    importResult.Add(resultImport);
+                                    response.countImportFailed = response.countImportFailed + 1;
+                                }
+                            }
                         }
                     }
                 }
@@ -665,16 +715,66 @@ namespace MarketData.Processes.Processes
                             && saveBrandRequest.brandTypeID != Guid.Empty)
                         {
                             var result = await SaveBrand(saveBrandRequest);
+
                             if (result.isSuccess)
                             {
                                 response.countImportSuccess = response.countImportSuccess + 1;
                             }
                             else
                             {
+                                ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                {
+                                    row = saveBrandRequest.row
+                                };
+
+                                if (result.isDuplicated == true)
+                                {
+                                    resultImport.result = $"Row {saveBrandRequest.row} data is duplicate.";
+                                }
+                                else
+                                {
+                                    resultImport.result = $"Row {saveBrandRequest.row} save data failed.";
+                                }
+
+                                importResult.Add(resultImport);
                                 response.countImportFailed = response.countImportFailed + 1;
                             }
                         }
+                        else
+                        {
+                            ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                            {
+                                row = saveBrandRequest.row,
+                            };
+
+                            resultImport.result = $"Row {saveBrandRequest.row} required value in column ";
+
+                            if (string.IsNullOrWhiteSpace(saveBrandRequest.brandName))
+                            {
+                                resultImport.result += "Name ";
+                            }
+
+                            if (saveBrandRequest.brandGroupID == Guid.Empty)
+                            {
+                                resultImport.result += "Brand_Group ";
+                            }
+
+                            if (saveBrandRequest.brandSegmentID == Guid.Empty)
+                            {
+                                resultImport.result += "Segment ";
+                            }
+
+                            if (saveBrandRequest.brandTypeID == Guid.Empty)
+                            {
+                                resultImport.result += "Type ";
+                            }
+
+                            importResult.Add(resultImport);
+                            response.countImportFailed = response.countImportFailed + 1;
+                        }
                     }
+
+                    response.importResult = importResult.OrderBy(c => c.row).ToList();
 
                     if (response.countImportSuccess > 0)
                     {
@@ -1043,6 +1143,8 @@ namespace MarketData.Processes.Processes
 
                 List<SaveDepsrtmentStoreRequest> saveDepartmentStoreList = new List<SaveDepsrtmentStoreRequest>();
 
+                List<ImportResultByRowResponse> importResult = new List<ImportResultByRowResponse>();
+
                 using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
                 {
                     while (reader.Read()) //Each row of the file
@@ -1071,23 +1173,70 @@ namespace MarketData.Processes.Processes
 
                         if (reader.Depth != 0)
                         {
-                            SaveDepsrtmentStoreRequest saveStore = new SaveDepsrtmentStoreRequest
-                            {
-                                departmentStoreName = reader.GetValue(0)?.ToString(),
-                                region = reader.GetValue(1)?.ToString(),
-                                retailerGroupName = reader.GetValue(2)?.ToString(),
-                                distributionChannelName = reader.GetValue(4)?.ToString()
-                            };
+                            string departmentStoreName = reader.GetValue(0)?.ToString();
+                            string region = reader.GetValue(1)?.ToString();
+                            string retailerGroupName = reader.GetValue(2)?.ToString();
+                            string rankText = reader.GetValue(3)?.ToString();
+                            string distributionChannelName = reader.GetValue(4)?.ToString();
 
-                            int rank = 0;
-                            int.TryParse(reader.GetValue(3)?.ToString(), out rank);
-
-                            if (rank != 0)
+                            if (!string.IsNullOrWhiteSpace(departmentStoreName) && !string.IsNullOrWhiteSpace(region)
+                                && !string.IsNullOrWhiteSpace(retailerGroupName) && !string.IsNullOrWhiteSpace(distributionChannelName))
                             {
-                                saveStore.rank = rank;
+                                SaveDepsrtmentStoreRequest saveStore = new SaveDepsrtmentStoreRequest
+                                {
+                                    departmentStoreName = reader.GetValue(0)?.ToString(),
+                                    region = reader.GetValue(1)?.ToString(),
+                                    retailerGroupName = reader.GetValue(2)?.ToString(),
+                                    distributionChannelName = reader.GetValue(4)?.ToString(),
+                                    row = reader.Depth + 1
+                                };
+
+                                int rank = 0;
+                                int.TryParse(reader.GetValue(3)?.ToString(), out rank);
+
+                                if (rank != 0)
+                                {
+                                    saveStore.rank = rank;
+                                }
+
+                                saveDepartmentStoreList.Add(saveStore);
                             }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(departmentStoreName) || !string.IsNullOrWhiteSpace(region)
+                                    || !string.IsNullOrWhiteSpace(rankText) || !string.IsNullOrWhiteSpace(retailerGroupName) || !string.IsNullOrWhiteSpace(distributionChannelName))
+                                {
+                                    int row = reader.Depth + 1;
+                                    ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                    {
+                                        row = reader.Depth + 1,
+                                        result = $"Row {row} required value in column "
+                                    };
 
-                            saveDepartmentStoreList.Add(saveStore);
+                                    if (string.IsNullOrWhiteSpace(departmentStoreName))
+                                    {
+                                        resultImport.result += "DepartmentStores, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(region))
+                                    {
+                                        resultImport.result += "Regions, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(retailerGroupName))
+                                    {
+                                        resultImport.result += "DepartmentStores_Group, ";
+                                    }
+
+                                    if (string.IsNullOrWhiteSpace(distributionChannelName))
+                                    {
+                                        resultImport.result += "Distribution_Channels, ";
+                                    }
+
+                                    importResult.Add(resultImport);
+                                    response.countImportFailed = response.countImportFailed + 1;
+                                }
+                            }
                         }
                     }
                 }
@@ -1101,10 +1250,14 @@ namespace MarketData.Processes.Processes
                     var groupByDistrubution = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.distributionChannelName))
                        .GroupBy(c => c.distributionChannelName);
 
+                    var groupByRegion = saveDepartmentStoreList.Where(e => !string.IsNullOrWhiteSpace(e.region))
+                       .GroupBy(c => c.region);
+
                     var regionData = repository.masterData.GetRegionList();
 
                     var retailerGroupData = new Dictionary<string, Guid>();
                     var distributionChannelData = new Dictionary<string, Guid>();
+                    var newRegionData = new Dictionary<string, Guid>();
 
                     foreach (var itemRetailerGroup in groupByRetailerGroup)
                     {
@@ -1162,9 +1315,30 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
+                    foreach (var itemRegion in groupByRegion)
+                    {
+                        var regionByName = repository.masterData.FindRegionBy(
+                            c => c.Region_Name.ToLower() == itemRegion.Key.ToLower());
+
+                        if (regionByName == null)
+                        {
+
+                            var createRegionResult = await repository.masterData.CreateRegion(itemRegion.Key);
+
+                            if (createRegionResult != null)
+                            {
+                                newRegionData.Add(itemRegion.Key, createRegionResult.Region_ID);
+                            }
+                        }
+                        else
+                        {
+                            newRegionData.Add(itemRegion.Key, regionByName.Region_ID);
+                        }
+                    }
+
                     foreach (var saveDepartmentStoreRequest in saveDepartmentStoreList)
                     {
-                        saveDepartmentStoreRequest.regionID = regionData.FirstOrDefault(c => c.Region_Name == saveDepartmentStoreRequest.region)?.Region_ID;
+                        saveDepartmentStoreRequest.regionID = newRegionData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.region).Value;
                         saveDepartmentStoreRequest.retailerGroupID = retailerGroupData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.retailerGroupName).Value;
                         saveDepartmentStoreRequest.distributionChannelID = distributionChannelData.FirstOrDefault(c => c.Key == saveDepartmentStoreRequest.distributionChannelName).Value;
                         saveDepartmentStoreRequest.active = true;
@@ -1172,7 +1346,8 @@ namespace MarketData.Processes.Processes
 
                         if (!string.IsNullOrWhiteSpace(saveDepartmentStoreRequest.departmentStoreName)
                             && saveDepartmentStoreRequest.retailerGroupID != Guid.Empty
-                            && saveDepartmentStoreRequest.distributionChannelID != Guid.Empty)
+                            && saveDepartmentStoreRequest.distributionChannelID != Guid.Empty
+                            && saveDepartmentStoreRequest.regionID != Guid.Empty)
                         {
                             var result = await SaveDepartmentStore(saveDepartmentStoreRequest);
                             if (result.isSuccess)
@@ -1181,10 +1356,58 @@ namespace MarketData.Processes.Processes
                             }
                             else
                             {
+                                ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                {
+                                    row = saveDepartmentStoreRequest.row
+                                };
+
+                                if (result.isDuplicated == true)
+                                {
+                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} data is duplicate.";
+                                }
+                                else
+                                {
+                                    resultImport.result = $"Row {saveDepartmentStoreRequest.row} save data failed.";
+                                }
+
+                                importResult.Add(resultImport);
                                 response.countImportFailed = response.countImportFailed + 1;
                             }
                         }
+                        else
+                        {
+                            ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                            {
+                                row = saveDepartmentStoreRequest.row,
+                                result = $"Row {saveDepartmentStoreRequest.row} required value in column "
+                            };
+
+                            if (string.IsNullOrWhiteSpace(saveDepartmentStoreRequest.departmentStoreName))
+                            {
+                                resultImport.result += "DepartmentStores, ";
+                            }
+
+                            if (saveDepartmentStoreRequest.regionID == Guid.Empty)
+                            {
+                                resultImport.result += "Regions, ";
+                            }
+
+                            if (saveDepartmentStoreRequest.retailerGroupID == Guid.Empty)
+                            {
+                                resultImport.result += "DepartmentStores_Group, ";
+                            }
+
+                            if (saveDepartmentStoreRequest.distributionChannelID == Guid.Empty)
+                            {
+                                resultImport.result += "Distribution_Channels, ";
+                            }
+
+                            importResult.Add(resultImport);
+                            response.countImportFailed = response.countImportFailed + 1;
+                        }
                     }
+
+                    response.importResult = importResult.OrderBy(c => c.row).ToList();
 
                     if (response.countImportSuccess > 0)
                     {

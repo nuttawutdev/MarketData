@@ -10,5 +10,6 @@ namespace MarketData.Model.Response.MasterData
         public bool wrongFormatFile { get; set; }
         public int countImportSuccess { get; set; }
         public int countImportFailed { get; set; }
+        public List<ImportResultByRowResponse> importResult { get; set; }
     }
 }
