@@ -8,6 +8,7 @@ using MarketData.Model.Response.MasterData;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -776,10 +777,30 @@ namespace MarketData.Processes.Processes
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
 
-                    if (response.countImportSuccess > 0)
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
                     {
-                        response.isSuccess = true;
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
                     }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileName = "ImportBrandDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.isSuccess = true;
                 }
                 else
                 {
@@ -1408,11 +1429,30 @@ namespace MarketData.Processes.Processes
                     }
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
-
-                    if (response.countImportSuccess > 0)
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
                     {
-                        response.isSuccess = true;
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
                     }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.fileName = "ImportDepartmentStoreDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
+                    response.isSuccess = true;
                 }
                 else
                 {
@@ -1737,6 +1777,29 @@ namespace MarketData.Processes.Processes
                     }
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
+                    {
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
+                    }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.fileName = "ImportCounterDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
                     response.isSuccess = true;
                 }
                 else
