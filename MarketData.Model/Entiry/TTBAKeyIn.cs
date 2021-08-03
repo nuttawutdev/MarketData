@@ -15,7 +15,7 @@ namespace MarketData.Model.Entiry
         public Guid DistributionChannel_ID { get; set; }
         public Guid RetailerGroup_ID { get; set; }
         public Guid DepartmentStore_ID { get; set; }
-        public char Brand_ID { get; set; }
+        public Guid Brand_ID { get; set; }
         public string Universe { get; set; }
         public Guid KeyIn_Status_ID { get; set; }
         public Guid? Created_By { get; set; }

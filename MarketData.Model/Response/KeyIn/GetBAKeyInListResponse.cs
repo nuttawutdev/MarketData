@@ -7,6 +7,7 @@ namespace MarketData.Model.Response.KeyIn
     public class GetBAKeyInListResponse : BaseGetDataListResponse
     {
         public List<BAKeyInData> data { get; set; }
+
     }
 
     public class BAKeyInData
