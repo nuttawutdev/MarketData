@@ -1,11 +1,12 @@
-﻿@{
+﻿@model MarketData.Models.BAKeyInListViewModel;
+@{
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
 }
 
 
 <h3>
     @ViewData["Title"]
-   @* <a href="KeyinByStore_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>*@
+    @* <a href="KeyinByStore_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>*@
 </h3>
 
 
@@ -15,105 +16,110 @@
 <div class="row">
     <div style="width: 100%; font-size: 13px;">
         <div class="row col-sm-12">
-
-            <div class="col-sm-4">
-                <label>Department Store</label>
-                <select class="form-control col-sm-12 col-lg-8" >
-                    <option>All</option>
-                    <option>Central Bangna</option>
-                    <option>The Mall Bangkae</option>
-                    <option>Robinson Bangrak</option>
-                </select>
-
-
-            </div>
-            <div class="col-sm-4">
-                <label>Brand</label>
-                <select class="form-control col-sm-12 col-lg-8">
-                    <option>All</option>
-                    <option>LOREAL</option>
-                    <option>SHISEDO</option>
-                    <option>Lux Asia</option>
-                </select>
-
-
-            </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label>Distribution Channel</label>
-                <select class="form-control col-sm-12 col-lg-8" >
-                    <option>All</option>
-                    <option>Counter</option>
-                    <option>Boutique</option>
-                    <option>Online</option>
-                </select>
+                @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control col-sm-12" })
 
+            </div>
+            <div class="col-sm-3">
+                <label>Retailer Group</label>
+                @Html.DropDownList("channelList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+
+            </div>
+            <div class="col-sm-3">
+                <label>Department Store</label>
+                @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
 
             </div>
 
+            <div class="col-sm-3">
+                <label>Brand</label>
+                @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control col-sm-12" })
+
+            </div>
         </div>
+
         <div class="row col-sm-12" style="padding-top: 15px;">
-            <div class="col-sm-4">
-                <label>Year</label>
-                <select class="form-control col-sm-12 col-lg-8">
-                    <option>2019</option>
-                    <option>2020</option>
-                </select>
-
-
-            </div>
-            <div class="col-sm-4">
-                <label>Month</label>
-                <select class="form-control col-sm-12 col-lg-8">
-                    <option>January</option>
-                    <option>February</option>
-                    <option>March</option>
-                    <option>April</option>
-                    <option>May</option>
-                    <option>June</option>
-                    <option>July</option>
-                    <option>August</option>
-                    <option>September</option>
-                    <option>October</option>
-                    <option>November</option>
-                    <option>December</option>
-                </select>
-
-
-            </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
 
                 <label> Week</label>
-                <select class="form-control col-sm-12 col-lg-8">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
+                <select id="ddlWeek" class="form-control col-sm-12 ">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
                 </select>
 
             </div>
 
+            <div class="col-sm-3">
+                <label>Month</label>
+                <select id="ddlMonth" class="form-control col-sm-12 ">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+
+
+            </div>
+            <div class="col-sm-3">
+                <label>Year</label>
+
+                @*@Html.DropDownList("yearList", new SelectList(Model.yearList, "year", "year"), "Please select", new { id = "yearList", @class = "form-control col-sm-12" })*@
+
+
+            </div>
+            <div class="col-sm-3">
+                <label>Universe</label>
+                @{
+                    List<SelectListItem> listUniverse = new List<SelectListItem>();
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "CPD",
+                        Value = "CPD"
+                    });
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "LPD",
+                        Value = "LPD",
+
+                    });
+
+                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "Please select", new { id = "iduniverseList", @class = "form-control " })
+
+                }
+
+
+            </div>
         </div>
-        <div class="row col-sm-12"  style="padding-top: 15px;padding-bottom:15px;">
-            <div class="col-sm-4">
+        <div class="row col-sm-12" style="padding-top: 15px;padding-bottom:15px;">
+            <div class="col-sm-3">
                 <label>Status</label>
-                <select class="form-control col-sm-12 col-lg-8">
-                    <option>New</option>
-                </select>
-            </div>
-            <div class="col-sm-4" style="align-self: flex-end;">
+                @Html.DropDownList("statusList", new SelectList(Model.statusList, "statusID", "statusName"), "Please select", new { id = "statusList", @class = "form-control col-sm-12" })
 
+
+            </div>
+            @*<div class="col-sm-3" style="align-self: flex-end;">
+
+                    <div class="filter-group">
+                        <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Show</button>
+                    </div>
+
+
+                </div>*@
+            <div class="col-sm-3" style="align-self: flex-end;">
                 <div class="filter-group">
-                    <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Show</button>
+                    <button type="button" class="btn btn-danger"><i class="ion-plus"></i> Create</button>
                 </div>
-
-
-            </div>
-            <div class="col-sm-4" >
-
-              
-                   
-
-
             </div>
 
         </div>
@@ -123,7 +129,7 @@
     </div>
 
 </div>
-<div class="container-xl" style="overflow-x:auto;">
+<!--<div class="container-xl" style="overflow-x:auto;">
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
@@ -161,14 +167,14 @@
                             <td class="col-1">
                                 <a href="KeyInByStore_Edit" class="btn btn-primary col-sm-12 col-md-5 btn-sm">
                                     <i class="ion-eye text-white"></i>
-                                </a>
-                                @*<a href="KeyInByStore_Edit" class="btn btn-warning col-sm-12 col-md-5 btn-sm">
-                                    <i class="ion-edit text-white"></i>
-                                </a>
-                                <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-5 btn-sm" data-toggle="modal">
-                                    <i class="ion-android-delete text-white"></i>
-                                </a>*@
-                            </td>
+                                </a>-->
+@*<a href="KeyInByStore_Edit" class="btn btn-warning col-sm-12 col-md-5 btn-sm">
+        <i class="ion-edit text-white"></i>
+    </a>
+    <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-5 btn-sm" data-toggle="modal">
+        <i class="ion-android-delete text-white"></i>
+    </a>*@
+<!--</td>
                         </tr>
 
                     </tbody>
@@ -176,6 +182,10 @@
             </div>
         </div>
     </div>
+</div>-->
+
+<div class="container-xl">
+    <table id="tableData" class="display" width="100%"></table>
 </div>
 
 <!-- Delete Modal HTML -->
@@ -198,3 +208,83 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#tableData").one("preInit.dt", function () {
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
+        @*var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetBAKeyInList", "KeyIn")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.data;
+                }
+            },
+            "columns": [
+
+                { data: "keyInID", title: "keyInID", visible: false },
+                { data: "year", title: "year" },
+                { data: "month", title: "month" },
+                { data: "week", title: "week" },
+                { data: "counter", title: "counter" },
+                { data: "retailerGroupID", title: "retailerGroupID", visible: false },
+                { data: "departmentStoreID", title: "departmentStoreID", visible: false },
+                { data: "brandID", title: "brandID", visible: false },
+                { data: "distributionChannelID", title: "distributionChannelID", visible: false },
+                { data: "distributionChannelName", title: "distributionChannelName" },
+                { data: "statusID", title: "statusID", visible: false },
+                { data: "statusName", title: "statusName" },
+                { data: "lastEdit", title: "lastEdit" },
+                { data: "approver", title: "approver" },
+                { data: "submitDate", title: "submitDate" },
+                { data: "approveDate", title: "approveDate" },
+                { data: "remark", title: "remark" },
+                {
+                    orderable: false,
+                    title: "Action",
+                    width: "20%",
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                            /*'<a href="#confirmModal" data-id="' + row.brandSegmentID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
+                }}
+            ]
+        });*@
+
+
+        $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
+        });
+
+        //$('.status-dropdown').on('change', function (e) {
+        //    var status = $(this).val();
+        //    $('.status-dropdown').val(status);
+        //    dataTable.column(3).search(status).draw();
+        //});
+
+        //$('.isloreal-dropdown').on('change', function (e) {
+        //    var status = $(this).val();
+        //    $('.isloreal-dropdown').val(status);
+        //    dataTable.column(2).search(status).draw();
+        //});
+
+
+    });
+
+
+
+</script>
