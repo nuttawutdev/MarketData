@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MarketData.Processes;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,13 @@ namespace MarketData.Controllers
 {
     public class KeyInController : Controller
     {
+        private readonly Process process;
+
+        public KeyInController(Process process)
+        {
+            this.process = process;
+        }
+
         public IActionResult Index()
         {
             return View();
