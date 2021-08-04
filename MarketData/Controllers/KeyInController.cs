@@ -29,70 +29,104 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyinByStore()
         {
-            var userID = HttpContext.Session.GetString("userID");
+            BAKeyInListViewModel dataModel = new BAKeyInListViewModel();
 
-            if (userID != null)
+            try
             {
-                BAKeyInListViewModel data = new BAKeyInListViewModel();
+                var userID = HttpContext.Session.GetString("userID");
 
-                var baKeyInData = process.keyIn.GetBAKeyInList(new Guid(userID));
-                var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
-                var keyInStatus = process.masterData.GetKeyInStatus();
-
-                if (baKeyInOption.channel != null && baKeyInOption.channel.Any())
+                if (userID != null)
                 {
-                    data.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
-                    {
-                        distributionChannelID = c.distributionChannelID,
-                        distributionChannelName = c.distributionChannelName
-                    }).ToList();
-                }
+                    var baKeyInData = process.keyIn.GetBAKeyInList(new Guid(userID));
+                    var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
+                    var keyInStatus = process.masterData.GetKeyInStatus();
 
-                if (baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
+                    if (baKeyInOption != null && baKeyInOption.channel != null && baKeyInOption.channel.Any())
+                    {
+                        dataModel.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
+                        {
+                            distributionChannelID = c.distributionChannelID,
+                            distributionChannelName = c.distributionChannelName
+                        }).ToList();
+                    }
+
+                    if (baKeyInOption != null && baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
+                    {
+                        dataModel.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName
+                        }).ToList();
+                    }
+
+                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                    {
+                        dataModel.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
+                        {
+                            brandID = c.brandID,
+                            brandName = c.brandName
+                        }).ToList();
+                    }
+
+                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                    {
+                        dataModel.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                        {
+                            retailerGroupID = c.retailerGroupID,
+                            retailerGroupName = c.retailerGroupName
+                        }).ToList();
+                    }
+
+                    if (keyInStatus != null && keyInStatus.data != null && keyInStatus.data.Any())
+                    {
+                        dataModel.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
+                        {
+                            statusID = c.statusID,
+                            statusName = c.statusName
+                        }).ToList();
+                    }
+
+                    if (baKeyInData != null)
+                    {
+                        dataModel.yearList = baKeyInData.year;
+
+                        if (baKeyInData.data != null && baKeyInData.data.Any())
+                        {
+                            dataModel.data = baKeyInData.data.Select(c => new BAKeyInDataViewModel
+                            {
+                                approveDate = c.approveDate,
+                                approver = c.approver,
+                                brandID = c.brandID,
+                                counter = c.counter,
+                                distributionChannelID = c.distributionChannelID,
+                                distributionChannelName = c.distributionChannelName,
+                                departmentStoreID = c.departmentStoreID,
+                                keyInID = c.keyInID,
+                                retailerGroupID = c.retailerGroupID,
+                                lastEdit = c.lastEdit,
+                                month = c.month,
+                                remark = c.remark,
+                                statusID = c.statusID,
+                                statusName = c.statusName,
+                                submitDate = c.submitDate,
+                                week = c.week,
+                                year = c.year
+                            }).ToList();
+                        }
+                    }
+
+                    dataModel.userID = new Guid(userID);
+                    return View(dataModel);
+                }
+                else
                 {
-                    data.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
-                    {
-                        departmentStoreID = c.departmentStoreID,
-                        departmentStoreName = c.departmentStoreName
-                    }).ToList();
+                    return RedirectToAction("KeyIn", "Home");
                 }
-
-                if (baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                {
-                    data.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
-                    {
-                        brandID = c.brandID,
-                        brandName = c.brandName
-                    }).ToList();
-                }
-
-                if (baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                {
-                    data.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
-                    {
-                        retailerGroupID = c.retailerGroupID,
-                        retailerGroupName = c.retailerGroupName
-                    }).ToList();
-                }
-
-                if (keyInStatus.data != null && keyInStatus.data.Any())
-                {
-                    data.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
-                    {
-                        statusID = c.statusID,
-                        statusName = c.statusName
-                    }).ToList();
-                }
-
-                data.yearList = baKeyInData.year;
-
-                return View(data);
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("KeyIn", "Home");
+                return View(dataModel);
             }
-
         }
 
         public IActionResult KeyinByStore_Edit()
