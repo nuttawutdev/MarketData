@@ -7,13 +7,13 @@ namespace MarketData.Models
 {
     public class BAKeyInListViewModel
     {
-        public List<BAKeyInDataViewModel> data { get; set; }
-        public List<ChannelKeyInViewModel> channelList { get; set; }
-        public List<RetailerGroupKeyInViewModel> retailerGroupList { get; set; }
-        public List<DepartmentStoreKeyInViewModel> departmentStoreList { get; set; }
-        public List<BrandKeyInViewModel> brandList { get; set; }
-        public List<string> yearList { get; set; }
-        public List<StatusKeyInViewModel> statusList { get; set; }
+        public List<BAKeyInDataViewModel> data { get; set; } = new List<BAKeyInDataViewModel>();
+        public List<ChannelKeyInViewModel> channelList { get; set; } = new List<ChannelKeyInViewModel>();
+        public List<RetailerGroupKeyInViewModel> retailerGroupList { get; set; } = new List<RetailerGroupKeyInViewModel>();
+        public List<DepartmentStoreKeyInViewModel> departmentStoreList { get; set; } = new List<DepartmentStoreKeyInViewModel>();
+        public List<BrandKeyInViewModel> brandList { get; set; } = new List<BrandKeyInViewModel>();
+        public List<string> yearList { get; set; } = new List<string>();
+        public List<StatusKeyInViewModel> statusList { get; set; } = new List<StatusKeyInViewModel>();
         public Guid userID { get; set; }
     }
 

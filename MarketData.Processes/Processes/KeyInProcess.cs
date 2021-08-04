@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Entiry;
+﻿using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Response.KeyIn;
 using MarketData.Repositories;
 using System;
@@ -24,16 +25,112 @@ namespace MarketData.Processes.Processes
             try
             {
                 var userCounterData = repository.baKeyIn.GetUserCounter(userID);
-
                 List<BAKeyInData> baKeyInData = new List<BAKeyInData>();
-
-                foreach(var itemUserCounter in userCounterData)
+               
+                foreach (var itemUserCounter in userCounterData)
                 {
                     var baKeyInByCounter = repository.baKeyIn.GetBAKeyInByCounter(itemUserCounter.DepartmentStore_ID, itemUserCounter.Brand_ID, itemUserCounter.DistributionChannel_ID);
                     baKeyInData.AddRange(baKeyInByCounter);
                 }
 
+                if (baKeyInData.Any())
+                {
+                    var groupByYear = baKeyInData.GroupBy(e => e.year).Where(c => c.Key != DateTime.Now.Year.ToString());
+
+                    foreach(var itemGroupYear in groupByYear)
+                    {
+                        response.year.Add(itemGroupYear.Key);
+                    }
+                }
+
+                response.year.Add(DateTime.Now.Year.ToString());
                 response.data = baKeyInData;
+              
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GetBAKeyInOptionResponse GetBAKeyInOption(Guid userID)
+        {
+            GetBAKeyInOptionResponse response = new GetBAKeyInOptionResponse();
+
+            try
+            {
+                var userCounterData = repository.baKeyIn.GetUserCounter(userID);
+                List<DepartmentStoreData> departmentStoreBA = new List<DepartmentStoreData>();
+                List<RetailerGroupData> retailerGroupBA = new List<RetailerGroupData>();
+                List<DistributionChannelData> channelBA = new List<DistributionChannelData>();
+                List<BrandData> brandBA = new List<BrandData>();
+
+                var groupByDepartmentStore = userCounterData.GroupBy(s => s.DepartmentStore_ID);
+                var groupByChannel = userCounterData.GroupBy(s => s.DistributionChannel_ID);
+                var groupByBrand = userCounterData.GroupBy(s => s.Brand_ID);
+
+                foreach (var itemGroupStore in groupByDepartmentStore)
+                {
+                    var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == itemGroupStore.Key);
+
+                    DepartmentStoreData depaermentBA = new DepartmentStoreData
+                    {
+                        departmentStoreID = departmentData.Department_Store_ID,
+                        departmentStoreName = departmentData.Department_Store_Name,
+                        retailerGroupID = departmentData.Retailer_Group_ID,
+                        distributionChannelID = departmentData.Department_Store_ID,
+                    };
+
+                    departmentStoreBA.Add(depaermentBA);
+                }
+
+                foreach (var itemGroupChannel in groupByChannel)
+                {
+                    var channelData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == itemGroupChannel.Key);
+
+                    DistributionChannelData channel = new DistributionChannelData
+                    {
+                        distributionChannelID = channelData.Distribution_Channel_ID,
+                        distributionChannelName = channelData.Distribution_Channel_Name
+                    };
+
+                    channelBA.Add(channel);
+                }
+
+                foreach (var itemGroupBrand in groupByBrand)
+                {
+                    var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemGroupBrand.Key);
+
+                    BrandData brand = new BrandData
+                    {
+                        brandID = brandData.Brand_ID,
+                        brandName = brandData.Brand_Name,
+                    };
+
+                    brandBA.Add(brand);
+                }
+
+                var groupByRetailer = departmentStoreBA.GroupBy(g => g.retailerGroupID);
+
+                foreach (var itemRetailer in groupByRetailer)
+                {
+                    var retailerData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == itemRetailer.Key);
+
+                    RetailerGroupData retailer = new RetailerGroupData
+                    {
+                        retailerGroupID = retailerData.Retailer_Group_ID,
+                        retailerGroupName = retailerData.Retailer_Group_Name,
+                    };
+
+                    retailerGroupBA.Add(retailer);
+                }
+
+                response.channel = channelBA;
+                response.departmentStore = departmentStoreBA;
+                response.brand = brandBA;
+                response.retailerGroup = retailerGroupBA;
             }
             catch(Exception ex)
             {

@@ -20,7 +20,7 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-                var userCounterData = _dbContext.TMUserCounter.Where(c => c.User_ID != userID).AsNoTracking();
+                var userCounterData = _dbContext.TMUserCounter.Where(c => c.User_ID == userID).AsNoTracking();
                 return userCounterData.ToList();
             }
             catch (Exception ex)
@@ -59,6 +59,14 @@ namespace MarketData.Repositories.Repo
                      on e.KeyIn_Status_ID equals s.ID
                      into joinStatus
                   from status in joinStatus.DefaultIfEmpty()
+                  join c in _dbContext.TMUser
+                    on e.Created_By equals c.ID
+                    into joinCreateBy
+                  from createBy in joinCreateBy.DefaultIfEmpty()
+                  join u in _dbContext.TMUser
+                   on e.Updated_By equals u.ID
+                   into joinUpdateBy
+                  from updateBy in joinUpdateBy.DefaultIfEmpty()
                   select new BAKeyInData
                   {
                       keyInID = e.ID,
@@ -73,7 +81,7 @@ namespace MarketData.Repositories.Repo
                       distributionChannelName = channel.Distribution_Channel_Name,
                       statusID = e.KeyIn_Status_ID,
                       statusName = status.Status_Name,
-                      lastEdit = e.Updated_By.HasValue ? _dbContext.TMUser.Find(e.Updated_By).UserName : _dbContext.TMUser.Find(e.Created_By).UserName,
+                      lastEdit = updateBy != null ? updateBy.UserName : createBy != null ? createBy.UserName : string.Empty,
                       approver = approver != null ? approver.UserName : string.Empty,
                       approveDate = e.Approved_Date.HasValue ? e.Approved_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                       submitDate = e.Submited_Date.HasValue ? e.Submited_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",

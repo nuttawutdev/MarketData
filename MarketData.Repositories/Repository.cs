@@ -9,11 +9,13 @@ namespace MarketData.Repositories
     {
         public MasterDataRepository masterData;
         public BAKeyInRepository baKeyIn;
+        public UserRepository user;
 
         public Repository(MarketDataDBContext dbContext)
         {
             masterData = new MasterDataRepository(dbContext);
             baKeyIn = new BAKeyInRepository(dbContext);
+            user = new UserRepository(dbContext);
         }
     }
 }

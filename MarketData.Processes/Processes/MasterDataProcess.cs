@@ -1846,5 +1846,34 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public GetKeyInStatusResponse GetKeyInStatus()
+        {
+            GetKeyInStatusResponse response = new GetKeyInStatusResponse();
+
+            try
+            {
+                var searchData = repository.masterData.GetKeyInStatusList();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response.data = searchData.Select(c => new KeyInStatusData
+                    {
+                        statusID = c.ID,
+                        statusName = c.Status_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response.data = new List<KeyInStatusData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }
