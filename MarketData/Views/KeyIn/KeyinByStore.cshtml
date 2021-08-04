@@ -1,6 +1,7 @@
 ﻿@model MarketData.Models.BAKeyInListViewModel;
 @{
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
+    Html.RenderPartial("_WarningModal");
 }
 
 
@@ -23,7 +24,7 @@
             </div>
             <div class="col-sm-3">
                 <label>Retailer Group</label>
-                @Html.DropDownList("channelList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+                @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control col-sm-12" })
 
             </div>
             <div class="col-sm-3">
@@ -73,10 +74,14 @@
             </div>
             <div class="col-sm-3">
                 <label>Year</label>
-
-                @*@Html.DropDownList("yearList", new SelectList(Model.yearList, "year", "year"), "Please select", new { id = "yearList", @class = "form-control col-sm-12" })*@
-
-
+                @Html.DropDownList(
+                    "yearList",
+                    new SelectList(
+                        Model.yearList.Select(x => new { Value = x, Text = x }),
+                        "Value",
+                        "Text"
+                    ), new { id = "yearList", @class = "form-control col-sm-12" }
+                )
             </div>
             <div class="col-sm-3">
                 <label>Universe</label>
@@ -108,17 +113,9 @@
 
 
             </div>
-            @*<div class="col-sm-3" style="align-self: flex-end;">
-
-                    <div class="filter-group">
-                        <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Show</button>
-                    </div>
-
-
-                </div>*@
             <div class="col-sm-3" style="align-self: flex-end;">
                 <div class="filter-group">
-                    <button type="button" class="btn btn-danger"><i class="ion-plus"></i> Create</button>
+                    <button id="btnCreate" type="button" class="btn btn-danger"><i class="ion-plus"></i> Create</button>
                 </div>
             </div>
 
@@ -219,13 +216,25 @@
             $button.button();
 
         });
-
+         $.ajax({
+                type: "POST",
+                url: '@Url.Action("KeyinByStore", "KeyIn")',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+             success: function (result) {
+                 console.log(result)
+                },
+                error: function () {
+                    alert("Error while inserting data");
+                }
+            });
         @*var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
-                url: '@Url.Action("GetBAKeyInList", "KeyIn")',
+                url: '@Url.Action("KeyinByStore", "KeyIn")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
+                    console.log(result)
                     return result.data;
                 }
             },
@@ -257,7 +266,10 @@
                         return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                             /*'<a href="#confirmModal" data-id="' + row.brandSegmentID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
-                }}
+                    }
+                }
+
+
             ]
         });*@
 
@@ -283,6 +295,18 @@
         //});
 
 
+        $('#btnCreate').on('click', function (e) {
+           if(
+            !$('#channelList').val()||
+            !$('#retailerGroupList').val()||
+            !$('#departmentStoreList').val()||
+            !$('#brandList').val()||
+               !$('#iduniverseList').val()) {
+               $('#warningModal').modal('show');
+
+               $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
+        }
+        });
     });
 
 

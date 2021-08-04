@@ -1,0 +1,119 @@
+﻿
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="~/fonts/ionicons.min.css">
+<style>
+    body {
+        font-family: 'Varela Round', sans-serif;
+    }
+
+    #warningModal .modal-confirm {
+        color: #636363;
+        width: 325px;
+        font-size: 14px;
+    }
+
+        #warningModal .modal-confirm .modal-content {
+            padding: 20px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        #warningModal .modal-confirm .modal-header {
+            border-bottom: none;
+            position: relative;
+        }
+
+        #warningModal .modal-confirm h4 {
+            text-align: center;
+            font-size: 26px;
+            margin: 30px 0 -15px;
+        }
+
+        #warningModal .modal-confirm .form-control, #warningModal .modal-confirm .btn {
+            min-height: 40px;
+            border-radius: 3px;
+        }
+
+        #warningModal .modal-confirm .close {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        #warningModal .modal-confirm .modal-footer {
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+    #warningModal .modal-confirm .icon-box {
+        color: #fff;
+        position: absolute;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        top: -70px;
+        width: 95px;
+        height: 95px;
+        border-radius: 50%;
+        z-index: 9;
+        background: #ffc107;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+    }
+
+        #warningModal .modal-confirm .icon-box i {
+            font-size: 58px;
+            position: relative;
+            top: -8px;
+        }
+
+        #warningModal .modal-confirm.modal-dialog {
+            margin-top: 80px;
+        }
+
+        #warningModal .modal-confirm .btn {
+            color: #fff;
+            border-radius: 4px;
+            background: #ffc107;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            border: none;
+        }
+
+            #warningModal .modal-confirm .btn:hover, #warningModal .modal-confirm .btn:focus {
+                background: #ffc107;
+                outline: none;
+            }
+
+    #warningModal .trigger-btn {
+        display: inline-block;
+        margin: 100px auto;
+    }
+</style>
+
+
+<!-- Modal HTML -->
+<div id="warningModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="ion-alert text-white"></i>
+                </div>
+                <h4 class="modal-title w-100">Warning!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center" style="font-weight:bold" id="myModalWarningResult"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning btn-block " data-dismiss="modal">Cancel</button>
+
+            </div>
+        </div>
+    </div>
+</div>    
