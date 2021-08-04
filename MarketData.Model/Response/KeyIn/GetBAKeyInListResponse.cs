@@ -8,7 +8,6 @@ namespace MarketData.Model.Response.KeyIn
     public class GetBAKeyInListResponse : BaseGetDataListResponse
     {
         public List<BAKeyInData> data { get; set; }
-        public List<string> year { get; set; } = new List<string>();
     }
 
     public class BAKeyInData

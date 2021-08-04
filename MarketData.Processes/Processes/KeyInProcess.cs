@@ -33,17 +33,6 @@ namespace MarketData.Processes.Processes
                     baKeyInData.AddRange(baKeyInByCounter);
                 }
 
-                if (baKeyInData.Any())
-                {
-                    var groupByYear = baKeyInData.GroupBy(e => e.year).Where(c => c.Key != DateTime.Now.Year.ToString());
-
-                    foreach(var itemGroupYear in groupByYear)
-                    {
-                        response.year.Add(itemGroupYear.Key);
-                    }
-                }
-
-                response.year.Add(DateTime.Now.Year.ToString());
                 response.data = baKeyInData;
               
             }
@@ -125,6 +114,28 @@ namespace MarketData.Processes.Processes
                     };
 
                     retailerGroupBA.Add(retailer);
+                }
+
+                List<TTBAKeyIn> listBAKeyIn = new List<TTBAKeyIn>();
+
+                foreach (var itemUserCounter in userCounterData)
+                {
+                    var baKeyInByCounter = repository.baKeyIn.GetBAKeyInBy(c=> c.DepartmentStore_ID == itemUserCounter.DepartmentStore_ID
+                    && c.DistributionChannel_ID == itemUserCounter.DistributionChannel_ID && c.Brand_ID == itemUserCounter.Brand_ID);
+
+                    listBAKeyIn.AddRange(baKeyInByCounter);
+                }
+
+                response.year.Add(DateTime.Now.Year.ToString());
+
+                if (listBAKeyIn.Any())
+                {
+                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != DateTime.Now.Year.ToString());
+
+                    foreach (var itemGroupYear in groupByYear)
+                    {
+                        response.year.Add(itemGroupYear.Key);
+                    }
                 }
 
                 response.channel = channelBA;

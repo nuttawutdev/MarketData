@@ -37,7 +37,6 @@ namespace MarketData.Controllers
 
                 if (userID != null)
                 {
-                    var baKeyInData = process.keyIn.GetBAKeyInList(new Guid(userID));
                     var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
                     var keyInStatus = process.masterData.GetKeyInStatus();
 
@@ -86,34 +85,7 @@ namespace MarketData.Controllers
                         }).ToList();
                     }
 
-                    if (baKeyInData != null)
-                    {
-                        dataModel.yearList = baKeyInData.year;
-
-                        if (baKeyInData.data != null && baKeyInData.data.Any())
-                        {
-                            dataModel.data = baKeyInData.data.Select(c => new BAKeyInDataViewModel
-                            {
-                                approveDate = c.approveDate,
-                                approver = c.approver,
-                                brandID = c.brandID,
-                                counter = c.counter,
-                                distributionChannelID = c.distributionChannelID,
-                                distributionChannelName = c.distributionChannelName,
-                                departmentStoreID = c.departmentStoreID,
-                                keyInID = c.keyInID,
-                                retailerGroupID = c.retailerGroupID,
-                                lastEdit = c.lastEdit,
-                                month = c.month,
-                                remark = c.remark,
-                                statusID = c.statusID,
-                                statusName = c.statusName,
-                                submitDate = c.submitDate,
-                                week = c.week,
-                                year = c.year
-                            }).ToList();
-                        }
-                    }
+                    dataModel.yearList = baKeyInOption.year;
 
                     dataModel.userID = new Guid(userID);
                     return View(dataModel);
@@ -135,34 +107,54 @@ namespace MarketData.Controllers
         }
 
         #region BA KeyIn Function
-        //[HttpPost]
-        //public IActionResult GetBAKeyInList(Guid userID)
-        //{
-        //BAKeyInListViewModel BAKeyInListView = new BAKeyInListViewModel();
 
-        //if (ModelState.IsValid)
-        //{
-        //    var response = process.masterData.GetBrandList();
+        [HttpPost]
+        public IActionResult GetBAKeyInList()
+        {
+            BAKeyInListViewModel dataModel = new BAKeyInListViewModel();
 
-        //    if (response != null && response.data != null && response.data.Any())
-        //    {
+            try
+            {
+                var userID = HttpContext.Session.GetString("userID");
 
-        //    }
-        //    else
-        //    {
-        //        BAKeyInListView.brandList = new List<BAKeyInDataViewModel>();
-        //    }
+                if (userID != null)
+                {
+                    var baKeyInData = process.keyIn.GetBAKeyInList(new Guid(userID));
 
-        //    return Json(BAKeyInListView);
-        //}
-        //else
-        //{
-        //    return Json(BAKeyInListView);
-        //}
+                    if (baKeyInData != null && baKeyInData.data != null && baKeyInData.data.Any())
+                    {
+                        dataModel.data = baKeyInData.data.Select(c => new BAKeyInDataViewModel
+                        {
+                            approveDate = c.approveDate,
+                            approver = c.approver,
+                            brandID = c.brandID,
+                            counter = c.counter,
+                            distributionChannelID = c.distributionChannelID,
+                            distributionChannelName = c.distributionChannelName,
+                            departmentStoreID = c.departmentStoreID,
+                            keyInID = c.keyInID,
+                            retailerGroupID = c.retailerGroupID,
+                            lastEdit = c.lastEdit,
+                            month = c.month,
+                            remark = c.remark,
+                            statusID = c.statusID,
+                            statusName = c.statusName,
+                            submitDate = c.submitDate,
+                            week = c.week,
+                            year = c.year
+                        }).ToList();
+                    }
 
+                    dataModel.userID = new Guid(userID);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(dataModel);
+            }
 
-
-        //}
+            return Json(dataModel);
+        }
 
         #endregion
 

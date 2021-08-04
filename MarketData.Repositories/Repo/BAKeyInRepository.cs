@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace MarketData.Repositories.Repo
@@ -89,6 +90,18 @@ namespace MarketData.Repositories.Repo
                   });
 
                 return baKeyInDataList.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TTBAKeyIn> GetBAKeyInBy(Expression<Func<TTBAKeyIn, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTBAKeyIn.Where(expression).ToList();
             }
             catch (Exception ex)
             {

@@ -11,5 +11,6 @@ namespace MarketData.Model.Response.KeyIn
         public List<RetailerGroupData> retailerGroup { get; set; }
         public List<DistributionChannelData> channel { get; set; }
         public List<BrandData> brand { get; set; }
+        public List<string> year { get; set; } = new List<string>();
     }
 }
