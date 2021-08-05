@@ -251,6 +251,7 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
+                    response.status = repository.masterData.GetKeyInStatusBy(c => c.ID == baKeyInData.KeyIn_Status_ID)?.Status_Name;
                     response.data = BAKeyInDetailList;
                     response.isSuccess = true;
                 }
@@ -301,6 +302,7 @@ namespace MarketData.Processes.Processes
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
                 var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
 
+                response.status = repository.masterData.GetKeyInStatusBy(c => c.ID == BAKeyInData.KeyIn_Status_ID)?.Status_Name;
                 response.brand = brandBAData.Brand_Name;
                 response.departmentStore = departmentStoreData.Department_Store_Name;
                 response.channel = channelBAData.Distribution_Channel_Name;
