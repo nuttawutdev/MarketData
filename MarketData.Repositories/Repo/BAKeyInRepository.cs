@@ -1,4 +1,6 @@
-﻿using MarketData.Model.Entiry;
+﻿using MarketData.Model.Data;
+using MarketData.Model.Entiry;
+using MarketData.Model.Request.KeyIn;
 using MarketData.Model.Response.KeyIn;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -102,6 +104,120 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TTBAKeyIn.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TTBAKeyIn FindBAKeyInBy(Expression<Func<TTBAKeyIn, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTBAKeyIn.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TTBAKeyIn CreateBAKeyIn(CreateBAKeyInRequest request)
+        {
+            try
+            {
+                var keyInStatusNew = _dbContext.TMKeyInStatus.FirstOrDefault(c => c.Status_Name == "New");
+
+                TTBAKeyIn newBAKeyIn = new TTBAKeyIn
+                {
+                    ID = Guid.NewGuid(),
+                    RetailerGroup_ID = request.retailerGroupID,
+                    DepartmentStore_ID = request.departmentStoreID,
+                    DistributionChannel_ID = request.distributionChannelID,
+                    Brand_ID = request.brandID,
+                    Year = request.year,
+                    Month = request.month,
+                    Week = request.week,
+                    Universe = request.universe,
+                    Created_By = request.userID,
+                    Created_Date = DateTime.Now,
+                    KeyIn_Status_ID = keyInStatusNew.ID,
+                };
+
+                _dbContext.TTBAKeyIn.Add(newBAKeyIn);
+
+                if (_dbContext.SaveChanges() > 0)
+                {
+                    return newBAKeyIn;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool CreateBAKeyInDetail(List<TTBAKeyInDetail> listBAKeyInDetail)
+        {
+            try
+            {
+                _dbContext.TTBAKeyInDetail.AddRange(listBAKeyInDetail);
+
+                if (_dbContext.SaveChanges() > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<BAKeyInDetailData> GetBAKeyInDetailBy(Expression<Func<TTBAKeyInDetail, bool>> expression)
+        {
+            try
+            {
+                var BAKeyInDetail = _dbContext.TTBAKeyInDetail.Where(expression).ToList();
+
+                var baKeyInDetailDataList = (
+                     from e in BAKeyInDetail
+                     join b in _dbContext.TMBrand
+                         on e.Brand_ID equals b.Brand_ID
+                         into joinBrand
+                     from brand in joinBrand.DefaultIfEmpty()
+                     select new BAKeyInDetailData
+                     {
+                         ID = e.ID,
+                         brandID = e.Brand_ID,
+                         departmentStoreID = e.DepartmentStore_ID,
+                         amountSale = e.Amount_Sales,
+                         BAKeyInID = e.BAKeyIn_ID,
+                         fg = e.FG,
+                         sk = e.SK,
+                         mu = e.MU,
+                         ot = e.OT,
+                         brandName = brand.Brand_Name,
+                         channelID = e.DistributionChannel_ID,
+                         counterID = e.Counter_ID,
+                         month = e.Month,
+                         rank = e.Rank,
+                         remark = e.Remark,
+                         week = e.Week,
+                         wholeSale = e.Whole_Sales,
+                         yaer = e.Year,
+                     }).ToList();
+
+                return baKeyInDetailDataList;
             }
             catch (Exception ex)
             {
