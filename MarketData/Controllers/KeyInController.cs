@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MarketData.Models;
 using Microsoft.AspNetCore.Http;
+using MarketData.Model.Request.KeyIn;
 
 namespace MarketData.Controllers
 {

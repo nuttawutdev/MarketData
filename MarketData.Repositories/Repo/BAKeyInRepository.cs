@@ -201,7 +201,7 @@ namespace MarketData.Repositories.Repo
                          brandID = e.Brand_ID,
                          departmentStoreID = e.DepartmentStore_ID,
                          amountSale = e.Amount_Sales,
-                         BAKeyInID = e.BAKeyIn_ID,
+                         keyInID = e.BAKeyIn_ID,
                          fg = e.FG,
                          sk = e.SK,
                          mu = e.MU,

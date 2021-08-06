@@ -11,11 +11,8 @@ namespace MarketData.Model.Request.KeyIn
         public string week { get; set; }
         public Guid retailerGroupID { get; set; }
         public Guid departmentStoreID { get; set; }
-        public string departmentStoreName { get; set; }
         public Guid brandID { get; set; }
-        public string brandName { get; set; }
         public Guid distributionChannelID { get; set; }
-        public string channelName { get; set; }
         public string universe { get; set; }
         public Guid userID { get; set; }
     }

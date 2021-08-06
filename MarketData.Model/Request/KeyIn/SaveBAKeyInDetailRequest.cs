@@ -8,5 +8,7 @@ namespace MarketData.Model.Request.KeyIn
     public class SaveBAKeyInDetailRequest
     {
         public Guid BAKeyInID { get; set; }
+        public List<BAKeyInDetailData> BAKeyInDetailList { get; set; }
+        public Guid userID { get; set; }
     }
 }

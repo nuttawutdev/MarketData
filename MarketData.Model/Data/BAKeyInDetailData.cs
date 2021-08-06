@@ -7,7 +7,7 @@ namespace MarketData.Model.Data
     public class BAKeyInDetailData
     {
         public Guid ID { get; set; }
-        public Guid BAKeyInID { get; set; }
+        public Guid keyInID { get; set; }
         public Guid counterID { get; set; }
         public Guid departmentStoreID { get; set; }
         public Guid channelID { get; set; }
