@@ -154,10 +154,10 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public BAKeyInDetailResponse CreateBAKeyInDetail(CreateBAKeyInRequest request)
+        public CreateBAKeyInDetailResponse CreateBAKeyInDetail(CreateBAKeyInRequest request)
         {
             DateTime dateNow = DateTime.Now;
-            BAKeyInDetailResponse response = new BAKeyInDetailResponse();
+            CreateBAKeyInDetailResponse response = new CreateBAKeyInDetailResponse();
             var keyInStatusNew = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "New");
 
             try
@@ -181,25 +181,8 @@ namespace MarketData.Processes.Processes
 
                         if (createDetailResult)
                         {
-                            var listBrandIDInCounter = listDetail.Select(r => r.Brand_ID);
-                            var brandListData = repository.masterData.GetBrandListBy(e => listBrandIDInCounter.Contains(e.Brand_ID));
-
-                            response.data = listDetail.Select(e => new BAKeyInDetailData
-                            {
-                                ID = e.ID,
-                                keyInID = createBAKeyInResponse.ID,
-                                departmentStoreID = e.DepartmentStore_ID,
-                                brandID = e.Brand_ID,
-                                brandName = brandListData.FirstOrDefault(c => c.Brand_ID == e.Brand_ID)?.Brand_Name,
-                                channelID = e.DistributionChannel_ID,
-                                yaer = e.Year,
-                                month = e.Month,
-                                week = e.Week,
-                                counterID = e.Counter_ID
-                            }).ToList();
-
+                            response.baKeyInID = createBAKeyInResponse.ID;
                             response.isSuccess = true;
-                            response.status = keyInStatusNew.Status_Name;
                         }
                         else
                         {
@@ -224,20 +207,7 @@ namespace MarketData.Processes.Processes
                             var listBrandIDInCounter = listDetail.Select(r => r.Brand_ID);
                             var brandListData = repository.masterData.GetBrandListBy(e => listBrandIDInCounter.Contains(e.Brand_ID));
 
-                            response.data = listDetail.Select(e => new BAKeyInDetailData
-                            {
-                                ID = e.ID,
-                                keyInID = baKeyInData.ID,
-                                departmentStoreID = e.DepartmentStore_ID,
-                                brandID = e.Brand_ID,
-                                brandName = brandListData.FirstOrDefault(c => c.Brand_ID == e.Brand_ID)?.Brand_Name,
-                                channelID = e.DistributionChannel_ID,
-                                yaer = e.Year,
-                                month = e.Month,
-                                week = e.Week,
-                                counterID = e.Counter_ID
-                            }).ToList();
-
+                            response.baKeyInID = baKeyInData.ID;
                             response.isSuccess = true;
                         }
                         else
@@ -248,76 +218,48 @@ namespace MarketData.Processes.Processes
                     else
                     {
                         var counterList = repository.masterData.GetCounterListBy(
-                        e => e.Distribution_Channel_ID == request.distributionChannelID
-                        && e.Department_Store_ID == request.departmentStoreID
-                        && e.Active_Flag && e.Delete_Flag != true);
+                                        e => e.Distribution_Channel_ID == request.distributionChannelID
+                                        && e.Department_Store_ID == request.departmentStoreID
+                                        && e.Active_Flag && e.Delete_Flag != true);
 
-                        // New Counter
-                        if (counterList.Count > BAKeyInDetailList.Count)
+                        try
                         {
-                            var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
-                            var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
-
-                            List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
+                            // New Counter
+                            if (counterList.Count > BAKeyInDetailList.Count)
                             {
-                                ID = Guid.NewGuid(),
-                                BAKeyIn_ID = baKeyInData.ID,
-                                DepartmentStore_ID = request.departmentStoreID,
-                                DistributionChannel_ID = request.distributionChannelID,
-                                Brand_ID = c.Brand_ID,
-                                Year = request.year,
-                                Month = request.month,
-                                Week = request.week,
-                                Created_By = request.userID,
-                                Created_Date = dateNow,
-                                Counter_ID = c.Counter_ID
-                            }).ToList();
+                                var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
+                                var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
 
-                            repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
-                            BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == baKeyInData.ID);
-                        }
+                                List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
+                                {
+                                    ID = Guid.NewGuid(),
+                                    BAKeyIn_ID = baKeyInData.ID,
+                                    DepartmentStore_ID = request.departmentStoreID,
+                                    DistributionChannel_ID = request.distributionChannelID,
+                                    Brand_ID = c.Brand_ID,
+                                    Year = request.year,
+                                    Month = request.month,
+                                    Week = request.week,
+                                    Created_By = request.userID,
+                                    Created_Date = dateNow,
+                                    Counter_ID = c.Counter_ID
+                                }).ToList();
 
-                        string previousYear = (Int32.Parse(request.year) - 1).ToString();
-
-                        foreach (var itemBADetail in BAKeyInDetailList)
-                        {
-                            var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
-                                c => c.DepartmentStore_ID == request.departmentStoreID
-                                && c.DistributionChannel_ID == request.distributionChannelID
-                                && c.Brand_ID == itemBADetail.brandID
-                                && c.Year == previousYear
-                                && c.Month == request.month
-                                && c.Week == "4").FirstOrDefault();
-
-                            if (BAKeyInDetailPreviousYear != null)
-                            {
-                                itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.amountSale;
+                                repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
                             }
                         }
-
-                        response.isSuccess = true;
+                        finally
+                        {
+                            response.baKeyInID = baKeyInData.ID;
+                            response.isSuccess = true;
+                        }                     
                     }
-
-                    response.status = repository.masterData.GetKeyInStatusBy(c => c.ID == baKeyInData.KeyIn_Status_ID)?.Status_Name;
-                    response.data = BAKeyInDetailList;
-
                 }
             }
             catch (Exception ex)
             {
                 response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
-
-            var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == request.brandID);
-            var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == request.departmentStoreID);
-            var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == request.distributionChannelID);
-
-            response.brand = brandBAData?.Brand_Name;
-            response.departmentStore = departmentStoreData?.Department_Store_Name;
-            response.channel = channelBAData?.Distribution_Channel_Name;
-            response.year = request.year;
-            response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(request.month));
-            response.week = request.week;
 
             return response;
         }
@@ -401,6 +343,115 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public SaveDataResponse SaveBAKeyInDetail(SaveBAKeyInDetailRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+            DateTime dateNoew = DateTime.Now;
+
+            try
+            {
+                var inprogressStatus = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "In-Progress");
+                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, inprogressStatus.ID);
+
+                if (updateBAKeyIn)
+                {
+                    var baKeyInDetailID = request.BAKeyInDetailList.Select(c => c.ID);
+
+                    var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
+
+                    foreach(var itemDetail in baKeyInDetailData)
+                    {
+                        var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
+                        itemDetail.Rank = baKeyInDetailUpdate.rank;
+                        itemDetail.Amount_Sales = baKeyInDetailUpdate.amountSale;
+                        itemDetail.Whole_Sales = baKeyInDetailUpdate.wholeSale;
+                        itemDetail.SK = baKeyInDetailUpdate.sk;
+                        itemDetail.MU = baKeyInDetailUpdate.mu;
+                        itemDetail.FG = baKeyInDetailUpdate.fg;
+                        itemDetail.OT = baKeyInDetailUpdate.ot;
+                        itemDetail.Remark = baKeyInDetailUpdate.remark;
+                        itemDetail.Updated_By = request.userID;
+                        itemDetail.Updated_Date = dateNoew;
+                    }
+
+                    var updateDetailResult = repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
+
+                    if (updateDetailResult)
+                    {
+                        response.isSuccess = true;
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public SaveDataResponse SubmitBAKeyInDetail(SaveBAKeyInDetailRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+            DateTime dateNoew = DateTime.Now;
+
+            try
+            {
+                var submitStatus = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "Submit");
+                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, submitStatus.ID);
+
+                if (updateBAKeyIn)
+                {
+                    var baKeyInDetailID = request.BAKeyInDetailList.Select(c => c.ID);
+                    var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
+
+                    foreach (var itemDetail in baKeyInDetailData)
+                    {
+                        var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
+                        itemDetail.Rank = baKeyInDetailUpdate.rank;
+                        itemDetail.Amount_Sales = baKeyInDetailUpdate.amountSale;
+                        itemDetail.Whole_Sales = baKeyInDetailUpdate.wholeSale;
+                        itemDetail.SK = baKeyInDetailUpdate.sk;
+                        itemDetail.MU = baKeyInDetailUpdate.mu;
+                        itemDetail.FG = baKeyInDetailUpdate.fg;
+                        itemDetail.OT = baKeyInDetailUpdate.ot;
+                        itemDetail.Remark = baKeyInDetailUpdate.remark;
+                        itemDetail.Updated_By = request.userID;
+                        itemDetail.Updated_Date = dateNoew;
+                    }
+
+                    var updateDetailResult = repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
+
+                    if (updateDetailResult)
+                    {
+                        response.isSuccess = true;
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
         private (bool, List<TTBAKeyInDetail>) CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
             DateTime dateNow = DateTime.Now;
@@ -435,6 +486,6 @@ namespace MarketData.Processes.Processes
                 return (false, null);
             }
         }
-        
+
     }
 }

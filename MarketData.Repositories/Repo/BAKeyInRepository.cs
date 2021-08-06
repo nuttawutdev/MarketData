@@ -224,5 +224,74 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<TTBAKeyInDetail> GetBAKeyInDetailListData(Expression<Func<TTBAKeyInDetail, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTBAKeyInDetail.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public bool UpdateBAKeyIn(SaveBAKeyInDetailRequest request, Guid status, bool isSubmit = false)
+        {
+            try
+            {
+                var baKeyInData = _dbContext.TTBAKeyIn.Find(request.BAKeyInID);
+                baKeyInData.Updated_By = request.userID;
+                baKeyInData.Updated_Date = DateTime.Now;
+                baKeyInData.KeyIn_Status_ID = status;
+
+                int monthKeyIn = Int32.Parse(baKeyInData.Month);
+                int YearKeyIn = Int32.Parse(baKeyInData.Month);
+
+                if (isSubmit)
+                {
+                    if (baKeyInData.Week == "1" && (YearKeyIn < DateTime.Now.Year 
+                        || monthKeyIn < DateTime.Now.Month 
+                        || DateTime.Now.Day > 9))
+                    {
+                        baKeyInData.Remark = "ล่าช้า";
+                    }
+                    else if (baKeyInData.Week == "2" && DateTime.Now.Day > 17)
+                    {
+                        baKeyInData.Remark = "ล่าช้า";
+                    }
+                    else if (baKeyInData.Week == "3" && DateTime.Now.Day > 25)
+                    {
+                        baKeyInData.Remark = "ล่าช้า";
+                    }
+                    else if (baKeyInData.Week == "4" && DateTime.Now.Day > 5)
+                    {
+                        baKeyInData.Remark = "ล่าช้า";
+                    }
+
+                    baKeyInData.Submited_Date = DateTime.Now;
+                }
+
+                _dbContext.TTBAKeyIn.Update(baKeyInData);
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public bool UpdateBAKeyInDetail(List<TTBAKeyInDetail> listDetail)
+        {
+            try
+            {
+                _dbContext.TTBAKeyInDetail.UpdateRange(listDetail);
+                return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
