@@ -26,41 +26,6 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyinByBrand()
         {
-            var userID = HttpContext.Session.GetString("userID");
-
-            SaveBAKeyInDetailRequest request = new SaveBAKeyInDetailRequest
-            {
-                BAKeyInID = new Guid("E81EA953-B2FD-44D3-900B-9719B487AA70"),
-                userID = new Guid(userID),
-                BAKeyInDetailList = new List<Model.Data.BAKeyInDetailData>
-                {
-                    new Model.Data.BAKeyInDetailData
-                    {
-                        ID = new Guid("B27AF927-6C84-4472-B873-0E677EE20899"),
-                        amountSale = 2000,
-                        rank = 1,
-                        wholeSale = 500,
-                        sk = 20,
-                        mu = 10,
-                        fg = 30,
-                        ot = 40,
-                    },
-                     new Model.Data.BAKeyInDetailData
-                    {
-                        ID = new Guid("23580C70-7CF4-4890-A1BE-3BC28907625A"),
-                        amountSale = 5000,
-                        rank = 2,
-                        wholeSale = 1200,
-                        sk = 20,
-                        mu = 10,
-                        fg = 30,
-                        ot = 40,
-                    }
-                }
-            };
-
-            var result = process.keyIn.SaveBAKeyInDetail(request);
-
             return View();
         }
 

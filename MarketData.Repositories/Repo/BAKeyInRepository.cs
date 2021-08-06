@@ -246,27 +246,45 @@ namespace MarketData.Repositories.Repo
                 baKeyInData.KeyIn_Status_ID = status;
 
                 int monthKeyIn = Int32.Parse(baKeyInData.Month);
-                int YearKeyIn = Int32.Parse(baKeyInData.Month);
+                int YearKeyIn = Int32.Parse(baKeyInData.Year);
 
                 if (isSubmit)
                 {
-                    if (baKeyInData.Week == "1" && (YearKeyIn < DateTime.Now.Year 
-                        || monthKeyIn < DateTime.Now.Month 
-                        || DateTime.Now.Day > 9))
+                    if (baKeyInData.Week == "1")
                     {
-                        baKeyInData.Remark = "ล่าช้า";
+                        DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 10, 0, 0, 0);
+
+                        if (DateTime.Now > dateDeadLine)
+                        {
+                            baKeyInData.Remark = "ล่าช้า";
+                        }
                     }
-                    else if (baKeyInData.Week == "2" && DateTime.Now.Day > 17)
+                    else if (baKeyInData.Week == "2")
                     {
-                        baKeyInData.Remark = "ล่าช้า";
+                        DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 18, 0, 0, 0);
+
+                        if (DateTime.Now > dateDeadLine)
+                        {
+                            baKeyInData.Remark = "ล่าช้า";
+                        }
                     }
-                    else if (baKeyInData.Week == "3" && DateTime.Now.Day > 25)
+                    else if (baKeyInData.Week == "3")
                     {
-                        baKeyInData.Remark = "ล่าช้า";
+                        DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 25, 0, 0, 0);
+
+                        if (DateTime.Now > dateDeadLine)
+                        {
+                            baKeyInData.Remark = "ล่าช้า";
+                        }
                     }
-                    else if (baKeyInData.Week == "4" && DateTime.Now.Day > 5)
+                    else if (baKeyInData.Week == "4")
                     {
-                        baKeyInData.Remark = "ล่าช้า";
+                        DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 5, 0, 0, 0).AddMonths(1);
+
+                        if (DateTime.Now > dateDeadLine)
+                        {
+                            baKeyInData.Remark = "ล่าช้า";
+                        }
                     }
 
                     baKeyInData.Submited_Date = DateTime.Now;

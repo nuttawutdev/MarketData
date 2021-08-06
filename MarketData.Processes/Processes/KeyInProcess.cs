@@ -406,7 +406,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var submitStatus = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "Submit");
-                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, submitStatus.ID);
+                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, submitStatus.ID,true);
 
                 if (updateBAKeyIn)
                 {
