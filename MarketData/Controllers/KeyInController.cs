@@ -137,8 +137,9 @@ namespace MarketData.Controllers
                 return View(dataModel);
             }
         }
+
         [HttpPost]
-        public async Task<IActionResult> KeyinByStore_Edit([FromBody] CreateBAKeyInRequest request) 
+        public IActionResult KeyinByStore_Edit([FromBody] CreateBAKeyInRequest request) 
         { 
             return View();
         }

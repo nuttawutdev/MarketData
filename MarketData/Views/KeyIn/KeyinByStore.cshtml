@@ -344,6 +344,9 @@
             } else {
                    var model = @Html.Raw(Json.Serialize(Model));
 
+
+             
+
              var frmdata = {
                  year: $("#yearList").val(),
                  month: $('#ddlMonth').val(),
@@ -352,12 +355,10 @@
                  retailerGroupID: $('#retailerGroupList').val(),
                  departmentStoreID: $('#departmentStoreList').val(),
                  brandID: $('#brandList').val(),
-                 universe: $('#iduniverseList').val(),           
-                 userID: ''//$('#iduserID').val()
+                 universe: $('#iduniverseList').val(),
+                 userID: null//$('#iduserID').val()
             };
-                debugger;
 
-                console.log(frmdata)
             $.ajax({
                  type: "POST",
                  url: '@Url.Action("KeyinByStore_Edit", "KeyIn")',
@@ -365,7 +366,7 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
-                
+
                 },
                 error: function () {
                 }

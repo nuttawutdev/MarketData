@@ -240,7 +240,7 @@ namespace MarketData.Processes.Processes
                                     Year = request.year,
                                     Month = request.month,
                                     Week = request.week,
-                                    Created_By = request.userID,
+                                    Created_By = request.userID.GetValueOrDefault(),
                                     Created_Date = dateNow,
                                     Counter_ID = c.Counter_ID
                                 }).ToList();
@@ -473,7 +473,7 @@ namespace MarketData.Processes.Processes
                     Year = request.year,
                     Month = request.month,
                     Week = request.week,
-                    Created_By = request.userID,
+                    Created_By = request.userID.GetValueOrDefault(),
                     Created_Date = dateNow,
                     Counter_ID = c.Counter_ID
                 }).ToList();
