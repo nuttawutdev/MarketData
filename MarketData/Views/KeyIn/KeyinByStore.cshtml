@@ -228,10 +228,10 @@
                     alert("Error while inserting data");
                 }
             });
-        @*var dataTable=  $('#tableData').DataTable({
+        var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
-                url: '@Url.Action("KeyinByStore", "KeyIn")',
+                url: '@Url.Action("GetBAKeyInList", "KeyIn")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
                     console.log(result)
@@ -241,37 +241,35 @@
             "columns": [
 
                 { data: "keyInID", title: "keyInID", visible: false },
-                { data: "year", title: "year" },
-                { data: "month", title: "month" },
-                { data: "week", title: "week" },
-                { data: "counter", title: "counter" },
+                { data: "year", title: "Year" },
+                { data: "month", title: "Month" },
+                { data: "week", title: "Week" },
+                { data: "counter", title: "Counter" },
                 { data: "retailerGroupID", title: "retailerGroupID", visible: false },
                 { data: "departmentStoreID", title: "departmentStoreID", visible: false },
                 { data: "brandID", title: "brandID", visible: false },
                 { data: "distributionChannelID", title: "distributionChannelID", visible: false },
-                { data: "distributionChannelName", title: "distributionChannelName" },
+                { data: "distributionChannelName", title: "Distribution Chanel" },
                 { data: "statusID", title: "statusID", visible: false },
-                { data: "statusName", title: "statusName" },
-                { data: "lastEdit", title: "lastEdit" },
-                { data: "approver", title: "approver" },
-                { data: "submitDate", title: "submitDate" },
-                { data: "approveDate", title: "approveDate" },
-                { data: "remark", title: "remark" },
+                { data: "statusName", title: "Status" },
+                { data: "lastEdit", title: "Last Edit" },
+                { data: "approver", title: "Approver" },
+                { data: "submitDate", title: "Submit Date" },
+                { data: "approveDate", title: "Approve Date" },
+                { data: "remark", title: "Remark" },
                 {
                     orderable: false,
                     title: "Action",
-                    width: "20%",
                     className: "text-center",
                     render: function (data, type, row) {
                         return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                            /*'<a href="#confirmModal" data-id="' + row.brandSegmentID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
                     }
                 }
 
 
             ]
-        });*@
+        });
 
 
         $('.btnReresh').on('click', function (e) {
@@ -282,30 +280,97 @@
             }, 500);
         });
 
-        //$('.status-dropdown').on('change', function (e) {
-        //    var status = $(this).val();
-        //    $('.status-dropdown').val(status);
-        //    dataTable.column(3).search(status).draw();
-        //});
+        $('#channelList').on('change', function (e) {
+            var status = $(this).val();
+            $('#channelList').val(status);
+            dataTable.column(8).search(status).draw();
+        });
 
-        //$('.isloreal-dropdown').on('change', function (e) {
-        //    var status = $(this).val();
-        //    $('.isloreal-dropdown').val(status);
-        //    dataTable.column(2).search(status).draw();
-        //});
+        $('#retailerGroupList').on('change', function (e) {
+            var status = $(this).val();
+            $('#retailerGroupList').val(status);
+            dataTable.column(5).search(status).draw();
+        });
 
+        $('#departmentStoreList').on('change', function (e) {
+            var status = $(this).val();
+            $('#departmentStoreList').val(status);
+            dataTable.column(6).search(status).draw();
+        });
+
+        $('#brandList').on('change', function (e) {
+            var status = $(this).val();
+            $('#brandList').val(status);
+            dataTable.column(7).search(status).draw();
+        });
+
+
+        $('#ddlWeek').on('change', function (e) {
+            var status = $(this).val();
+            $('#ddlWeek').val(status);
+            dataTable.column(3).search(status).draw();
+        });
+
+
+        $('#ddlMonth').on('change', function (e) {
+            var status = $(this).val();
+            $('#ddlMonth').val(status);
+            dataTable.column(2).search(status).draw();
+        });
+
+
+        $('#yearList').on('change', function (e) {
+            var status = $(this).val();
+            $('#yearList').val(status);
+            dataTable.column(1).search(status).draw();
+        });
+
+        $('#statusList').on('change', function (e) {
+            var status = $(this).val();
+            $('#statusList').val(status);
+            dataTable.column(10).search(status).draw();
+        });
 
         $('#btnCreate').on('click', function (e) {
-           if(
-            !$('#channelList').val()||
-            !$('#retailerGroupList').val()||
-            !$('#departmentStoreList').val()||
-            !$('#brandList').val()||
-               !$('#iduniverseList').val()) {
-               $('#warningModal').modal('show');
+            if (
+                !$('#channelList').val() ||
+                !$('#retailerGroupList').val() ||
+                !$('#departmentStoreList').val() ||
+                !$('#brandList').val() ||
+                !$('#iduniverseList').val()) {
+                $('#warningModal').modal('show');
 
-               $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
-        }
+                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
+            } else {
+                   var model = @Html.Raw(Json.Serialize(Model));
+
+             var frmdata = {
+                 year: $("#yearList").val(),
+                 month: $('#ddlMonth').val(),
+                 week: $('#ddlWeek').val(),
+                 distributionChannelID: $('#channelList').val(),
+                 retailerGroupID: $('#retailerGroupList').val(),
+                 departmentStoreID: $('#departmentStoreList').val(),
+                 brandID: $('#brandList').val(),
+                 universe: $('#iduniverseList').val(),           
+                 userID: ''//$('#iduserID').val()
+            };
+                debugger;
+
+                console.log(frmdata)
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("KeyinByStore_Edit", "KeyIn")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                success: function (data) {
+                
+                },
+                error: function () {
+                }
+            });
+            }
         });
     });
 
