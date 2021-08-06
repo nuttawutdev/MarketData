@@ -7,7 +7,6 @@
 
 <h3>
     @ViewData["Title"]
-    @* <a href="KeyinByStore_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>*@
 </h3>
 
 
@@ -126,60 +125,6 @@
     </div>
 
 </div>
-<!--<div class="container-xl" style="overflow-x:auto;">
-    <div class="table-responsive table-sm">
-        <div class="table-wrapper">
-            <div style=" overflow-x: auto;">
-                <table class="table table-striped table-hover ">
-                    <thead class="table-secondary">
-                        <tr class="row m-0">
-
-                            <th class="col-1">Year</th>
-                            <th class="col-1">Month</th>
-                            <th class="col-1">Week</th>
-                            <th class="col-1">Counter</th>
-                            <th class="col-1">Distribution Chanel</th>
-                            <th class="col-1">Status</th>
-                            <th class="col-1">Last Edit</th>
-                            <th class="col-1">Approver</th>
-                            <th class="col-1">Submit Date</th>
-                            <th class="col-1">Approve Date</th>
-                            <th class="col-1">Remark</th>
-                            <th class="col-1">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="row m-0">
-                            <td class="col-1">2020</td>
-                            <td class="col-1">09</td>
-                            <td class="col-1">3</td>
-                            <td class="col-1">Lancome Siam Paragon</td>
-                            <td class="col-1">Counter</td>
-                            <td class="col-1">Submitted</td>
-                            <td class="col-1">Sirilux</td>
-                            <td class="col-1">Natchapon</td>
-                            <td class="col-1">2020-09-30</td>
-                            <td class="col-1"></td>
-                            <td class="col-1">ล่าช้า</td>
-                            <td class="col-1">
-                                <a href="KeyInByStore_Edit" class="btn btn-primary col-sm-12 col-md-5 btn-sm">
-                                    <i class="ion-eye text-white"></i>
-                                </a>-->
-@*<a href="KeyInByStore_Edit" class="btn btn-warning col-sm-12 col-md-5 btn-sm">
-        <i class="ion-edit text-white"></i>
-    </a>
-    <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-5 btn-sm" data-toggle="modal">
-        <i class="ion-android-delete text-white"></i>
-    </a>*@
-<!--</td>
-                        </tr>
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>-->
 
 <div class="container-xl">
     <table id="tableData" class="display" width="100%"></table>
@@ -216,18 +161,7 @@
             $button.button();
 
         });
-         $.ajax({
-                type: "POST",
-                url: '@Url.Action("GetBAKeyInList", "KeyIn")',
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-             success: function (result) {
-                 console.log(result)
-                },
-                error: function () {
-                    alert("Error while inserting data");
-                }
-            });
+   
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
@@ -352,7 +286,7 @@
                  retailerGroupID: $('#retailerGroupList').val(),
                  departmentStoreID: $('#departmentStoreList').val(),
                  brandID: $('#brandList').val(),
-                 universe: $('#iduniverseList').val(),           
+                 universe: $('#iduniverseList').val(),
                  userID: ''//$('#iduserID').val()
             };
                 debugger;
@@ -365,7 +299,7 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
-                
+
                 },
                 error: function () {
                 }
