@@ -1,4 +1,10 @@
-﻿.buttonIcon{
+﻿input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.buttonIcon{
     width:40px;
     margin-left:5px;
 }

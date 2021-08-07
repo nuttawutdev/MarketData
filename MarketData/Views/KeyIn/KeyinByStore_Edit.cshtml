@@ -1,5 +1,8 @@
-﻿@{
+﻿@model MarketData.Models.BAKeyInDetailViewModel
+
+@{
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
+    Html.RenderPartial("_WarningModal");
 }
 
 
@@ -20,7 +23,7 @@
             <div class="col-sm-2">
                 <label><b>Department Store</b></label><br />
                 <label>
-                    Siam Paragon
+                   @Model.departmentStore
                 </label>
 
 
@@ -28,7 +31,7 @@
             <div class="col-sm-2">
                 <label><b>Distribution Channel</b></label><br />
                 <label>
-                    Couter
+                   @Model.channel
                 </label>
 
 
@@ -36,37 +39,39 @@
             <div class="col-sm-2">
                 <label><b>Brand</b></label><br />
                 <label>
-                    Lancome
+                    @Model.brand
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Year</b></label><br />
                 <label>
-                    2020
+                    @Model.year
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Month</b></label><br />
                 <label>
-                    September
+                    @Model.month
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Week</b></label><br />
                 <label>
-                    3
+                    @Model.week
                 </label>
             </div>
             <div class="col-sm-2">
                 <label><b>Status</b></label><br />
                 <label>
-                    Save
+                    @Model.status
                 </label>
             </div>
         </div>
     </div>
 
 </div>
+
+
 <div class="container-xl" style="padding-top:20px">
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
@@ -74,9 +79,11 @@
                 <table class="table table-striped table-hover ">
                     <thead class="table-secondary">
                         <tr class="row m-0">
-
+                            @{ 
+                                var titelPrevYear = "Amount Sales ("+ (Convert.ToInt32(Model.year)-1)+" "+ Model.month+" week "+Model.week+")";
+                            }
                             <th class="col-2">Brand</th>
-                            <th class="col-2">Amount Sales (2019 September week 3)</th>
+                            <th class="col-2">@titelPrevYear</th>
                             <th class="col-1">Rank</th>
                             <th class="col-1">Amount Sales</th>
                             <th class="col-1">Whole Sales</th>
@@ -88,40 +95,61 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="row m-0">
-                            <td class="col-2">Chanel</td>
-                            <td class="col-2">900,000</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
+                        @{
+                            foreach (var item in Model.BAKeyInDetailList)
+                            {
+                                <tr class="row m-0">
+                                    <td class="col-2">@item.brandName</td>
+                                    <td class="col-2">@item.amountSalePreviousYear</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm" value="@item.sk">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm" value="@item.mu">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm" value="@item.fg">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm" value="@item.ot">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm" value="@item.remark"></td>
+                                </tr>
+                            }
 
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="col-2">Laura Mercier</td>
-                            <td class="col-2">700,000</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
+                        }
 
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="KeyInByStore" class="btn btn-danger">Save</a>
+        <a id="btnSave" class="btn btn-danger">Save</a>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
 </div>
+
+
+<div class="container-xl">
+    <table id="tableData" class="display" width="100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.wholeSale').on('change', function (e) {
+            var wholeSale = $(this).val();
+           var amountSale = $(this).closest('.row').find('.amountSale').val();
+            if (wholeSale > amountSale) {
+                $('#warningModal').modal('show');
+
+                $('#myModalWarningResult').text('Amount Sales ต้องมากกว่า Whole Sales');
+                $(this).val('');
+            }
+        });
+
+
+
+    });
+
+
+
+</script>
