@@ -44,6 +44,7 @@
 
                 <label> Week</label>
                 <select id="ddlWeek" class="form-control col-sm-12 ">
+                    <option value="">All</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -55,6 +56,7 @@
             <div class="col-sm-3">
                 <label>Month</label>
                 <select id="ddlMonth" class="form-control col-sm-12 ">
+                    <option value="">All</option>
                     <option value="01">January</option>
                     <option value="02">February</option>
                     <option value="03">March</option>
@@ -79,7 +81,7 @@
                         Model.yearList.Select(x => new { Value = x, Text = x }),
                         "Value",
                         "Text"
-                    ), new { id = "yearList", @class = "form-control col-sm-12" }
+                    ), "All", new { id = "yearList", @class = "form-control col-sm-12" }
                 )
             </div>
             <div class="col-sm-3">
@@ -98,7 +100,7 @@
 
                     });
 
-                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "Please select", new { id = "iduniverseList", @class = "form-control " })
+                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
 
                 }
 
@@ -108,7 +110,7 @@
         <div class="row col-sm-12" style="padding-top: 15px;padding-bottom:15px;">
             <div class="col-sm-3">
                 <label>Status</label>
-                @Html.DropDownList("statusList", new SelectList(Model.statusList, "statusID", "statusName"), "Please select", new { id = "statusList", @class = "form-control col-sm-12" })
+                @Html.DropDownList("statusList", new SelectList(Model.statusList, "statusID", "statusName"), "All", new { id = "statusList", @class = "form-control col-sm-12" })
 
 
             </div>
@@ -161,7 +163,7 @@
             $button.button();
 
         });
-   
+
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
@@ -196,9 +198,12 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                    }
+                        if (row.statusID!='D66D23BB-DF1F-490F-A740-64CC357D6DE4' ){
+                            return '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        }else{
+                            return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                        }
+                      }
                 }
 
 
@@ -279,7 +284,7 @@
                    var model = @Html.Raw(Json.Serialize(Model));
 
 
-             
+
 
              var frmdata = {
                  year: $("#yearList").val(),
@@ -295,12 +300,17 @@
 
             $.ajax({
                  type: "POST",
-                 url: '@Url.Action("KeyinByStore_Edit", "KeyIn")',
+                 url: '@Url.Action("CreateBAKeyInDetail", "KeyIn")',
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
-
+                    console.log(data)
+                    if (data.isSuccess) {
+                        //baKeyInID Brand_Edit_View?brandID=
+                        var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
+                        window.location.href = url.replace('_id_', data.baKeyInID);
+                    }
                 },
                 error: function () {
                 }
