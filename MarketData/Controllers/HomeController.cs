@@ -43,6 +43,16 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyIn()
         {
+            //var role = HttpContext.Session.GetString("role");
+
+            //if(role == "BA")
+            //{
+            //    return RedirectToAction("KeyinByStore", "KeyIn");
+            //}
+            //else
+            //{
+
+            //}
             return View();
         }
         public IActionResult Login()
@@ -66,6 +76,7 @@ namespace MarketData.Controllers
                 if(userData != null)
                 {
                     HttpContext.Session.SetString("userID", userData.userID.ToString());
+                    HttpContext.Session.SetString("role", userData.role);
                     return View("Index");
                 }
                 else

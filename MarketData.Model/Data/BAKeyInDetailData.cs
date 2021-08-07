@@ -13,7 +13,7 @@ namespace MarketData.Model.Data
         public Guid channelID { get; set; }
         public Guid brandID { get; set; }
         public string brandName { get; set; }
-        public string yaer { get; set; }
+        public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }
         public int? rank { get; set; }

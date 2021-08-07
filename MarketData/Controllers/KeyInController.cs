@@ -131,11 +131,11 @@ namespace MarketData.Controllers
                 status = response.status,
                 week = response.week,
                 departmentStore = response.departmentStore,
-                BAKeyInDetailList = response.data.Select(c=> new BAKeyInDetailData
+                BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
                 {
                     ID = c.ID,
                     keyInID = c.keyInID,
-                    fg= c.fg,
+                    fg = c.fg,
                     amountSale = c.amountSale,
                     amountSalePreviousYear = c.amountSalePreviousYear,
                     brandID = c.brandID,
@@ -151,7 +151,7 @@ namespace MarketData.Controllers
                     sk = c.sk,
                     week = c.week,
                     wholeSale = c.wholeSale,
-                    yaer = c.yaer
+                    year = c.year
                 }).ToList()
             };
 

@@ -27,6 +27,7 @@ namespace MarketData.Processes.Processes
                 if (userData != null)
                 {
                     response.userID = userData.ID;
+                    response.role = request.userName.ToLower().Contains("admin") ? "Admin" : "BA";
                 }
 
             }

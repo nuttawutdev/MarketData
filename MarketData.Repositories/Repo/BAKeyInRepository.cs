@@ -214,7 +214,7 @@ namespace MarketData.Repositories.Repo
                          remark = e.Remark,
                          week = e.Week,
                          wholeSale = e.Whole_Sales,
-                         yaer = e.Year,
+                         year = e.Year,
                      }).ToList();
 
                 return baKeyInDetailDataList;
