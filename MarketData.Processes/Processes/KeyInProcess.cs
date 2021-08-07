@@ -232,9 +232,20 @@ namespace MarketData.Processes.Processes
 
                                 if(request.week != "4")
                                 {
-                                    // Filter Brand Type Fragrances
-                                    newCounter = newCounter.Where(
-                                        e => repository.masterData.FindBrandTypeBy(t => t.Brand_Type_ID == repository.masterData.FindBrandBy(c => c.Brand_ID == e.Brand_ID).Brand_Type_ID)?.Brand_Type_Name != "Fragrances").ToList();
+                                    List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
+
+                                    foreach (var itemCounter in newCounter)
+                                    {
+                                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
+                                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                                        {
+                                            listCounterFilterFragrances.Add(itemCounter);
+                                        }
+                                    }
+
+                                    newCounter = listCounterFilterFragrances;
                                 }
 
                                 List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
@@ -285,17 +296,31 @@ namespace MarketData.Processes.Processes
                         && e.Department_Store_ID == BAKeyInData.DepartmentStore_ID
                         && e.Active_Flag && e.Delete_Flag != true);
 
+
                 // New Counter
                 if (counterList.Count > BAKeyInDetailList.Count)
                 {
                     var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
                     var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
 
+                    
                     if (BAKeyInData.Week != "4")
                     {
                         // Filter Brand Type Fragrances
-                        newCounter = newCounter.Where(
-                            e => repository.masterData.FindBrandTypeBy(t => t.Brand_Type_ID == repository.masterData.FindBrandBy(c => c.Brand_ID == e.Brand_ID).Brand_Type_ID)?.Brand_Type_Name != "Fragrances").ToList();
+                        List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
+
+                        foreach(var itemCounter in newCounter)
+                        {
+                            var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
+                            var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                            if(brandTypeData?.Brand_Type_Name != "Fragrances")
+                            {
+                                listCounterFilterFragrances.Add(itemCounter);
+                            }
+                        }
+
+                        newCounter = listCounterFilterFragrances;
                     }
 
 
@@ -481,8 +506,20 @@ namespace MarketData.Processes.Processes
                 if(request.week != "4")
                 {
                     // Filter Brand Type Fragrances
-                    counterList = counterList.Where(
-                        e => repository.masterData.FindBrandTypeBy(t => t.Brand_Type_ID == repository.masterData.FindBrandBy(c => c.Brand_ID == e.Brand_ID).Brand_Type_ID)?.Brand_Type_Name != "Fragrances").ToList();
+                    List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
+
+                    foreach (var itemCounter in counterList)
+                    {
+                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
+                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                        {
+                            listCounterFilterFragrances.Add(itemCounter);
+                        }
+                    }
+
+                    counterList = listCounterFilterFragrances;
                 }
 
                 List<TTBAKeyInDetail> listBAKeyInDetail = counterList.Select(c => new TTBAKeyInDetail
