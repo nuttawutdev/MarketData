@@ -43,17 +43,17 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyIn()
         {
-            //var role = HttpContext.Session.GetString("role");
+            var role = HttpContext.Session.GetString("role");
 
-            //if(role == "BA")
-            //{
-            //    return RedirectToAction("KeyinByStore", "KeyIn");
-            //}
-            //else
-            //{
-
-            //}
-            return View();
+            if (role == "BA")
+            {
+                return RedirectToAction("KeyinByStore", "KeyIn");
+            }
+            else
+            {
+                return RedirectToAction("KeyinByBrand", "KeyIn");
+            }
+            
         }
         public IActionResult Login()
         {
