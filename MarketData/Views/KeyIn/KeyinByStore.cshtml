@@ -178,9 +178,9 @@
                     className: "text-center",
                     render: function (data, type, row) {
                         if (row.statusID!='D66D23BB-DF1F-490F-A740-64CC357D6DE4' ){
-                            return '<a href="KeyinByStore_Edit?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                            return '<a href="KeyinByStore_Edit?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                         }else{
-                            return '<a href="KeyinByStore_View?keyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                            return '<a href="KeyinByStore_View?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
                         }
                       }
                 }
