@@ -103,13 +103,31 @@ namespace MarketData.Controllers
             }
         }
 
+      
+        public ActionResult KeyinByStore_Edit(Guid baKeyInID)
+        {
+            var viewData = GetBAKeyInDetail(baKeyInID);
+            return View(viewData);
+        }
         [HttpPost]
-        public IActionResult KeyinByStore_Edit([FromBody] CreateBAKeyInRequest request) 
-        { 
-            return View();
+        public IActionResult CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
+        {
+            var viewData = process.keyIn.CreateBAKeyInDetail(request);
+            return Json(viewData);
         }
 
         #region BA KeyIn Function
+        public BAKeyInListViewModel GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
+        {
+    
+
+            var response = process.keyIn.GetBAKeyInDetail(baKeyInID);
+            BAKeyInListViewModel data = new BAKeyInListViewModel();
+         
+
+            return data;
+
+        }
 
         [HttpPost]
         public IActionResult GetBAKeyInList()
