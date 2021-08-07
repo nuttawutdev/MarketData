@@ -10,6 +10,5 @@ namespace MarketData.Model.Request.KeyIn
         public Guid BAKeyInID { get; set; }
         public List<BAKeyInDetailData> BAKeyInDetailList { get; set; }
         public Guid userID { get; set; }
-        public string remark { get; set; }
     }
 }

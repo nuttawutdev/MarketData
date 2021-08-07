@@ -103,7 +103,7 @@ namespace MarketData.Controllers
             }
         }
 
-      
+
         public ActionResult KeyinByStore_Edit(Guid baKeyInID)
         {
             var viewData = GetBAKeyInDetail(baKeyInID);
@@ -117,13 +117,44 @@ namespace MarketData.Controllers
         }
 
         #region BA KeyIn Function
-        public BAKeyInListViewModel GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
+        public BAKeyInDetailViewModel GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
-    
 
             var response = process.keyIn.GetBAKeyInDetail(baKeyInID);
-            BAKeyInListViewModel data = new BAKeyInListViewModel();
-         
+            BAKeyInDetailViewModel data = new BAKeyInDetailViewModel
+            {
+                BAKeyInID = baKeyInID,
+                brand = response.brand,
+                channel = response.channel,
+                month = response.month,
+                year = response.year,
+                status = response.status,
+                week = response.week,
+                departmentStore = response.departmentStore,
+                BAKeyInDetailList = response.data.Select(c=> new BAKeyInDetailData
+                {
+                    ID = c.ID,
+                    keyInID = c.keyInID,
+                    fg= c.fg,
+                    amountSale = c.amountSale,
+                    amountSalePreviousYear = c.amountSalePreviousYear,
+                    brandID = c.brandID,
+                    brandName = c.brandName,
+                    channelID = c.channelID,
+                    counterID = c.counterID,
+                    departmentStoreID = c.departmentStoreID,
+                    month = c.month,
+                    mu = c.mu,
+                    ot = c.ot,
+                    rank = c.rank,
+                    remark = c.remark,
+                    sk = c.sk,
+                    week = c.week,
+                    wholeSale = c.wholeSale,
+                    yaer = c.yaer
+                }).ToList()
+            };
+
 
             return data;
 
