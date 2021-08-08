@@ -26,6 +26,16 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyinByBrand()
         {
+            GetAdminKeyInRequest request = new GetAdminKeyInRequest
+            {
+                brandID = new Guid("36680587-1ABE-474C-878B-9EA94E02BA0B"),
+                year = "2021",
+                month = "08",
+                week = "1",
+                universe = "LPD"
+            };
+
+            var result = process.keyIn.GetAdminKeyInData(request);
             return View();
         }
 

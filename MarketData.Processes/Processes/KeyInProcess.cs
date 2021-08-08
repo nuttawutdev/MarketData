@@ -506,6 +506,7 @@ namespace MarketData.Processes.Processes
                     && (!request.distributionChannelID.HasValue || (request.distributionChannelID.HasValue && request.distributionChannelID == c.distributionChannelID))
                     && (!request.brandID.HasValue || (request.brandID.HasValue && request.brandID == c.brandID)));
 
+                List<AdminKeyInDetailData> adminKeyInDetailList = new List<AdminKeyInDetailData>();
 
                 foreach (var itemCounter in counterByFilter)
                 {
@@ -518,33 +519,45 @@ namespace MarketData.Processes.Processes
                         && c.Month == request.month
                         && c.Week == request.week);
 
-                    if (adminKeyInData == null)
-                    {
-                        TTAdminKeyInDetail adminKeyInDetail = new TTAdminKeyInDetail
-                        {
-                            ID = Guid.NewGuid(),
-                            RetailerGroup_ID = itemCounter.retailerGroupID,
-                            DepartmentStore_ID = itemCounter.departmentStoreID,
-                            DistributionChannel_ID = itemCounter.distributionChannelID,
-                            Brand_ID = itemCounter.brandID,
-                            Year = request.year,
-                            Month = request.month,
-                            Week = request.week,
-                            Created_By = request.userID,
-                            Created_Date = DateTime.Now,
-                        };
+                    string previousYear = (int.Parse(request.year) - 1).ToString();
 
-                        repository.adminKeyIn.CreateAdminKeyInDetail(adminKeyInDetail);
-                    }
+                    var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
+                       c => c.DepartmentStore_ID == itemCounter.departmentStoreID
+                       && c.DistributionChannel_ID == itemCounter.distributionChannelID
+                       && c.Brand_ID == itemCounter.brandID
+                       && c.Year == previousYear
+                       && c.Month == request.month
+                       && c.Week == "4").FirstOrDefault();
+
                     AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
                     {
                         ID = adminKeyInData != null ? adminKeyInData.ID : Guid.NewGuid(),
+                        retailerGroupID = itemCounter.retailerGroupID,
+                        departmentStoreID = itemCounter.departmentStoreID,
+                        distributionChannelID = itemCounter.distributionChannelID,
+                        brandID = itemCounter.brandID,
+                        year = request.year,
+                        month = request.month,
+                        week = request.week,
+                        counterID = itemCounter.counterID,
+                        amountSale = adminKeyInData != null ? adminKeyInData.Amount_Sales : null,
+                        wholeSale = adminKeyInData != null ? adminKeyInData.Whole_Sales : null,
+                        fg = adminKeyInData != null ? adminKeyInData.FG : null,
+                        mu = adminKeyInData != null ? adminKeyInData.MU : null,
+                        ot = adminKeyInData != null ? adminKeyInData.OT : null,
+                        sk = adminKeyInData != null ? adminKeyInData.SK : null,
+                        rank = adminKeyInData != null ? adminKeyInData.Rank : null,
+                        remark = adminKeyInData != null ? adminKeyInData.Remark : null,
+                        universe = request.universe,
+                        amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.amountSale : null
                     };
+
+                    adminKeyInDetailList.Add(dataDetail);
                 }
             }
             catch (Exception ex)
             {
-
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;
