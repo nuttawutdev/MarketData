@@ -27,16 +27,6 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyinByBrand()
         {
-            GetAdminKeyInRequest request = new GetAdminKeyInRequest
-            {
-                brandID = new Guid("36680587-1ABE-474C-878B-9EA94E02BA0B"),
-                year = "2021",
-                month = "08",
-                week = "1",
-                universe = "LPD"
-            };
-
-            var result = process.keyIn.GetAdminKeyInData(request);
             return View();
         }
 
@@ -220,13 +210,13 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
+        public async Task<IActionResult> SaveBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response;
 
             if (ModelState.IsValid)
             {
-                response = process.keyIn.SaveBAKeyInDetail(request);
+                response = await process.keyIn.SaveBAKeyInDetail(request);
                 return Json(response);
             }
             else
