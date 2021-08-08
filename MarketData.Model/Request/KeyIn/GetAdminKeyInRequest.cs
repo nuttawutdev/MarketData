@@ -14,5 +14,6 @@ namespace MarketData.Model.Request.KeyIn
         public Guid? brandID { get; set; }
         public Guid? distributionChannelID { get; set; }
         public string universe { get; set; }
+        public Guid userID { get; set; }
     }
 }

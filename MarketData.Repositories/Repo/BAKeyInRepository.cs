@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MarketData.Repositories.Repo
 {
     public class BAKeyInRepository
     {
         private readonly MarketDataDBContext _dbContext;
+      
         public BAKeyInRepository(MarketDataDBContext dbContext)
         {
             _dbContext = dbContext;
@@ -162,7 +164,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool CreateBAKeyInDetail(List<TTBAKeyInDetail> listBAKeyInDetail)
+        public async Task<bool> CreateBAKeyInDetail(List<TTBAKeyInDetail> listBAKeyInDetail)
         {
             try
             {
@@ -236,7 +238,8 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
-        public bool UpdateBAKeyIn(SaveBAKeyInDetailRequest request, Guid status, bool isSubmit = false)
+
+        public async Task<bool> UpdateBAKeyIn(SaveBAKeyInDetailRequest request, Guid status, bool isSubmit = false)
         {
             try
             {
@@ -291,7 +294,7 @@ namespace MarketData.Repositories.Repo
                 }
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
@@ -299,12 +302,12 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public bool UpdateBAKeyInDetail(List<TTBAKeyInDetail> listDetail)
+        public async Task<bool> UpdateBAKeyInDetail(List<TTBAKeyInDetail> listDetail)
         {
             try
             {
                 _dbContext.TTBAKeyInDetail.UpdateRange(listDetail);
-                return _dbContext.SaveChanges() > 0;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

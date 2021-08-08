@@ -1000,6 +1000,7 @@ namespace MarketData.Repositories.Repo
                        departmentStoreID = department != null ? department.Department_Store_ID : Guid.Empty,
                        departmentStoreName = department != null ? department.Department_Store_Name : string.Empty,
                        brandID = brand != null ? brand.Brand_ID : Guid.Empty,
+                       retailerGroupID = retailer.Retailer_Group_ID,
                        retailerGroupName = retailer.Retailer_Group_Name,
                        brandName = brand != null ? brand.Brand_Name : string.Empty,
                        distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,

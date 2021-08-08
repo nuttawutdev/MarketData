@@ -13,11 +13,11 @@ namespace MarketData.Model.Entiry
         public Guid DistributionChannel_ID { get; set; }
         public Guid RetailerGroup_ID { get; set; }
         public Guid DepartmentStore_ID { get; set; }
-        public char Brand_ID { get; set; }
+        public Guid Brand_ID { get; set; }
         public string Universe { get; set; }
-        public int Year { get; set; }
-        public int Month { get; set; }
-        public int Week { get; set; }
+        public string Year { get; set; }
+        public string Month { get; set; }
+        public string Week { get; set; }
         public int? Rank { get; set; }
         public decimal? Amount_Sales { get; set; }
         public decimal? Whole_Sales { get; set; }
