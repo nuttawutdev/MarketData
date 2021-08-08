@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MarketData.Models;
 using Microsoft.AspNetCore.Http;
 using MarketData.Model.Request.KeyIn;
+using MarketData.Model.Response;
 
 namespace MarketData.Controllers
 {
@@ -217,6 +218,28 @@ namespace MarketData.Controllers
 
             return Json(dataModel);
         }
+
+        [HttpPost]
+        public IActionResult SaveBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = process.keyIn.SaveBAKeyInDetail(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false,
+                    responseError = "Please input required field."
+                };
+                return Json(response);
+            }
+        }
+
 
         #endregion
 
