@@ -133,7 +133,7 @@
     </div>
     <div class="modal-footer">
         <button id="btnSave" class="btn btn-danger " type="button">Save</button>
-        <button id="btnSave" class="btn btn-warning text-white" type="button">Submit</button>
+        <button id="btnSubmit" class="btn btn-warning text-white" type="button">Submit</button>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
@@ -144,63 +144,23 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        $('.wholeSale').on('change', function (e) {
-            var wholeSale = $(this).val();
-            var amountSale = $(this).closest('.row').find('.amountSale').val();
-            if (wholeSale > amountSale) {
-                $('#warningModal').modal('show');
+        //$('.wholeSale').on('change', function (e) {
+        //    var wholeSale = $(this).val();
+        //    var amountSale = $(this).closest('.row').find('.amountSale').val();
+        //    if (wholeSale > amountSale) {
+        //        $('#warningModal').modal('show');
 
-                $('#myModalWarningResult').text('Amount Sales ต้องมากกว่า Whole Sales');
-                $(this).val('');
-            }
-        });
+        //        $('#myModalWarningResult').text('Amount Sales ต้องมากกว่า Whole Sales');
+        //        $(this).val('');
+        //    }
+        //});
 
         $('#btnSave').on('click', function (e) {
             $("#blocker").show();
              var model = @Html.Raw(Json.Serialize(Model));
 
-            var frmdata  = {};
-            var memberDetails = new Array();
-            var bAKeyInID = '';
-            $("#tblDetails TBODY TR").each(function () {
-                var row = $(this);
-                var memberDetail = {};
-                var rank = row.find("TD").find(".rank").val();
-                var amountSale = row.find("TD").find(".amountSale").val();
-                var wholeSale = row.find("TD").find(".wholeSale").val();
-                var sk = row.find("TD").find(".sk").val();
-                var mu = row.find("TD").find(".mu").val();
-                var fg = row.find("TD").find(".fg").val();
-                var ot = row.find("TD").find(".ot").val();
-
-                bAKeyInID = row.find("TD").eq(1).html()
-                memberDetail.ID = row.find("TD").eq(0).html();
-                memberDetail.keyInID = row.find("TD").eq(1).html();
-                memberDetail.counterID = row.find("TD").eq(2).html();
-                memberDetail.departmentStoreID = row.find("TD").eq(3).html();
-                memberDetail.channelID = row.find("TD").eq(4).html();
-                memberDetail.year = row.find("TD").eq(5).html();
-                memberDetail.month = row.find("TD").eq(6).html();
-                memberDetail.week = row.find("TD").eq(7).html();
-                memberDetail.brandID = row.find("TD").eq(8).html();
-                memberDetail.brandName = row.find("TD").eq(9).html();
-                memberDetail.amountSalePreviousYear = row.find("TD").eq(10).html();
-                memberDetail.rank = rank ? parseInt(rank) : null;
-                memberDetail.amountSale = amountSale ? parseFloat(amountSale) : null;
-                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : null;
-                memberDetail.sk = sk ? parseFloat(sk) : null;
-                memberDetail.mu = mu ? parseFloat(mu) : null;
-                memberDetail.fg = fg ? parseFloat(fg) : null;
-                memberDetail.ot = ot ? parseFloat(ot) : null;
-                memberDetail.remark = row.find("TD").find(".remark").val();
-                memberDetails.push(memberDetail);
-            });
-
-            frmdata.BAKeyInDetailList = memberDetails;
-            frmdata.BAKeyInID = bAKeyInID;
-            frmdata.userID = bAKeyInID;
-
-    
+            var frmdata = getDataFromTable();
+          
             $.ajax({
                  type: "POST",
                  url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
@@ -229,6 +189,191 @@
             });
 
         });
+
+        $('#btnSubmit').on('click', function (e) {
+            //$("#blocker").show();
+
+               var frmdata = getDataFromTable('Submit');
+            console.log(frmdata)
+            if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
+                   console.log('validate_NullAmount');
+               } else {
+                   console.log('else validate_NullAmount');
+               }
+            @*$.ajax({
+                 type: "POST",
+                 url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                    success: function (data) {
+                    $("#blocker").hide();
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "KeyinByStore");
+                        $('#successModal').modal('show');
+                    } else if (data.isDuplicated) {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Duplicate data!');
+                    } else {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text(data.responseError != ""
+                            && data.responseError != null ? data.responseError : 'Save data failed');
+                     }
+                    $('#confirmID').val('');
+                    $('#myModalFailedResult').val('');
+                },
+                error: function () {
+                    $("#blocker").hide();
+                }
+            });*@
+
+           });
+
+        function getDataFromTable(type){
+            var model = @Html.Raw(Json.Serialize(Model));
+
+            var frmdata  = {};
+            var memberDetails = new Array();
+            var bAKeyInID = '';
+            $("#tblDetails TBODY TR").each(function () {
+                var row = $(this);
+                var memberDetail = {};
+                var rank = row.find("TD").find(".rank").val();
+                var amountSale = row.find("TD").find(".amountSale").val();
+                var wholeSale = row.find("TD").find(".wholeSale").val();
+                var sk = row.find("TD").find(".sk").val();
+                var mu = row.find("TD").find(".mu").val();
+                var fg = row.find("TD").find(".fg").val();
+                var ot = row.find("TD").find(".ot").val();
+                var amountSalePreviousYear = row.find("TD").eq(10).html();
+                bAKeyInID = row.find("TD").eq(1).html()
+                memberDetail.ID = row.find("TD").eq(0).html();
+                memberDetail.keyInID = row.find("TD").eq(1).html();
+                memberDetail.counterID = row.find("TD").eq(2).html();
+                memberDetail.departmentStoreID = row.find("TD").eq(3).html();
+                memberDetail.channelID = row.find("TD").eq(4).html();
+                memberDetail.year = row.find("TD").eq(5).html();
+                memberDetail.month = row.find("TD").eq(6).html();
+                memberDetail.week = row.find("TD").eq(7).html();
+                memberDetail.brandID = row.find("TD").eq(8).html();
+                memberDetail.brandName = row.find("TD").eq(9).html();
+                memberDetail.amountSalePreviousYear = amountSalePreviousYear ? parseFloat(amountSalePreviousYear) : null;
+                memberDetail.rank = rank ? parseInt(rank) : null;
+                memberDetail.amountSale = amountSale ? parseFloat(amountSale) : null;
+                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : type == 'Submit' ? 0 : null;
+                memberDetail.sk = sk ? parseFloat(sk) : null;
+                memberDetail.mu = mu ? parseFloat(mu) : null;
+                memberDetail.fg = fg ? parseFloat(fg) : null;
+                memberDetail.ot = ot ? parseFloat(ot) : null;
+                memberDetail.remark = row.find("TD").find(".remark").val();
+                memberDetails.push(memberDetail);
+            });
+
+            frmdata.BAKeyInDetailList = memberDetails;
+            frmdata.BAKeyInID = bAKeyInID;
+            frmdata.userID = bAKeyInID;
+            return frmdata;
+        };
+
+        function validate_AmountSale_Rank(data) {
+            var isNullAmount = data.BAKeyInDetailList.some(function (i) {
+                return (i.amountSale == null && i.rank != null) ||
+                  (i.amountSale != null && i.rank == null) ||
+                  (i.amountSale == null && i.rank == null && i.remark == '');
+          })
+            if (isNullAmount) {
+                showWarningAlert('NullAmount');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var sk = i.sk != null ? parseFloat(i.ot) : 0;
+                var mu = i.mu != null ? parseFloat(i.mu) : 0;
+                var fg = i.fg != null ? parseFloat(i.fg) : 0;
+                var ot = i.ot != null ? parseFloat(i.ot) : 0;
+                
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var sk = i.sk != null && i.sk != '' ? parseFloat(i.sk) : 0;
+                var mu = i.mu != null && i.mu != '' ? parseFloat(i.mu) : 0;
+                var fg = i.fg != null && i.fg != '' ? parseFloat(i.fg) : 0;
+                var ot = i.ot != null && i.ot != '' ? parseFloat(i.ot) : 0;
+
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                return i.week == 4 && i.wholeSale == null
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales_AmountSales(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
+                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
+                return amountSale < wholeSale;
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales_AmountSales');
+                return 0;
+            } else return 1;
+        }
+
+
+        function showWarningAlert(typeWarning) {
+            var msg = '';
+            switch (typeWarning) {
+                case 'NullAmount':
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    break;
+                case '100Percent':
+                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100% เท่านั้น';
+                    break;
+                case 'NullWholeSales':
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    break;
+                case 'NullWholeSales_AmountSales':
+                    msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
+                    break;
+                default:
+            }
+
+
+            $('#warningModal').modal('show');
+
+            $('#myModalWarningResult').text(msg);
+
+
+        }
+
 
     });
 
