@@ -105,23 +105,23 @@ namespace MarketData.Controllers
         }
 
 
-        public ActionResult KeyinByStore_Edit(Guid baKeyInID)
+        public async Task<IActionResult> KeyinByStore_Edit(Guid baKeyInID)
         {
-            var viewData = GetBAKeyInDetail(baKeyInID);
+            var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
         [HttpPost]
-        public IActionResult CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
+        public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
         {
-            var viewData = process.keyIn.CreateBAKeyInDetail(request);
+            var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
         }
 
         #region BA KeyIn Function
-        public BAKeyInDetailViewModel GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
+        public async Task<BAKeyInDetailViewModel> GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
 
-            var response = process.keyIn.GetBAKeyInDetail(baKeyInID);
+            var response = await process.keyIn.GetBAKeyInDetail(baKeyInID);
             BAKeyInDetailViewModel data = new BAKeyInDetailViewModel
             {
                 BAKeyInID = baKeyInID,

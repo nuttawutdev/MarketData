@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using static MarketData.Helper.Utility;
 
 namespace MarketData.Processes.Processes
@@ -154,7 +155,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public CreateBAKeyInDetailResponse CreateBAKeyInDetail(CreateBAKeyInRequest request)
+        public async Task<CreateBAKeyInDetailResponse> CreateBAKeyInDetail(CreateBAKeyInRequest request)
         {
             DateTime dateNow = DateTime.Now;
             CreateBAKeyInDetailResponse response = new CreateBAKeyInDetailResponse();
@@ -177,7 +178,7 @@ namespace MarketData.Processes.Processes
 
                     if (createBAKeyInResponse != null)
                     {
-                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = CreateBAKeyInDetail(request, createBAKeyInResponse.ID);
+                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, createBAKeyInResponse.ID);
 
                         if (createDetailResult)
                         {
@@ -200,7 +201,7 @@ namespace MarketData.Processes.Processes
 
                     if (!BAKeyInDetailList.Any())
                     {
-                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = CreateBAKeyInDetail(request, baKeyInData.ID);
+                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, baKeyInData.ID);
 
                         if (createDetailResult)
                         {
@@ -230,7 +231,7 @@ namespace MarketData.Processes.Processes
                                 var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
                                 var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
 
-                                if(request.week != "4")
+                                if (request.week != "4")
                                 {
                                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
@@ -270,7 +271,7 @@ namespace MarketData.Processes.Processes
                         {
                             response.baKeyInID = baKeyInData.ID;
                             response.isSuccess = true;
-                        }                     
+                        }
                     }
                 }
             }
@@ -282,7 +283,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public BAKeyInDetailResponse GetBAKeyInDetail(Guid baKeyInID)
+        public async Task<BAKeyInDetailResponse> GetBAKeyInDetail(Guid baKeyInID)
         {
             BAKeyInDetailResponse response = new BAKeyInDetailResponse();
 
@@ -303,18 +304,18 @@ namespace MarketData.Processes.Processes
                     var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
                     var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
 
-                    
+
                     if (BAKeyInData.Week != "4")
                     {
                         // Filter Brand Type Fragrances
                         List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
-                        foreach(var itemCounter in newCounter)
+                        foreach (var itemCounter in newCounter)
                         {
                             var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
                             var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if(brandTypeData?.Brand_Type_Name != "Fragrances")
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }
@@ -339,7 +340,7 @@ namespace MarketData.Processes.Processes
                         Counter_ID = c.Counter_ID
                     }).ToList();
 
-                    repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
+                    await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
                     BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == BAKeyInData.ID);
                 }
 
@@ -383,7 +384,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SaveBAKeyInDetail(SaveBAKeyInDetailRequest request)
+        public async Task<SaveDataResponse> SaveBAKeyInDetail(SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
             DateTime dateNoew = DateTime.Now;
@@ -391,7 +392,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var inprogressStatus = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "In-Progress");
-                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, inprogressStatus.ID);
+                var updateBAKeyIn = await repository.baKeyIn.UpdateBAKeyIn(request, inprogressStatus.ID);
 
                 if (updateBAKeyIn)
                 {
@@ -399,7 +400,7 @@ namespace MarketData.Processes.Processes
 
                     var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
 
-                    foreach(var itemDetail in baKeyInDetailData)
+                    foreach (var itemDetail in baKeyInDetailData)
                     {
                         var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
                         itemDetail.Rank = baKeyInDetailUpdate.rank;
@@ -414,7 +415,7 @@ namespace MarketData.Processes.Processes
                         itemDetail.Updated_Date = dateNoew;
                     }
 
-                    var updateDetailResult = repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
+                    var updateDetailResult = await repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
 
                     if (updateDetailResult)
                     {
@@ -438,7 +439,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public SaveDataResponse SubmitBAKeyInDetail(SaveBAKeyInDetailRequest request)
+        public async Task<SaveDataResponse> SubmitBAKeyInDetail(SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
             DateTime dateNoew = DateTime.Now;
@@ -446,7 +447,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var submitStatus = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "Submit");
-                var updateBAKeyIn = repository.baKeyIn.UpdateBAKeyIn(request, submitStatus.ID,true);
+                var updateBAKeyIn = await repository.baKeyIn.UpdateBAKeyIn(request, submitStatus.ID, true);
 
                 if (updateBAKeyIn)
                 {
@@ -468,7 +469,7 @@ namespace MarketData.Processes.Processes
                         itemDetail.Updated_Date = dateNoew;
                     }
 
-                    var updateDetailResult = repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
+                    var updateDetailResult = await repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
 
                     if (updateDetailResult)
                     {
@@ -492,7 +493,64 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        private (bool, List<TTBAKeyInDetail>) CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
+        public GetAdminKeyInResponse GetAdminKeyInData(GetAdminKeyInRequest request)
+        {
+            GetAdminKeyInResponse response = new GetAdminKeyInResponse();
+
+            try
+            {
+                var counterList = repository.masterData.GetCounterList();
+                var counterByFilter = counterList.Where(
+                    c => (!request.departmentStoreID.HasValue || (request.departmentStoreID.HasValue && request.departmentStoreID == c.departmentStoreID))
+                    && (!request.retailerGroupID.HasValue || (request.retailerGroupID.HasValue && request.retailerGroupID == c.retailerGroupID))
+                    && (!request.distributionChannelID.HasValue || (request.distributionChannelID.HasValue && request.distributionChannelID == c.distributionChannelID))
+                    && (!request.brandID.HasValue || (request.brandID.HasValue && request.brandID == c.brandID)));
+
+
+                foreach (var itemCounter in counterByFilter)
+                {
+                    var adminKeyInData = repository.adminKeyIn.FindAdminKeyInDetailBy(
+                        c => c.RetailerGroup_ID == itemCounter.retailerGroupID
+                        && c.DepartmentStore_ID == itemCounter.departmentStoreID
+                        && c.DistributionChannel_ID == itemCounter.distributionChannelID
+                        && c.Brand_ID == itemCounter.brandID
+                        && c.Year == request.year
+                        && c.Month == request.month
+                        && c.Week == request.week);
+
+                    if (adminKeyInData == null)
+                    {
+                        TTAdminKeyInDetail adminKeyInDetail = new TTAdminKeyInDetail
+                        {
+                            ID = Guid.NewGuid(),
+                            RetailerGroup_ID = itemCounter.retailerGroupID,
+                            DepartmentStore_ID = itemCounter.departmentStoreID,
+                            DistributionChannel_ID = itemCounter.distributionChannelID,
+                            Brand_ID = itemCounter.brandID,
+                            Year = request.year,
+                            Month = request.month,
+                            Week = request.week,
+                            Created_By = request.userID,
+                            Created_Date = DateTime.Now,
+                        };
+
+                        repository.adminKeyIn.CreateAdminKeyInDetail(adminKeyInDetail);
+                    }
+                    AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
+                    {
+                        ID = adminKeyInData != null ? adminKeyInData.ID : Guid.NewGuid(),
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return response;
+        }
+
+        private async Task<(bool, List<TTBAKeyInDetail>)> CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
             DateTime dateNow = DateTime.Now;
 
@@ -503,7 +561,7 @@ namespace MarketData.Processes.Processes
                          && e.Department_Store_ID == request.departmentStoreID
                          && e.Active_Flag && e.Delete_Flag != true);
 
-                if(request.week != "4")
+                if (request.week != "4")
                 {
                     // Filter Brand Type Fragrances
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
@@ -537,7 +595,7 @@ namespace MarketData.Processes.Processes
                     Counter_ID = c.Counter_ID
                 }).ToList();
 
-                var createBAKeyInDetailResponse = repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
+                var createBAKeyInDetailResponse = await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
                 return (createBAKeyInDetailResponse, listBAKeyInDetail);
             }
             catch (Exception ex)
