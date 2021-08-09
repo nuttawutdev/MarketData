@@ -531,11 +531,13 @@ namespace MarketData.Processes.Processes
 
                     AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
                     {
-                        ID = adminKeyInData != null ? adminKeyInData.ID : Guid.NewGuid(),
+                        ID = adminKeyInData != null ? adminKeyInData.ID : Guid.Empty,
                         retailerGroupID = itemCounter.retailerGroupID,
                         departmentStoreID = itemCounter.departmentStoreID,
+                        departmentStoreName = itemCounter.departmentStoreName,
                         distributionChannelID = itemCounter.distributionChannelID,
                         brandID = itemCounter.brandID,
+                        brandName = itemCounter.brandName,
                         year = request.year,
                         month = request.month,
                         week = request.week,
@@ -617,5 +619,6 @@ namespace MarketData.Processes.Processes
             }
         }
 
+    
     }
 }

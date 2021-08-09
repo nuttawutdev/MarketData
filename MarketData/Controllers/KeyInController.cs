@@ -104,12 +104,12 @@ namespace MarketData.Controllers
             }
         }
 
-
         public async Task<IActionResult> KeyinByStore_Edit(Guid baKeyInID)
         {
             var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
         {
@@ -120,44 +120,50 @@ namespace MarketData.Controllers
         #region BA KeyIn Function
         public async Task<BAKeyInDetailViewModel> GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
-
-            var response = await process.keyIn.GetBAKeyInDetail(baKeyInID);
-            BAKeyInDetailViewModel data = new BAKeyInDetailViewModel
+            try
             {
-                BAKeyInID = baKeyInID,
-                brand = response.brand,
-                channel = response.channel,
-                month = response.month,
-                year = response.year,
-                status = response.status,
-                week = response.week,
-                departmentStore = response.departmentStore,
-                BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
+                var response = await process.keyIn.GetBAKeyInDetail(baKeyInID);
+                BAKeyInDetailViewModel data = new BAKeyInDetailViewModel
                 {
-                    ID = c.ID,
-                    keyInID = c.keyInID,
-                    fg = c.fg,
-                    amountSale = c.amountSale,
-                    amountSalePreviousYear = c.amountSalePreviousYear,
-                    brandID = c.brandID,
-                    brandName = c.brandName,
-                    channelID = c.channelID,
-                    counterID = c.counterID,
-                    departmentStoreID = c.departmentStoreID,
-                    month = c.month,
-                    mu = c.mu,
-                    ot = c.ot,
-                    rank = c.rank,
-                    remark = c.remark,
-                    sk = c.sk,
-                    week = c.week,
-                    wholeSale = c.wholeSale,
-                    year = c.year
-                }).ToList()
-            };
+                    BAKeyInID = baKeyInID,
+                    brand = response.brand,
+                    channel = response.channel,
+                    month = response.month,
+                    year = response.year,
+                    status = response.status,
+                    week = response.week,
+                    departmentStore = response.departmentStore,
+                    BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
+                    {
+                        ID = c.ID,
+                        keyInID = c.keyInID,
+                        fg = c.fg,
+                        amountSale = c.amountSale,
+                        amountSalePreviousYear = c.amountSalePreviousYear,
+                        brandID = c.brandID,
+                        brandName = c.brandName,
+                        channelID = c.channelID,
+                        counterID = c.counterID,
+                        departmentStoreID = c.departmentStoreID,
+                        month = c.month,
+                        mu = c.mu,
+                        ot = c.ot,
+                        rank = c.rank,
+                        remark = c.remark,
+                        sk = c.sk,
+                        week = c.week,
+                        wholeSale = c.wholeSale,
+                        year = c.year
+                    }).ToList()
+                };
 
 
-            return data;
+                return data;
+            }
+            catch (Exception ex)
+            {
+                return new BAKeyInDetailViewModel();
+            }
 
         }
 
@@ -216,6 +222,9 @@ namespace MarketData.Controllers
 
             if (ModelState.IsValid)
             {
+                var userID = HttpContext.Session.GetString("userID");
+                request.userID = new Guid(userID);
+
                 response = await process.keyIn.SaveBAKeyInDetail(request);
                 return Json(response);
             }
@@ -233,5 +242,50 @@ namespace MarketData.Controllers
 
         #endregion
 
+
+        #region Admin KeyIn Function
+
+        [HttpPost]
+        public IActionResult GetAdminKeyInDetail([FromBody] GetAdminKeyInRequest request)
+        {
+            AdminKeyInDetailViewModel dataModel = new AdminKeyInDetailViewModel();
+
+            try
+            {
+                var response = process.keyIn.GetAdminKeyInData(request);
+                dataModel.data = response.data.Select(c => new AdminKeyInDetailData
+                {
+                    ID = c.ID,
+                    fg = c.fg,
+                    amountSale = c.amountSale,
+                    amountSalePreviousYear = c.amountSalePreviousYear,
+                    brandID = c.brandID,
+                    brandName = c.brandName,
+                    channelID = c.distributionChannelID,
+                    counterID = c.counterID,
+                    departmentStoreID = c.departmentStoreID,
+                    departmentStoreName = c.departmentStoreName,
+                    month = c.month,
+                    mu = c.mu,
+                    ot = c.ot,
+                    rank = c.rank,
+                    remark = c.remark,
+                    sk = c.sk,
+                    week = c.week,
+                    wholeSale = c.wholeSale,
+                    year = c.year,
+                    universe = c.universe
+                }).ToList();
+
+                return Json(dataModel);
+            }
+            catch (Exception ex)
+            {
+                return Json(dataModel);
+            }
+        }
+
+        #endregion
     }
 }
+
