@@ -25,9 +25,64 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
         public IActionResult KeyinByBrand()
         {
-            return View();
+            AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
+
+            try
+            {
+                var adminOption = process.keyIn.GetAdminKeyInOption();
+
+                if(adminOption != null)
+                {
+                    if(adminOption.departmentStore != null && adminOption.departmentStore.Any())
+                    {
+                        dataModel.departmentStoreList = adminOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            distributionChannelID = c.distributionChannelID,
+                            retailerGroupID = c.retailerGroupID
+                        }).ToList();
+                    }
+
+                    if (adminOption.retailerGroup != null && adminOption.retailerGroup.Any())
+                    {
+                        dataModel.retailerGroupList = adminOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                        {
+                            retailerGroupName = c.retailerGroupName,
+                            retailerGroupID = c.retailerGroupID
+                        }).ToList();
+                    }
+
+                    if (adminOption.channel != null && adminOption.channel.Any())
+                    {
+                        dataModel.channelList = adminOption.channel.Select(c => new ChannelKeyInViewModel
+                        {
+                            distributionChannelID = c.distributionChannelID,
+                            distributionChannelName = c.distributionChannelName
+                        }).ToList();
+                    }
+
+                    if (adminOption.brand != null && adminOption.brand.Any())
+                    {
+                        dataModel.brandList = adminOption.brand.Select(c => new BrandKeyInViewModel
+                        {
+                            brandID = c.brandID,
+                            brandName = c.brandName,
+                        }).ToList();
+                    }
+
+                    dataModel.yearList = adminOption.year;
+                }
+            }
+            catch(Exception ex)
+            {
+                return RedirectToAction("KeyIn", "Home");
+            }
+
+            return View(dataModel);
         }
 
         public IActionResult KeyinByStore()

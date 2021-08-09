@@ -396,35 +396,7 @@ namespace MarketData.Processes.Processes
 
                 if (updateBAKeyIn)
                 {
-                    var baKeyInDetailID = request.BAKeyInDetailList.Select(c => c.ID);
-
-                    var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
-
-                    foreach (var itemDetail in baKeyInDetailData)
-                    {
-                        var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
-                        itemDetail.Rank = baKeyInDetailUpdate.rank;
-                        itemDetail.Amount_Sales = baKeyInDetailUpdate.amountSale;
-                        itemDetail.Whole_Sales = baKeyInDetailUpdate.wholeSale;
-                        itemDetail.SK = baKeyInDetailUpdate.sk;
-                        itemDetail.MU = baKeyInDetailUpdate.mu;
-                        itemDetail.FG = baKeyInDetailUpdate.fg;
-                        itemDetail.OT = baKeyInDetailUpdate.ot;
-                        itemDetail.Remark = baKeyInDetailUpdate.remark;
-                        itemDetail.Updated_By = request.userID;
-                        itemDetail.Updated_Date = dateNoew;
-                    }
-
-                    var updateDetailResult = await repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
-
-                    if (updateDetailResult)
-                    {
-                        response.isSuccess = true;
-                    }
-                    else
-                    {
-                        response.isSuccess = false;
-                    }
+                    response.isSuccess = await SaveBAKeyInDetailData(request);
                 }
                 else
                 {
@@ -451,34 +423,7 @@ namespace MarketData.Processes.Processes
 
                 if (updateBAKeyIn)
                 {
-                    var baKeyInDetailID = request.BAKeyInDetailList.Select(c => c.ID);
-                    var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
-
-                    foreach (var itemDetail in baKeyInDetailData)
-                    {
-                        var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
-                        itemDetail.Rank = baKeyInDetailUpdate.rank;
-                        itemDetail.Amount_Sales = baKeyInDetailUpdate.amountSale;
-                        itemDetail.Whole_Sales = baKeyInDetailUpdate.wholeSale;
-                        itemDetail.SK = baKeyInDetailUpdate.sk;
-                        itemDetail.MU = baKeyInDetailUpdate.mu;
-                        itemDetail.FG = baKeyInDetailUpdate.fg;
-                        itemDetail.OT = baKeyInDetailUpdate.ot;
-                        itemDetail.Remark = baKeyInDetailUpdate.remark;
-                        itemDetail.Updated_By = request.userID;
-                        itemDetail.Updated_Date = dateNoew;
-                    }
-
-                    var updateDetailResult = await repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
-
-                    if (updateDetailResult)
-                    {
-                        response.isSuccess = true;
-                    }
-                    else
-                    {
-                        response.isSuccess = false;
-                    }
+                    response.isSuccess = await SaveBAKeyInDetailData(request);
                 }
                 else
                 {
@@ -565,6 +510,136 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public async Task<SaveAdminKeyInResponse> SaveAdminKeyIn(SaveAdminKeyInDetailRequest request)
+        {
+            SaveAdminKeyInResponse response = new SaveAdminKeyInResponse();
+            DateTime dateNoew = DateTime.Now;
+
+            try
+            {
+                var updateAdminKeyInDetailID = request.data.Where(e => e.ID != Guid.Empty).Select(c => c.ID);
+                var newAdminKeyInDetail = request.data.Where(e => e.ID == Guid.Empty);
+
+                bool addDetailResult = true;
+                bool updateDetailResult = true;
+
+                if (updateAdminKeyInDetailID.Any())
+                {
+                    var adminInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => updateAdminKeyInDetailID.Contains(c.ID));
+
+                    foreach (var itemDetail in adminInDetailData)
+                    {
+                        var adminKeyInDetailUpdate = request.data.FirstOrDefault(c => c.ID == itemDetail.ID);
+                        itemDetail.Rank = adminKeyInDetailUpdate.rank;
+                        itemDetail.Amount_Sales = adminKeyInDetailUpdate.amountSale;
+                        itemDetail.Whole_Sales = adminKeyInDetailUpdate.wholeSale;
+                        itemDetail.SK = adminKeyInDetailUpdate.sk;
+                        itemDetail.MU = adminKeyInDetailUpdate.mu;
+                        itemDetail.FG = adminKeyInDetailUpdate.fg;
+                        itemDetail.OT = adminKeyInDetailUpdate.ot;
+                        itemDetail.Remark = adminKeyInDetailUpdate.remark;
+                        itemDetail.Updated_By = request.userID;
+                        itemDetail.Updated_Date = dateNoew;
+                    }
+
+                    updateDetailResult = await repository.adminKeyIn.UpdateAdminKeyInDetail(adminInDetailData);
+                }
+
+                if (newAdminKeyInDetail.Any())
+                {
+                    List<TTAdminKeyInDetail> listNewAdminDetail = newAdminKeyInDetail.Select(c => new TTAdminKeyInDetail
+                    {
+                        ID = Guid.NewGuid(),
+                        DepartmentStore_ID = c.departmentStoreID,
+                        DistributionChannel_ID = c.distributionChannelID,
+                        Brand_ID = c.brandID,
+                        Counter_ID = c.counterID,
+                        RetailerGroup_ID = c.retailerGroupID,
+                        FG = c.fg,
+                        MU = c.mu,
+                        OT = c.ot,
+                        SK = c.sk,
+                        Amount_Sales = c.amountSale,
+                        Whole_Sales = c.wholeSale,
+                        Month = c.month,
+                        Year = c.year,
+                        Week = c.week,
+                        Rank = c.rank,
+                        Remark = c.remark,
+                        Universe = c.universe,
+                        Created_By = request.userID,
+                        Created_Date = dateNoew
+                    }).ToList();
+
+                    addDetailResult = await repository.adminKeyIn.AddAdminKeyInDetail(listNewAdminDetail);
+                }
+
+                if (updateDetailResult && addDetailResult)
+                {
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GetAdminKeyInOptionResponse GetAdminKeyInOption()
+        {
+            GetAdminKeyInOptionResponse response = new GetAdminKeyInOptionResponse();
+
+            try
+            {
+                var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
+                var getRetailerResponse = repository.masterData.GetRetailerGroupList().Where(c => c.Active_Flag);
+                var getBrandResponse = repository.masterData.GetBrandList().Where(c => c.active);
+                var getChannelResponse = repository.masterData.GetDistributionChannelList().Where(c => c.Active_Flag);
+                response.channel = getChannelResponse.Select(c => new DistributionChannelData
+                {
+                    distributionChannelID = c.Distribution_Channel_ID,
+                    distributionChannelName = c.Distribution_Channel_Name
+                }).ToList();
+                response.departmentStore = getDepartmentStoreResponse.ToList();
+                response.brand = getBrandResponse.ToList();
+                response.retailerGroup = getRetailerResponse.Select(c => new RetailerGroupData
+                {
+                    retailerGroupID = c.Retailer_Group_ID,
+                    retailerGroupName = c.Retailer_Group_Name
+                }).ToList();
+
+                List<string> yearList = new List<string>();
+                string currentYear = DateTime.Now.Year.ToString();
+
+                yearList.Add(currentYear);
+
+                var adminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.ID != Guid.Empty);
+
+                var olldYearList = adminKeyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+
+                if (olldYearList.Any())
+                {
+                    yearList.AddRange(olldYearList);
+                }
+
+                response.year = yearList;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+
         private async Task<(bool, List<TTBAKeyInDetail>)> CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
             DateTime dateNow = DateTime.Now;
@@ -619,6 +694,37 @@ namespace MarketData.Processes.Processes
             }
         }
 
-    
+        private async Task<bool> SaveBAKeyInDetailData(SaveBAKeyInDetailRequest request)
+        {
+            DateTime dateNoew = DateTime.Now;
+
+            try
+            {
+                var baKeyInDetailID = request.BAKeyInDetailList.Select(c => c.ID);
+                var baKeyInDetailData = repository.baKeyIn.GetBAKeyInDetailListData(c => baKeyInDetailID.Contains(c.ID));
+
+                foreach (var itemDetail in baKeyInDetailData)
+                {
+                    var baKeyInDetailUpdate = request.BAKeyInDetailList.FirstOrDefault(c => c.ID == itemDetail.ID);
+                    itemDetail.Rank = baKeyInDetailUpdate.rank;
+                    itemDetail.Amount_Sales = baKeyInDetailUpdate.amountSale;
+                    itemDetail.Whole_Sales = baKeyInDetailUpdate.wholeSale;
+                    itemDetail.SK = baKeyInDetailUpdate.sk;
+                    itemDetail.MU = baKeyInDetailUpdate.mu;
+                    itemDetail.FG = baKeyInDetailUpdate.fg;
+                    itemDetail.OT = baKeyInDetailUpdate.ot;
+                    itemDetail.Remark = baKeyInDetailUpdate.remark;
+                    itemDetail.Updated_By = request.userID;
+                    itemDetail.Updated_Date = dateNoew;
+                }
+
+                var updateDetailResult = await repository.baKeyIn.UpdateBAKeyInDetail(baKeyInDetailData);
+                return updateDetailResult;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

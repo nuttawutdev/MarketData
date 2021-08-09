@@ -170,7 +170,7 @@ namespace MarketData.Repositories.Repo
             {
                 _dbContext.TTBAKeyInDetail.AddRange(listBAKeyInDetail);
 
-                if (_dbContext.SaveChanges() > 0)
+                if (await _dbContext.SaveChangesAsync() > 0)
                 {
                     return true;
                 }

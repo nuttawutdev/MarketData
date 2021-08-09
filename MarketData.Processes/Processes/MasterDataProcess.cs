@@ -1049,18 +1049,7 @@ namespace MarketData.Processes.Processes
 
                 if (dataList.Any())
                 {
-                    response.data = dataList.Select(c => new DepartmentStoreData
-                    {
-                        departmentStoreID = c.departmentStoreID,
-                        departmentStoreName = c.departmentStoreName,
-                        distributionChannelID = c.distributionChannelID,
-                        distributionChannelName = c.distributionChannelName,
-                        retailerGroupName = c.retailerGroupName,
-                        retailerGroupID = c.retailerGroupID,
-                        rank = c.rank,
-                        active = c.active,
-                        region = c.region
-                    }).ToList();
+                    response.data = dataList;
                 }
                 else
                 {
