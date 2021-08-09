@@ -294,6 +294,29 @@ namespace MarketData.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                var userID = HttpContext.Session.GetString("userID");
+                request.userID = new Guid(userID);
+
+                response = await process.keyIn.SubmitBAKeyInDetail(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false,
+                    responseError = "Please input required field."
+                };
+                return Json(response);
+            }
+        }
 
         #endregion
 
