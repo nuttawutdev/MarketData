@@ -326,11 +326,14 @@ namespace MarketData.Controllers
         [HttpPost]
         public IActionResult GetAdminKeyInDetail([FromBody] GetAdminKeyInRequest request)
         {
-            AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
+            AdminKeyInDetailViewModel dataModel = new AdminKeyInDetailViewModel();
 
             try
             {
                 var response = process.keyIn.GetAdminKeyInData(request);
+                dataModel.year = request.year;
+                dataModel.month = request.month;
+                dataModel.week = request.week;
                 dataModel.data = response.data.Select(c => new AdminKeyInDetailData
                 {
                     ID = c.ID,
@@ -352,7 +355,7 @@ namespace MarketData.Controllers
                     week = c.week,
                     wholeSale = c.wholeSale,
                     year = c.year,
-                    universe = c.universe
+                    universe = c.universe                   
                 }).ToList();
 
                 return Json(dataModel);

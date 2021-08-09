@@ -1,4 +1,5 @@
 ﻿@model MarketData.Models.AdminKeyInViewModel
+
 @{
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายแบรนด์";
     Html.RenderPartial("_WarningModal");
@@ -136,7 +137,7 @@
                     @*<thead class="table-secondary">
                         <tr class="row m-0">
                             @{
-                                var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.) - 1) + " " + Model.month + " week 4)";
+                                var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.year) - 1) + " " + Model.month + " week 4)";
                             }
                             <th class="col-2">Brand</th>
                             <th class="col-2">@titelPrevYear</th>
@@ -152,11 +153,10 @@
                     </thead>
                     <tbody>
                         @{
-                            foreach (var item in Model.ad)
+                            foreach (var item in Model.data)
                             {
                                 <tr class="row m-0">
                                     <td class="col-2 ID" hidden>@item.ID</td>
-                                    <td class="col-2" hidden>@item.keyInID</td>
                                     <td class="col-2" hidden>@item.counterID</td>
                                     <td class="col-2" hidden>@item.departmentStoreID</td>
                                     <td class="col-2" hidden>@item.channelID</td>
@@ -196,7 +196,7 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-
+      
     }
 </script>
 
