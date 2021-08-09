@@ -326,7 +326,7 @@ namespace MarketData.Controllers
         [HttpPost]
         public IActionResult GetAdminKeyInDetail([FromBody] GetAdminKeyInRequest request)
         {
-            AdminKeyInDetailViewModel dataModel = new AdminKeyInDetailViewModel();
+            AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
 
             try
             {
