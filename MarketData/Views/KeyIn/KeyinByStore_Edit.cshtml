@@ -191,43 +191,43 @@
         });
 
         $('#btnSubmit').on('click', function (e) {
-            //$("#blocker").show();
+          
 
-               var frmdata = getDataFromTable('Submit');
-            console.log(frmdata)
-            if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
-                   console.log('validate_NullAmount');
-               } else {
-                   console.log('else validate_NullAmount');
-               }
-            @*$.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                    success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "KeyinByStore");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
-                }
-            });*@
+            var frmdata = getDataFromTable('Submit');
 
-           });
+            if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+        
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SubmitBAKeyInDetail", "KeyIn")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                        success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "KeyinByStore");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+
+
+        });
 
         function getDataFromTable(type){
             var model = @Html.Raw(Json.Serialize(Model));
@@ -347,6 +347,45 @@
             } else return 1;
         }
 
+        function validate_Rank_AmountSales(data) {
+
+            var number = 0;
+            var duplicateRank = false;
+            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
+
+                if (number == data.BAKeyInDetailList[i].rank) {
+                    duplicateRank = true;
+                    break;
+                } else {
+                    number = data.BAKeyInDetailList[i].rank
+                }
+            }
+
+            if (duplicateRank) {
+                showWarningAlert('DuplicateRank');
+                return 0;
+            }
+
+            var sortAmount = data.BAKeyInDetailList.sort((a, b) => (a.amountSale > b.amountSale) ? -1 : 1)
+
+            var inCorrectAmountRank = false;
+            var sort = 1;
+            for (var i = 0; i < sortAmount.length; i++) {
+                if (sortAmount[i].rank == sort) {
+                    sort++;
+                } else {
+                    inCorrectAmountRank = true;
+                    break;
+                }
+            }
+            if (inCorrectAmountRank) {
+                showWarningAlert('IncorrectAmountRank');
+                return 0;
+            } else {
+                return 1;
+            }
+
+        }
 
         function showWarningAlert(typeWarning) {
             var msg = '';
@@ -362,6 +401,12 @@
                     break;
                 case 'NullWholeSales_AmountSales':
                     msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
+                    break;
+                case 'DuplicateRank':
+                    msg = 'Duplicate Rank!';
+                    break;
+                case 'IncorrectAmountRank':
+                    msg = 'ข้อมูล Amount sales และ Rank ไม่สอดคล้องกัน';
                     break;
                 default:
             }
