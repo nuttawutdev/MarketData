@@ -165,7 +165,7 @@ namespace MarketData.Processes.Processes
             {
                 var userCounterData = repository.baKeyIn.GetUserCounter(request.userID.GetValueOrDefault());
 
-                var userCounterValidate = userCounterData.Where(c => 
+                var userCounterValidate = userCounterData.Where(c =>
                     c.DepartmentStore_ID == request.departmentStoreID
                     && c.Brand_ID == request.brandID
                     && c.DistributionChannel_ID == request.distributionChannelID).Any();
@@ -471,51 +471,24 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemCounter in counterByFilter)
                 {
-                    var adminKeyInData = repository.adminKeyIn.FindAdminKeyInDetailBy(
-                        c => c.RetailerGroup_ID == itemCounter.retailerGroupID
-                        && c.DepartmentStore_ID == itemCounter.departmentStoreID
-                        && c.DistributionChannel_ID == itemCounter.distributionChannelID
-                        && c.Brand_ID == itemCounter.brandID
-                        && c.Year == request.year
-                        && c.Month == request.month
-                        && c.Week == request.week);
-
-                    string previousYear = (int.Parse(request.year) - 1).ToString();
-
-                    var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
-                       c => c.DepartmentStore_ID == itemCounter.departmentStoreID
-                       && c.DistributionChannel_ID == itemCounter.distributionChannelID
-                       && c.Brand_ID == itemCounter.brandID
-                       && c.Year == previousYear
-                       && c.Month == request.month
-                       && c.Week == "4").FirstOrDefault();
-
-                    AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
+                    if (request.week != "4")
                     {
-                        ID = adminKeyInData != null ? adminKeyInData.ID : Guid.Empty,
-                        retailerGroupID = itemCounter.retailerGroupID,
-                        departmentStoreID = itemCounter.departmentStoreID,
-                        departmentStoreName = itemCounter.departmentStoreName,
-                        distributionChannelID = itemCounter.distributionChannelID,
-                        brandID = itemCounter.brandID,
-                        brandName = itemCounter.brandName,
-                        year = request.year,
-                        month = request.month,
-                        week = request.week,
-                        counterID = itemCounter.counterID,
-                        amountSale = adminKeyInData != null ? adminKeyInData.Amount_Sales : null,
-                        wholeSale = adminKeyInData != null ? adminKeyInData.Whole_Sales : null,
-                        fg = adminKeyInData != null ? adminKeyInData.FG : null,
-                        mu = adminKeyInData != null ? adminKeyInData.MU : null,
-                        ot = adminKeyInData != null ? adminKeyInData.OT : null,
-                        sk = adminKeyInData != null ? adminKeyInData.SK : null,
-                        rank = adminKeyInData != null ? adminKeyInData.Rank : null,
-                        remark = adminKeyInData != null ? adminKeyInData.Remark : null,
-                        universe = request.universe,
-                        amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.amountSale : null
-                    };
+                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.brandID);
+                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                    adminKeyInDetailList.Add(dataDetail);
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                        {
+
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
+                            adminKeyInDetailList.Add(dataDetail);
+                        }
+                    }
+                    else
+                    {
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
+                        adminKeyInDetailList.Add(dataDetail);
+                    }
+                   
                 }
             }
             catch (Exception ex)
@@ -740,6 +713,56 @@ namespace MarketData.Processes.Processes
             {
                 throw ex;
             }
+        }
+
+        private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request)
+        {
+
+            var adminKeyInData = repository.adminKeyIn.FindAdminKeyInDetailBy(
+                c => c.RetailerGroup_ID == itemCounter.retailerGroupID
+                && c.DepartmentStore_ID == itemCounter.departmentStoreID
+                && c.DistributionChannel_ID == itemCounter.distributionChannelID
+                && c.Brand_ID == itemCounter.brandID
+                && c.Year == request.year
+                && c.Month == request.month
+                && c.Week == request.week);
+
+            string previousYear = (int.Parse(request.year) - 1).ToString();
+
+            var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
+               c => c.DepartmentStore_ID == itemCounter.departmentStoreID
+               && c.DistributionChannel_ID == itemCounter.distributionChannelID
+               && c.Brand_ID == itemCounter.brandID
+               && c.Year == previousYear
+               && c.Month == request.month
+               && c.Week == "4").FirstOrDefault();
+
+            AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
+            {
+                ID = adminKeyInData != null ? adminKeyInData.ID : Guid.Empty,
+                retailerGroupID = itemCounter.retailerGroupID,
+                departmentStoreID = itemCounter.departmentStoreID,
+                departmentStoreName = itemCounter.departmentStoreName,
+                distributionChannelID = itemCounter.distributionChannelID,
+                brandID = itemCounter.brandID,
+                brandName = itemCounter.brandName,
+                year = request.year,
+                month = request.month,
+                week = request.week,
+                counterID = itemCounter.counterID,
+                amountSale = adminKeyInData != null ? adminKeyInData.Amount_Sales : null,
+                wholeSale = adminKeyInData != null ? adminKeyInData.Whole_Sales : null,
+                fg = adminKeyInData != null ? adminKeyInData.FG : null,
+                mu = adminKeyInData != null ? adminKeyInData.MU : null,
+                ot = adminKeyInData != null ? adminKeyInData.OT : null,
+                sk = adminKeyInData != null ? adminKeyInData.SK : null,
+                rank = adminKeyInData != null ? adminKeyInData.Rank : null,
+                remark = adminKeyInData != null ? adminKeyInData.Remark : null,
+                universe = request.universe,
+                amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.amountSale : null
+            };
+
+            return dataDetail;
         }
     }
 }
