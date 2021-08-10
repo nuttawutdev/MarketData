@@ -83,7 +83,7 @@ namespace MarketData.Controllers
             }
 
             return View(dataModel);
-        }
+        } 
 
         public IActionResult KeyinByStore()
         {
