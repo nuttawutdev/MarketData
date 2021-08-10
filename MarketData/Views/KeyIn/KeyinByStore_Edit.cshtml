@@ -160,8 +160,9 @@
                     success: function (data) {
                     $("#blocker").hide();
                     if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "KeyinByStore");
+                        $('#successModalHref').attr("href", "");
                         $('#successModal').modal('show');
+
                     } else if (data.isDuplicated) {
                         $('#failedModal').modal('show');
                         $('#myModalFailedResult').text('Duplicate data!');
@@ -176,7 +177,7 @@
                 error: function () {
                     $("#blocker").hide();
                 }
-            });
+            }); 
 
         });
 
@@ -197,7 +198,7 @@
                         success: function (data) {
                         $("#blocker").hide();
                         if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "KeyinByStore");
+                            $('#successModalHref').attr("href", "KeyinByStore");                    
                             $('#successModal').modal('show');
                         } else if (data.isDuplicated) {
                             $('#failedModal').modal('show');

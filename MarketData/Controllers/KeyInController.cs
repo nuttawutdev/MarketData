@@ -83,7 +83,7 @@ namespace MarketData.Controllers
             }
 
             return View(dataModel);
-        }
+        } 
 
         public IActionResult KeyinByStore()
         {
@@ -164,6 +164,12 @@ namespace MarketData.Controllers
             var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
+        public async Task<IActionResult> KeyinByStore_Edit_View(Guid baKeyInID)
+        {
+            var viewData = await GetBAKeyInDetail(baKeyInID, true); 
+            return View(viewData);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
