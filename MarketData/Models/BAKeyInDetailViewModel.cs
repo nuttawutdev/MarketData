@@ -9,6 +9,7 @@ namespace MarketData.Models
     {
         public Guid BAKeyInID { get; set; }
         public List<BAKeyInDetailData> BAKeyInDetailList { get; set; }
+        public List<KeyInRemark> remarkList { get; set; }
         public string departmentStore { get; set; }
         public string channel { get; set; }
         public string brand { get; set; }
@@ -38,6 +39,12 @@ namespace MarketData.Models
         public string mu { get; set; }
         public string fg { get; set; }
         public string ot { get; set; }
+        public string remark { get; set; }
+    }
+
+    public class KeyInRemark
+    {
+        public Guid ID { get; set; }
         public string remark { get; set; }
     }
 }

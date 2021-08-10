@@ -34,9 +34,9 @@ namespace MarketData.Controllers
             {
                 var adminOption = process.keyIn.GetAdminKeyInOption();
 
-                if(adminOption != null)
+                if (adminOption != null)
                 {
-                    if(adminOption.departmentStore != null && adminOption.departmentStore.Any())
+                    if (adminOption.departmentStore != null && adminOption.departmentStore.Any())
                     {
                         dataModel.departmentStoreList = adminOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
                         {
@@ -77,7 +77,7 @@ namespace MarketData.Controllers
                     dataModel.yearList = adminOption.year;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return RedirectToAction("KeyIn", "Home");
             }
@@ -178,6 +178,9 @@ namespace MarketData.Controllers
             try
             {
                 var response = await process.keyIn.GetBAKeyInDetail(baKeyInID);
+
+                var keyInRemark = process.masterData.GetKeyInRemark();
+
                 BAKeyInDetailViewModel data = new BAKeyInDetailViewModel
                 {
                     BAKeyInID = baKeyInID,
@@ -209,9 +212,13 @@ namespace MarketData.Controllers
                         week = c.week,
                         wholeSale = c.wholeSale.HasValue ? c.wholeSale.Value.ToString("0.00") : string.Empty,
                         year = c.year
+                    }).ToList(),
+                    remarkList = keyInRemark.Select(c => new KeyInRemark
+                    {
+                        ID = c.ID,
+                        remark = c.remark
                     }).ToList()
                 };
-
 
                 return data;
             }
@@ -355,7 +362,7 @@ namespace MarketData.Controllers
                     week = c.week,
                     wholeSale = c.wholeSale,
                     year = c.year,
-                    universe = c.universe                   
+                    universe = c.universe
                 }).ToList();
 
                 return Json(dataModel);

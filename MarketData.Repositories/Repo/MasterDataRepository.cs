@@ -1190,5 +1190,17 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<TMKeyInRemark> GetKeyInRemark()
+        {
+            try
+            {
+                return _dbContext.TMKeyInRemark.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

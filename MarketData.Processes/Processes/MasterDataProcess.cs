@@ -1864,5 +1864,30 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public List<KeyInRemarkData> GetKeyInRemark()
+        {
+            List<KeyInRemarkData> response = new List<KeyInRemarkData>();
+
+            try
+            {
+                var searchData = repository.masterData.GetKeyInRemark();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response = searchData.Select(c => new KeyInRemarkData
+                    {
+                        ID = c.ID,
+                        remark = c.Remark
+                    }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
     }
 }
