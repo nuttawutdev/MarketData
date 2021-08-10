@@ -639,7 +639,6 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-
         private async Task<(bool, List<TTBAKeyInDetail>)> CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
             DateTime dateNow = DateTime.Now;

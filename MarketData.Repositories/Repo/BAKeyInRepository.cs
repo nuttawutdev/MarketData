@@ -40,7 +40,8 @@ namespace MarketData.Repositories.Repo
             {
                 var baKeyInData = _dbContext.TTBAKeyIn.Where(
                     c => c.DepartmentStore_ID == departmentStoreID
-                    && c.Brand_ID == brandID && c.DistributionChannel_ID == channelID).AsNoTracking();
+                    && c.Brand_ID == brandID && c.DistributionChannel_ID == channelID).AsNoTracking().ToList();
+
 
                 var baKeyInDataList = (
                   from e in baKeyInData
