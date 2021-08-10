@@ -270,7 +270,7 @@
             $('#yearList').val(status);
             dataTable.column(1).search(status).draw();
         });
-         
+
         $('#statusList').on('change', function (e) {
             var status = $(this).val();
             $('#statusList').val(status);
@@ -313,8 +313,15 @@
                 datatype: "json",
                 success: function (data) {
                     if (data.isSuccess) {
-                        var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
-                        window.location.href = url.replace('_id_', data.baKeyInID);
+                        if (!data.isSubmited) {
+                             var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
+                             window.location.href = url.replace('_id_', data.baKeyInID);
+                        }
+                        else {
+                             var url = '@Url.Action("KeyinByStore_Edit_View", "KeyIn", new { baKeyInID = "_id_" })';
+                             window.location.href = url.replace('_id_', data.baKeyInID);
+                        }
+
                     }
                 },
                 error: function () {

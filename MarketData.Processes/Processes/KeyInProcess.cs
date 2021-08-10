@@ -282,6 +282,9 @@ namespace MarketData.Processes.Processes
                                 response.isSuccess = true;
                             }
                         }
+
+                        var keyInStauts = repository.masterData.GetKeyInStatusBy(c => c.ID == baKeyInData.KeyIn_Status_ID);
+                        response.isSubmited = keyInStauts.Status_Name == "Submit";
                     }
                 }
                 else
@@ -494,7 +497,7 @@ namespace MarketData.Processes.Processes
             }
             catch (Exception ex)
             {
-                response.responseError = "TestCCC";
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;
