@@ -186,7 +186,7 @@
             var frmdata = getDataFromTable('Submit');
 
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-        
+                console.log(frmdata)
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",
@@ -236,6 +236,7 @@
                 var fg = row.find("TD").find(".fg").val();
                 var ot = row.find("TD").find(".ot").val();
                 var amountSalePreviousYear = row.find("TD").eq(10).html();
+                var week = row.find("TD").eq(7).html();
                 bAKeyInID = row.find("TD").eq(1).html()
                 memberDetail.ID = row.find("TD").eq(0).html();
                 memberDetail.keyInID = row.find("TD").eq(1).html();
@@ -244,13 +245,13 @@
                 memberDetail.channelID = row.find("TD").eq(4).html();
                 memberDetail.year = row.find("TD").eq(5).html();
                 memberDetail.month = row.find("TD").eq(6).html();
-                memberDetail.week = row.find("TD").eq(7).html();
+                memberDetail.week = week;
                 memberDetail.brandID = row.find("TD").eq(8).html();
                 memberDetail.brandName = row.find("TD").eq(9).html();
                 memberDetail.amountSalePreviousYear = amountSalePreviousYear ? parseFloat(amountSalePreviousYear) : null;
                 memberDetail.rank = rank ? parseInt(rank) : null;
                 memberDetail.amountSale = amountSale ? parseFloat(amountSale) : null;
-                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : type == 'Submit' ? 0 : null;
+                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : type == 'Submit' && week == 4 ? 0 : null;
                 memberDetail.sk = sk ? parseFloat(sk) : null;
                 memberDetail.mu = mu ? parseFloat(mu) : null;
                 memberDetail.fg = fg ? parseFloat(fg) : null;
@@ -327,8 +328,8 @@
 
             var validateData = data.BAKeyInDetailList.some(function (i) {
                 var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
-                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
-                return amountSale < wholeSale;
+                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;            
+                return amountSale < wholeSale ;
             })
 
             if (validateData) {
@@ -343,7 +344,7 @@
             var duplicateRank = false;
             for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
 
-                if (number == data.BAKeyInDetailList[i].rank) {
+                if (data.BAKeyInDetailList[i].rank != null && data.BAKeyInDetailList[i].rank != '' && number == data.BAKeyInDetailList[i].rank) {
                     duplicateRank = true;
                     break;
                 } else {
@@ -361,11 +362,13 @@
             var inCorrectAmountRank = false;
             var sort = 1;
             for (var i = 0; i < sortAmount.length; i++) {
-                if (sortAmount[i].rank == sort) {
+                if (sortAmount[i].amountSale != null && sortAmount[i].rank != null) {
+                if (  sortAmount[i].rank == sort ) {
                     sort++;
                 } else {
                     inCorrectAmountRank = true;
                     break;
+                    }
                 }
             }
             if (inCorrectAmountRank) {
