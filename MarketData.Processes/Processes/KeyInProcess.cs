@@ -460,8 +460,6 @@ namespace MarketData.Processes.Processes
 
             try
             {
-
-
                 var counterList = repository.masterData.GetCounterList();
                 var counterByFilter = counterList.Where(
                     c => (!request.departmentStoreID.HasValue || (request.departmentStoreID.HasValue && request.departmentStoreID == c.departmentStoreID))
@@ -496,7 +494,7 @@ namespace MarketData.Processes.Processes
             }
             catch (Exception ex)
             {
-                response.responseError = ex.Message ?? ex.InnerException?.Message;
+                response.responseError = "Test";
             }
 
             return response;
