@@ -494,7 +494,7 @@ namespace MarketData.Processes.Processes
             }
             catch (Exception ex)
             {
-                response.responseError = "Test";
+                response.responseError = "TestCCC";
             }
 
             return response;
