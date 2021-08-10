@@ -168,6 +168,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
         {
+            var userID = HttpContext.Session.GetString("userID");
+            request.userID = new Guid(userID);
+
             var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
         }

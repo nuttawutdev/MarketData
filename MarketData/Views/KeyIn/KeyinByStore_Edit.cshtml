@@ -25,7 +25,7 @@
             <div class="col-sm-2">
                 <label><b>Department Store</b></label><br />
                 <label>
-                   @Model.departmentStore
+                    @Model.departmentStore
                 </label>
 
 
@@ -33,7 +33,7 @@
             <div class="col-sm-2">
                 <label><b>Distribution Channel</b></label><br />
                 <label>
-                   @Model.channel
+                    @Model.channel
                 </label>
 
 
@@ -81,8 +81,8 @@
                 <table class="table table-striped table-hover " id="tblDetails">
                     <thead class="table-secondary">
                         <tr class="row m-0">
-                            @{ 
-                                var titelPrevYear = "Amount Sales ("+ (Convert.ToInt32(Model.year)-1)+" "+ Model.month+" week 4)";
+                            @{
+                                var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.year) - 1) + " " + Model.month + " week 4)";
                             }
                             <th class="col-2">Brand</th>
                             <th class="col-2">@titelPrevYear</th>
@@ -100,27 +100,27 @@
                         @{
                             foreach (var item in Model.BAKeyInDetailList)
                             {
-                                                <tr class="row m-0">
-                                                    <td class="col-2 ID" hidden>@item.ID</td>
-                                                    <td class="col-2" hidden>@item.keyInID</td>
-                                                    <td class="col-2" hidden>@item.counterID</td>
-                                                    <td class="col-2" hidden>@item.departmentStoreID</td>
-                                                    <td class="col-2" hidden>@item.channelID</td>
-                                                    <td class="col-2" hidden>@item.year</td>
-                                                    <td class="col-2" hidden>@item.month</td>
-                                                    <td class="col-2" hidden>@item.week</td>
-                                                    <td class="col-2" hidden>@item.brandID</td>
-                                                    <td class="col-2">@item.brandName</td>
-                                                    <td class="col-2">@item.amountSalePreviousYear</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number"  class="form-control input-sm rank" value="@item.rank"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number"  class="form-control input-sm amountSale" value="@item.amountSale"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm sk" value="@item.sk">%</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm mu" value="@item.mu">%</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg">%</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot">%</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm remark" value="@item.remark"></td>
-                                                </tr>
+                                <tr class="row m-0">
+                                    <td class="col-2 ID" hidden>@item.ID</td>
+                                    <td class="col-2" hidden>@item.keyInID</td>
+                                    <td class="col-2" hidden>@item.counterID</td>
+                                    <td class="col-2" hidden>@item.departmentStoreID</td>
+                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="col-2" hidden>@item.year</td>
+                                    <td class="col-2" hidden>@item.month</td>
+                                    <td class="col-2" hidden>@item.week</td>
+                                    <td class="col-2" hidden>@item.brandID</td>
+                                    <td class="col-2">@item.brandName</td>
+                                    <td class="col-2">@item.amountSalePreviousYear</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm rank" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm sk" value="@item.sk">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm mu" value="@item.mu">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm remark" value="@item.remark"></td>
+                                </tr>
                             }
 
                         }
@@ -150,7 +150,7 @@
              var model = @Html.Raw(Json.Serialize(Model));
 
             var frmdata = getDataFromTable();
-          
+
             $.ajax({
                  type: "POST",
                  url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
@@ -181,7 +181,7 @@
         });
 
         $('#btnSubmit').on('click', function (e) {
-          
+
 
             var frmdata = getDataFromTable('Submit');
 
@@ -285,7 +285,7 @@
                 var mu = i.mu != null ? parseFloat(i.mu) : 0;
                 var fg = i.fg != null ? parseFloat(i.fg) : 0;
                 var ot = i.ot != null ? parseFloat(i.ot) : 0;
-                
+
                 var sum = sk + mu + fg + ot;
                 return sum != 0 && sum != 100;
             })
@@ -328,7 +328,7 @@
 
             var validateData = data.BAKeyInDetailList.some(function (i) {
                 var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
-                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;            
+                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
                 return amountSale < wholeSale ;
             })
 
