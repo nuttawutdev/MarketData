@@ -163,27 +163,41 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var baKeyInData = repository.baKeyIn.FindBAKeyInBy(
-                    c => c.DepartmentStore_ID == request.departmentStoreID
-                    && c.DistributionChannel_ID == request.distributionChannelID
+                var userCounterData = repository.baKeyIn.GetUserCounter(request.userID);
+
+                var userCounterValidate = userCounterData.Where(c => 
+                    c.DepartmentStore_ID == request.departmentStoreID
                     && c.Brand_ID == request.brandID
-                    && c.RetailerGroup_ID == request.retailerGroupID
-                    && c.Year == request.year
-                    && c.Month == request.month
-                    && c.Week == request.week);
+                    && c.DistributionChannel_ID == request.distributionChannelID).Any();
 
-                if (baKeyInData == null)
+                if (userCounterValidate)
                 {
-                    var createBAKeyInResponse = repository.baKeyIn.CreateBAKeyIn(request);
+                    var baKeyInData = repository.baKeyIn.FindBAKeyInBy(
+                                c => c.DepartmentStore_ID == request.departmentStoreID
+                                && c.DistributionChannel_ID == request.distributionChannelID
+                                && c.Brand_ID == request.brandID
+                                && c.RetailerGroup_ID == request.retailerGroupID
+                                && c.Year == request.year
+                                && c.Month == request.month
+                                && c.Week == request.week);
 
-                    if (createBAKeyInResponse != null)
+                    if (baKeyInData == null)
                     {
-                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, createBAKeyInResponse.ID);
+                        var createBAKeyInResponse = repository.baKeyIn.CreateBAKeyIn(request);
 
-                        if (createDetailResult)
+                        if (createBAKeyInResponse != null)
                         {
-                            response.baKeyInID = createBAKeyInResponse.ID;
-                            response.isSuccess = true;
+                            (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, createBAKeyInResponse.ID);
+
+                            if (createDetailResult)
+                            {
+                                response.baKeyInID = createBAKeyInResponse.ID;
+                                response.isSuccess = true;
+                            }
+                            else
+                            {
+                                response.isSuccess = false;
+                            }
                         }
                         else
                         {
@@ -192,88 +206,90 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        response.isSuccess = false;
+                        var BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == baKeyInData.ID);
+
+                        if (!BAKeyInDetailList.Any())
+                        {
+                            (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, baKeyInData.ID);
+
+                            if (createDetailResult)
+                            {
+                                var listBrandIDInCounter = listDetail.Select(r => r.Brand_ID);
+                                var brandListData = repository.masterData.GetBrandListBy(e => listBrandIDInCounter.Contains(e.Brand_ID));
+
+                                response.baKeyInID = baKeyInData.ID;
+                                response.isSuccess = true;
+                            }
+                            else
+                            {
+                                response.isSuccess = false;
+                            }
+                        }
+                        else
+                        {
+                            var counterList = repository.masterData.GetCounterListBy(
+                                            e => e.Distribution_Channel_ID == request.distributionChannelID
+                                            && e.Department_Store_ID == request.departmentStoreID
+                                            && e.Active_Flag && e.Delete_Flag != true);
+
+                            try
+                            {
+                                // New Counter
+                                if (counterList.Count > BAKeyInDetailList.Count)
+                                {
+                                    var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
+                                    var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
+
+                                    if (request.week != "4")
+                                    {
+                                        List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
+
+                                        foreach (var itemCounter in newCounter)
+                                        {
+                                            var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
+                                            var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                                            {
+                                                listCounterFilterFragrances.Add(itemCounter);
+                                            }
+                                        }
+
+                                        newCounter = listCounterFilterFragrances;
+                                    }
+
+                                    List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
+                                    {
+                                        ID = Guid.NewGuid(),
+                                        BAKeyIn_ID = baKeyInData.ID,
+                                        DepartmentStore_ID = request.departmentStoreID,
+                                        DistributionChannel_ID = request.distributionChannelID,
+                                        Brand_ID = c.Brand_ID,
+                                        Year = request.year,
+                                        Month = request.month,
+                                        Week = request.week,
+                                        Created_By = request.userID,
+                                        Created_Date = dateNow,
+                                        Counter_ID = c.Counter_ID
+                                    }).ToList();
+
+                                    await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
+                                }
+                            }
+                            finally
+                            {
+                                response.baKeyInID = baKeyInData.ID;
+                                response.isSuccess = true;
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    var BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == baKeyInData.ID);
-
-                    if (!BAKeyInDetailList.Any())
-                    {
-                        (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, baKeyInData.ID);
-
-                        if (createDetailResult)
-                        {
-                            var listBrandIDInCounter = listDetail.Select(r => r.Brand_ID);
-                            var brandListData = repository.masterData.GetBrandListBy(e => listBrandIDInCounter.Contains(e.Brand_ID));
-
-                            response.baKeyInID = baKeyInData.ID;
-                            response.isSuccess = true;
-                        }
-                        else
-                        {
-                            response.isSuccess = false;
-                        }
-                    }
-                    else
-                    {
-                        var counterList = repository.masterData.GetCounterListBy(
-                                        e => e.Distribution_Channel_ID == request.distributionChannelID
-                                        && e.Department_Store_ID == request.departmentStoreID
-                                        && e.Active_Flag && e.Delete_Flag != true);
-
-                        try
-                        {
-                            // New Counter
-                            if (counterList.Count > BAKeyInDetailList.Count)
-                            {
-                                var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
-                                var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
-
-                                if (request.week != "4")
-                                {
-                                    List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
-
-                                    foreach (var itemCounter in newCounter)
-                                    {
-                                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
-                                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
-
-                                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
-                                        {
-                                            listCounterFilterFragrances.Add(itemCounter);
-                                        }
-                                    }
-
-                                    newCounter = listCounterFilterFragrances;
-                                }
-
-                                List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
-                                {
-                                    ID = Guid.NewGuid(),
-                                    BAKeyIn_ID = baKeyInData.ID,
-                                    DepartmentStore_ID = request.departmentStoreID,
-                                    DistributionChannel_ID = request.distributionChannelID,
-                                    Brand_ID = c.Brand_ID,
-                                    Year = request.year,
-                                    Month = request.month,
-                                    Week = request.week,
-                                    Created_By = request.userID.GetValueOrDefault(),
-                                    Created_Date = dateNow,
-                                    Counter_ID = c.Counter_ID
-                                }).ToList();
-
-                                repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
-                            }
-                        }
-                        finally
-                        {
-                            response.baKeyInID = baKeyInData.ID;
-                            response.isSuccess = true;
-                        }
-                    }
+                    response.isSuccess = false;
+                    response.responseError = "ข้อมูลไม่ถูกต้อง";
                 }
+
             }
             catch (Exception ex)
             {
@@ -679,7 +695,7 @@ namespace MarketData.Processes.Processes
                     Year = request.year,
                     Month = request.month,
                     Week = request.week,
-                    Created_By = request.userID.GetValueOrDefault(),
+                    Created_By = request.userID,
                     Created_Date = dateNow,
                     Counter_ID = c.Counter_ID
                 }).ToList();
