@@ -461,6 +461,7 @@ namespace MarketData.Processes.Processes
             try
             {
 
+
                 var counterList = repository.masterData.GetCounterList();
                 var counterByFilter = counterList.Where(
                     c => (!request.departmentStoreID.HasValue || (request.departmentStoreID.HasValue && request.departmentStoreID == c.departmentStoreID))
