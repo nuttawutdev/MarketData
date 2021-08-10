@@ -166,7 +166,7 @@ namespace MarketData.Controllers
         }
         public async Task<IActionResult> KeyinByStore_Edit_View(Guid baKeyInID)
         {
-            var viewData = await GetBAKeyInDetail(baKeyInID, true);
+            var viewData = await GetBAKeyInDetail(baKeyInID, true); 
             return View(viewData);
         }
 
