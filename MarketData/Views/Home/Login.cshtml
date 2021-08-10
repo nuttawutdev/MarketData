@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MarketData.Models.LoginViewModel
+
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -20,13 +22,19 @@
 
 <body>
     <section class="login-dark">
-        <form method="post">
+        <form asp-action="Login">
             <h2 class="visually-hidden">Login Form</h2>
             <div class="illustration"><i class="icon ion-ios-locked-outline text-danger"></i></div>
-            <div class="mb-3"><input class="form-control text-danger" type="email" name="email" placeholder="Email"></div>
-            <div class="mb-3"><input class="form-control text-danger" type="password" name="password" placeholder="Password"></div>
-            <div class="mb-3"><button class="btn btn-danger d-block w-100" type="submit" asp-area="" asp-controller="Home" asp-action="Index">Log In</button></div>
-          
+            <div class="mb-3">
+                <input asp-for="userName" class="form-control text-danger" placeholder="User Name" />
+                @*<input class="form-control text-danger" type="email" name="email" placeholder="Email">*@
+            </div>
+            <div class="mb-3">
+                <input asp-for="password" class="form-control text-danger" type="password" placeholder="Password" />
+                @*<input class="form-control text-danger" type="password" name="password" placeholder="Password">*@
+            </div>
+            <div class="mb-3"><button class="btn btn-danger d-block w-100" type="submit">Log In</button></div>
+
             <a class="forgot " asp-area="" asp-controller="Home" asp-action="ForgotPassword">Forgot your email or password?</a>
         </form>
     </section>

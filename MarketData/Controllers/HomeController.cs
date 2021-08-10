@@ -1,9 +1,11 @@
-﻿using MarketData.Models;
+﻿using MarketData.Model.Request.User;
+using MarketData.Models;
+using MarketData.Processes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,18 +13,18 @@ namespace MarketData.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly Process process;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(Process process)
         {
-            _logger = logger;
+            this.process = process;
         }
 
         public IActionResult Index()
         {
             return View();
         }
-       
+
         public IActionResult ForgotPassword()
         {
             return View();
@@ -41,16 +43,51 @@ namespace MarketData.Controllers
         }
         public IActionResult KeyIn()
         {
-            return View();
+            var role = HttpContext.Session.GetString("role");
+
+            if (role == "BA")
+            {
+                return RedirectToAction("KeyinByStore", "KeyIn");
+            }
+            else
+            {
+                return RedirectToAction("KeyinByBrand", "KeyIn");
+            }
+            
         }
         public IActionResult Login()
         {
             return View();
         }
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+
+        [HttpPost]
+        public IActionResult Login(LoginViewModel request)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+            if (ModelState.IsValid)
+            {
+                LoginRequest loginRequest = new LoginRequest
+                {
+                    userName = request.userName
+                };
+
+                var userData = process.user.Login(loginRequest);
+
+                if(userData != null)
+                {
+                    HttpContext.Session.SetString("userID", userData.userID.ToString());
+                    HttpContext.Session.SetString("role", userData.role);
+                    return View("Index");
+                }
+                else
+                {
+                    return View("Login");
+                }               
+            }
+            else
+            {
+                return View("Login");
+            }
         }
     }
 }

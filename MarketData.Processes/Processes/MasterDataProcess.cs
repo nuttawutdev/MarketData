@@ -8,6 +8,7 @@ using MarketData.Model.Response.MasterData;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -776,10 +777,30 @@ namespace MarketData.Processes.Processes
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
 
-                    if (response.countImportSuccess > 0)
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
                     {
-                        response.isSuccess = true;
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
                     }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileName = "ImportBrandDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.isSuccess = true;
                 }
                 else
                 {
@@ -1028,18 +1049,7 @@ namespace MarketData.Processes.Processes
 
                 if (dataList.Any())
                 {
-                    response.data = dataList.Select(c => new DepartmentStoreData
-                    {
-                        departmentStoreID = c.departmentStoreID,
-                        departmentStoreName = c.departmentStoreName,
-                        distributionChannelID = c.distributionChannelID,
-                        distributionChannelName = c.distributionChannelName,
-                        retailerGroupName = c.retailerGroupName,
-                        retailerGroupID = c.retailerGroupID,
-                        rank = c.rank,
-                        active = c.active,
-                        region = c.region
-                    }).ToList();
+                    response.data = dataList;
                 }
                 else
                 {
@@ -1408,11 +1418,30 @@ namespace MarketData.Processes.Processes
                     }
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
-
-                    if (response.countImportSuccess > 0)
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
                     {
-                        response.isSuccess = true;
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
                     }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.fileName = "ImportDepartmentStoreDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
+                    response.isSuccess = true;
                 }
                 else
                 {
@@ -1737,6 +1766,29 @@ namespace MarketData.Processes.Processes
                     }
 
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
+                    {
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
+                    }
+
+                    string today = DateTime.Now.ToString();
+                    DateTime dateNow;
+                    IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.fileName = "ImportCounterDataResult_" + dateNow.ToString("dd-MM-yyyy-HH-mm");
                     response.isSuccess = true;
                 }
                 else
@@ -1779,6 +1831,60 @@ namespace MarketData.Processes.Processes
             catch (Exception ex)
             {
                 response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GetKeyInStatusResponse GetKeyInStatus()
+        {
+            GetKeyInStatusResponse response = new GetKeyInStatusResponse();
+
+            try
+            {
+                var searchData = repository.masterData.GetKeyInStatusList();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response.data = searchData.Select(c => new KeyInStatusData
+                    {
+                        statusID = c.ID,
+                        statusName = c.Status_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response.data = new List<KeyInStatusData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public List<KeyInRemarkData> GetKeyInRemark()
+        {
+            List<KeyInRemarkData> response = new List<KeyInRemarkData>();
+
+            try
+            {
+                var searchData = repository.masterData.GetKeyInRemark();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response = searchData.Select(c => new KeyInRemarkData
+                    {
+                        ID = c.ID,
+                        remark = c.Remark
+                    }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
 
             return response;

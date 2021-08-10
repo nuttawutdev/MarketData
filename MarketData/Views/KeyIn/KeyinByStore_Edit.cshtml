@@ -1,5 +1,10 @@
-﻿@{
+﻿@model MarketData.Models.BAKeyInDetailViewModel
+
+@{
     ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
+    Html.RenderPartial("_WarningModal");
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 
@@ -20,7 +25,7 @@
             <div class="col-sm-2">
                 <label><b>Department Store</b></label><br />
                 <label>
-                    Siam Paragon
+                    @Model.departmentStore
                 </label>
 
 
@@ -28,7 +33,7 @@
             <div class="col-sm-2">
                 <label><b>Distribution Channel</b></label><br />
                 <label>
-                    Couter
+                    @Model.channel
                 </label>
 
 
@@ -36,47 +41,51 @@
             <div class="col-sm-2">
                 <label><b>Brand</b></label><br />
                 <label>
-                    Lancome
+                    @Model.brand
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Year</b></label><br />
                 <label>
-                    2020
+                    @Model.year
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Month</b></label><br />
                 <label>
-                    September
+                    @Model.month
                 </label>
             </div>
             <div class="col-sm-1">
                 <label><b>Week</b></label><br />
                 <label>
-                    3
+                    @Model.week
                 </label>
             </div>
             <div class="col-sm-2">
                 <label><b>Status</b></label><br />
                 <label>
-                    Save
+                    @Model.status
                 </label>
             </div>
         </div>
     </div>
 
 </div>
+
+
 <div class="container-xl" style="padding-top:20px">
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
-                <table class="table table-striped table-hover ">
+                <table class="table table-striped table-hover " id="tblDetails">
                     <thead class="table-secondary">
                         <tr class="row m-0">
-
+                            @{
+                                var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.year) - 1) + " " + Model.month + " week 4)";
+                            }
                             <th class="col-2">Brand</th>
-                            <th class="col-2">Amount Sales (2019 September week 3)</th>
+                            <th class="col-2">@titelPrevYear</th>
                             <th class="col-1">Rank</th>
                             <th class="col-1">Amount Sales</th>
                             <th class="col-1">Whole Sales</th>
@@ -88,40 +97,324 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="row m-0">
-                            <td class="col-2">Chanel</td>
-                            <td class="col-2">900,000</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex"style=" align-items:center"><input type="text" class="form-control input-sm"></td>
+                        @{
+                            foreach (var item in Model.BAKeyInDetailList)
+                            {
+                                <tr class="row m-0">
+                                    <td class="col-2 ID" hidden>@item.ID</td>
+                                    <td class="col-2" hidden>@item.keyInID</td>
+                                    <td class="col-2" hidden>@item.counterID</td>
+                                    <td class="col-2" hidden>@item.departmentStoreID</td>
+                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="col-2" hidden>@item.year</td>
+                                    <td class="col-2" hidden>@item.month</td>
+                                    <td class="col-2" hidden>@item.week</td>
+                                    <td class="col-2" hidden>@item.brandID</td>
+                                    <td class="col-2">@item.brandName</td>
+                                    <td class="col-2">@item.amountSalePreviousYear</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm rank" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm sk" value="@item.sk">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm mu" value="@item.mu">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot">%</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm remark" value="@item.remark"></td>
+                                </tr>
+                            }
 
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="col-2">Laura Mercier</td>
-                            <td class="col-2">700,000</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm">%</td>
-                            <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm"></td>
+                        }
 
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="KeyInByStore" class="btn btn-danger">Save</a>
+        <button id="btnSave" class="btn btn-danger " type="button">Save</button>
+        <button id="btnSubmit" class="btn btn-warning text-white" type="button">Submit</button>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
 </div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#btnSave').on('click', function (e) {
+            $("#blocker").show();
+             var model = @Html.Raw(Json.Serialize(Model));
+
+            var frmdata = getDataFromTable();
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                    success: function (data) {
+                    $("#blocker").hide();
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "KeyinByStore");
+                        $('#successModal').modal('show');
+                    } else if (data.isDuplicated) {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Duplicate data!');
+                    } else {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text(data.responseError != ""
+                            && data.responseError != null ? data.responseError : 'Save data failed');
+                     }
+                    $('#confirmID').val('');
+                    $('#myModalFailedResult').val('');
+                },
+                error: function () {
+                    $("#blocker").hide();
+                }
+            });
+
+        });
+
+        $('#btnSubmit').on('click', function (e) {
+
+
+            var frmdata = getDataFromTable('Submit');
+
+            if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+                console.log(frmdata)
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SubmitBAKeyInDetail", "KeyIn")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                        success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "KeyinByStore");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+
+
+        });
+
+        function getDataFromTable(type){
+            var model = @Html.Raw(Json.Serialize(Model));
+
+            var frmdata  = {};
+            var memberDetails = new Array();
+            var bAKeyInID = '';
+            $("#tblDetails TBODY TR").each(function () {
+                var row = $(this);
+                var memberDetail = {};
+                var rank = row.find("TD").find(".rank").val();
+                var amountSale = row.find("TD").find(".amountSale").val();
+                var wholeSale = row.find("TD").find(".wholeSale").val();
+                var sk = row.find("TD").find(".sk").val();
+                var mu = row.find("TD").find(".mu").val();
+                var fg = row.find("TD").find(".fg").val();
+                var ot = row.find("TD").find(".ot").val();
+                var amountSalePreviousYear = row.find("TD").eq(10).html();
+                var week = row.find("TD").eq(7).html();
+                bAKeyInID = row.find("TD").eq(1).html()
+                memberDetail.ID = row.find("TD").eq(0).html();
+                memberDetail.keyInID = row.find("TD").eq(1).html();
+                memberDetail.counterID = row.find("TD").eq(2).html();
+                memberDetail.departmentStoreID = row.find("TD").eq(3).html();
+                memberDetail.channelID = row.find("TD").eq(4).html();
+                memberDetail.year = row.find("TD").eq(5).html();
+                memberDetail.month = row.find("TD").eq(6).html();
+                memberDetail.week = week;
+                memberDetail.brandID = row.find("TD").eq(8).html();
+                memberDetail.brandName = row.find("TD").eq(9).html();
+                memberDetail.amountSalePreviousYear = amountSalePreviousYear ? parseFloat(amountSalePreviousYear) : null;
+                memberDetail.rank = rank ? parseInt(rank) : null;
+                memberDetail.amountSale = amountSale ? parseFloat(amountSale) : null;
+                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : type == 'Submit' && week == 4 ? 0 : null;
+                memberDetail.sk = sk ? parseFloat(sk) : null;
+                memberDetail.mu = mu ? parseFloat(mu) : null;
+                memberDetail.fg = fg ? parseFloat(fg) : null;
+                memberDetail.ot = ot ? parseFloat(ot) : null;
+                memberDetail.remark = row.find("TD").find(".remark").val();
+                memberDetails.push(memberDetail);
+            });
+
+            frmdata.BAKeyInDetailList = memberDetails;
+            frmdata.BAKeyInID = bAKeyInID;
+            frmdata.userID = bAKeyInID;
+            return frmdata;
+        };
+
+        function validate_AmountSale_Rank(data) {
+            var isNullAmount = data.BAKeyInDetailList.some(function (i) {
+                return (i.amountSale == null && i.rank != null) ||
+                  (i.amountSale != null && i.rank == null) ||
+                  (i.amountSale == null && i.rank == null && i.remark == '');
+          })
+            if (isNullAmount) {
+                showWarningAlert('NullAmount');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var sk = i.sk != null ? parseFloat(i.ot) : 0;
+                var mu = i.mu != null ? parseFloat(i.mu) : 0;
+                var fg = i.fg != null ? parseFloat(i.fg) : 0;
+                var ot = i.ot != null ? parseFloat(i.ot) : 0;
+
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var sk = i.sk != null && i.sk != '' ? parseFloat(i.sk) : 0;
+                var mu = i.mu != null && i.mu != '' ? parseFloat(i.mu) : 0;
+                var fg = i.fg != null && i.fg != '' ? parseFloat(i.fg) : 0;
+                var ot = i.ot != null && i.ot != '' ? parseFloat(i.ot) : 0;
+
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                return i.week == 4 && i.wholeSale == null
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales_AmountSales(data) {
+
+            var validateData = data.BAKeyInDetailList.some(function (i) {
+                var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
+                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
+                return amountSale < wholeSale ;
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales_AmountSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Rank_AmountSales(data) {
+
+            var number = 0;
+            var duplicateRank = false;
+            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
+
+                if (data.BAKeyInDetailList[i].rank != null && data.BAKeyInDetailList[i].rank != '' && number == data.BAKeyInDetailList[i].rank) {
+                    duplicateRank = true;
+                    break;
+                } else {
+                    number = data.BAKeyInDetailList[i].rank
+                }
+            }
+
+            if (duplicateRank) {
+                showWarningAlert('DuplicateRank');
+                return 0;
+            }
+
+            var sortAmount = data.BAKeyInDetailList.sort((a, b) => (a.amountSale > b.amountSale) ? -1 : 1)
+
+            var inCorrectAmountRank = false;
+            var sort = 1;
+            for (var i = 0; i < sortAmount.length; i++) {
+                if (sortAmount[i].amountSale != null && sortAmount[i].rank != null) {
+                if (  sortAmount[i].rank == sort ) {
+                    sort++;
+                } else {
+                    inCorrectAmountRank = true;
+                    break;
+                    }
+                }
+            }
+            if (inCorrectAmountRank) {
+                showWarningAlert('IncorrectAmountRank');
+                return 0;
+            } else {
+                return 1;
+            }
+
+        }
+
+        function showWarningAlert(typeWarning) {
+            var msg = '';
+            switch (typeWarning) {
+                case 'NullAmount':
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    break;
+                case '100Percent':
+                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100% เท่านั้น';
+                    break;
+                case 'NullWholeSales':
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    break;
+                case 'NullWholeSales_AmountSales':
+                    msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
+                    break;
+                case 'DuplicateRank':
+                    msg = 'Duplicate Rank!';
+                    break;
+                case 'IncorrectAmountRank':
+                    msg = 'ข้อมูล Amount sales และ Rank ไม่สอดคล้องกัน';
+                    break;
+                default:
+            }
+
+
+            $('#warningModal').modal('show');
+
+            $('#myModalWarningResult').text(msg);
+
+
+        }
+
+
+    });
+
+
+
+</script>

@@ -11,5 +11,7 @@ namespace MarketData.Model.Response.MasterData
         public int countImportSuccess { get; set; }
         public int countImportFailed { get; set; }
         public List<ImportResultByRowResponse> importResult { get; set; }
+        public string fileResult { get; set; }
+        public string fileName { get; set; }
     }
 }

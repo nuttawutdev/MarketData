@@ -21,5 +21,12 @@ namespace MarketData.Repositories
         public DbSet<TMDistributionChannel> TMDistributionChannel { get; set; }
         public DbSet<TMRetailerGroup> TMRetailerGroup { get; set; }
         public DbSet<TMRegion> TMRegion { get; set; }
+        public DbSet<TMUserCounter> TMUserCounter { get; set; }
+        public DbSet<TTBAKeyIn> TTBAKeyIn { get; set; }
+        public DbSet<TTBAKeyInDetail> TTBAKeyInDetail { get; set; }
+        public DbSet<TMKeyInRemark> TMKeyInRemark { get; set; }
+        public DbSet<TTAdminKeyInDetail> TTAdminKeyInDetail { get; set; }
+        public DbSet<TMUser> TMUser { get; set; }
+        public DbSet<TMKeyInStatus> TMKeyInStatus { get; set; }
     }
 }

@@ -469,6 +469,17 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMBrand> GetBrandListBy(Expression<Func<TMBrand, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMBrand.Where(expression).AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public async Task<bool> SaveBrand(SaveBrandRequest request)
         {
             string today = DateTime.Now.ToString();
@@ -989,6 +1000,7 @@ namespace MarketData.Repositories.Repo
                        departmentStoreID = department != null ? department.Department_Store_ID : Guid.Empty,
                        departmentStoreName = department != null ? department.Department_Store_Name : string.Empty,
                        brandID = brand != null ? brand.Brand_ID : Guid.Empty,
+                       retailerGroupID = retailer.Retailer_Group_ID,
                        retailerGroupName = retailer.Retailer_Group_Name,
                        brandName = brand != null ? brand.Brand_Name : string.Empty,
                        distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,
@@ -1090,6 +1102,18 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMCounter> GetCounterListBy(Expression<Func<TMCounter, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMCounter.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #endregion
 
         public List<TMRegion> GetRegionList()
@@ -1136,6 +1160,42 @@ namespace MarketData.Repositories.Repo
                 {
                     return null;
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMKeyInStatus> GetKeyInStatusList()
+        {
+            try
+            {
+                return _dbContext.TMKeyInStatus.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMKeyInStatus GetKeyInStatusBy(Expression<Func<TMKeyInStatus, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMKeyInStatus.Where(expression).AsNoTracking().FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMKeyInRemark> GetKeyInRemark()
+        {
+            try
+            {
+                return _dbContext.TMKeyInRemark.AsNoTracking().ToList();
             }
             catch (Exception ex)
             {

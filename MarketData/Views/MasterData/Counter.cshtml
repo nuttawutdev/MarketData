@@ -88,6 +88,26 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        function base64ToArrayBuffer(base64) {
+            var binaryString = window.atob(base64);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+            for (var i = 0; i < binaryLen; i++) {
+                var ascii = binaryString.charCodeAt(i);
+                bytes[i] = ascii;
+            }
+            return bytes;
+        }
+
+        function saveByteArray(reportName, byte) {
+            var blob = new Blob([byte], { type: "text/plain" });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            var fileName = reportName;
+            link.download = fileName;
+            link.click();
+        };
+
         $("#file-upload").change(function () {
             $("#blocker").show();
 
@@ -121,6 +141,9 @@
                                 for (var i = 0; i < data.importResult.length; i++) {
                                     $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result + "</p>");
                                 }
+
+                                var sampleArr = base64ToArrayBuffer(data.fileResult);
+                                saveByteArray(data.fileName, sampleArr);
 
                                 $('#importDataModalHref').attr("href", "Counter");
                                 $('#importDataModal').modal('show');
