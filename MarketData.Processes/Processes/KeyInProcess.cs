@@ -473,6 +473,7 @@ namespace MarketData.Processes.Processes
                 {
                     if (request.week != "4")
                     {
+
                         var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.brandID);
                         var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
