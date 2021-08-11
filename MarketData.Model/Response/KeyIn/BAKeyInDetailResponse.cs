@@ -7,7 +7,6 @@ namespace MarketData.Model.Response.KeyIn
 {
     public class BAKeyInDetailResponse : BaseResponse
     {
-        public bool isSuccess { get; set; }
         public string departmentStore { get; set; }
         public string channel { get; set; }
         public string brand { get; set; }

@@ -509,14 +509,16 @@ namespace MarketData.Processes.Processes
                     {
                         AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
                         adminKeyInDetailList.Add(dataDetail);
-                    }
-                   
+                    }                  
                 }
+
+                response.data = adminKeyInDetailList;
             }
             catch (Exception ex)
             {
                 response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
+
 
             return response;
         }

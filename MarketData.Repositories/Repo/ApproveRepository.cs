@@ -1,4 +1,6 @@
 ﻿using MarketData.Model.Entiry;
+using MarketData.Model.Response.Approve;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,5 +39,17 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        //public List<ApproveKeyInData> GetApproveKeyInData()
+        //{
+        //    try
+        //    {
+        //        var approveKeyInData = _dbContext.TTApproveKeyIn.AsNoTracking().ToList();
+        //    }
+        //    catch(Exception ex)
+        //    {
+
+        //    }
+        //}
     }
 }
