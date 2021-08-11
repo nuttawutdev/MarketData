@@ -234,8 +234,9 @@
                         if (data.data != null) {
 
                             var titleTable = '<thead class="table-secondary">' +
-                                '    <th class="col-2">Brand</th>' +
-                                '    <th class="col-2">Amount Sales (' + parseInt(data.year) + " " + $('#ddlMonth option:selected').text() + ' week 4)</th>' +
+                                '    <th class="col-1">Brand</th>' +
+                                '    <th class="col-2">Department Store</th>' +
+                                '    <th class="col-1">Amount Sales (' + parseInt(data.year) + " " + $('#ddlMonth option:selected').text() + ' week 4)</th>' +
                                 '    <th class="col-1">Rank</th>' +
                                 '    <th class="col-1">Amount Sales</th>' +
                                 '    <th class="col-1">Whole Sales</th>' +
@@ -271,8 +272,9 @@
                                 '<td class="col-2" hidden>' + data.data[i].month +'</td>' +
                                 '<td class="col-2" hidden>' + data.data[i].week +'</td>' +
                                 '<td class="col-2" hidden>' + data.data[i].brandID +'</td>' +
-                                '<td class="col-2">' + data.data[i].brandName+'</td>' +
-                                '<td class="col-2">' + amountSalePreviousYear +'</td>' +
+                                '<td class="col-1">' + data.data[i].brandName + '</td>' +
+                                '<td class="col-2">' + data.data[i].departmentStoreName + '</td>' +
+                                '<td class="col-1">' + amountSalePreviousYear +'</td>' +
                                 '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm rank" value=' + rank+'></td>' +
                                 '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value=' + amountSale+'></td>' +
                                 '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value=' + wholeSale+'></td>' +
