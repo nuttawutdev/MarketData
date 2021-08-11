@@ -187,7 +187,6 @@
     </div>
     <div class="modal-footer">
         <button id="btnSubmit" class="btn btn-warning text-white" type="button">Submit</button>
-        <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
 </div>
@@ -196,6 +195,9 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+
+        $('#btnSubmit').hide();
+
         $('#btnCreate').on('click', function (e) {
             $("#blocker").show();
             if (
@@ -206,11 +208,9 @@
                 $('#warningModal').modal('show');
 
                 $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายแบรนด์');
+                $("#blocker").hide();
             } else {
                 var model = @Html.Raw(Json.Serialize(Model));
-
-
-
 
                 var frmdata = {
                     year: $("#yearList").val(),
@@ -231,8 +231,60 @@
                     datatype: "json",
                     success: function (data) {
                         $("#blocker").hide();
-                        if (data.isSuccess) {
-                            console.log(data)
+                        if (data.data != null) {
+
+                            var titleTable = '<thead class="table-secondary">' +
+                                '    <th class="col-2">Brand</th>' +
+                                '    <th class="col-2">Amount Sales (' + parseInt(data.year) + " " + $('#ddlMonth option:selected').text() + ' week 4)</th>' +
+                                '    <th class="col-1">Rank</th>' +
+                                '    <th class="col-1">Amount Sales</th>' +
+                                '    <th class="col-1">Whole Sales</th>' +
+                                '    <th class="col-1">SK (%)</th>' +
+                                '    <th class="col-1">MU (%)</th>' +
+                                '    <th class="col-1">FG (%)</th>' +
+                                '    <th class="col-1">OT (%)</th>' +
+                                '    <th class="col-1">Remark</th>' +
+                                '</tr>' +
+                                '</thead>';
+
+                            $('#tblDetails').empty();
+                            var rowTable = ' <tbody>';
+                            for (var i = 0; i < data.data.length - 1; i++) {
+
+                                var amountSalePreviousYear = data.data[i].amountSalePreviousYear ? data.data[i].amountSalePreviousYear : "";
+                                var rank = data.data[i].rank ? data.data[i].rank : "";
+                                var amountSale = data.data[i].amountSale ? data.data[i].amountSale : "";
+                                var wholeSale = data.data[i].wholeSale ? data.data[i].wholeSale : "";
+                                var sk = data.data[i].sk ? data.data[i].sk : "";
+                                var mu = data.data[i].mu ? data.data[i].mu : "";                             
+                                var fg = data.data[i].fg ? data.data[i].fg : "";
+                                var ot = data.data[i].ot ? data.data[i].ot : "";
+                                var remark = data.data[i].remark ? data.data[i].remark : "";
+
+                                rowTable +=
+                                '<tr>'+
+                                '<td class="col-2 ID" hidden>' + data.data[i].id +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].counterID +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].departmentStoreID +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].channelID +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].year +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].month +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].week +'</td>' +
+                                '<td class="col-2" hidden>' + data.data[i].brandID +'</td>' +
+                                '<td class="col-2">' + data.data[i].brandName+'</td>' +
+                                '<td class="col-2">' + amountSalePreviousYear +'</td>' +
+                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm rank" value=' + rank+'></td>' +
+                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value=' + amountSale+'></td>' +
+                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value=' + wholeSale+'></td>' +
+                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm sk" value=' + sk+'></td>'+
+                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm mu" value=' + mu+'></td>'+
+                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm fg" value=' + fg+'></td>'+
+                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm ot" value=' + ot+'></td>'+
+                                '<td class="col-1" style=" align-items:center"><input type="text" class="form-control input-sm remark" value=' + remark+'></td>' +
+                                '</tr>';
+                            }
+                            $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
+                            $('#btnSubmit').show();
                         }
                     },
                     error: function () {
