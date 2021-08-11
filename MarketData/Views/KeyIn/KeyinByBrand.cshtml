@@ -196,7 +196,50 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-      
-    }
+        $('#btnCreate').on('click', function (e) {
+            $("#blocker").show();
+            if (
+                !$('#ddlWeek').val() ||
+                !$('#ddlMonth').val() ||
+                !$('#yearList').val() ||
+                !$('#iduniverseList').val()) {
+                $('#warningModal').modal('show');
+
+                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายแบรนด์');
+            } else {
+                var model = @Html.Raw(Json.Serialize(Model));
+
+
+
+
+                var frmdata = {
+                    year: $("#yearList").val(),
+                    month: $('#ddlMonth').val(),
+                    week: $('#ddlWeek').val(),
+                    distributionChannelID: $('#channelList').val() ? $('#channelList').val() : null,
+                    retailerGroupID: $('#retailerGroupList').val() ? $('#retailerGroupList').val() : null,
+                    departmentStoreID: $('#departmentStoreList').val() ? $('#departmentStoreList').val() : null,
+                    brandID: $('#brandList').val() ? $('#brandList').val() : null ,
+                    universe: $('#iduniverseList').val()
+                };
+                console.log(frmdata)
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetAdminKeyInDetail", "KeyIn")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            console.log(data)
+                        }
+                    },
+                    error: function () {
+                    }
+                });
+            }
+        })
+    });
 </script>
 
