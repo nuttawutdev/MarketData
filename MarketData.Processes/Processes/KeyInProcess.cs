@@ -442,7 +442,25 @@ namespace MarketData.Processes.Processes
 
                 if (updateBAKeyIn)
                 {
-                    response.isSuccess = await SaveBAKeyInDetailData(request);
+                    var saveDetailResult = await SaveBAKeyInDetailData(request);
+                    if (saveDetailResult)
+                    {
+                        var baKeyInData = repository.baKeyIn.FindBAKeyInBy(c => c.ID == request.BAKeyInID);
+                        var createApproveKeyInResult = await repository.approve.CreateApproveKeyInData(baKeyInData);
+
+                        if (createApproveKeyInResult)
+                        {
+                            response.isSuccess = true;
+                        }
+                        else
+                        {
+                            response.isSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                    }
                 }
                 else
                 {

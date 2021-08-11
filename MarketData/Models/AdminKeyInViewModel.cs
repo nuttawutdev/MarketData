@@ -12,5 +12,12 @@ namespace MarketData.Models
         public List<DepartmentStoreKeyInViewModel> departmentStoreList { get; set; } = new List<DepartmentStoreKeyInViewModel>();
         public List<BrandKeyInViewModel> brandList { get; set; } = new List<BrandKeyInViewModel>();
         public List<string> yearList { get; set; } = new List<string>();
+        public List<AdminKeyInRemark> remarkList { get; set; }
+    }
+
+    public class AdminKeyInRemark
+    {
+        public Guid ID { get; set; }
+        public string remark { get; set; }
     }
 }
