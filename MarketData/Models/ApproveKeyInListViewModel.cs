@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace MarketData.Model.Response.Approve
+namespace MarketData.Models
 {
-    public class GetApproveKeyInListResponse : BaseResponse
+    public class ApproveKeyInListViewModel
     {
-        public List<ApproveKeyInData> data { get; set; }
+        public List<ApproveKeyInDataViewModel> data { get; set; }
     }
 
-    public class ApproveKeyInData
+    public class ApproveKeyInDataViewModel
     {
         public Guid approveKeyInID { get; set; }
         public Guid baKeyInID { get; set; }

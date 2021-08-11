@@ -1202,5 +1202,17 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<TMApproveStatus> GetApproveStatusList()
+        {
+            try
+            {
+                return _dbContext.TMApproveStatus.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

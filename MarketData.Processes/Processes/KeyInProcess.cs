@@ -22,6 +22,7 @@ namespace MarketData.Processes.Processes
             this.repository = repository;
         }
 
+        #region BA KeyIn
         public GetBAKeyInListResponse GetBAKeyInList(Guid userID)
         {
             GetBAKeyInListResponse response = new GetBAKeyInListResponse();
@@ -475,6 +476,9 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        #endregion
+
+        #region Admin KeyIn
         public GetAdminKeyInResponse GetAdminKeyInData(GetAdminKeyInRequest request)
         {
             GetAdminKeyInResponse response = new GetAdminKeyInResponse();
@@ -652,6 +656,9 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        #endregion
+
+        #region Private Function
         private async Task<(bool, List<TTBAKeyInDetail>)> CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
             DateTime dateNow = DateTime.Now;
@@ -788,5 +795,6 @@ namespace MarketData.Processes.Processes
 
             return dataDetail;
         }
+        #endregion
     }
 }
