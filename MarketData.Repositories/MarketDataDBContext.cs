@@ -28,5 +28,7 @@ namespace MarketData.Repositories
         public DbSet<TTAdminKeyInDetail> TTAdminKeyInDetail { get; set; }
         public DbSet<TMUser> TMUser { get; set; }
         public DbSet<TMKeyInStatus> TMKeyInStatus { get; set; }
+        public DbSet<TTApproveKeyIn> TTApproveKeyIn { get; set; }
+        public DbSet<TMApproveStatus> TMApproveStatus { get; set; }
     }
 }

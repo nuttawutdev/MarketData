@@ -33,6 +33,7 @@ namespace MarketData.Controllers
             try
             {
                 var adminOption = process.keyIn.GetAdminKeyInOption();
+                var keyInRemark = process.masterData.GetKeyInRemark();
 
                 if (adminOption != null)
                 {
@@ -74,6 +75,11 @@ namespace MarketData.Controllers
                         }).ToList();
                     }
 
+                    dataModel.remarkList = keyInRemark.Select(c => new AdminKeyInRemark
+                    {
+                        ID = c.ID,
+                        remark = c.remark
+                    }).ToList();
                     dataModel.yearList = adminOption.year;
                 }
             }
