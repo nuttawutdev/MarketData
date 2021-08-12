@@ -282,27 +282,10 @@
         function validate_Sum_Percent(data) {
 
             var validateData = data.BAKeyInDetailList.some(function (i) {
-                var sk = i.sk != null ? parseFloat(i.ot) : 0;
+                var sk = i.sk != null ? parseFloat(i.sk) : 0;
                 var mu = i.mu != null ? parseFloat(i.mu) : 0;
                 var fg = i.fg != null ? parseFloat(i.fg) : 0;
                 var ot = i.ot != null ? parseFloat(i.ot) : 0;
-
-                var sum = sk + mu + fg + ot;
-                return sum != 0 && sum != 100;
-            })
-            if (validateData) {
-                showWarningAlert('100Percent');
-                return 0;
-            } else return 1;
-        }
-
-        function validate_Sum_Percent(data) {
-
-            var validateData = data.BAKeyInDetailList.some(function (i) {
-                var sk = i.sk != null && i.sk != '' ? parseFloat(i.sk) : 0;
-                var mu = i.mu != null && i.mu != '' ? parseFloat(i.mu) : 0;
-                var fg = i.fg != null && i.fg != '' ? parseFloat(i.fg) : 0;
-                var ot = i.ot != null && i.ot != '' ? parseFloat(i.ot) : 0;
 
                 var sum = sk + mu + fg + ot;
                 return sum != 0 && sum != 100;
