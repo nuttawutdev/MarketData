@@ -177,6 +177,9 @@ namespace MarketData.Controllers
         }
 
 
+
+
+        #region BA KeyIn Function
         [HttpPost]
         public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
         {
@@ -186,8 +189,6 @@ namespace MarketData.Controllers
             var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
         }
-
-        #region BA KeyIn Function
         public async Task<BAKeyInDetailViewModel> GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
             try
@@ -387,6 +388,29 @@ namespace MarketData.Controllers
             catch (Exception ex)
             {
                 return Json(dataModel);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> SaveAdminKeyIn([FromBody] SaveAdminKeyInDetailRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                var userID = HttpContext.Session.GetString("userID");
+                request.userID = new Guid(userID);
+
+                response = await process.keyIn.SaveAdminKeyIn(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false,
+                    responseError = "Please input required field."
+                };
+                return Json(response);
             }
         }
 
