@@ -5,7 +5,7 @@
 }
 
 
-<h3>
+<h3 style="padding-left:20px;padding-right:20px">
     @ViewData["Title"]
 
 </h3>
@@ -15,27 +15,36 @@
 <br />
 <br />
 
-<div class="row">
+<div class="row" style="overflow-x:auto;padding-left:20px;padding-right:20px">
     <div style="width: 100%; font-size: 13px;">
         <div class="row col-sm-12">
 
             <div class="col-sm-2">
-                <label><b>Department Store</b></label><br />
-                <label>
-                   @Model.departmentStore
-                </label>
-
-
-            </div>
-            <div class="col-sm-2">
                 <label><b>Distribution Channel</b></label><br />
                 <label>
-                   @Model.channel
+                    @Model.channel
                 </label>
 
 
             </div>
+
             <div class="col-sm-2">
+                <label><b>Retailer Group</b></label><br />
+                <label>
+                    @Model.retailerGroup
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Department Store</b></label><br />
+                <label>
+                    @Model.departmentStore
+                </label>
+            </div>
+
+            <div class="col-sm-1">
                 <label><b>Brand</b></label><br />
                 <label>
                     @Model.brand
@@ -59,27 +68,35 @@
                     @Model.week
                 </label>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
+                <label><b>Universe</b></label><br />
+                <label>
+                    @Model.universe
+                </label>
+
+
+            </div>
+            <div class="col-sm-1">
                 <label><b>Status</b></label><br />
                 <label>
                     @Model.status
                 </label>
-            </div> 
+            </div>
         </div>
     </div>
 
 </div>
 
 
-<div class="container-xl" style="padding-top:20px">
+<div class="container-xl" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
                 <table class="table table-striped table-hover " id="tblDetails">
                     <thead class="table-secondary">
                         <tr class="row m-0">
-                            @{ 
-                                var titelPrevYear = "Amount Sales ("+ (Convert.ToInt32(Model.year)-1)+" "+ Model.month+" week 4)";
+                            @{
+                                var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.year) - 1) + " " + Model.month + " week 4)";
                             }
                             <th class="col-2">Brand</th>
                             <th class="col-2">@titelPrevYear</th>
@@ -97,27 +114,27 @@
                         @{
                             foreach (var item in Model.BAKeyInDetailList)
                             {
-                                                <tr class="row m-0">
-                                                    <td class="col-2 ID" hidden>@item.ID</td>
-                                                    <td class="col-2" hidden>@item.keyInID</td>
-                                                    <td class="col-2" hidden>@item.counterID</td>
-                                                    <td class="col-2" hidden>@item.departmentStoreID</td>
-                                                    <td class="col-2" hidden>@item.channelID</td>
-                                                    <td class="col-2" hidden>@item.year</td>
-                                                    <td class="col-2" hidden>@item.month</td>
-                                                    <td class="col-2" hidden>@item.week</td>
-                                                    <td class="col-2" hidden>@item.brandID</td>
-                                                    <td class="col-2">@item.brandName</td>
-                                                    <td class="col-2">@item.amountSalePreviousYear</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.rank</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.amountSale</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.wholeSale</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.sk != "" && item.sk != null ? item.sk : "")</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.mu != "" && item.mu != null ? item.mu : "")</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.fg != "" && item.fg != null ? item.fg : "")</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.ot != "" && item.ot != null ? item.ot : "")</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.remark</td>
-                                                </tr>
+                                <tr class="row m-0">
+                                    <td class="col-2 ID" hidden>@item.ID</td>
+                                    <td class="col-2" hidden>@item.keyInID</td>
+                                    <td class="col-2" hidden>@item.counterID</td>
+                                    <td class="col-2" hidden>@item.departmentStoreID</td>
+                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="col-2" hidden>@item.year</td>
+                                    <td class="col-2" hidden>@item.month</td>
+                                    <td class="col-2" hidden>@item.week</td>
+                                    <td class="col-2" hidden>@item.brandID</td>
+                                    <td class="col-2">@item.brandName</td>
+                                    <td class="col-2">@item.amountSalePreviousYear</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.rank</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.amountSale</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.wholeSale</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.sk != "" && item.sk != null ? item.sk : "")</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.mu != "" && item.mu != null ? item.mu : "")</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.fg != "" && item.fg != null ? item.fg : "")</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@(item.ot != "" && item.ot != null ? item.ot : "")</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">@item.remark</td>
+                                </tr>
                             }
 
                         }
@@ -134,4 +151,11 @@
     </div>
 </div>
 
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#container").removeClass("container");
+
+    });
+</script>
 
