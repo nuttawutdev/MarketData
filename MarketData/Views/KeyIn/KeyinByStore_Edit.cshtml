@@ -136,7 +136,9 @@
                                                     <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm mu" value="@item.mu"></td>
                                                     <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg"></td>
                                                     <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="text" class="form-control input-sm remark" value="@item.remark"></td>
+                                                    <td class="col-1 d-inline-flex" style=" align-items:center">
+                                                        @Html.DropDownList("remarkList", new SelectList(Model.remarkList, "ID", "remark"),  new { id = "remarkList", @class = "form-control col-sm-12 remark" })
+                                                    </td>
                                                 </tr>
                             }
 
@@ -253,6 +255,7 @@
                 var ot = row.find("TD").find(".ot").val();
                 var amountSalePreviousYear = row.find("TD").eq(10).html();
                 var week = row.find("TD").eq(7).html();
+                var remark = row.find("TD").find(".remark option:selected").text();
                 bAKeyInID = row.find("TD").eq(1).html()
                 memberDetail.ID = row.find("TD").eq(0).html();
                 memberDetail.keyInID = row.find("TD").eq(1).html();
@@ -272,7 +275,7 @@
                 memberDetail.mu = mu ? parseFloat(mu) : null;
                 memberDetail.fg = fg ? parseFloat(fg) : null;
                 memberDetail.ot = ot ? parseFloat(ot) : null;
-                memberDetail.remark = row.find("TD").find(".remark").val();
+                memberDetail.remark = remark;
                 memberDetails.push(memberDetail);
             });
 
