@@ -165,7 +165,7 @@
                 $("#blocker").hide();
             } else {
                 var model = @Html.Raw(Json.Serialize(Model));
-
+                  var model2 = @Html.Raw(Json.Serialize(Model.remarkList));
                 var frmdata = {
                     year: $("#yearList").val(),
                     month: $('#ddlMonth').val(),
@@ -216,34 +216,32 @@
                                 var remark = data.data[i].remark ? data.data[i].remark : "";
 
                                 rowTable +=
-                                '<tr>'+
-                                '<td class="col-2 ID" hidden>' + data.data[i].id + '</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].counterID +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].departmentStoreID +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].channelID +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].year +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].month +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].week +'</td>' +
-                                '<td class="col-2" hidden>' + data.data[i].brandID +'</td>' +
-                                '<td class="col-1">' + data.data[i].brandName + '</td>' +
-                                '<td class="col-2">' + data.data[i].departmentStoreName + '</td>' +
-                                '<td class="col-1">' + amountSalePreviousYear +'</td>' +
-                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm rank" value=' + rank+'></td>' +
-                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value=' + amountSale+'></td>' +
-                                '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value=' + wholeSale+'></td>' +
-                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm sk" value=' + sk+'></td>'+
-                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm mu" value=' + mu+'></td>'+
-                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm fg" value=' + fg+'></td>'+
-                                '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm ot" value=' + ot+'></td>'+
-                                '<td class="col-1" style=" align-items:center"><input type="text" class="form-control input-sm remark" value=' + remark + '></td>' +
-                                    @*<select id="ddlRemark" class="form-control col-sm-12 ddlRemark">
-                                                            @foreach (var item2 in Model.remarkList)
-                                                            {
+                                    '<tr>' +
+                                    '<td class="col-2 ID" hidden>' + data.data[i].id + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].counterID + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].departmentStoreID + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].channelID + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].year + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].month + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].week + '</td>' +
+                                    '<td class="col-2" hidden>' + data.data[i].brandID + '</td>' +
+                                    '<td class="col-1">' + data.data[i].brandName + '</td>' +
+                                    '<td class="col-2">' + data.data[i].departmentStoreName + '</td>' +
+                                    '<td class="col-1">' + amountSalePreviousYear + '</td>' +
+                                    '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm rank" value=' + rank + '></td>' +
+                                    '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value=' + amountSale + '></td>' +
+                                    '<td class="col-1" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value=' + wholeSale + '></td>' +
+                                    '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm sk" value=' + sk + '></td>' +
+                                    '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm mu" value=' + mu + '></td>' +
+                                    '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm fg" value=' + fg + '></td>' +
+                                    '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm ot" value=' + ot + '></td>' +
+                                    '<td class="col-1" style=" align-items:center"><select id="ddlRemark" class="form-control col-sm-12 remark">';
 
-                                                                <option value="@item2.ID" @item2="=">@item2.remark</option>
+                                for (var j = 0; j < @Model.remarkList.Count; j++) {
+                                    //'<option value="' + Model.remarkList[j].ID + '" ' + Model.remarkList[j].remark == data.data[i].remark ? "selected":""+'>' + Model.remarkList[j].remark+'</option>';
+                                }
 
-                                                            }
-                                                        </select*@
+                                rowTable +=  '</select></td>' +
                                 '<td class="col-2" hidden>' + data.data[i].retailerGroupID + '</td>' +
                                     '</tr>';
                             }
