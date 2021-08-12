@@ -530,9 +530,9 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<SaveAdminKeyInResponse> SaveAdminKeyIn(SaveAdminKeyInDetailRequest request)
+        public async Task<SaveDataResponse> SaveAdminKeyIn(SaveAdminKeyInDetailRequest request)
         {
-            SaveAdminKeyInResponse response = new SaveAdminKeyInResponse();
+            SaveDataResponse response = new SaveDataResponse();
             DateTime dateNoew = DateTime.Now;
 
             try
