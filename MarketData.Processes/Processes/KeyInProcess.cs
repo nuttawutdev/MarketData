@@ -587,7 +587,7 @@ namespace MarketData.Processes.Processes
                         Rank = c.rank,
                         Remark = c.remark,
                         Universe = c.universe,
-                        Created_By = request.userID,
+                        Created_By = request.userID.GetValueOrDefault(),
                         Created_Date = dateNoew
                     }).ToList();
 
