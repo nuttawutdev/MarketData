@@ -286,9 +286,7 @@
                 !$('#brandList').val() ||
                 !$('#iduniverseList').val()) {
                 $('#warningModal').modal('show');
-
-
-                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
+                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบถ้วน เพื่อบันทึกข้อมูลยอดขาย');
 
             } else {
 
@@ -316,14 +314,17 @@
                     $("#blocker").hide();
                     if (data.isSuccess) {
                         if (!data.isSubmited) {
-                             var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
-                             window.location.href = url.replace('_id_', data.baKeyInID);
+                            var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.baKeyInID);
                         }
                         else {
-                             var url = '@Url.Action("KeyinByStore_Edit_View", "KeyIn", new { baKeyInID = "_id_" })';
-                             window.location.href = url.replace('_id_', data.baKeyInID);
+                            var url = '@Url.Action("KeyinByStore_Edit_View", "KeyIn", new { baKeyInID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.baKeyInID);
                         }
-
+                    }
+                    else {
+                        $('#warningModal').modal('show');
+                        $('#myModalWarningResult').text(data.responseError);
                     }
                 },
                 error: function () {

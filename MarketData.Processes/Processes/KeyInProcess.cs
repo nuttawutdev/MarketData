@@ -164,6 +164,16 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                int monthKeyIn = Int32.Parse(request.month);
+                int yearKeyIn = Int32.Parse(request.year);
+
+                if (yearKeyIn == DateTime.Now.Year && monthKeyIn > DateTime.Now.Month)
+                {
+                    response.responseError = "ไม่สามารถเลือกบันทึกข้อมูลล่วงหน้าได้";
+                    return response;
+                }
+
+
                 var userCounterData = repository.baKeyIn.GetUserCounter(request.userID.GetValueOrDefault());
 
                 var userCounterValidate = userCounterData.Where(c =>
