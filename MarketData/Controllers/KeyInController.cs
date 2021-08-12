@@ -359,6 +359,7 @@ namespace MarketData.Controllers
                 dataModel.year = request.year;
                 dataModel.month = request.month;
                 dataModel.week = request.week;
+                dataModel.totalAmountPreviosYear = response.totalAmountPreviosYear;
                 dataModel.data = response.data.Select(c => new AdminKeyInDetailData
                 {
                     ID = c.ID,

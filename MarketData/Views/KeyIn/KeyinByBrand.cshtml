@@ -250,6 +250,21 @@
                                 '<td class="col-2" hidden>' + data.data[i].retailerGroupID + '</td>' +
                                     '</tr>';
                             }
+
+                            rowTable += '<tr>' +
+                                '<td class="col-1">Total</td>' +
+                                '<td class="col-1"></td>' +
+                                '<td class="col-2">' + data.totalAmountPreviosYear+'</td>' +
+                                '<td class="col-1" style=" align-items:center"></td>' +
+                                '<td class="col-1" style=" align-items:center"></td>' +
+                                '<td class="col-1" style=" align-items:center"></td>' +
+                                '<td class="col-1" style=" align-items:center;"></td>' +
+                                '<td class="col-1" style=" align-items:center;"></td>' +
+                                '<td class="col-1" style=" align-items:center;"></td>' +
+                                '<td class="col-1" style=" align-items:center;"></td>' +
+                                '<td class="col-1" style=" align-items:center"></td>'+ 
+                                '</tr>';
+
                             $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
                             $('#btnSubmit').show();
                         }

@@ -8,6 +8,7 @@ namespace MarketData.Models
     public class AdminKeyInDetailViewModel
     {
         public List<AdminKeyInDetailData> data { get; set; } = new List<AdminKeyInDetailData>();
+        public string totalAmountPreviosYear { get; set; }
         public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }

@@ -530,6 +530,17 @@ namespace MarketData.Processes.Processes
                 }
 
                 response.data = adminKeyInDetailList;
+                var amountPreviousYear = adminKeyInDetailList.Where(c => c.amountSalePreviousYear > 0);
+
+                if (amountPreviousYear.Any())
+                {
+                    response.totalAmountPreviosYear = amountPreviousYear.Sum(e => e.amountSalePreviousYear.Value).ToString("0.00");
+                }
+                else
+                {
+                    response.totalAmountPreviosYear = string.Empty;
+                }
+
             }
             catch (Exception ex)
             {
