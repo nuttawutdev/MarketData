@@ -369,6 +369,7 @@ namespace MarketData.Controllers
                     brandName = c.brandName,
                     channelID = c.distributionChannelID,
                     counterID = c.counterID,
+                    retailerGroupID = c.retailerGroupID,
                     departmentStoreID = c.departmentStoreID,
                     departmentStoreName = c.departmentStoreName,
                     month = c.month,

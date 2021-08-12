@@ -19,6 +19,7 @@ namespace MarketData.Models
         public Guid counterID { get; set; }
         public Guid departmentStoreID { get; set; }
         public string departmentStoreName { get; set; }
+        public Guid retailerGroupID { get; set; }
         public Guid channelID { get; set; }
         public Guid brandID { get; set; }
         public string brandName { get; set; }
