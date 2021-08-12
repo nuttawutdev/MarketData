@@ -606,7 +606,7 @@ namespace MarketData.Processes.Processes
             }
             catch (Exception ex)
             {
-                response.responseError = ex.Message ?? ex.InnerException?.Message;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
 
             return response;

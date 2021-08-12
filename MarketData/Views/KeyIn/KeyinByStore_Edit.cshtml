@@ -137,7 +137,7 @@
                                                     <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg"></td>
                                                     <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot"></td>
                                                     <td class="col-1 d-inline-flex" style=" align-items:center">
-                                                        @Html.DropDownList("remarkList", new SelectList(Model.remarkList, "ID", "remark"),  new { id = "remarkList", @class = "form-control col-sm-12 remark" })
+                                                        @Html.DropDownListFor(c=> item.remark, new SelectList(Model.remarkList, "remark", "remark"), "", new { id = "remarkList", @class = "form-control col-sm-12 remark" })
                                                     </td>
                                                 </tr>
                             }
