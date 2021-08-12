@@ -206,6 +206,8 @@ namespace MarketData.Controllers
                     status = response.status,
                     week = response.week,
                     departmentStore = response.departmentStore,
+                    retailerGroup = response.retailerGroup,
+                    universe = response.universe,
                     BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
                     {
                         ID = c.ID,

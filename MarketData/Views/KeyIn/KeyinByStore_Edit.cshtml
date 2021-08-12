@@ -8,7 +8,7 @@
 }
 
 
-<h3>
+<h3 style="padding-left:20px;padding-right:20px">
     @ViewData["Title"]
 
 </h3>
@@ -18,18 +18,10 @@
 <br />
 <br />
 
-<div class="row">
+<div class="row" style="overflow-x:auto;padding-left:20px;padding-right:20px">
     <div style="width: 100%; font-size: 13px;">
         <div class="row col-sm-12">
 
-            <div class="col-sm-2">
-                <label><b>Department Store</b></label><br />
-                <label>
-                    @Model.departmentStore
-                </label>
-
-
-            </div>
             <div class="col-sm-2">
                 <label><b>Distribution Channel</b></label><br />
                 <label>
@@ -38,7 +30,24 @@
 
 
             </div>
+
             <div class="col-sm-2">
+                <label><b>Retailer Group</b></label><br />
+                <label>
+                    @Model.retailerGroup
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Department Store</b></label><br />
+                <label>
+                    @Model.departmentStore
+                </label>
+            </div>
+
+            <div class="col-sm-1">
                 <label><b>Brand</b></label><br />
                 <label>
                     @Model.brand
@@ -62,7 +71,15 @@
                     @Model.week
                 </label>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
+                <label><b>Universe</b></label><br />
+                <label>
+                    @Model.universe
+                </label>
+
+
+            </div>
+            <div class="col-sm-1">
                 <label><b>Status</b></label><br />
                 <label>
                     @Model.status
@@ -74,7 +91,7 @@
 </div>
 
 
-<div class="container-xl" style="padding-top:20px">
+<div class="container-xl" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
@@ -133,7 +150,7 @@
     </div>
     <div class="modal-footer">
         <button id="btnSave" class="btn btn-danger " type="button">Save</button>
-        <button id="btnSubmit" class="btn btn-warning text-white" type="button">Submit</button>
+        <button id="btnSubmit" class="btn btn-primary text-white" type="button">Submit</button>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
     </div>
@@ -144,7 +161,7 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-
+        $("#container").removeClass("container");
         $('#btnSave').on('click', function (e) {
             $("#blocker").show();
              var model = @Html.Raw(Json.Serialize(Model));
@@ -177,13 +194,11 @@
                 error: function () {
                     $("#blocker").hide();
                 }
-            }); 
+            });
 
         });
 
         $('#btnSubmit').on('click', function (e) {
-
-
             var frmdata = getDataFromTable('Submit');
 
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
@@ -198,7 +213,7 @@
                         success: function (data) {
                         $("#blocker").hide();
                         if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "KeyinByStore");                    
+                            $('#successModalHref').attr("href", "KeyinByStore");
                             $('#successModal').modal('show');
                         } else if (data.isDuplicated) {
                             $('#failedModal').modal('show');

@@ -38,7 +38,7 @@ namespace MarketData.Processes.Processes
                     baKeyInData.AddRange(baKeyInByCounter);
                 }
 
-                response.data = baKeyInData;
+                response.data = baKeyInData.OrderByDescending(c => c.year).ThenByDescending(c => c.month).ThenByDescending(c => c.week).ToList();
 
             }
             catch (Exception ex)
@@ -384,11 +384,14 @@ namespace MarketData.Processes.Processes
 
                 var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == BAKeyInData.Brand_ID);
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
+                var retailerGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == BAKeyInData.RetailerGroup_ID);
                 var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
 
+                response.universe = BAKeyInData.Universe;
                 response.status = repository.masterData.GetKeyInStatusBy(c => c.ID == BAKeyInData.KeyIn_Status_ID)?.Status_Name;
                 response.brand = brandBAData?.Brand_Name;
                 response.departmentStore = departmentStoreData?.Department_Store_Name;
+                response.retailerGroup = retailerGroupData?.Retailer_Group_Name;
                 response.channel = channelBAData?.Distribution_Channel_Name;
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
@@ -513,7 +516,7 @@ namespace MarketData.Processes.Processes
                     {
                         AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
                         adminKeyInDetailList.Add(dataDetail);
-                    }                  
+                    }
                 }
 
                 response.data = adminKeyInDetailList;

@@ -181,6 +181,7 @@
                     return result.data;
                 }
             },
+            "order": [],
             "columns": [
 
                 { data: "keyInID", title: "keyInID", visible: false },
@@ -286,23 +287,23 @@
                 !$('#iduniverseList').val()) {
                 $('#warningModal').modal('show');
 
+
                 $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
+
             } else {
-                   var model = @Html.Raw(Json.Serialize(Model));
 
-
-
-
-             var frmdata = {
-                 year: $("#yearList").val(),
-                 month: $('#ddlMonth').val(),
-                 week: $('#ddlWeek').val(),
-                 distributionChannelID: $('#channelList').val(),
-                 retailerGroupID: $('#retailerGroupList').val(),
-                 departmentStoreID: $('#departmentStoreList').val(),
-                 brandID: $('#brandList').val(),
-                 universe: $('#iduniverseList').val(),
-                 userID: null//$('#iduserID').val()
+                $("#blocker").show();
+                var model = @Html.Raw(Json.Serialize(Model));
+                var frmdata = {
+                     year: $("#yearList").val(),
+                     month: $('#ddlMonth').val(),
+                     week: $('#ddlWeek').val(),
+                     distributionChannelID: $('#channelList').val(),
+                     retailerGroupID: $('#retailerGroupList').val(),
+                     departmentStoreID: $('#departmentStoreList').val(),
+                     brandID: $('#brandList').val(),
+                     universe: $('#iduniverseList').val(),
+                     userID: null//$('#iduserID').val()
             };
 
             $.ajax({
@@ -312,6 +313,7 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
+                    $("#blocker").hide();
                     if (data.isSuccess) {
                         if (!data.isSubmited) {
                              var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
@@ -325,6 +327,7 @@
                     }
                 },
                 error: function () {
+                    $("#blocker").hide();
                 }
             });
             }
