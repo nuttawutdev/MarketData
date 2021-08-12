@@ -321,6 +321,7 @@
                 memberDetail.ot = ot ? parseFloat(ot) : null;
                 memberDetail.remark = row.find("TD").find(".remark").val();
                 memberDetail.retailerGroupID = row.find("TD").eq(19).html();
+                memberDetail.universe = $('#iduniverseList').val()
                 memberDetails.push(memberDetail);
             });
 
