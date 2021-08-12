@@ -235,7 +235,15 @@
                                 '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm mu" value=' + mu+'></td>'+
                                 '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm fg" value=' + fg+'></td>'+
                                 '<td class="col-1" style=" align-items:center;"><input type="number" class="form-control input-sm ot" value=' + ot+'></td>'+
-                                '<td class="col-1" style=" align-items:center"><input type="text" class="form-control input-sm remark" value=' + remark+'></td>' +
+                                '<td class="col-1" style=" align-items:center"><input type="text" class="form-control input-sm remark" value=' + remark + '></td>' +
+                                    @*<select id="ddlRemark" class="form-control col-sm-12 ddlRemark">
+                                                            @foreach (var item2 in Model.remarkList)
+                                                            {
+
+                                                                <option value="@item2.ID" @item2="=">@item2.remark</option>
+
+                                                            }
+                                                        </select*@
                                 '<td class="col-2" hidden>' + data.data[i].retailerGroupID + '</td>' +
                                     '</tr>';
                             }
@@ -253,7 +261,7 @@
             var frmdata = getDataFromTable();
             console.log(frmdata)
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-            
+
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",
