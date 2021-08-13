@@ -166,7 +166,6 @@
             } else {
                 var model = @Html.Raw(Json.Serialize(Model));
                 var model2 = @Html.Raw(Json.Serialize(Model.remarkList));
-                console.log(model2)
                 var frmdata = {
                     year: $("#yearList").val(),
                     month: $('#ddlMonth').val(),
@@ -270,6 +269,7 @@
                         }
                     },
                     error: function () {
+                        $("#blocker").hide();
                     }
                 });
             }
@@ -277,9 +277,9 @@
 
         $('#btnSubmit').on('click', function (e) {
             var frmdata = getDataFromTable();
+            frmdata.data.splice(-1);
             console.log(frmdata)
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",

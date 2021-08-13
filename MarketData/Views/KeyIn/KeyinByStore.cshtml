@@ -311,7 +311,6 @@
                 data: JSON.stringify(frmdata),
                 datatype: "json",
                 success: function (data) {
-                    $("#blocker").hide();
                     if (data.isSuccess) {
                         if (!data.isSubmited) {
                             var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
@@ -323,6 +322,7 @@
                         }
                     }
                     else {
+                        $("#blocker").hide();
                         $('#warningModal').modal('show');
                         $('#myModalWarningResult').text(data.responseError);
                     }

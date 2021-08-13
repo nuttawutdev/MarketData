@@ -877,6 +877,18 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMDepartmentStore> GetDepartmentStoreListBy(Expression<Func<TMDepartmentStore, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMDepartmentStore.Where(expression).AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMDepartmentStore FindDepartmentStoreBy(Expression<Func<TMDepartmentStore, bool>> expression)
         {
             try

@@ -170,14 +170,12 @@ namespace MarketData.Controllers
             var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
+      
         public async Task<IActionResult> KeyinByStore_Edit_View(Guid baKeyInID)
         {
             var viewData = await GetBAKeyInDetail(baKeyInID, true); 
             return View(viewData);
         }
-
-
-
 
         #region BA KeyIn Function
         [HttpPost]

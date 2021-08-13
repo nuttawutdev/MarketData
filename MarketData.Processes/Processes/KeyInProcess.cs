@@ -334,16 +334,19 @@ namespace MarketData.Processes.Processes
                     var existBrandList = BAKeyInDetailList.Select(c => c.brandID);
                     var newCounter = counterList.Where(e => !existBrandList.Contains(e.Brand_ID));
 
-
                     if (BAKeyInData.Week != "4")
                     {
+                        var brandIDCounter = newCounter.GroupBy(c => c.Brand_ID).Select(e => e.Key);
+                        var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID));
+                        var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
+
                         // Filter Brand Type Fragrances
                         List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
                         foreach (var itemCounter in newCounter)
                         {
-                            var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
-                            var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+                            var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
+                            var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
                             if (brandTypeData?.Brand_Type_Name != "Fragrances")
                             {
@@ -353,7 +356,6 @@ namespace MarketData.Processes.Processes
 
                         newCounter = listCounterFilterFragrances;
                     }
-
 
                     List<TTBAKeyInDetail> listBAKeyInDetail = newCounter.Select(c => new TTBAKeyInDetail
                     {
@@ -378,7 +380,7 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBADetail in BAKeyInDetailList)
                 {
-                    var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
+                    var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
                         c => c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
                         && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
                         && c.Brand_ID == itemBADetail.brandID
@@ -388,7 +390,7 @@ namespace MarketData.Processes.Processes
 
                     if (BAKeyInDetailPreviousYear != null)
                     {
-                        itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.amountSale;
+                        itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.Amount_Sales;
                     }
                 }
 
@@ -507,24 +509,30 @@ namespace MarketData.Processes.Processes
 
                 List<AdminKeyInDetailData> adminKeyInDetailList = new List<AdminKeyInDetailData>();
 
+                var brandIDCounter = counterByFilter.GroupBy(c => c.brandID).Select(e => e.Key);
+                var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID));
+                var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
+
+                var allAdminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(e => e.ID != Guid.Empty);
+                var allBAKeyInData = repository.baKeyIn.GetBAKeyInDetailListData(e => e.ID != Guid.Empty);
+
                 foreach (var itemCounter in counterByFilter)
                 {
                     if (request.week != "4")
                     {
-
-                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.brandID);
-                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+                        var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.brandID);
+                        var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
                         if (brandTypeData?.Brand_Type_Name != "Fragrances")
                         {
 
-                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
                     }
                     else
                     {
-                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request);
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allBAKeyInData);
                         adminKeyInDetailList.Add(dataDetail);
                     }
                 }
@@ -559,7 +567,8 @@ namespace MarketData.Processes.Processes
             try
             {
                 var updateAdminKeyInDetailID = request.data.Where(e => e.ID != Guid.Empty).Select(c => c.ID);
-                var newAdminKeyInDetail = request.data.Where(e => e.ID == Guid.Empty);
+                var newAdminKeyInDetail = request.data.Where(e => e.ID == Guid.Empty
+                    && (e.amountSale.HasValue || e.wholeSale.HasValue || e.rank.HasValue || e.sk.HasValue || e.mu.HasValue || e.fg.HasValue || e.ot.HasValue || !string.IsNullOrWhiteSpace(e.remark)));
 
                 bool addDetailResult = true;
                 bool updateDetailResult = true;
@@ -639,22 +648,33 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
+                var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
                 var getRetailerResponse = repository.masterData.GetRetailerGroupList().Where(c => c.Active_Flag);
-                var getBrandResponse = repository.masterData.GetBrandList().Where(c => c.active);
+                var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
                 var getChannelResponse = repository.masterData.GetDistributionChannelList().Where(c => c.Active_Flag);
+
                 response.channel = getChannelResponse.Select(c => new DistributionChannelData
                 {
                     distributionChannelID = c.Distribution_Channel_ID,
                     distributionChannelName = c.Distribution_Channel_Name
                 }).ToList();
-                response.departmentStore = getDepartmentStoreResponse.ToList();
-                response.brand = getBrandResponse.ToList();
+                response.departmentStore = getDepartmentStoreResponse.Select(c => new DepartmentStoreData
+                {
+                    departmentStoreID = c.Department_Store_ID,
+                    departmentStoreName = c.Department_Store_Name,
+                    distributionChannelID = c.Distribution_Channel_ID,
+                    retailerGroupID = c.Retailer_Group_ID
+                }).OrderBy(r => r.departmentStoreName).ToList();
+                response.brand = getBrandResponse.Select(c => new BrandData
+                {
+                    brandID = c.Brand_ID,
+                    brandName = c.Brand_Name
+                }).OrderBy(r => r.brandName).ToList();
                 response.retailerGroup = getRetailerResponse.Select(c => new RetailerGroupData
                 {
                     retailerGroupID = c.Retailer_Group_ID,
                     retailerGroupName = c.Retailer_Group_Name
-                }).ToList();
+                }).OrderBy(r => r.retailerGroupName).ToList();
 
                 List<string> yearList = new List<string>();
                 string currentYear = DateTime.Now.Year.ToString();
@@ -699,10 +719,14 @@ namespace MarketData.Processes.Processes
                     // Filter Brand Type Fragrances
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
+                    var brandIDCounter = counterList.GroupBy(c => c.Brand_ID).Select(e => e.Key);
+                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID));
+                    var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
+
                     foreach (var itemCounter in counterList)
                     {
-                        var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
-                        var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+                        var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
+                        var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
                         if (brandTypeData?.Brand_Type_Name != "Fragrances")
                         {
@@ -728,7 +752,17 @@ namespace MarketData.Processes.Processes
                     Counter_ID = c.Counter_ID
                 }).ToList();
 
-                var createBAKeyInDetailResponse = await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
+                bool createBAKeyInDetailResponse;
+
+                if (listBAKeyInDetail.Any())
+                {
+                    createBAKeyInDetailResponse = await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetail);
+                }
+                else
+                {
+                    createBAKeyInDetailResponse = true;
+                }
+
                 return (createBAKeyInDetailResponse, listBAKeyInDetail);
             }
             catch (Exception ex)
@@ -770,10 +804,10 @@ namespace MarketData.Processes.Processes
             }
         }
 
-        private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request)
+        private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request, List<TTAdminKeyInDetail> allAdminKeyInData, List<TTBAKeyInDetail> allBAKeyInDetail)
         {
 
-            var adminKeyInData = repository.adminKeyIn.FindAdminKeyInDetailBy(
+            var adminKeyInData = allAdminKeyInData.FirstOrDefault(
                 c => c.RetailerGroup_ID == itemCounter.retailerGroupID
                 && c.DepartmentStore_ID == itemCounter.departmentStoreID
                 && c.DistributionChannel_ID == itemCounter.distributionChannelID
@@ -784,13 +818,13 @@ namespace MarketData.Processes.Processes
 
             string previousYear = (int.Parse(request.year) - 1).ToString();
 
-            var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailBy(
+            var BAKeyInDetailPreviousYear = allBAKeyInDetail.FirstOrDefault(
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
                && c.DistributionChannel_ID == itemCounter.distributionChannelID
                && c.Brand_ID == itemCounter.brandID
                && c.Year == previousYear
                && c.Month == request.month
-               && c.Week == "4").FirstOrDefault();
+               && c.Week == "4");
 
             AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
             {
@@ -814,7 +848,7 @@ namespace MarketData.Processes.Processes
                 rank = adminKeyInData != null ? adminKeyInData.Rank : null,
                 remark = adminKeyInData != null ? adminKeyInData.Remark : null,
                 universe = request.universe,
-                amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.amountSale : null
+                amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.Amount_Sales : null
             };
 
             return dataDetail;

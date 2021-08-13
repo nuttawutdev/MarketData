@@ -113,5 +113,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public TTApproveKeyIn FindApproveKeyInBy(Expression<Func<TTApproveKeyIn, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTApproveKeyIn.Where(expression).FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -65,7 +65,7 @@ namespace MarketData.Controllers
                         }).ToList();
                     }
 
-                    if(approveStatus != null && approveStatus.Any())
+                    if (approveStatus != null && approveStatus.Any())
                     {
                         dataModel.statusList = approveStatus.Select(c => new StatusKeyInViewModel
                         {
@@ -73,20 +73,22 @@ namespace MarketData.Controllers
                             statusName = c.statusName
                         }).ToList();
                     }
-                    
+
                     dataModel.yearList = approveOption.year;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return RedirectToAction("Index", "Home");
             }
 
             return View(dataModel);
         }
-        public IActionResult Approve_Edit()
+
+        public IActionResult Approve_Edit(Guid baKeyInID)
         {
-            return View();
+            var viewData = GetApproveKeyInDetail(baKeyInID);
+            return View(viewData);
         }
 
         [HttpPost]
@@ -128,6 +130,57 @@ namespace MarketData.Controllers
             }
 
             return Json(dataModel);
+        }
+
+        public ApproveKeyInDetailViewModel GetApproveKeyInDetail(Guid approveKeyInID)
+        {
+            try
+            {
+                var response = process.approve.GetApproveKeyInDetail(approveKeyInID);
+
+                ApproveKeyInDetailViewModel data = new ApproveKeyInDetailViewModel
+                {
+                    approveKeyInID = response.approveKeyInID,
+                    brand = response.brand,
+                    channel = response.channel,
+                    month = response.month,
+                    year = response.year,
+                    status = response.status,
+                    week = response.week,
+                    departmentStore = response.departmentStore,
+                    retailerGroup = response.retailerGroup,
+                    universe = response.universe,
+                    BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
+                    {
+                        ID = c.ID,
+                        keyInID = c.keyInID,
+                        fg = c.fg.HasValue ? c.fg.Value.ToString("0.00") : string.Empty,
+                        amountSale = c.amountSale.HasValue ? c.amountSale.Value.ToString("0.00") : string.Empty,
+                        amountSalePreviousYear = c.amountSalePreviousYear.HasValue ? c.amountSalePreviousYear.Value.ToString("0.00") : string.Empty,
+                        brandID = c.brandID,
+                        brandName = c.brandName,
+                        channelID = c.channelID,
+                        counterID = c.counterID,
+                        departmentStoreID = c.departmentStoreID,
+                        month = c.month,
+                        mu = c.mu.HasValue ? c.mu.Value.ToString("0.00") : string.Empty,
+                        ot = c.ot.HasValue ? c.ot.Value.ToString("0.00") : string.Empty,
+                        rank = c.rank,
+                        remark = c.remark,
+                        sk = c.sk.HasValue ? c.sk.Value.ToString("0.00") : string.Empty,
+                        week = c.week,
+                        wholeSale = c.wholeSale.HasValue ? c.wholeSale.Value.ToString("0.00") : string.Empty,
+                        year = c.year
+                    }).ToList(),
+                };
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                return new ApproveKeyInDetailViewModel();
+            }
+
         }
     }
 }
