@@ -85,9 +85,9 @@ namespace MarketData.Controllers
             return View(dataModel);
         }
 
-        public IActionResult Approve_Edit(Guid baKeyInID)
+        public IActionResult Approve_Edit(Guid approveKeyInID)
         {
-            var viewData = GetApproveKeyInDetail(baKeyInID);
+            var viewData = GetApproveKeyInDetail(approveKeyInID);
             return View(viewData);
         }
 
