@@ -1,5 +1,7 @@
-﻿using MarketData.Models;
+﻿using MarketData.Model.Request.Approve;
+using MarketData.Models;
 using MarketData.Processes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -181,6 +183,26 @@ namespace MarketData.Controllers
                 return new ApproveKeyInDetailViewModel();
             }
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveKeyInData([FromBody] ApproveKeyInDataRequest request)
+        {
+            var userID = HttpContext.Session.GetString("userID");
+            request.userID = new Guid(userID);
+
+            var viewData = await process.approve.ApproveKeyInData(request);
+            return Json(viewData);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectKeyInData([FromBody] RejectKeyInDataRequest request)
+        {
+            var userID = HttpContext.Session.GetString("userID");
+            request.userID = new Guid(userID);
+
+            var viewData = await process.approve.RejectKeyInData(request);
+            return Json(viewData);
         }
     }
 }
