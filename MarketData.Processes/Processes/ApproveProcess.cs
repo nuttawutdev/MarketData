@@ -1,4 +1,6 @@
 ﻿using MarketData.Model.Data;
+using MarketData.Model.Request.Approve;
+using MarketData.Model.Response;
 using MarketData.Model.Response.Approve;
 using MarketData.Model.Response.KeyIn;
 using MarketData.Repositories;
@@ -139,6 +141,90 @@ namespace MarketData.Processes.Processes
                 response.week = BAKeyInData.Week;
                 response.data = BAKeyInDetailList;
 
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> ApproveKeyInData(ApproveKeyInDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var approveStatus = repository.masterData.GetApproveKeyInStatusBy(c => c.Status_Name == "Approve");
+                var approveData = repository.approve.FindApproveKeyInBy(c => c.ID == request.approveKeyInID);
+
+                var updateBAKeyInResult = await repository.baKeyIn.ApproveBAKeyIn(approveData.BAKeyIn_ID, request.userID);
+
+                if (updateBAKeyInResult)
+                {
+                    approveData.Status_ID = approveStatus.ID;
+                    approveData.Remark = request.remark;
+                    approveData.Action_By = request.userID;
+                    approveData.Action_Date = DateTime.Now;
+
+                    var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
+
+                    if (updateApproveResult)
+                    {
+                        response.isSuccess = true;
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> RejectKeyInData(RejectKeyInDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(c => c.Status_Name == "Reject");
+                var approveData = repository.approve.FindApproveKeyInBy(c => c.ID == request.approveKeyInID);
+
+                var updateBAKeyInResult = await repository.baKeyIn.RejectBAKeyIn(approveData.BAKeyIn_ID, request.userID);
+
+                if (updateBAKeyInResult)
+                {
+                    approveData.Status_ID = rejectStatus.ID;
+                    approveData.Remark = request.remark;
+                    approveData.Action_By = request.userID;
+                    approveData.Action_Date = DateTime.Now;
+
+                    var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
+
+                    if (updateApproveResult)
+                    {
+                        response.isSuccess = true;
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
             }
             catch (Exception ex)
             {

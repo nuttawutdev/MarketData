@@ -126,5 +126,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> UpdateApproveKeyInData(TTApproveKeyIn updateData)
+        {
+            try
+            {
+                _dbContext.TTApproveKeyIn.Update(updateData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

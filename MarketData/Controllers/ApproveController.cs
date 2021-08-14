@@ -94,7 +94,7 @@ namespace MarketData.Controllers
         [HttpPost]
         public IActionResult GetApproveKeyInList()
         {
-            ApproveKeyInListViewModel dataModel = new ApproveKeyInListViewModel();
+            ApproveKeyInViewModel dataModel = new ApproveKeyInViewModel();
 
             try
             {

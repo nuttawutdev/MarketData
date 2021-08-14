@@ -1226,5 +1226,17 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public TMApproveStatus GetApproveKeyInStatusBy(Expression<Func<TMApproveStatus, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMApproveStatus.Where(expression).AsNoTracking().FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

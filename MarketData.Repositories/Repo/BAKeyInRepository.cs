@@ -15,7 +15,7 @@ namespace MarketData.Repositories.Repo
     public class BAKeyInRepository
     {
         private readonly MarketDataDBContext _dbContext;
-      
+
         public BAKeyInRepository(MarketDataDBContext dbContext)
         {
             _dbContext = dbContext;
@@ -293,6 +293,43 @@ namespace MarketData.Repositories.Repo
 
                     baKeyInData.Submited_Date = DateTime.Now;
                 }
+
+                _dbContext.TTBAKeyIn.Update(baKeyInData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> ApproveBAKeyIn(Guid baKeyInID, Guid userID)
+        {
+            try
+            {
+                var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
+                baKeyInData.Approved_By = userID;
+                baKeyInData.Approved_Date = DateTime.Now;
+
+                _dbContext.TTBAKeyIn.Update(baKeyInData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RejectBAKeyIn(Guid baKeyInID,Guid userID)
+        {
+            try
+            {
+                var keyInStatusReject = _dbContext.TMKeyInStatus.FirstOrDefault(c => c.Status_Name == "Reject");
+
+                var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
+                baKeyInData.Approved_By = userID;
+                baKeyInData.KeyIn_Status_ID = keyInStatusReject.ID;
+                baKeyInData.Approved_Date = DateTime.Now;
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
                 return await _dbContext.SaveChangesAsync() > 0;
