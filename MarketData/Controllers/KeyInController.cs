@@ -187,6 +187,7 @@ namespace MarketData.Controllers
             var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
         }
+     
         public async Task<BAKeyInDetailViewModel> GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
             try
