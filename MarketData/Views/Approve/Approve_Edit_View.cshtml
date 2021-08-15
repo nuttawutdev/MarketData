@@ -1,11 +1,7 @@
 ﻿@model MarketData.Models.ApproveKeyInDetailViewModel
 
 @{
-    ViewData["Title"] = "บันทึกข้อมูลยอดขายรายร้านค้า";
-    Html.RenderPartial("_WarningModal");
-    Html.RenderPartial("_SuccessModal");
-    Html.RenderPartial("_FailedModal");
-    Html.RenderPartial("_ConfirmModalWithText");
+    ViewData["Title"] = "แสดงข้อมูลยอดขายรายร้านค้า";
 }
 
 <style>
@@ -71,13 +67,13 @@
                         @Model.year
                     </label>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <label><b>Month</b></label><br />
                     <label>
                         @Model.month
                     </label>
                 </div>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <label><b>Week</b></label><br />
                     <label>
                         @Model.week
@@ -166,11 +162,13 @@
     <div class="container-xl" style="overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px">
  
             <div class="">
-                <textarea class="form-control" id="txtRemark" style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;" placeholder="ข้อมูลเพิ่มเติม"></textarea>
+                <textarea class="form-control" 
+                          id="txtRemark"
+                          style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;" 
+                          placeholder="ข้อมูลเพิ่มเติม"                          
+                          disabled>@Model.remark</textarea>
             </div>
             <div style="padding-top: 20px; text-align:right">
-                <button id="btnApprove" class="btn btn-danger " type="button">Approve</button>
-                <button id="btnReject" class="btn btn-primary text-white" type="button">Reject</button>
                 <a href="Approve" class="btn btn-outline-danger">Cancel</a>
             </div>
            
@@ -179,68 +177,6 @@
     <script>
     $(document).ready(function () {
         $("#container").removeClass("container");
-        $('#btnApprove').on('click', function (e) {
-            $('#confirmWithTextID').val('Approve');
-            $('#ConfirmModalWithText').modal('show');
-            $('#myModalConfirmWithText').text('คุณต้องการ Approve ใช่ไหม?');
-        });
-
-        $('#btnReject').on('click', function (e) {
-            $('#confirmWithTextID').val('Reject');
-            if ($('#txtRemark').val() == "") {
-                $('#warningModal').modal('show');
-
-                $('#myModalWarningResult').text('กรุณาใส่ข้อมูลเพิ่มเติมสำหรับการ Reject');
-            } else {
-                $('#myModalConfirmWithText').text('คุณต้องการ Reject ใช่ไหม?');
-                $('#ConfirmModalWithText').modal('show');
-            }
-
-        });
-
-        $(".btnConfirmModalWithText").click(function () {
-            $('#ConfirmModalWithText').modal('hide');
-                   var frmdata = {
-                       approveKeyInID: $('#approveKeyInID').val(),
-                       remark: $('#txtRemark').val(),
-                       userID: $('#approveKeyInID').val(),
-            };
-            var urlAction = '';
-            if ($('#confirmWithTextID').val() == 'Approve') {
-                urlAction = '@Url.Action("ApproveKeyInData", "Approve")';
-            } else {
-                urlAction = '@Url.Action("RejectKeyInData", "Approve")';
-            }
-            $.ajax({
-                type: "POST",
-                url: urlAction,
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                     if (data.isSuccess) {
-                         $('#successModalHref').attr("href", "Approve");
-                         $('#successModal').modal('show');
-                     } else if (data.isDuplicated) {
-                         $('#failedModal').modal('show');
-                         $('#myModalFailedResult').text('Duplicate data!');
-                     } else {
-                         $('#failedModal').modal('show');
-                         $('#myModalFailedResult').text(data.responseError != ""
-                             && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-
-
-                     $('#myModalFailedResult').val('');
-                    $('#confirmWithTextID').val('');
-                     $('#ConfirmModalWithText').val('');
-                     $('#myModalConfirmWithTextResult').val('');
-                     $('#myModalWarningResult').text('');
-                },
-                error: function () {
-                }
-            });
-          });
-
+     
     });
     </script>

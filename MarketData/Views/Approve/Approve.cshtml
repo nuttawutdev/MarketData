@@ -15,54 +15,74 @@
 <div class="row">
     <div style="width: 100%; font-size: 13px;">
         <div class="row col-sm-12">
+            <div class="col-sm-3">
+                <label>Distribution Channel</label>
 
-            <div class="col-sm-4">
+                @if (Model.channelList.Count > 1)
+                {
+                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), new { id = "channelList", @class = "form-control col-sm-12" })
+                }
+            </div>
+            <div class="col-sm-3">
+                <label>Retailer Group</label>
+
+                @if (Model.retailerGroupList.Count > 1)
+                {
+                    @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+                }
+
+            </div>
+            <div class="col-sm-3">
                 <label>Department Store</label>
                 @if (Model.departmentStoreList.Count > 1)
                 {
-                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12 col-lg-8" })
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
                 }
                 else
                 {
-                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), new { id = "departmentStoreList", @class = "form-control col-sm-12 col-lg-8" })
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), new { id = "departmentStoreList", @class = "form-control col-sm-12" })
                 }
-
             </div>
-            <div class="col-sm-4">
-                <label>Distribution Channel</label>
-                @if (Model.channelList.Count > 1)
+
+            <div class="col-sm-3">
+                <label>Brand</label>
+                @if (Model.brandList.Count > 1)
                 {
-                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control col-sm-12 col-lg-8" })
+                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control col-sm-12" })
                 }
                 else
                 {
-                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), new { id = "channelList", @class = "form-control col-sm-12 col-lg-8" })
+                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control col-sm-12" })
                 }
 
             </div>
-            <div class="col-sm-4">
-
-
-
-            </div>
-
         </div>
+
         <div class="row col-sm-12" style="padding-top: 15px;">
-            <div class="col-sm-4">
-                <label>Year</label>
-                @Html.DropDownList(
-                   "yearList",
-                   new SelectList(
-                       Model.yearList.Select(x => new { Value = x, Text = x }),
-                       "Value",
-                       "Text"
-                   ), "All", new { id = "yearList", @class = "form-control col-sm-12 col-lg-8" }
-               )
+            <div class="col-sm-3">
+
+                <label> Week</label>
+                <select id="ddlWeek" class="form-control col-sm-12 ">
+                    <option value="">All</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
 
             </div>
-            <div class="col-sm-4">
+
+            <div class="col-sm-3">
                 <label>Month</label>
-                <select id="ddlMonth" class="form-control col-sm-12 col-lg-8  ">
+                <select id="ddlMonth" class="form-control col-sm-12 ">
                     <option value="">All</option>
                     <option value="01">January</option>
                     <option value="02">February</option>
@@ -80,33 +100,52 @@
 
 
             </div>
-            <div class="col-sm-4">
-
-                <label> Week</label>
-                <select id="ddlWeek" class="form-control col-sm-12 col-lg-8 ">
-                    <option value="">All</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                </select>
+            <div class="col-sm-3">
+                <label>Year</label>
+                @Html.DropDownList(
+                    "yearList",
+                    new SelectList(
+                        Model.yearList.Select(x => new { Value = x, Text = x }),
+                        "Value",
+                        "Text"
+                    ), "All", new { id = "yearList", @class = "form-control col-sm-12" }
+                )
             </div>
+            <div class="col-sm-3">
+                <label>Universe</label>
+                @{
+                    List<SelectListItem> listUniverse = new List<SelectListItem>();
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "CPD",
+                        Value = "CPD"
+                    });
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "LPD",
+                        Value = "LPD",
 
+                    });
+
+                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+
+                }
+
+
+            </div>
         </div>
         <div class="row col-sm-12" style="padding-top: 15px;padding-bottom:15px;">
-            <div class="col-sm-4">
-            </div>
-            <div class="col-sm-4" style="align-self: flex-end;">
+            <div class="col-sm-3">
+                <label>Status</label>
+                @Html.DropDownList("statusList", new SelectList(Model.statusList, "statusID", "statusName"), "All", new { id = "statusList", @class = "form-control col-sm-12" })
 
 
             </div>
-            <div class="col-sm-4">
-
+            <div class="col-sm-3" style="align-self: flex-end;">
+         
             </div>
 
         </div>
-
-
 
     </div>
 
@@ -144,11 +183,11 @@
                 { data: "year", title: "Year" },
                 { data: "month", title: "Month" },
                 { data: "week", title: "Week" },
-                { data: "departmentStoreName", title: "Department Store" },
-                { data: "brandName", title: "Brand" },
-                { data: "retailerGroupID", title: "retailerGroupID", visible: false },
                 { data: "departmentStoreID", title: "departmentStoreID", visible: false },
+                { data: "departmentStoreName", title: "Department Store" },
                 { data: "brandID", title: "brandID", visible: false },
+                { data: "brandName", title: "Brand" },
+                { data: "retailerGroupID", title: "retailerGroupID", visible: false },   
                 { data: "distributionChannelID", title: "distributionChannelID", visible: false },
                 { data: "distributionChannelName", title: "Distribution Chanel" },
                 { data: "statusID", title: "statusID", visible: false },
@@ -160,7 +199,7 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        if (row.statusID.toUpperCase() != 'D66D23BB-DF1F-490F-A740-64CC357D6DE4') {
+                        if (row.statusID.toUpperCase() == 'ADE8DDCA-743B-4A42-85AD-A6065D9C9F66') {
                             return '<a href="Approve_Edit?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                         }else{
                             return '<a href="Approve_Edit?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
@@ -187,38 +226,50 @@
             dataTable.column(8).search(status).draw();
         });
 
+        $('#retailerGroupList').on('change', function (e) {
+            var status = $(this).val();
+            $('#retailerGroupList').val(status);
+            dataTable.column(9).search(status).draw();
+        });
+
         $('#departmentStoreList').on('change', function (e) {
             var status = $(this).val();
             $('#departmentStoreList').val(status);
-            dataTable.column(6).search(status).draw();
+            dataTable.column(5).search(status).draw();
         });
+
+        $('#brandList').on('change', function (e) {
+            var status = $(this).val();
+            $('#brandList').val(status);
+            dataTable.column(7).search(status).draw();
+        });
+
 
         $('#ddlWeek').on('change', function (e) {
             var status = $(this).val();
             $('#ddlWeek').val(status);
-            dataTable.column(3).search(status).draw();
+            dataTable.column(4).search(status).draw();
         });
 
 
         $('#ddlMonth').on('change', function (e) {
             var status = $(this).val();
             $('#ddlMonth').val(status);
-            dataTable.column(2).search(status).draw();
+            dataTable.column(3).search(status).draw();
         });
 
 
         $('#yearList').on('change', function (e) {
             var status = $(this).val();
             $('#yearList').val(status);
-            dataTable.column(1).search(status).draw();
+            dataTable.column(2).search(status).draw();
         });
 
         $('#statusList').on('change', function (e) {
             var status = $(this).val();
             $('#statusList').val(status);
-            dataTable.column(10).search(status).draw();
+            dataTable.column(12).search(status).draw();
         });
-
     
     });
 

@@ -92,8 +92,11 @@ namespace MarketData.Controllers
             var viewData = GetApproveKeyInDetail(approveKeyInID);
             return View(viewData);
         }
-
-
+        public IActionResult Approve_Edit_View(Guid approveKeyInID)
+        {
+            var viewData = GetApproveKeyInDetail(approveKeyInID);
+            return View(viewData);
+        }
         [HttpPost]
         public IActionResult GetApproveKeyInList()
         {
