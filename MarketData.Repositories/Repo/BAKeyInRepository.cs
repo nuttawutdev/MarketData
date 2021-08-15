@@ -210,6 +210,7 @@ namespace MarketData.Repositories.Repo
                          mu = e.MU,
                          ot = e.OT,
                          brandName = brand.Brand_Name,
+                         brandColor = brand.Brand_Color,
                          channelID = e.DistributionChannel_ID,
                          counterID = e.Counter_ID,
                          month = e.Month,
