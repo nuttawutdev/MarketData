@@ -368,6 +368,7 @@ namespace MarketData.Controllers
                     amountSalePreviousYear = c.amountSalePreviousYear,
                     brandID = c.brandID,
                     brandName = c.brandName,
+                    brandColor = c.brandColor,
                     channelID = c.distributionChannelID,
                     counterID = c.counterID,
                     retailerGroupID = c.retailerGroupID,

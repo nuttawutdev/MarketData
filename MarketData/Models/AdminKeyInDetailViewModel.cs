@@ -23,6 +23,7 @@ namespace MarketData.Models
         public Guid retailerGroupID { get; set; }
         public Guid channelID { get; set; }
         public Guid brandID { get; set; }
+        public string brandColor { get; set; }
         public string brandName { get; set; }
         public string year { get; set; }
         public string month { get; set; }

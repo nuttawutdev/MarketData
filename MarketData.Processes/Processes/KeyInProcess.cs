@@ -537,6 +537,11 @@ namespace MarketData.Processes.Processes
                     }
                 }
 
+                foreach(var itemAdmin in adminKeyInDetailList)
+                {
+                    itemAdmin.brandColor = brandDataList.FirstOrDefault(c => c.Brand_ID == itemAdmin.brandID).Brand_Color;
+                }
+
                 response.data = adminKeyInDetailList;
                 var amountPreviousYear = adminKeyInDetailList.Where(c => c.amountSalePreviousYear > 0);
 
