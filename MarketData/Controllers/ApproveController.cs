@@ -142,7 +142,7 @@ namespace MarketData.Controllers
 
                 ApproveKeyInDetailViewModel data = new ApproveKeyInDetailViewModel
                 {
-                    approveKeyInID = response.approveKeyInID,
+                    approveKeyInID = approveKeyInID,
                     brand = response.brand,
                     channel = response.channel,
                     month = response.month,

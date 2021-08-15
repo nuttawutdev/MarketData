@@ -77,8 +77,8 @@ namespace MarketData.Repositories.Repo
                     {
                         approveKeyInID = a.ID,
                         baKeyInID = a.BAKeyIn_ID,
-                        brandID = brand.Brand_ID,
-                        brandName = brand.Brand_Name,
+                        brandID = brand != null ? brand.Brand_ID : Guid.Empty,
+                        brandName = brand != null ? brand.Brand_Name : string.Empty,
                         departmentStoreID = store.Department_Store_ID,
                         departmentStoreName = store.Department_Store_Name,
                         distributionChannelID = channel.Distribution_Channel_ID,
@@ -90,7 +90,7 @@ namespace MarketData.Repositories.Repo
                         statusID = status.ID,
                         statusName = status.Status_Name,
                         approveDate = baKeyIn.Approved_Date.HasValue ? baKeyIn.Approved_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
-                        approver  = user.UserName
+                        approver = user != null ? user.UserName : string.Empty
                     }).ToList();
 
                 return approveKeyInDataList;
@@ -134,7 +134,7 @@ namespace MarketData.Repositories.Repo
                 _dbContext.TTApproveKeyIn.Update(updateData);
                 return await _dbContext.SaveChangesAsync() > 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
