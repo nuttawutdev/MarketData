@@ -93,6 +93,7 @@ namespace MarketData.Controllers
             return View(viewData);
         }
 
+
         [HttpPost]
         public IActionResult GetApproveKeyInList()
         {
@@ -152,6 +153,7 @@ namespace MarketData.Controllers
                     departmentStore = response.departmentStore,
                     retailerGroup = response.retailerGroup,
                     universe = response.universe,
+                    remark = response.remark,
                     BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
                     {
                         ID = c.ID,

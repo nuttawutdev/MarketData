@@ -131,6 +131,7 @@ namespace MarketData.Processes.Processes
                 var retailerGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == BAKeyInData.RetailerGroup_ID);
                 var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
 
+                response.remark = approveData.Remark;
                 response.universe = BAKeyInData.Universe;
                 response.status = repository.masterData.GetApproveKeyInStatusBy(c => c.ID == approveData.Status_ID)?.Status_Name;
                 response.brand = brandBAData?.Brand_Name;

@@ -17,6 +17,7 @@ namespace MarketData.Model.Response.Approve
         public string week { get; set; }
         public string status { get; set; }
         public string universe { get; set; }
+        public string remark { get; set; }
         public List<BAKeyInDetailData> data { get; set; }
     }
 }
