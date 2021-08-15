@@ -104,6 +104,7 @@ namespace MarketData.Processes.Processes
             {
                 var keyInData = repository.approve.FindApproveKeyInBy(c => c.ID == approveKeyInID);
 
+                var approveData = repository.approve.FindApproveKeyInBy(c => c.ID == approveKeyInID);
                 var BAKeyInData = repository.baKeyIn.FindBAKeyInBy(c => c.ID == keyInData.BAKeyIn_ID);
                 var BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == keyInData.BAKeyIn_ID);
 
@@ -131,7 +132,7 @@ namespace MarketData.Processes.Processes
                 var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
 
                 response.universe = BAKeyInData.Universe;
-                response.status = repository.masterData.GetKeyInStatusBy(c => c.ID == BAKeyInData.KeyIn_Status_ID)?.Status_Name;
+                response.status = repository.masterData.GetApproveKeyInStatusBy(c => c.ID == approveData.Status_ID)?.Status_Name;
                 response.brand = brandBAData?.Brand_Name;
                 response.departmentStore = departmentStoreData?.Department_Store_Name;
                 response.retailerGroup = retailerGroupData?.Retailer_Group_Name;
