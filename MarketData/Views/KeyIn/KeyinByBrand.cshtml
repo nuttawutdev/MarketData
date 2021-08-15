@@ -221,10 +221,10 @@
                                     var selectedRemark = model2[j].remark == data.data[i].remark ? "selected" : "";
                                     option += '<option value="' + model2[j].remark + '" ' + selectedRemark +'>' + model2[j].remark + '</option>';
                                 }
-
                                 option += '</select></td>';
+                              
                                 rowTable +=
-                                    '<tr>' +
+                                    '<tr ' + data.data[i].brandColor == "" ? '' : ' style="background: '+data.data[i].brandColor +'"'+'>' +
                                     '<td class="col-2 ID" hidden>' + data.data[i].id + '</td>' +
                                     '<td class="col-2" hidden>' + data.data[i].counterID + '</td>' +
                                     '<td class="col-2" hidden>' + data.data[i].departmentStoreID + '</td>' +

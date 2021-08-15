@@ -114,7 +114,7 @@
                         @{
                             foreach (var item in Model.BAKeyInDetailList)
                             {
-                                <tr class="row m-0">
+                                <tr class="row m-0"  style="background: @( item.brandColor==""?"": item.brandColor)">
                                     <td class="col-2 ID" hidden>@item.ID</td>
                                     <td class="col-2" hidden>@item.keyInID</td>
                                     <td class="col-2" hidden>@item.counterID</td>
