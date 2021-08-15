@@ -161,6 +161,7 @@ namespace MarketData.Controllers
                         amountSalePreviousYear = c.amountSalePreviousYear.HasValue ? c.amountSalePreviousYear.Value.ToString("0.00") : string.Empty,
                         brandID = c.brandID,
                         brandName = c.brandName,
+                        brandColor = c.brandColor,
                         channelID = c.channelID,
                         counterID = c.counterID,
                         departmentStoreID = c.departmentStoreID,
