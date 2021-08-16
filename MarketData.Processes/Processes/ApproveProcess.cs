@@ -1,4 +1,5 @@
 ﻿using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Request.Approve;
 using MarketData.Model.Response;
 using MarketData.Model.Response.Approve;
@@ -106,11 +107,19 @@ namespace MarketData.Processes.Processes
 
                 var approveData = repository.approve.FindApproveKeyInBy(c => c.ID == approveKeyInID);
                 var BAKeyInData = repository.baKeyIn.FindBAKeyInBy(c => c.ID == keyInData.BAKeyIn_ID);
-                var BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == keyInData.BAKeyIn_ID);
+
+                List<BAKeyInDetailData> baKeyInList = new List<BAKeyInDetailData>();
+
+                baKeyInList = repository.approve.GetApproveKeyInDetailBy(c => c.ApproveKeyIn_ID == approveKeyInID);
+
+                if (!baKeyInList.Any())
+                {
+                    baKeyInList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == BAKeyInData.ID);
+                }
 
                 string previousYear = (Int32.Parse(BAKeyInData.Year) - 1).ToString();
 
-                foreach (var itemBADetail in BAKeyInDetailList)
+                foreach (var itemBADetail in baKeyInList)
                 {
                     var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
                         c => c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
@@ -141,7 +150,7 @@ namespace MarketData.Processes.Processes
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
-                response.data = BAKeyInDetailList;
+                response.data = baKeyInList;
 
             }
             catch (Exception ex)
@@ -174,7 +183,33 @@ namespace MarketData.Processes.Processes
 
                     if (updateApproveResult)
                     {
-                        response.isSuccess = true;
+                        var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.BAKeyIn_ID == approveData.BAKeyIn_ID);
+
+                        List<TTApproveKeyInDetail> approveKeyInDetail = baKeyInDetail.Select(c => new TTApproveKeyInDetail
+                        {
+                            ID = Guid.NewGuid(),
+                            DepartmentStore_ID = c.DepartmentStore_ID,
+                            DistributionChannel_ID = c.DistributionChannel_ID,
+                            FG = c.FG,
+                            MU = c.MU,
+                            OT = c.OT,
+                            SK = c.SK,
+                            Amount_Sales = c.Amount_Sales,
+                            ApproveKeyIn_ID = request.approveKeyInID,
+                            Brand_ID = c.Brand_ID,
+                            Counter_ID = c.Counter_ID,
+                            Month = c.Month,
+                            Year = c.Year,
+                            Week = c.Week,
+                            Rank = c.Rank,
+                            Remark = c.Remark,
+                            Whole_Sales = c.Whole_Sales,
+                            Created_By = request.userID,
+                            Created_Date = DateTime.Now
+                        }).ToList();
+
+
+                        response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
                     }
                     else
                     {
@@ -216,7 +251,33 @@ namespace MarketData.Processes.Processes
 
                     if (updateApproveResult)
                     {
-                        response.isSuccess = true;
+                        var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.BAKeyIn_ID == approveData.BAKeyIn_ID);
+
+                        List<TTApproveKeyInDetail> approveKeyInDetail = baKeyInDetail.Select(c => new TTApproveKeyInDetail
+                        {
+                            ID = Guid.NewGuid(),
+                            DepartmentStore_ID = c.DepartmentStore_ID,
+                            DistributionChannel_ID = c.DistributionChannel_ID,
+                            FG = c.FG,
+                            MU = c.MU,
+                            OT = c.OT,
+                            SK = c.SK,
+                            Amount_Sales = c.Amount_Sales,
+                            ApproveKeyIn_ID = request.approveKeyInID,
+                            Brand_ID = c.Brand_ID,
+                            Counter_ID = c.Counter_ID,
+                            Month = c.Month,
+                            Year = c.Year,
+                            Week = c.Week,
+                            Rank = c.Rank,
+                            Remark = c.Remark,
+                            Whole_Sales = c.Whole_Sales,
+                            Created_By = request.userID,
+                            Created_Date = DateTime.Now
+                        }).ToList();
+
+
+                        response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
                     }
                     else
                     {

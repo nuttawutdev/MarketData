@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Entiry;
+﻿using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Response.Approve;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,6 +34,8 @@ namespace MarketData.Repositories.Repo
                 };
 
                 _dbContext.TTApproveKeyIn.Add(aaproveKeyInData);
+
+
                 return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
@@ -133,6 +136,62 @@ namespace MarketData.Repositories.Repo
             {
                 _dbContext.TTApproveKeyIn.Update(updateData);
                 return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> InsertApproveKeyInDetail(List<TTApproveKeyInDetail> dataDetail)
+        {
+            try
+            {
+                _dbContext.TTApproveKeyInDetail.AddRange(dataDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<BAKeyInDetailData> GetApproveKeyInDetailBy(Expression<Func<TTApproveKeyInDetail, bool>> expression)
+        {
+            try
+            {
+                var approveKeyInDetail = _dbContext.TTApproveKeyInDetail.Where(expression).ToList();
+
+                var baKeyInDetailDataList = (
+                     from e in approveKeyInDetail
+                     join b in _dbContext.TMBrand
+                         on e.Brand_ID equals b.Brand_ID
+                         into joinBrand
+                     from brand in joinBrand.DefaultIfEmpty()
+                     select new BAKeyInDetailData
+                     {
+                         ID = e.ID,
+                         brandID = e.Brand_ID,
+                         departmentStoreID = e.DepartmentStore_ID,
+                         amountSale = e.Amount_Sales,
+                         keyInID = e.ApproveKeyIn_ID,
+                         fg = e.FG,
+                         sk = e.SK,
+                         mu = e.MU,
+                         ot = e.OT,
+                         brandName = brand.Brand_Name,
+                         brandColor = brand.Brand_Color,
+                         channelID = e.DistributionChannel_ID,
+                         counterID = e.Counter_ID,
+                         month = e.Month,
+                         rank = e.Rank,
+                         remark = e.Remark,
+                         week = e.Week,
+                         wholeSale = e.Whole_Sales,
+                         year = e.Year,
+                     }).ToList();
+
+                return baKeyInDetailDataList;
             }
             catch (Exception ex)
             {
