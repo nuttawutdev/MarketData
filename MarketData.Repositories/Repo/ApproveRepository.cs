@@ -92,7 +92,7 @@ namespace MarketData.Repositories.Repo
                         retailerGroupID = store.Retailer_Group_ID,
                         statusID = status.ID,
                         statusName = status.Status_Name,
-                        approveDate = baKeyIn.Approved_Date.HasValue ? baKeyIn.Approved_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
+                        approveDate = a.Action_Date.HasValue ? a.Action_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                         approver = user != null ? user.UserName : string.Empty
                     }).ToList();
 
