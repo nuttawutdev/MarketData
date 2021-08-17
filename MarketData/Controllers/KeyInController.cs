@@ -28,141 +28,159 @@ namespace MarketData.Controllers
 
         public IActionResult KeyinByBrand()
         {
-            AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
 
-            try
+            var role = HttpContext.Session.GetString("role");
+            if (role == "Admin")
             {
-                var adminOption = process.keyIn.GetAdminKeyInOption();
-                var keyInRemark = process.masterData.GetKeyInRemark();
+                AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
 
-                if (adminOption != null)
+                try
                 {
-                    if (adminOption.departmentStore != null && adminOption.departmentStore.Any())
-                    {
-                        dataModel.departmentStoreList = adminOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
-                        {
-                            departmentStoreID = c.departmentStoreID,
-                            departmentStoreName = c.departmentStoreName,
-                            distributionChannelID = c.distributionChannelID,
-                            retailerGroupID = c.retailerGroupID
-                        }).ToList();
-                    }
+                    var adminOption = process.keyIn.GetAdminKeyInOption();
+                    var keyInRemark = process.masterData.GetKeyInRemark();
 
-                    if (adminOption.retailerGroup != null && adminOption.retailerGroup.Any())
+                    if (adminOption != null)
                     {
-                        dataModel.retailerGroupList = adminOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                        if (adminOption.departmentStore != null && adminOption.departmentStore.Any())
                         {
-                            retailerGroupName = c.retailerGroupName,
-                            retailerGroupID = c.retailerGroupID
-                        }).ToList();
-                    }
+                            dataModel.departmentStoreList = adminOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                            {
+                                departmentStoreID = c.departmentStoreID,
+                                departmentStoreName = c.departmentStoreName,
+                                distributionChannelID = c.distributionChannelID,
+                                retailerGroupID = c.retailerGroupID
+                            }).ToList();
+                        }
 
-                    if (adminOption.channel != null && adminOption.channel.Any())
-                    {
-                        dataModel.channelList = adminOption.channel.Select(c => new ChannelKeyInViewModel
+                        if (adminOption.retailerGroup != null && adminOption.retailerGroup.Any())
                         {
-                            distributionChannelID = c.distributionChannelID,
-                            distributionChannelName = c.distributionChannelName
-                        }).ToList();
-                    }
+                            dataModel.retailerGroupList = adminOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                            {
+                                retailerGroupName = c.retailerGroupName,
+                                retailerGroupID = c.retailerGroupID
+                            }).ToList();
+                        }
 
-                    if (adminOption.brand != null && adminOption.brand.Any())
-                    {
-                        dataModel.brandList = adminOption.brand.Select(c => new BrandKeyInViewModel
+                        if (adminOption.channel != null && adminOption.channel.Any())
                         {
-                            brandID = c.brandID,
-                            brandName = c.brandName,
-                        }).ToList();
-                    }
+                            dataModel.channelList = adminOption.channel.Select(c => new ChannelKeyInViewModel
+                            {
+                                distributionChannelID = c.distributionChannelID,
+                                distributionChannelName = c.distributionChannelName
+                            }).ToList();
+                        }
 
-                    dataModel.remarkList = keyInRemark.Select(c => new AdminKeyInRemark
-                    {
-                        ID = c.ID,
-                        remark = c.remark
-                    }).ToList();
-                    dataModel.yearList = adminOption.year;
+                        if (adminOption.brand != null && adminOption.brand.Any())
+                        {
+                            dataModel.brandList = adminOption.brand.Select(c => new BrandKeyInViewModel
+                            {
+                                brandID = c.brandID,
+                                brandName = c.brandName,
+                            }).ToList();
+                        }
+
+                        dataModel.remarkList = keyInRemark.Select(c => new AdminKeyInRemark
+                        {
+                            ID = c.ID,
+                            remark = c.remark
+                        }).ToList();
+                        dataModel.yearList = adminOption.year;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    return RedirectToAction("KeyIn", "Home");
+                }
+
+                return View(dataModel);
             }
-            catch (Exception ex)
+            else
             {
-                return RedirectToAction("KeyIn", "Home");
+                return RedirectToAction("KeyinByStore");
             }
 
-            return View(dataModel);
-        } 
+        }
 
         public IActionResult KeyinByStore()
         {
             BAKeyInListViewModel dataModel = new BAKeyInListViewModel();
 
-            try
+            var role = HttpContext.Session.GetString("role");
+            if (role == "BA")
             {
-                var userID = HttpContext.Session.GetString("userID");
-
-                if (userID != null)
+                try
                 {
-                    var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
-                    var keyInStatus = process.masterData.GetKeyInStatus();
+                    var userID = HttpContext.Session.GetString("userID");
 
-                    if (baKeyInOption != null && baKeyInOption.channel != null && baKeyInOption.channel.Any())
+                    if (userID != null)
                     {
-                        dataModel.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
-                        {
-                            distributionChannelID = c.distributionChannelID,
-                            distributionChannelName = c.distributionChannelName
-                        }).ToList();
-                    }
+                        var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
+                        var keyInStatus = process.masterData.GetKeyInStatus();
 
-                    if (baKeyInOption != null && baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
+                        if (baKeyInOption != null && baKeyInOption.channel != null && baKeyInOption.channel.Any())
+                        {
+                            dataModel.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
+                            {
+                                distributionChannelID = c.distributionChannelID,
+                                distributionChannelName = c.distributionChannelName
+                            }).ToList();
+                        }
+
+                        if (baKeyInOption != null && baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
+                        {
+                            dataModel.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                            {
+                                departmentStoreID = c.departmentStoreID,
+                                departmentStoreName = c.departmentStoreName
+                            }).ToList();
+                        }
+
+                        if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                        {
+                            dataModel.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
+                            {
+                                brandID = c.brandID,
+                                brandName = c.brandName
+                            }).ToList();
+                        }
+
+                        if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                        {
+                            dataModel.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                            {
+                                retailerGroupID = c.retailerGroupID,
+                                retailerGroupName = c.retailerGroupName
+                            }).ToList();
+                        }
+
+                        if (keyInStatus != null && keyInStatus.data != null && keyInStatus.data.Any())
+                        {
+                            dataModel.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
+                            {
+                                statusID = c.statusID,
+                                statusName = c.statusName
+                            }).ToList();
+                        }
+
+                        dataModel.yearList = baKeyInOption.year;
+
+                        dataModel.userID = new Guid(userID);
+                        return View(dataModel);
+                    }
+                    else
                     {
-                        dataModel.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
-                        {
-                            departmentStoreID = c.departmentStoreID,
-                            departmentStoreName = c.departmentStoreName
-                        }).ToList();
+                        return RedirectToAction("KeyIn", "Home");
                     }
-
-                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                    {
-                        dataModel.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
-                        {
-                            brandID = c.brandID,
-                            brandName = c.brandName
-                        }).ToList();
-                    }
-
-                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                    {
-                        dataModel.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
-                        {
-                            retailerGroupID = c.retailerGroupID,
-                            retailerGroupName = c.retailerGroupName
-                        }).ToList();
-                    }
-
-                    if (keyInStatus != null && keyInStatus.data != null && keyInStatus.data.Any())
-                    {
-                        dataModel.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
-                        {
-                            statusID = c.statusID,
-                            statusName = c.statusName
-                        }).ToList();
-                    }
-
-                    dataModel.yearList = baKeyInOption.year;
-
-                    dataModel.userID = new Guid(userID);
+                }
+                catch (Exception ex)
+                {
                     return View(dataModel);
                 }
-                else
-                {
-                    return RedirectToAction("KeyIn", "Home");
-                }
             }
-            catch (Exception ex)
+            else
             {
-                return View(dataModel);
-            }
+                return RedirectToAction("KeyinByBrand");
+            }        
         }
 
         public async Task<IActionResult> KeyinByStore_Edit(Guid baKeyInID)
@@ -170,10 +188,10 @@ namespace MarketData.Controllers
             var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
-      
+
         public async Task<IActionResult> KeyinByStore_Edit_View(Guid baKeyInID)
         {
-            var viewData = await GetBAKeyInDetail(baKeyInID, true); 
+            var viewData = await GetBAKeyInDetail(baKeyInID, true);
             return View(viewData);
         }
 
@@ -187,7 +205,7 @@ namespace MarketData.Controllers
             var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
         }
-     
+
         public async Task<BAKeyInDetailViewModel> GetBAKeyInDetail(Guid baKeyInID, bool viewOnly = false)
         {
             try
@@ -212,23 +230,23 @@ namespace MarketData.Controllers
                     {
                         ID = c.ID,
                         keyInID = c.keyInID,
-                        fg = c.fg.HasValue ? c.fg.Value.ToString("0.00") : string.Empty,
-                        amountSale = c.amountSale.HasValue ? c.amountSale.Value.ToString("0.00") : string.Empty,
-                        amountSalePreviousYear = c.amountSalePreviousYear.HasValue ? c.amountSalePreviousYear.Value.ToString("0.00") : string.Empty,
+                        fg = c.fg.HasValue ? c.fg.Value.ToString("N") : string.Empty,
+                        amountSale = c.amountSale.HasValue ? c.amountSale.Value.ToString("N") : string.Empty,
+                        amountSalePreviousYear = c.amountSalePreviousYear.HasValue ? c.amountSalePreviousYear.Value.ToString("N") : string.Empty,
                         brandID = c.brandID,
                         brandName = c.brandName,
-                        brandColor =  c.brandColor,
+                        brandColor = c.brandColor,
                         channelID = c.channelID,
                         counterID = c.counterID,
                         departmentStoreID = c.departmentStoreID,
                         month = c.month,
-                        mu = c.mu.HasValue ? c.mu.Value.ToString("0.00") : string.Empty,
-                        ot = c.ot.HasValue ? c.ot.Value.ToString("0.00") : string.Empty,
+                        mu = c.mu.HasValue ? c.mu.Value.ToString("N") : string.Empty,
+                        ot = c.ot.HasValue ? c.ot.Value.ToString("N") : string.Empty,
                         rank = c.rank,
                         remark = c.remark,
-                        sk = c.sk.HasValue ? c.sk.Value.ToString("0.00") : string.Empty,
+                        sk = c.sk.HasValue ? c.sk.Value.ToString("N") : string.Empty,
                         week = c.week,
-                        wholeSale = c.wholeSale.HasValue ? c.wholeSale.Value.ToString("0.00") : string.Empty,
+                        wholeSale = c.wholeSale.HasValue ? c.wholeSale.Value.ToString("N") : string.Empty,
                         year = c.year
                     }).ToList(),
                     remarkList = keyInRemark.Select(c => new KeyInRemark
@@ -363,25 +381,25 @@ namespace MarketData.Controllers
                 dataModel.data = response.data.Select(c => new AdminKeyInDetailData
                 {
                     ID = c.ID,
-                    fg = c.fg,
-                    amountSale = c.amountSale,
-                    amountSalePreviousYear = c.amountSalePreviousYear,
+                    departmentStoreName = c.departmentStoreName,
+                    retailerGroupID = c.retailerGroupID,
+                    fg = c.fg.HasValue ? c.fg.Value.ToString("N") : string.Empty,
+                    amountSale = c.amountSale.HasValue ? c.amountSale.Value.ToString("N") : string.Empty,
+                    amountSalePreviousYear = c.amountSalePreviousYear.HasValue ? c.amountSalePreviousYear.Value.ToString("N") : string.Empty,
                     brandID = c.brandID,
                     brandName = c.brandName,
                     brandColor = c.brandColor,
                     channelID = c.distributionChannelID,
                     counterID = c.counterID,
-                    retailerGroupID = c.retailerGroupID,
                     departmentStoreID = c.departmentStoreID,
-                    departmentStoreName = c.departmentStoreName,
                     month = c.month,
-                    mu = c.mu,
-                    ot = c.ot,
+                    mu = c.mu.HasValue ? c.mu.Value.ToString("N") : string.Empty,
+                    ot = c.ot.HasValue ? c.ot.Value.ToString("N") : string.Empty,
                     rank = c.rank,
                     remark = c.remark,
-                    sk = c.sk,
+                    sk = c.sk.HasValue ? c.sk.Value.ToString("N") : string.Empty,
                     week = c.week,
-                    wholeSale = c.wholeSale,
+                    wholeSale = c.wholeSale.HasValue ? c.wholeSale.Value.ToString("N") : string.Empty,
                     year = c.year,
                     universe = c.universe
                 }).ToList();

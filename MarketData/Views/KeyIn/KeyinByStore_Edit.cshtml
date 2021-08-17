@@ -117,29 +117,29 @@
                         @{
                             foreach (var item in Model.BAKeyInDetailList)
                             {
-                                                <tr class="row m-0" style="background: @( item.brandColor==""?"": item.brandColor)">
-                                                    <td class="col-2 ID" hidden>@item.ID</td>
-                                                    <td class="col-2" hidden>@item.keyInID</td>
-                                                    <td class="col-2" hidden>@item.counterID</td>
-                                                    <td class="col-2" hidden>@item.departmentStoreID</td>
-                                                    <td class="col-2" hidden>@item.channelID</td>
-                                                    <td class="col-2" hidden>@item.year</td>
-                                                    <td class="col-2" hidden>@item.month</td>
-                                                    <td class="col-2" hidden>@item.week</td>
-                                                    <td class="col-2" hidden>@item.brandID</td>
-                                                    <td class="col-2">@item.brandName</td>
-                                                    <td class="col-2">@item.amountSalePreviousYear</td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm rank" value="@item.rank"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm amountSale" value="@item.amountSale"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm sk" value="@item.sk"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm mu" value="@item.mu"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm fg" value="@item.fg"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm ot" value="@item.ot"></td>
-                                                    <td class="col-1 d-inline-flex" style=" align-items:center">
-                                                        @Html.DropDownListFor(c=> item.remark, new SelectList(Model.remarkList, "remark", "remark"), "", new { id = "remarkList", @class = "form-control col-sm-12 remark" })
-                                                    </td>
-                                                </tr>
+                                <tr class="row m-0" style="color:@(item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"? "white" : "black"); background: @( item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"?item.brandColor:"" )">
+                                    <td class="col-2 ID" hidden>@item.ID</td>
+                                    <td class="col-2" hidden>@item.keyInID</td>
+                                    <td class="col-2" hidden>@item.counterID</td>
+                                    <td class="col-2" hidden>@item.departmentStoreID</td>
+                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="col-2" hidden>@item.year</td>
+                                    <td class="col-2" hidden>@item.month</td>
+                                    <td class="col-2" hidden>@item.week</td>
+                                    <td class="col-2" hidden>@item.brandID</td>
+                                    <td class="col-2">@item.brandName</td>
+                                    <td class="col-2">@item.amountSalePreviousYear</td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm rank" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm amountSale" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm sk" value="@item.sk"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm mu" value="@item.mu"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm fg" value="@item.fg"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm ot" value="@item.ot"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center">
+                                        @Html.DropDownListFor(c => item.remark, new SelectList(Model.remarkList, "remark", "remark"), "", new { id = "remarkList", @class = "form-control col-sm-12 remark" })
+                                    </td>
+                                </tr>
                             }
 
                         }
@@ -166,12 +166,12 @@
         $("#blocker").hide();
         $("#container").removeClass("container");
         $('#btnSave').on('click', function (e) {
-            $("#blocker").show();
-             var model = @Html.Raw(Json.Serialize(Model));
-
             var frmdata = getDataFromTable();
 
-            $.ajax({
+            console.log(frmdata,'frmdata')
+            if (validate_AmountSale_Rank_Save(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+                $("#blocker").show();
+                   $.ajax({
                  type: "POST",
                  url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
                 contentType: "application/json; charset=utf-8",
@@ -198,6 +198,8 @@
                     $("#blocker").hide();
                 }
             });
+            }
+
 
         });
 
@@ -244,12 +246,15 @@
             var frmdata  = {};
             var memberDetails = new Array();
             var bAKeyInID = '';
+
+
             $("#tblDetails TBODY TR").each(function () {
                 var row = $(this);
                 var memberDetail = {};
                 var rank = row.find("TD").find(".rank").val();
                 var amountSale = row.find("TD").find(".amountSale").val();
                 var wholeSale = row.find("TD").find(".wholeSale").val();
+
                 var sk = row.find("TD").find(".sk").val();
                 var mu = row.find("TD").find(".mu").val();
                 var fg = row.find("TD").find(".fg").val();
@@ -270,12 +275,12 @@
                 memberDetail.brandName = row.find("TD").eq(9).html();
                 memberDetail.amountSalePreviousYear = amountSalePreviousYear ? parseFloat(amountSalePreviousYear) : null;
                 memberDetail.rank = rank ? parseInt(rank) : null;
-                memberDetail.amountSale = amountSale ? parseFloat(amountSale) : null;
-                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale) : type == 'Submit' && week == 4 ? 0 : null;
-                memberDetail.sk = sk ? parseFloat(sk) : null;
-                memberDetail.mu = mu ? parseFloat(mu) : null;
-                memberDetail.fg = fg ? parseFloat(fg) : null;
-                memberDetail.ot = ot ? parseFloat(ot) : null;
+                memberDetail.amountSale = amountSale ? parseFloat(amountSale.replace(/\,/g, "")) : null;
+                memberDetail.wholeSale = wholeSale ? parseFloat(wholeSale.replace(/\,/g, "")) : type == 'Submit' && week == 4 ? 0 : null;
+                memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
+                memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
+                memberDetail.fg = fg ? parseFloat(fg.replace(/\,/g, "")) : null;
+                memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
                 memberDetail.remark = remark;
                 memberDetails.push(memberDetail);
             });
@@ -298,6 +303,17 @@
             } else return 1;
         }
 
+        function validate_AmountSale_Rank_Save(data) {
+            var isNullAmount = data.BAKeyInDetailList.some(function (i) {
+                return (i.amountSale == null && i.rank != null) ||
+                    (i.amountSale != null && i.rank == null);
+            })
+            if (isNullAmount) {
+                showWarningAlert('NullAmount');
+                return 0;
+            } else return 1;
+        }
+
         function validate_Sum_Percent(data) {
 
             var validateData = data.BAKeyInDetailList.some(function (i) {
@@ -314,6 +330,7 @@
                 return 0;
             } else return 1;
         }
+
 
         function validate_WholeSales(data) {
 
@@ -412,12 +429,89 @@
 
             $('#myModalWarningResult').text(msg);
 
-
         }
 
+        $("input[data-type='currency']").on({
+            keyup: function () {
+                formatCurrency($(this));
+            },
+            blur: function () {
+                formatCurrency($(this), "blur");
+            }
+        });
+
+
+        function formatNumber(n) {
+            // format number 1000000 to 1,234,567
+            return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
+
+        function formatCurrency(input, blur) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = input.val();
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position
+            var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+                // On blur make sure 2 numbers after decimal
+                if (blur === "blur") {
+                    right_side += "00";
+                }
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side + "." + right_side;
+
+            } else {
+                // no decimal entered
+                // add commas to number
+                // remove all non-digits
+                input_val = formatNumber(input_val);
+                input_val = input_val;
+
+                // final formatting
+                if (blur === "blur") {
+                    input_val += ".00";
+                }
+            }
+
+            // send updated string to input
+            input.val(input_val);
+
+            // put caret back in the right position
+            var updated_len = input_val.length;
+            caret_pos = updated_len - original_len + caret_pos;
+            input[0].setSelectionRange(caret_pos, caret_pos);
+        }
 
     });
-
-
-
 </script>

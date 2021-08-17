@@ -29,13 +29,13 @@ namespace MarketData.Models
         public string month { get; set; }
         public string week { get; set; }
         public int? rank { get; set; }
-        public decimal? amountSalePreviousYear { get; set; }
-        public decimal? amountSale { get; set; }
-        public decimal? wholeSale { get; set; }
-        public decimal? sk { get; set; }
-        public decimal? mu { get; set; }
-        public decimal? fg { get; set; }
-        public decimal? ot { get; set; }
+        public string amountSalePreviousYear { get; set; }
+        public string amountSale { get; set; }
+        public string wholeSale { get; set; }
+        public string sk { get; set; }
+        public string mu { get; set; }
+        public string fg { get; set; }
+        public string ot { get; set; }
         public string remark { get; set; }
         public string universe { get; set; }
     }
