@@ -28,6 +28,7 @@ namespace MarketData.Controllers
                 try
                 {
                     var adjustOption = process.adjust.GetAdjustOption();
+                    var adjustStatus = process.masterData.GetAdjustStatus();
 
                     if (adjustOption != null)
                     {
@@ -66,6 +67,15 @@ namespace MarketData.Controllers
                             {
                                 brandID = c.brandID,
                                 brandName = c.brandName,
+                            }).ToList();
+                        }
+
+                        if (adjustStatus != null && adjustStatus.Any())
+                        {
+                            dataModel.statusList = adjustStatus.Select(c => new StatusKeyInViewModel
+                            {
+                                statusID = c.statusID,
+                                statusName = c.statusName,
                             }).ToList();
                         }
 

@@ -1918,5 +1918,34 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public List<AdjustStatusData> GetAdjustStatus()
+        {
+            List<AdjustStatusData> response = new List<AdjustStatusData>();
+
+            try
+            {
+                var searchData = repository.masterData.GetAdjustStatusList();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response = searchData.Select(c => new AdjustStatusData
+                    {
+                        statusID = c.ID,
+                        statusName = c.Status_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response = new List<AdjustStatusData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
     }
 }

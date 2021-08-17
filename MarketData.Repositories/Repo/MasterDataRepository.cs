@@ -1238,5 +1238,29 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<TMAdjustStatus> GetAdjustStatusList()
+        {
+            try
+            {
+                return _dbContext.TMAdjustStatus.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMAdjustStatus GetAdjustStatusBy(Expression<Func<TMAdjustStatus, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMAdjustStatus.Where(expression).AsNoTracking().FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

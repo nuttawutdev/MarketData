@@ -9,7 +9,7 @@ namespace MarketData.Controllers
     public class UsersController : Controller
     {
 
-        public IActionResult Users()
+        public IActionResult Index()
         {
             return View();
         }
