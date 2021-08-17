@@ -12,6 +12,7 @@ namespace MarketData.Processes
         public KeyInProcess keyIn;
         public UserProcess user;
         public ApproveProcess approve;
+        public AdjustProcess adjust;
 
         public Process(Repository repository)
         {
@@ -19,6 +20,7 @@ namespace MarketData.Processes
             keyIn = new KeyInProcess(repository);
             user = new UserProcess(repository);
             approve = new ApproveProcess(repository);
+            adjust = new AdjustProcess(repository);
         }
     }
 }

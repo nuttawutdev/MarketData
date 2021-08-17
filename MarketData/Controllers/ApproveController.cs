@@ -18,7 +18,7 @@ namespace MarketData.Controllers
             this.process = process;
         }
 
-        public IActionResult Approve()
+        public IActionResult Index()
         {
             ApproveKeyInViewModel dataModel = new ApproveKeyInViewModel();
 

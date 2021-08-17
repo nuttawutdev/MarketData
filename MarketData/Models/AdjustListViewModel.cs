@@ -16,7 +16,6 @@ namespace MarketData.Models
         public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }
-        public string counter { get; set; }
         public Guid retailerGroupID { get; set; }
         public string retailerGroupName { get; set; }
         public Guid departmentStoreID { get; set; }
