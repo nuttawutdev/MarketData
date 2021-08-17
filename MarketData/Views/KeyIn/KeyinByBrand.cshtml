@@ -223,7 +223,7 @@
                                     option += '<option value="' + model2[j].remark + '" ' + selectedRemark +'>' + model2[j].remark + '</option>';
                                 }
                                 option += '</select></td>';
-                          
+
                                 if (data.data[i].brandColor != "" && data.data[i].brandColor != null && data.data[i].brandColor != "#ffffff") {
                                     rowTable += '<tr style="background: ' + data.data[i].brandColor + ';color: white">';
                                 } else {
@@ -266,7 +266,7 @@
                                 '<td class="col-1" style=" align-items:center;"></td>' +
                                 '<td class="col-1" style=" align-items:center;"></td>' +
                                 '<td class="col-1" style=" align-items:center;"></td>' +
-                                '<td class="col-1" style=" align-items:center"></td>'+ 
+                                '<td class="col-1" style=" align-items:center"></td>'+
                                 '</tr>';
 
                             $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
@@ -307,7 +307,7 @@
             // original length
             var original_len = input_val.length;
 
-            // initial caret position 
+            // initial caret position
             var caret_pos = input.prop("selectionStart");
 
             // check for decimal
@@ -552,6 +552,43 @@
 
             $('#myModalWarningResult').text(msg);
 
+
+        }
+
+        $('#channelList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
+
+        $('#retailerGroupList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
+
+          function getDepartmentStoreList() {
+            var retailerGroupID = $("#retailerGroupList").val();
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (retailerGroupID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.retailerGroupID == retailerGroupID
+                });
+            }
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value='All'>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
 
         }
 

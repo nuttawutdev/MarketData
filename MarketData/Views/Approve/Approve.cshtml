@@ -114,6 +114,7 @@
             <div class="col-sm-3">
                 <label>Universe</label>
                 @{
+                    var defaultUniverse = "LPD";
                     List<SelectListItem> listUniverse = new List<SelectListItem>();
                     listUniverse.Add(new SelectListItem
                     {
@@ -127,7 +128,7 @@
 
                     });
 
-                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+                    @Html.DropDownListFor(c => defaultUniverse, new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
 
                 }
 
@@ -142,7 +143,7 @@
 
             </div>
             <div class="col-sm-3" style="align-self: flex-end;">
-         
+
             </div>
 
         </div>
@@ -187,7 +188,7 @@
                 { data: "departmentStoreName", title: "Department Store" },
                 { data: "brandID", title: "brandID", visible: false },
                 { data: "brandName", title: "Brand" },
-                { data: "retailerGroupID", title: "retailerGroupID", visible: false },   
+                { data: "retailerGroupID", title: "retailerGroupID", visible: false },
                 { data: "distributionChannelID", title: "distributionChannelID", visible: false },
                 { data: "distributionChannelName", title: "Distribution Chanel" },
                 { data: "statusID", title: "statusID", visible: false },
@@ -224,12 +225,14 @@
             var status = $(this).val();
             $('#channelList').val(status);
             dataTable.column(10).search(status).draw();
+            getDepartmentStoreList()
         });
 
         $('#retailerGroupList').on('change', function (e) {
             var status = $(this).val();
             $('#retailerGroupList').val(status);
             dataTable.column(9).search(status).draw();
+            getDepartmentStoreList()
         });
 
         $('#departmentStoreList').on('change', function (e) {
@@ -270,7 +273,37 @@
             $('#statusList').val(status);
             dataTable.column(12).search(status).draw();
         });
-    
+
+         function getDepartmentStoreList() {
+            var retailerGroupID = $("#retailerGroupList").val();
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (retailerGroupID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.retailerGroupID == retailerGroupID
+                });
+            }
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value='All'>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+
+            dataTable.column(5).search('').draw();
+        }
+
     });
 
 
