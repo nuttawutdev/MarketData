@@ -115,6 +115,7 @@
             <div class="col-sm-3">
                 <label>Universe</label>
                 @{
+                    var defaultUniverse = "LPD";
                     List<SelectListItem> listUniverse = new List<SelectListItem>();
                     listUniverse.Add(new SelectListItem
                     {
@@ -128,7 +129,7 @@
 
                     });
 
-                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+                    @Html.DropDownListFor(c => defaultUniverse, new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
 
                 }
 
@@ -284,6 +285,9 @@
                 !$('#retailerGroupList').val() ||
                 !$('#departmentStoreList').val() ||
                 !$('#brandList').val() ||
+                !$('#yearList').val() ||               
+                !$('#ddlMonth').val() ||
+                !$('#ddlWeek').val() ||
                 !$('#iduniverseList').val()) {
                 $('#warningModal').modal('show');
                 $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบถ้วน เพื่อบันทึกข้อมูลยอดขาย');

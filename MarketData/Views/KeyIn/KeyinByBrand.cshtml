@@ -1,7 +1,7 @@
 ﻿@model MarketData.Models.AdminKeyInViewModel
 
 @{
-    ViewData["Title"] = "บันทึกข้อมูลยอดขายรายแบรนด์";
+    ViewData["Title"] = "บันทึกข้อมูลยอดขาย";
     Html.RenderPartial("_WarningModal");
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
@@ -92,6 +92,7 @@
                 <div class="col-sm-3">
                     <label>Universe</label>
                     @{
+                        var defaultUniverse = "LPD";
                         List<SelectListItem> listUniverse = new List<SelectListItem>();
                         listUniverse.Add(new SelectListItem
                         {
@@ -105,7 +106,7 @@
 
                         });
 
-                        @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+                        @Html.DropDownListFor(c => defaultUniverse, new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
 
                     }
 
@@ -116,7 +117,7 @@
 
                 <div class="col-sm-3" style="align-self: flex-end;">
                     <div class="filter-group">
-                        <button id="btnCreate" type="button" class="btn btn-danger"><i class="ion-search"></i> Show</button>
+                        <button id="btnCreate" type="button" class="btn btn-danger"><i class="ion-plus"></i> Create</button>
                     </div>
                 </div>
 
@@ -241,7 +242,7 @@
                                     '<td class="col-1">' + data.data[i].departmentStoreName + '</td>' +
                                     '<td class="col-2">' + amountSalePreviousYear + '</td>' +
                                     '<td class="col-1" style="align-items:center"><input  type="number" class="form-control input-sm rank" value=' + rank + '></td>' +
-                                    '<td class="col-1" style="align-items:center"><input data-type="currency" type="text" class="form-control input-sm amountSale" value=' + amountSale + '></td>' +
+                                    '<td class="col-1" style="align-items:center"><input type="text" data-type="currency" class="form-control input-sm amountSale" value=' + amountSale + '></td>' +
                                     '<td class="col-1" style="align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale" value=' + wholeSale + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm sk" value=' + sk + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm mu" value=' + mu + '></td>' +
@@ -279,14 +280,12 @@
             }
         })
 
+        $(document).on("keyup", "input[data-type='currency']", function (event) {
+            formatCurrency($(this));
+        });
 
-        $("input[data-type='currency']").on({
-            keyup: function () {
-                formatCurrency($(this));
-            },
-            blur: function () {
-                formatCurrency($(this), "blur");
-            }
+        $(document).on("blur", "input[data-type='currency']", function (event) {
+            formatCurrency($(this), "blur");
         });
 
 
