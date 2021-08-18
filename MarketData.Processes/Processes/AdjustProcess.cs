@@ -41,10 +41,37 @@ namespace MarketData.Processes.Processes
                     c => c.year == request.year && c.month == request.month
                     && c.week == request.week && c.universe == request.universe);
 
+                var adjustStatus = repository.masterData.GetAdjustStatusList();
+                var adjustStatusPending = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Pending");
+                var listAdjustData = repository.adjust.GetAdjustDatalBy(
+                    c => c.Year == request.year
+                    && c.Month == request.month
+                    && c.Week == request.week
+                    && c.Universe == request.universe);
+
                 List<AdjustData> adjustDataList = new List<AdjustData>();
 
                 foreach (var itemDepartment in departmentStoreByFilter)
                 {
+                    var adjustStatusData = listAdjustData.FirstOrDefault(
+                        c => c.DistributionChannel_ID == itemDepartment.distributionChannelID
+                        && c.RetailerGroup_ID == itemDepartment.retailerGroupID
+                        && c.DepartmentStore_ID == itemDepartment.departmentStoreID);
+
+                    string statusName = string.Empty;
+                    Guid statusID;
+
+                    if(adjustStatusData != null)
+                    {
+                        statusID = adjustStatusData.ID;
+                        statusName = adjustStatus.FirstOrDefault(c => c.ID == adjustStatusData.ID).Status_Name;
+                    }
+                    else
+                    {
+                        statusID = adjustStatusPending.ID;
+                        statusName = adjustStatusPending.Status_Name;
+                    }
+
                     AdjustData adjustData = new AdjustData
                     {
                         retailerGroupID = itemDepartment.retailerGroupID,
@@ -56,6 +83,8 @@ namespace MarketData.Processes.Processes
                         departmentStoreName = itemDepartment.departmentStoreName,
                         distributionChannelID = itemDepartment.distributionChannelID,
                         distributionChannelName = itemDepartment.distributionChannelName,
+                        statusID = statusID,
+                        statusName = statusName,
                         brandStatus = new Dictionary<string, string>()
                     };
 

@@ -23,6 +23,16 @@ namespace MarketData.Controllers
             var role = HttpContext.Session.GetString("role");
             if (role == "Admin")
             {
+                GetAdjustListRequest request = new GetAdjustListRequest
+                {
+                    year = "2021",
+                    month = "08",
+                    week = "4",
+                    universe = "LPD"
+                };
+
+                var data = process.adjust.GetAdjustDataList(request);
+
                 AdjustDataViewModel dataModel = new AdjustDataViewModel();
 
                 try
