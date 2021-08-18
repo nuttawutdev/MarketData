@@ -500,7 +500,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var counterList = repository.masterData.GetCounterList();
+                var counterList = repository.masterData.GetCounterList().Where(e => e.active);
                 var counterByFilter = counterList.Where(
                     c => (!request.departmentStoreID.HasValue || (request.departmentStoreID.HasValue && request.departmentStoreID == c.departmentStoreID))
                     && (!request.retailerGroupID.HasValue || (request.retailerGroupID.HasValue && request.retailerGroupID == c.retailerGroupID))
@@ -537,7 +537,7 @@ namespace MarketData.Processes.Processes
                     }
                 }
 
-                foreach(var itemAdmin in adminKeyInDetailList)
+                foreach (var itemAdmin in adminKeyInDetailList)
                 {
                     itemAdmin.brandColor = brandDataList.FirstOrDefault(c => c.Brand_ID == itemAdmin.brandID).Brand_Color;
                 }

@@ -26,6 +26,8 @@ namespace MarketData.Model.Response.Approve
         public Guid statusID { get; set; }
         public string statusName { get; set; }
         public string approver { get; set; }
+        public DateTime? dateApprove { get; set; }
         public string approveDate { get; set; }
+        public string universe { get; set; }
     }
 }

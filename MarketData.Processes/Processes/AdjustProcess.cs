@@ -24,11 +24,65 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                var departmentStoreList = repository.masterData.GetDepartmentStoreList().Where(e => e.active);
+                var departmentStoreByFilter = departmentStoreList.Where(
+                    c => (!request.departmentStoreID.HasValue || (request.departmentStoreID.HasValue && request.departmentStoreID == c.departmentStoreID))
+                    && (!request.retailerGroupID.HasValue || (request.retailerGroupID.HasValue && request.retailerGroupID == c.retailerGroupID))
+                    && (!request.distributionChannelID.HasValue || (request.distributionChannelID.HasValue && request.distributionChannelID == c.distributionChannelID)));
 
+                var departmentSoteIDList = departmentStoreByFilter.Select(c => c.departmentStoreID);
+                var counterByDepartmentStoreList = repository.masterData.GetCounterListBy(e => departmentSoteIDList.Contains(e.Department_Store_ID));
+                var allBrandByCounter = counterByDepartmentStoreList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
+
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe);
+                var allApproveKeyInData = repository.approve.GetApproveKeyInData();
+
+                var approveKeyInDataFilter = allApproveKeyInData.Where(
+                    c => c.year == request.year && c.month == request.month
+                    && c.week == request.week && c.universe == request.universe);
+
+                List<AdjustData> adjustDataList = new List<AdjustData>();
+
+                foreach (var itemDepartment in departmentStoreByFilter)
+                {
+                    AdjustData adjustData = new AdjustData
+                    {
+                        retailerGroupID = itemDepartment.retailerGroupID,
+                        retailerGroupName = itemDepartment.retailerGroupName,
+                        week = request.week,
+                        month = request.month,
+                        year = request.year,
+                        departmentStoreID = itemDepartment.departmentStoreID,
+                        departmentStoreName = itemDepartment.departmentStoreName,
+                        distributionChannelID = itemDepartment.distributionChannelID,
+                        distributionChannelName = itemDepartment.distributionChannelName,
+                        brandStatus = new Dictionary<string, string>()
+                    };
+
+                    foreach (var itemBrandLoreal in onlyBrandLorel)
+                    {
+                        var statusBrand = approveKeyInDataFilter.Where(
+                            e => e.brandID == itemBrandLoreal.brandID
+                            && e.departmentStoreID == itemDepartment.departmentStoreID
+                            && e.distributionChannelID == itemDepartment.distributionChannelID
+                            && e.retailerGroupID == itemDepartment.retailerGroupID)
+                            .OrderByDescending(c => c.dateApprove).FirstOrDefault();
+
+                        var brandShortName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
+                        var approveStatus = statusBrand?.statusName;
+
+                        adjustData.brandStatus.Add(brandShortName, approveStatus);
+                    }
+
+                    adjustDataList.Add(adjustData);
+                }
+
+                response.data = adjustDataList;
+                response.columnList = onlyBrandLorel.Select(c => !string.IsNullOrWhiteSpace(c.brandShortName) ? c.brandShortName : c.brandName).ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
 
             return response;

@@ -167,7 +167,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async  Task<bool> SaveBrandSegment(SaveBrandSegmentRequest request)
+        public async Task<bool> SaveBrandSegment(SaveBrandSegmentRequest request)
         {
             try
             {
@@ -448,6 +448,40 @@ namespace MarketData.Repositories.Repo
                    });
 
                 brandList = brandList.OrderBy(x => x.brandName);
+                return brandList.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<BrandData> GetBrandListLoreal(Expression<Func<TMBrand, bool>> expression)
+        {
+            try
+            {
+                var searchData = _dbContext.TMBrand.Where(expression).AsNoTracking();
+
+                var brandList = (
+                   from e in searchData
+                   join g in _dbContext.TMBrandGroup
+                       on e.Brand_Group_ID equals g.Brand_Group_ID
+                       into joinGroup
+                   from groups in joinGroup.DefaultIfEmpty()
+                   select new BrandData
+                   {
+                       brandID = e.Brand_ID,
+                       brandName = e.Brand_Name,
+                       brandShortName = e.Brand_Short_Name,
+                       brandGroupName = groups != null ? groups.Brand_Group_Name : "",
+                       universe = e.Universe,
+                       active = e.Active_Flag,
+                       color = e.Brand_Color,
+                       isLorealBrand = groups != null ? groups.Is_Loreal_Brand : false
+                   });
+
+                brandList = brandList.OrderBy(x => x.brandName).Where(c => c.isLorealBrand);
                 return brandList.ToList();
 
             }

@@ -61,15 +61,6 @@ namespace MarketData.Controllers
                             }).ToList();
                         }
 
-                        if (adjustOption.brand != null && adjustOption.brand.Any())
-                        {
-                            dataModel.brandList = adjustOption.brand.Select(c => new BrandKeyInViewModel
-                            {
-                                brandID = c.brandID,
-                                brandName = c.brandName,
-                            }).ToList();
-                        }
-
                         if (adjustStatus != null && adjustStatus.Any())
                         {
                             dataModel.statusList = adjustStatus.Select(c => new StatusKeyInViewModel

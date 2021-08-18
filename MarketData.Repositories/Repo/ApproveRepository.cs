@@ -92,8 +92,10 @@ namespace MarketData.Repositories.Repo
                         retailerGroupID = store.Retailer_Group_ID,
                         statusID = status.ID,
                         statusName = status.Status_Name,
+                        dateApprove = a.Action_Date,
                         approveDate = a.Action_Date.HasValue ? a.Action_Date.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm:ss") : "",
-                        approver = user != null ? user.UserName : string.Empty
+                        approver = user != null ? user.UserName : string.Empty,
+                        universe = baKeyIn.Universe
                     }).ToList();
 
                 return approveKeyInDataList;

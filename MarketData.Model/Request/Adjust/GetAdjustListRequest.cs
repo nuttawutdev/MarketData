@@ -11,7 +11,6 @@ namespace MarketData.Model.Request.Adjust
         public string week { get; set; }
         public Guid? retailerGroupID { get; set; }
         public Guid? departmentStoreID { get; set; }
-        public Guid? brandID { get; set; }
         public Guid? distributionChannelID { get; set; }
         public string universe { get; set; }
     }

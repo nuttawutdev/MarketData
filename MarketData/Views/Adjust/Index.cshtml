@@ -52,18 +52,6 @@
                 }
             </div>
 
-            <div class="col-sm-3">
-                <label>Brand</label>
-                @if (Model.brandList.Count > 1)
-                {
-                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control col-sm-12" })
-                }
-                else
-                {
-                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control col-sm-12" })
-                }
-
-            </div>
         </div>
         <div class="row col-sm-12" style="padding-top: 15px;">
             <div class="col-sm-3">
