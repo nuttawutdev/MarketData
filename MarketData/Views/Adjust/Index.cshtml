@@ -189,7 +189,7 @@
                     success: function (data) {
                         $("#blocker").hide();
                         console.log(data)
-
+                        $('#tblDetails').empty();
                         if (data.data.length > 0) {
 
                             var titleTable = '<thead class="table-secondary">' +
@@ -204,7 +204,7 @@
                                 titleTable += '    <th >' + data.columnList[i] + '</th>';
                             }
 
-                            titleTable +=  '<th >Action</th>';
+                            titleTable += '<th >Action</th>';
                             titleTable += '</tr></thead>';
 
 
@@ -227,7 +227,7 @@
                                 var jsonData = data.data[i].brandStatus;
                                 Object.keys(jsonData).forEach(function (key) {
                                     var value = jsonData[key] == null ? "" : jsonData[key];
-                                    console.log('value ',value)
+                                    console.log('value ', value)
                                     rowTable += '<td data-id=' + key + '>' + value + '</td>';
 
                                 });
@@ -242,6 +242,20 @@
 
                             $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
 
+                        }
+                        else {
+                            var titleTable = '<thead class="table-secondary">' +
+                                '    <th >Year</th>' +
+                                '    <th >Month</th>' +
+                                '    <th >Week</th>' +
+                                '    <th >Distribution Chanel</th>' +
+                                '    <th >Retailer Group</th>' +
+                                '    <th >Department Store</th>';
+
+
+                            titleTable += '<th >Action</th>';
+                            titleTable += '</tr></thead>';
+                            $('#tblDetails').append(titleTable);
                         }
                     },
                     error: function () {
