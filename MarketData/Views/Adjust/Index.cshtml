@@ -153,7 +153,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $("#container").removeClass("container");
-    
+
 
         $('#btnShow').on('click', function (e) {
             $("#blocker").show();
@@ -189,9 +189,9 @@
                     success: function (data) {
                         $("#blocker").hide();
                         console.log(data)
-            
-                        if (data.data.length > 0 && data.columnList.length> 0) {
-                   
+
+                        if (data.data.length > 0) {
+
                             var titleTable = '<thead class="table-secondary">' +
                                 '    <th >Year</th>' +
                                 '    <th >Month</th>' +
@@ -229,14 +229,14 @@
                                     var value = jsonData[key] == null ? "" : jsonData[key];
                                     console.log('value ',value)
                                     rowTable += '<td data-id=' + key + '>' + value + '</td>';
-                                    
+
                                 });
 
                                 rowTable += '<td > <a href="#" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a></td > ';
 
                                 rowTable += '</tr>';
 
-                              
+
                             }
 
 
@@ -251,6 +251,41 @@
             }
         })
 
+          $('#channelList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
 
+        $('#retailerGroupList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
+
+          function getDepartmentStoreList() {
+            var retailerGroupID = $("#retailerGroupList").val();
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (retailerGroupID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.retailerGroupID == retailerGroupID
+                });
+            }
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value=''>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+
+        }
     });
 </script>
