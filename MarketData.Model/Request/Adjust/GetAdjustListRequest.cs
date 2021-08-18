@@ -12,6 +12,7 @@ namespace MarketData.Model.Request.Adjust
         public Guid? retailerGroupID { get; set; }
         public Guid? departmentStoreID { get; set; }
         public Guid? distributionChannelID { get; set; }
+        public Guid? statusID { get; set; }
         public string universe { get; set; }
     }
 }

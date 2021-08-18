@@ -106,6 +106,12 @@ namespace MarketData.Processes.Processes
                     adjustDataList.Add(adjustData);
                 }
 
+                if (request.statusID.HasValue)
+                {
+                    adjustDataList = adjustDataList.Where(c => c.statusID == request.statusID).ToList();
+
+                }
+
                 response.data = adjustDataList;
                 response.columnList = onlyBrandLorel.Select(c => !string.IsNullOrWhiteSpace(c.brandShortName) ? c.brandShortName : c.brandName).ToList();
             }
