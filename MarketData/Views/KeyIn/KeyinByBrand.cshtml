@@ -169,7 +169,7 @@
                     retailerGroupID: $('#retailerGroupList').val() ? $('#retailerGroupList').val() : null,
                     departmentStoreID: $('#departmentStoreList').val() ? $('#departmentStoreList').val() : null,
                     brandID: $('#brandList').val() ? $('#brandList').val() : null ,
-                    universe: $('#iduniverseList').val()
+                    universe: $('#iduniverseList').val() ?  $('#iduniverseList').val() : null
                 };
                 $.ajax({
                     type: "POST",
@@ -427,7 +427,7 @@
                 memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
                 memberDetail.remark = row.find("TD").find(".remark").val();
                 memberDetail.retailerGroupID = row.find("TD").eq(19).html();
-                memberDetail.universe = $('#iduniverseList').val()
+                memberDetail.universe = $('#iduniverseList').val() ?  $('#iduniverseList').val() : null
                 memberDetails.push(memberDetail);
             });
 

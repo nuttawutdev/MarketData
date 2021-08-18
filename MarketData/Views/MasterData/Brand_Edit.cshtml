@@ -126,7 +126,7 @@
                  brandTypeName: $('#idbrandTypeList option:selected').text(),
                  brandColor: $("#idbrandColor").val(),
                  lorealBrandRank: parseInt($('#idlorealBrandRank').val()),
-                 universe: $('#iduniverseList').val(),
+                 universe: $('#iduniverseList').val() ?  $('#iduniverseList').val() : null,
                  active: $("#flagactive").prop("checked"),
                  userID: $('#iduserID').val()
             };
