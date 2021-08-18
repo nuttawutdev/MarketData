@@ -43,7 +43,6 @@
 
                 </div>
             </div>
-
             <div class="row col-sm-12" style="padding-top: 15px;">
                 <div class="col-sm-3">
 
@@ -122,13 +121,8 @@
                 </div>
 
             </div>
-
-
-
         </div>
-
     </div>
-
 </div>
 
 <div style="overflow-x:auto; padding-top:30px;padding-left:20px;padding-right:20px">
@@ -585,7 +579,7 @@
             var lengthSelect = $('#departmentStoreList');
 
             lengthSelect.empty();
-            lengthSelect.append("<option value='All'>All</option>")
+            lengthSelect.append("<option value=''>All</option>")
             $.each(departmentStoreList, function (index, row) {
                 lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
             });
