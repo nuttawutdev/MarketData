@@ -180,5 +180,11 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public GetAdjustDetailResponse GetAdjustDataDetail(GetAdjustDetailRequest request)
+        {
+            GetAdjustDetailResponse response = new GetAdjustDetailResponse();
+            return response;
+        }
     }
 }

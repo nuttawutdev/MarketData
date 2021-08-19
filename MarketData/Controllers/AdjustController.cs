@@ -87,6 +87,53 @@ namespace MarketData.Controllers
 
         }
 
+        public IActionResult Adjust_Edit(string year, string month, string week, Guid departmentStoreID)
+        {
+            var role = HttpContext.Session.GetString("role");
+            if (role == "Admin")
+            {
+                GetAdjustDetailRequest request = new GetAdjustDetailRequest
+                {
+                    year = year,
+                    month = month,
+                    week = week,
+                    departmentStoreID = departmentStoreID
+                };
+
+                var adjustDetailData = process.adjust.GetAdjustDataDetail(request);
+
+                AdjustDetailViewModel dataModel = new AdjustDetailViewModel
+                {
+                    data = adjustDetailData.data.Select(c => new AdjustDetailViewData
+                    {
+                        brandID = c.brandID,
+                        adjustAmountSale = c.adjustAmountSale,
+                        adjustWholeSale = c.adjustWholeSale,
+                        adminAmountSale = c.adminAmountSale,
+                        amountPreviousYear = c.amountPreviousYear,
+                        brandKeyInAmount = c.brandKeyInAmount,
+                        brandKeyInRank = c.brandKeyInRank,
+                        fg = c.fg,
+                        mu = c.mu,
+                        ot = c.ot,
+                        sk = c.sk,
+                        brandName = c.brandName,
+                        remark = c.remark,
+                        rank = c.rank,
+                        percentGrowth = c.percentGrowth
+
+                    }).ToList()
+                };
+
+                return View(dataModel);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+        }
+
         [HttpPost]
         public IActionResult GetAdjustList([FromBody] GetAdjustListRequest request)
         {
