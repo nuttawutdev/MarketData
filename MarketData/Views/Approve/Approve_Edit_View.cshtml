@@ -32,8 +32,16 @@
         @ViewData["Title"]
     </h3>
     <hr />
-    <br />
-    <br />
+    @if (!string.IsNullOrWhiteSpace(Model.baRemark))
+    {
+        <div class="row" style="word-break:break-all;padding-left:15px;padding-right:15px;color:blue">
+            <p style="font-size: 14px;font-weight:bold;">ข้อมูลเพิ่มเติมจาก BA : </p>
+            <p style="font-size: 14px;word-break:break-all" id="baRemark">
+                @Model.baRemark
+            </p>
+        </div>
+    }
+
 
     <div class="row">
         <div style="width: 100%; font-size: 13px;">
@@ -44,7 +52,7 @@
                         @Model.departmentStore
                     </label>
                     <input type="hidden" id="approveKeyInID" value="@Model.approveKeyInID" />
-                </div>     
+                </div>
                 <div class="col-sm-2">
                     <label><b>Retailer Group</b></label><br />
                     <label>
@@ -86,14 +94,14 @@
                     </label>
                 </div>
                 @*<div class="col-sm-3">
-                    <div class="custom-file-upload">
+                        <div class="custom-file-upload">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Export to Excel
-                        </label>
-                        <input id="file-upload" type="file" />
-                    </div>
-                </div>*@
+                            <label for="file-upload" class="custom-file-upload1">
+                                <i class="ion-android-document"></i> Export to Excel
+                            </label>
+                            <input id="file-upload" type="file" />
+                        </div>
+                    </div>*@
             </div>
         </div>
 
@@ -164,7 +172,7 @@
             <div class="">
                 <textarea class="form-control" 
                           id="txtRemark"
-                          style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;" 
+                          style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px; height: 100px" 
                           placeholder="ข้อมูลเพิ่มเติม"                          
                           disabled>@Model.remark</textarea>
             </div>

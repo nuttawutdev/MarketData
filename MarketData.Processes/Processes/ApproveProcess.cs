@@ -141,6 +141,7 @@ namespace MarketData.Processes.Processes
                 var retailerGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == BAKeyInData.RetailerGroup_ID);
                 var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
 
+                response.baRemark = approveData.BA_Remark;
                 response.remark = approveData.Remark;
                 response.universe = BAKeyInData.Universe;
                 response.status = repository.masterData.GetApproveKeyInStatusBy(c => c.ID == approveData.Status_ID)?.Status_Name;
@@ -178,6 +179,7 @@ namespace MarketData.Processes.Processes
                     approveData.Status_ID = approveStatus.ID;
                     approveData.Remark = request.remark;
                     approveData.Action_By = request.userID;
+                    approveData.BA_Remark = request.baRemark;
                     approveData.Action_Date = Utility.GetDateNowThai();
 
                     var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
@@ -247,6 +249,7 @@ namespace MarketData.Processes.Processes
                     approveData.Remark = request.remark;
                     approveData.Action_By = request.userID;
                     approveData.Action_Date = Utility.GetDateNowThai();
+                    approveData.BA_Remark = request.baRemark;
 
                     var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
 

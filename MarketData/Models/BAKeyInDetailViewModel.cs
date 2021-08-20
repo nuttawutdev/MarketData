@@ -19,6 +19,8 @@ namespace MarketData.Models
         public string week { get; set; }
         public string status { get; set; }
         public string universe { get; set; }
+        public string remark { get; set; }
+        public string rejectReason { get; set; }
     }
 
     public class BAKeyInDetailData

@@ -31,6 +31,7 @@ namespace MarketData.Repositories.Repo
                     ID = Guid.NewGuid(),
                     BAKeyIn_ID = request.ID,
                     Status_ID = submittedStatus.ID,
+                    BA_Remark = request.Remark
                 };
 
                 _dbContext.TTApproveKeyIn.Add(aaproveKeyInData);

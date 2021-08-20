@@ -31,13 +31,23 @@
         align-items: center;
     }
 </style>
+
+
 <div class="container-xl" style="padding: 20px; overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px;">
     <h3>
         @ViewData["Title"]
     </h3>
     <hr />
-    <br />
-    <br />
+
+    @if (!string.IsNullOrWhiteSpace(Model.baRemark ))
+    {
+        <div class="row" style="word-break:break-all;padding-left:15px;padding-right:15px;color:blue">
+            <p style="font-size: 14px;font-weight:bold;">ข้อมูลเพิ่มเติมจาก BA : </p>
+            <p style="font-size: 14px;word-break:break-all" id="baRemark">
+                @Model.baRemark
+            </p>
+        </div>
+    }
 
     <div class="row">
         <div style="width: 100%; font-size: 13px;">
@@ -48,7 +58,7 @@
                         @Model.departmentStore
                     </label>
                     <input type="hidden" id="approveKeyInID" value="@Model.approveKeyInID" />
-                </div>     
+                </div>
                 <div class="col-sm-2">
                     <label><b>Retailer Group</b></label><br />
                     <label>
@@ -90,14 +100,14 @@
                     </label>
                 </div>
                 @*<div class="col-sm-3">
-                    <div class="custom-file-upload">
+                        <div class="custom-file-upload">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Export to Excel
-                        </label>
-                        <input id="file-upload" type="file" />
-                    </div>
-                </div>*@
+                            <label for="file-upload" class="custom-file-upload1">
+                                <i class="ion-android-document"></i> Export to Excel
+                            </label>
+                            <input id="file-upload" type="file" />
+                        </div>
+                    </div>*@
             </div>
         </div>
 
@@ -163,20 +173,20 @@
         </div>
     </div>
 </div>
-    <div class="container-xl" style="overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px">
- 
-            <div class="">
-                <textarea class="form-control" id="txtRemark" style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;" placeholder="ข้อมูลเพิ่มเติม"></textarea>
-            </div>
-            <div style="padding-top: 20px; text-align:right">
-                <button id="btnApprove" class="btn btn-danger " type="button">Approve</button>
-                <button id="btnReject" class="btn btn-primary text-white" type="button">Reject</button>
-                <a href="Index" class="btn btn-outline-danger">Cancel</a>
-            </div>
-           
-        </div>
+<div class="container-xl" style="overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px">
 
-    <script>
+    <div class="">
+        <textarea class="form-control" id="txtRemark" style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;height:100px" placeholder="ข้อมูลเพิ่มเติม"></textarea>
+    </div>
+    <div style="padding-top: 20px; text-align:right">
+        <button id="btnApprove" class="btn btn-danger " type="button">Approve</button>
+        <button id="btnReject" class="btn btn-primary text-white" type="button">Reject</button>
+        <a href="Index" class="btn btn-outline-danger">Cancel</a>
+    </div>
+
+</div>
+
+<script>
     $(document).ready(function () {
         $("#container").removeClass("container");
         $('#btnApprove').on('click', function (e) {
@@ -199,11 +209,18 @@
         });
 
         $(".btnConfirmModalWithText").click(function () {
+
+            var baRemark = null;
+            if ($('#baRemark').text()) {
+                baRemark = $('#baRemark').text().trim();
+            }
+
             $('#ConfirmModalWithText').modal('hide');
                    var frmdata = {
                        approveKeyInID: $('#approveKeyInID').val(),
                        remark: $('#txtRemark').val(),
                        userID: $('#approveKeyInID').val(),
+                       baRemark: baRemark
             };
             var urlAction = '';
             if ($('#confirmWithTextID').val() == 'Approve') {
@@ -243,4 +260,4 @@
           });
 
     });
-    </script>
+</script>

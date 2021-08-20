@@ -251,6 +251,7 @@ namespace MarketData.Repositories.Repo
                 baKeyInData.Updated_By = request.userID;
                 baKeyInData.Updated_Date = Utility.GetDateNowThai();
                 baKeyInData.KeyIn_Status_ID = status;
+                baKeyInData.Remark = request.remark;
 
                 int monthKeyIn = Int32.Parse(baKeyInData.Month);
                 int YearKeyIn = Int32.Parse(baKeyInData.Year);
@@ -263,7 +264,7 @@ namespace MarketData.Repositories.Repo
 
                         if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "2")
@@ -272,7 +273,7 @@ namespace MarketData.Repositories.Repo
 
                         if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "3")
@@ -281,7 +282,7 @@ namespace MarketData.Repositories.Repo
 
                         if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "4")
@@ -290,7 +291,7 @@ namespace MarketData.Repositories.Repo
 
                         if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
 

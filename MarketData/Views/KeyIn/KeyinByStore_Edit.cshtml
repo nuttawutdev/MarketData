@@ -13,13 +13,22 @@
 
 </h3>
 
-
 <hr />
-<br />
-<br />
+
+@if (Model.rejectReason != null)
+{
+    <div class="row" style="word-break:break-all;padding-left:35px;padding-right:35px;color:red">
+        <p style="font-size: 14px;font-weight:bold;">เหตุผลที่ถูกปฏิเสธ : </p>
+        <p style="font-size: 14px;word-break:break-all">
+            @Model.rejectReason
+        </p>
+    </div>
+}
+
 
 <div class="row" style="overflow-x:auto;padding-left:20px;padding-right:20px">
     <div style="width: 100%; font-size: 13px;">
+
         <div class="row col-sm-12">
 
             <div class="col-sm-2">
@@ -150,6 +159,14 @@
             </div>
         </div>
     </div>
+    <div style="overflow-x: auto;">
+        <div class="">
+            <textarea class="form-control"
+                      id="txtRemark"
+                      style=" resize: none; display: block; margin-left: auto; margin-right: auto; padding-bottom: 20px;height:100px"
+                      placeholder="ข้อมูลเพิ่มเติม">@Model.remark</textarea>
+        </div>
+    </div>
     <div class="modal-footer">
         <button id="btnSave" class="btn btn-danger " type="button">Save</button>
         <button id="btnSubmit" class="btn btn-primary text-white" type="button">Submit</button>
@@ -157,8 +174,6 @@
 
     </div>
 </div>
-
-
 
 <script type="text/javascript">
 
@@ -288,6 +303,7 @@
             frmdata.BAKeyInDetailList = memberDetails;
             frmdata.BAKeyInID = bAKeyInID;
             frmdata.userID = bAKeyInID;
+            frmdata.remark = $('#txtRemark').val();
             return frmdata;
         };
 

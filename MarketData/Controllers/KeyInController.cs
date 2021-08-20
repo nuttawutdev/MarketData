@@ -226,6 +226,8 @@ namespace MarketData.Controllers
                     departmentStore = response.departmentStore,
                     retailerGroup = response.retailerGroup,
                     universe = response.universe,
+                    remark = response.remark,
+                    rejectReason = response.rejectReason,
                     BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
                     {
                         ID = c.ID,

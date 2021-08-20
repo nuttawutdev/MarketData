@@ -19,5 +19,6 @@ namespace MarketData.Models
         public string status { get; set; }
         public string universe { get; set; }
         public string remark { get; set; }
+        public string baRemark { get; set; }
     }
 }

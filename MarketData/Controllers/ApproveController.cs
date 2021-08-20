@@ -165,6 +165,7 @@ namespace MarketData.Controllers
                     retailerGroup = response.retailerGroup,
                     universe = response.universe,
                     remark = response.remark,
+                    baRemark = response.baRemark,
                     BAKeyInDetailList = response.data.Select(c => new BAKeyInDetailData
                     {
                         ID = c.ID,
