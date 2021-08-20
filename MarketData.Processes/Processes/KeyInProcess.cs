@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.KeyIn;
 using MarketData.Model.Response;
@@ -131,11 +132,11 @@ namespace MarketData.Processes.Processes
                     listBAKeyIn.AddRange(baKeyInByCounter);
                 }
 
-                response.year.Add(DateTime.Now.Year.ToString());
+                response.year.Add(Utility.GetDateNowThai().Year.ToString());
 
                 if (listBAKeyIn.Any())
                 {
-                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != DateTime.Now.Year.ToString());
+                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != Utility.GetDateNowThai().Year.ToString());
 
                     foreach (var itemGroupYear in groupByYear)
                     {
@@ -158,7 +159,7 @@ namespace MarketData.Processes.Processes
 
         public async Task<CreateBAKeyInDetailResponse> CreateBAKeyInDetail(CreateBAKeyInRequest request)
         {
-            DateTime dateNow = DateTime.Now;
+            DateTime dateNow = Utility.GetDateNowThai();
             CreateBAKeyInDetailResponse response = new CreateBAKeyInDetailResponse();
             var keyInStatusNew = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "New");
 
@@ -167,7 +168,7 @@ namespace MarketData.Processes.Processes
                 int monthKeyIn = Int32.Parse(request.month);
                 int yearKeyIn = Int32.Parse(request.year);
 
-                if (yearKeyIn == DateTime.Now.Year && monthKeyIn > DateTime.Now.Month)
+                if (yearKeyIn == Utility.GetDateNowThai().Year && monthKeyIn > Utility.GetDateNowThai().Month)
                 {
                     response.responseError = "ไม่สามารถเลือกบันทึกข้อมูลล่วงหน้าได้";
                     return response;
@@ -368,7 +369,7 @@ namespace MarketData.Processes.Processes
                         Month = BAKeyInData.Month,
                         Week = BAKeyInData.Week,
                         Created_By = BAKeyInData.Created_By.GetValueOrDefault(),
-                        Created_Date = DateTime.Now,
+                        Created_Date = Utility.GetDateNowThai(),
                         Counter_ID = c.Counter_ID
                     }).ToList();
 
@@ -422,7 +423,7 @@ namespace MarketData.Processes.Processes
         public async Task<SaveDataResponse> SaveBAKeyInDetail(SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
-            DateTime dateNoew = DateTime.Now;
+            DateTime dateNoew = Utility.GetDateNowThai();
 
             try
             {
@@ -449,7 +450,7 @@ namespace MarketData.Processes.Processes
         public async Task<SaveDataResponse> SubmitBAKeyInDetail(SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
-            DateTime dateNoew = DateTime.Now;
+            DateTime dateNoew = Utility.GetDateNowThai();
 
             try
             {
@@ -567,7 +568,7 @@ namespace MarketData.Processes.Processes
         public async Task<SaveDataResponse> SaveAdminKeyIn(SaveAdminKeyInDetailRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
-            DateTime dateNoew = DateTime.Now;
+            DateTime dateNoew = Utility.GetDateNowThai();
 
             try
             {
@@ -682,7 +683,7 @@ namespace MarketData.Processes.Processes
                 }).OrderBy(r => r.retailerGroupName).ToList();
 
                 List<string> yearList = new List<string>();
-                string currentYear = DateTime.Now.Year.ToString();
+                string currentYear = Utility.GetDateNowThai().Year.ToString();
 
                 yearList.Add(currentYear);
 
@@ -710,7 +711,7 @@ namespace MarketData.Processes.Processes
         #region Private Function
         private async Task<(bool, List<TTBAKeyInDetail>)> CreateBAKeyInDetail(CreateBAKeyInRequest request, Guid keyInID)
         {
-            DateTime dateNow = DateTime.Now;
+            DateTime dateNow = Utility.GetDateNowThai();
 
             try
             {
@@ -778,7 +779,7 @@ namespace MarketData.Processes.Processes
 
         private async Task<bool> SaveBAKeyInDetailData(SaveBAKeyInDetailRequest request)
         {
-            DateTime dateNoew = DateTime.Now;
+            DateTime dateNoew = Utility.GetDateNowThai();
 
             try
             {

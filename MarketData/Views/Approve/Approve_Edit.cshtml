@@ -171,7 +171,7 @@
             <div style="padding-top: 20px; text-align:right">
                 <button id="btnApprove" class="btn btn-danger " type="button">Approve</button>
                 <button id="btnReject" class="btn btn-primary text-white" type="button">Reject</button>
-                <a href="Approve" class="btn btn-outline-danger">Cancel</a>
+                <a href="Index" class="btn btn-outline-danger">Cancel</a>
             </div>
            
         </div>
@@ -219,7 +219,7 @@
                 datatype: "json",
                 success: function (data) {
                      if (data.isSuccess) {
-                         $('#successModalHref').attr("href", "Approve");
+                         $('#successModalHref').attr("href", "Index");
                          $('#successModal').modal('show');
                      } else if (data.isDuplicated) {
                          $('#failedModal').modal('show');

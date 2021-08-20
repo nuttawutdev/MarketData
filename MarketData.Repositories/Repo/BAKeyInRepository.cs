@@ -1,10 +1,12 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.KeyIn;
 using MarketData.Model.Response.KeyIn;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -144,7 +146,7 @@ namespace MarketData.Repositories.Repo
                     Week = request.week,
                     Universe = request.universe,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now,
+                    Created_Date = Utility.GetDateNowThai(),
                     KeyIn_Status_ID = keyInStatusNew.ID,
                 };
 
@@ -247,7 +249,7 @@ namespace MarketData.Repositories.Repo
             {
                 var baKeyInData = _dbContext.TTBAKeyIn.Find(request.BAKeyInID);
                 baKeyInData.Updated_By = request.userID;
-                baKeyInData.Updated_Date = DateTime.Now;
+                baKeyInData.Updated_Date = Utility.GetDateNowThai();
                 baKeyInData.KeyIn_Status_ID = status;
 
                 int monthKeyIn = Int32.Parse(baKeyInData.Month);
@@ -259,7 +261,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 10, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
                             baKeyInData.Remark = "ล่าช้า";
                         }
@@ -268,7 +270,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 18, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
                             baKeyInData.Remark = "ล่าช้า";
                         }
@@ -277,7 +279,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 25, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
                             baKeyInData.Remark = "ล่าช้า";
                         }
@@ -286,13 +288,13 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 5, 0, 0, 0).AddMonths(1);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
                             baKeyInData.Remark = "ล่าช้า";
                         }
                     }
 
-                    baKeyInData.Submited_Date = DateTime.Now;
+                    baKeyInData.Submited_Date = Utility.GetDateNowThai();
                 }
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
@@ -310,7 +312,7 @@ namespace MarketData.Repositories.Repo
             {
                 var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
                 baKeyInData.Approved_By = userID;
-                baKeyInData.Approved_Date = DateTime.Now;
+                baKeyInData.Approved_Date = Utility.GetDateNowThai();
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
                 return await _dbContext.SaveChangesAsync() > 0;
@@ -330,7 +332,7 @@ namespace MarketData.Repositories.Repo
                 var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
                 baKeyInData.Approved_By = userID;
                 baKeyInData.KeyIn_Status_ID = keyInStatusReject.ID;
-                baKeyInData.Approved_Date = DateTime.Now;
+                baKeyInData.Approved_Date = Utility.GetDateNowThai();
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
                 return await _dbContext.SaveChangesAsync() > 0;

@@ -24,59 +24,67 @@ namespace MarketData.Controllers
 
             try
             {
-                var approveOption = process.approve.GetApproveKeyInOption();
-                var approveStatus = process.masterData.GetApproveStatus();
-
-                if (approveOption != null)
+                var role = HttpContext.Session.GetString("role");
+                if (role == "Admin")
                 {
-                    if (approveOption.departmentStore != null && approveOption.departmentStore.Any())
-                    {
-                        dataModel.departmentStoreList = approveOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
-                        {
-                            departmentStoreID = c.departmentStoreID,
-                            departmentStoreName = c.departmentStoreName,
-                            distributionChannelID = c.distributionChannelID,
-                            retailerGroupID = c.retailerGroupID
-                        }).ToList();
-                    }
+                    var approveOption = process.approve.GetApproveKeyInOption();
+                    var approveStatus = process.masterData.GetApproveStatus();
 
-                    if (approveOption.retailerGroup != null && approveOption.retailerGroup.Any())
+                    if (approveOption != null)
                     {
-                        dataModel.retailerGroupList = approveOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                        if (approveOption.departmentStore != null && approveOption.departmentStore.Any())
                         {
-                            retailerGroupName = c.retailerGroupName,
-                            retailerGroupID = c.retailerGroupID
-                        }).ToList();
-                    }
+                            dataModel.departmentStoreList = approveOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                            {
+                                departmentStoreID = c.departmentStoreID,
+                                departmentStoreName = c.departmentStoreName,
+                                distributionChannelID = c.distributionChannelID,
+                                retailerGroupID = c.retailerGroupID
+                            }).ToList();
+                        }
 
-                    if (approveOption.channel != null && approveOption.channel.Any())
-                    {
-                        dataModel.channelList = approveOption.channel.Select(c => new ChannelKeyInViewModel
+                        if (approveOption.retailerGroup != null && approveOption.retailerGroup.Any())
                         {
-                            distributionChannelID = c.distributionChannelID,
-                            distributionChannelName = c.distributionChannelName
-                        }).ToList();
-                    }
+                            dataModel.retailerGroupList = approveOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                            {
+                                retailerGroupName = c.retailerGroupName,
+                                retailerGroupID = c.retailerGroupID
+                            }).ToList();
+                        }
 
-                    if (approveOption.brand != null && approveOption.brand.Any())
-                    {
-                        dataModel.brandList = approveOption.brand.Select(c => new BrandKeyInViewModel
+                        if (approveOption.channel != null && approveOption.channel.Any())
                         {
-                            brandID = c.brandID,
-                            brandName = c.brandName,
-                        }).ToList();
-                    }
+                            dataModel.channelList = approveOption.channel.Select(c => new ChannelKeyInViewModel
+                            {
+                                distributionChannelID = c.distributionChannelID,
+                                distributionChannelName = c.distributionChannelName
+                            }).ToList();
+                        }
 
-                    if (approveStatus != null && approveStatus.Any())
-                    {
-                        dataModel.statusList = approveStatus.Select(c => new StatusKeyInViewModel
+                        if (approveOption.brand != null && approveOption.brand.Any())
                         {
-                            statusID = c.statusID,
-                            statusName = c.statusName
-                        }).ToList();
-                    }
+                            dataModel.brandList = approveOption.brand.Select(c => new BrandKeyInViewModel
+                            {
+                                brandID = c.brandID,
+                                brandName = c.brandName,
+                            }).ToList();
+                        }
 
-                    dataModel.yearList = approveOption.year;
+                        if (approveStatus != null && approveStatus.Any())
+                        {
+                            dataModel.statusList = approveStatus.Select(c => new StatusKeyInViewModel
+                            {
+                                statusID = c.statusID,
+                                statusName = c.statusName
+                            }).ToList();
+                        }
+
+                        dataModel.yearList = approveOption.year;
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
                 }
             }
             catch (Exception ex)

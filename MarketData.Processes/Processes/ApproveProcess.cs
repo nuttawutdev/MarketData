@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.Approve;
 using MarketData.Model.Response;
@@ -72,7 +73,7 @@ namespace MarketData.Processes.Processes
                 }).ToList();
 
                 List<string> yearList = new List<string>();
-                string currentYear = DateTime.Now.Year.ToString();
+                string currentYear = Utility.GetDateNowThai().Year.ToString();
 
                 yearList.Add(currentYear);
 
@@ -177,7 +178,7 @@ namespace MarketData.Processes.Processes
                     approveData.Status_ID = approveStatus.ID;
                     approveData.Remark = request.remark;
                     approveData.Action_By = request.userID;
-                    approveData.Action_Date = DateTime.Now;
+                    approveData.Action_Date = Utility.GetDateNowThai();
 
                     var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
 
@@ -205,7 +206,7 @@ namespace MarketData.Processes.Processes
                             Remark = c.Remark,
                             Whole_Sales = c.Whole_Sales,
                             Created_By = request.userID,
-                            Created_Date = DateTime.Now
+                            Created_Date = Utility.GetDateNowThai()
                         }).ToList();
 
 
@@ -245,7 +246,7 @@ namespace MarketData.Processes.Processes
                     approveData.Status_ID = rejectStatus.ID;
                     approveData.Remark = request.remark;
                     approveData.Action_By = request.userID;
-                    approveData.Action_Date = DateTime.Now;
+                    approveData.Action_Date = Utility.GetDateNowThai();
 
                     var updateApproveResult = await repository.approve.UpdateApproveKeyInData(approveData);
 
@@ -273,7 +274,7 @@ namespace MarketData.Processes.Processes
                             Remark = c.Remark,
                             Whole_Sales = c.Whole_Sales,
                             Created_By = request.userID,
-                            Created_Date = DateTime.Now
+                            Created_Date = Utility.GetDateNowThai()
                         }).ToList();
 
 

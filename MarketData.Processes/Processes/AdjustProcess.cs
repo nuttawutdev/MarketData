@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Request.Adjust;
 using MarketData.Model.Response.AdjustData;
 using MarketData.Repositories;
@@ -158,7 +159,7 @@ namespace MarketData.Processes.Processes
                 }).OrderBy(r => r.retailerGroupName).ToList();
 
                 List<string> yearList = new List<string>();
-                string currentYear = DateTime.Now.Year.ToString();
+                string currentYear = Utility.GetDateNowThai().Year.ToString();
 
                 yearList.Add(currentYear);
 

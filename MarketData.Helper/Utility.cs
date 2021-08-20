@@ -22,5 +22,11 @@ namespace MarketData.Helper
             November,
             December
         }
+
+        public static DateTime GetDateNowThai()
+        {
+            var dateUtc = DateTime.UtcNow;
+            return dateUtc.AddHours(7);
+        }
     }
 }

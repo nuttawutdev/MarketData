@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using MarketData.Helper;
 using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request;
@@ -793,7 +794,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -1434,7 +1435,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -1782,7 +1783,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
