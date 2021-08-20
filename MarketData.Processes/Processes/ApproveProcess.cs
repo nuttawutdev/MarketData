@@ -34,7 +34,7 @@ namespace MarketData.Processes.Processes
 
                 if (approveKeyInData.Any())
                 {
-                    response.data = approveKeyInData;
+                    response.data = approveKeyInData.OrderByDescending(c => c.year).ThenByDescending(c => c.month).ThenByDescending(c => c.week).ThenByDescending(c => c.dateApprove).ToList(); ;
                 }
                 else
                 {
@@ -152,7 +152,7 @@ namespace MarketData.Processes.Processes
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
-                response.data = baKeyInList;
+                response.data = baKeyInList.OrderBy(c => c.brandName).ToList();
 
             }
             catch (Exception ex)

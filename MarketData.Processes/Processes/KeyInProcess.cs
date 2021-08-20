@@ -410,7 +410,7 @@ namespace MarketData.Processes.Processes
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
-                response.data = BAKeyInDetailList;
+                response.data = BAKeyInDetailList.OrderBy(c=>c.brandName).ToList();
 
                 var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(r => r.Status_Name == "Reject");
                 var approveData = repository.approve.GetApproveKeyInBy(c => c.BAKeyIn_ID == BAKeyInData.ID).OrderByDescending(d => d.Action_Date).FirstOrDefault();
@@ -551,7 +551,7 @@ namespace MarketData.Processes.Processes
                     itemAdmin.brandColor = brandDataList.FirstOrDefault(c => c.Brand_ID == itemAdmin.brandID).Brand_Color;
                 }
 
-                response.data = adminKeyInDetailList;
+                response.data = adminKeyInDetailList.OrderBy(c => c.brandName).ToList();
                 var amountPreviousYear = adminKeyInDetailList.Where(c => c.amountSalePreviousYear > 0);
 
                 if (amountPreviousYear.Any())
