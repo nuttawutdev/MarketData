@@ -1,1 +1,186 @@
 ﻿
+@model MarketData.Models.AdjustDetailViewModel
+
+@{
+    ViewData["Title"] = "Adjust Detail";
+    Html.RenderPartial("_WarningModal");
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
+}
+
+
+<h3 style="padding-left:20px;padding-right:20px">
+    @ViewData["Title"]
+
+</h3>
+
+<hr />
+
+
+<div class="row" style="overflow-x:auto;padding-left:20px;padding-right:20px">
+    <div style="width: 100%; font-size: 13px;">
+
+        <div class="row col-sm-12">
+
+            <div class="col-sm-2">
+                <label><b>Distribution Channel</b></label><br />
+                <label>
+                    @Model.channel
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Retailer Group</b></label><br />
+                <label>
+                    @Model.retailerGroup
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Department Store</b></label><br />
+                <label>
+                    @Model.departmentStore
+                </label>
+            </div>
+
+            <div class="col-sm-1">
+                <label><b>Year</b></label><br />
+                <label>
+                    @Model.year
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Month</b></label><br />
+                <label>
+                    @Model.month
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Week</b></label><br />
+                <label>
+                    @Model.week
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Universe</b></label><br />
+                <label>
+                    @Model.universe
+                </label>
+
+
+            </div>
+            <div class="col-sm-1">
+                <label><b>Status</b></label><br />
+                <label>
+                    @Model.status
+                </label>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div style="overflow-x:auto; padding-top:30px;padding-left:20px;padding-right:20px">
+    <div class="table-responsive table-sm">
+        <div class="table-wrapper">
+            <div style=" overflow-x: auto;">
+                <table class="table table-hover " id="tblDetails">
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#container").removeClass("container");
+        var model = @Html.Raw(Json.Serialize(Model));
+        console.log(model)
+        var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
+        console.log(lastYear)
+        var titleTable = '<thead class="table-secondary">' +
+            '    <th >Brand</th>' +
+            '    <th >Amt. (' + lastYear+')</th>';
+
+        for (var i = 0; i < model.brandDataColumn.length; i++) {
+            titleTable += '    <th >' + model.brandDataColumn[i] + '</th>';
+        }
+
+        titleTable += '    <th >Admin-Amt.Sales</th>' +
+            '    <th >Adj.Amt.Sales</th>' +
+            '    <th >Adj.Whole Sales</th>' +
+            '    <th >Rank</th>' +
+            '    <th >SK (%)</th>' +
+            '    <th >MU (%)</th>' +
+            '    <th >FG (%)</th>' +
+            '    <th >OT (%)</th>' +
+            '    <th >Remark</th>' +
+            '    <th >Growth (%)</th>' +
+            '</tr></thead>';
+
+
+        $('#tblDetails').empty();
+        var rowTable = ' <tbody>';
+        for (var i = 0; i < model.data.length; i++) {
+
+            var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : model.data[i].amountPreviousYear;
+
+            rowTable += '<tr >' +
+                '<td hidden>' + model.data[i].brandID + '</td>' +
+                '<td >' + model.data[i].brandName + '</td>' +
+                '<td >' + amountPreviousYear + '</td>';
+
+            var brandKeyInAmount = model.data[i].brandKeyInAmount;
+            Object.keys(brandKeyInAmount).forEach(function (key) {
+                var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
+                var keyBrandKeyInAmount = key;
+
+                rowTable += '<td data-id=' + keyBrandKeyInAmount + '>' + valueBrandKeyInAmount + '</td>';
+
+
+             var brandKeyInRank = model.data[i].brandKeyInRank;
+            Object.keys(brandKeyInRank).forEach(function (keys) {
+                var valueBrandKeyInRank = brandKeyInRank[keys] == null ? "" : brandKeyInRank[keys];
+                var keyBrandKeyInRank = keys;
+
+                if (keyBrandKeyInRank == keyBrandKeyInAmount) {
+                    rowTable += '<td data-id=' + keyBrandKeyInRank + '>' + valueBrandKeyInRank + '</td>';
+                }
+
+            });
+            });
+
+            var adminAmountSale = model.data[i].adminAmountSale == null ? "" : model.data[i].adminAmountSale;
+            var adjustAmountSale = model.data[i].adjustAmountSale == null ? "" : model.data[i].adjustAmountSale;
+            var adjustWholeSale = model.data[i].adjustWholeSale == null ? "" : model.data[i].adjustWholeSale
+            var rank = model.data[i].rank == null ? "" : model.data[i].rank;
+            var sk = model.data[i].sk == null ? "" : model.data[i].sk;
+            var mu = model.data[i].mu == null ? "" : model.data[i].mu;
+            var fg = model.data[i].fg == null ? "" : model.data[i].fg;
+            var ot = model.data[i].ot == null ? "" : model.data[i].ot;
+            var remark = model.data[i].remark == null ? "" : model.data[i].remark;
+            var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
+
+            rowTable += '  <td >' + adminAmountSale + '</td>' +
+                '  <td >' + adjustAmountSale + '</td>' +
+                '  <td >' + adjustWholeSale + '</td>' +
+                '  <td >' + rank + '</td>' +
+                '  <td >' + sk+ '</td>' +
+                '  <td >' + mu + '</td>' +
+                '  <td >' + fg  + '</td>' +
+                '  <td >' + ot + '</td>' +
+                '  <td >' + remark  + '</td>' +
+                '  <td >' + percentGrowth + '</td>' +
+            '</tr>';
+        }
+
+        $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
+                        
+                  
+              
+        });
+</script>
