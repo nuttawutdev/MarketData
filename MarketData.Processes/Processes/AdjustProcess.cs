@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using static MarketData.Helper.Utility;
 
 namespace MarketData.Processes.Processes
@@ -189,7 +190,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public GetAdjustDetailResponse GetAdjustDataDetail(GetAdjustDetailRequest request)
+        public GetAdjustDetailResponse GetAdjustDataDetail(Guid adjustDataID)
         {
             GetAdjustDetailResponse response = new GetAdjustDetailResponse();
 
@@ -198,32 +199,20 @@ namespace MarketData.Processes.Processes
                 bool isSubmitted = false;
                 var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
 
-                var adjustData = repository.adjust.FindAdjustDatalBy(
-                    c => c.Year == request.year
-                    && c.Month == request.month
-                    && c.Week == request.week
-                    && c.DistributionChannel_ID == request.distributionChannelID
-                    && c.DepartmentStore_ID == request.departmentStoreID
-                    && c.Universe == request.universe);
+                var adjustData = repository.adjust.FindAdjustDatalBy(c => c.ID == adjustDataID);
+                var adjustDetail = repository.adjust.GetAdjustDataDetaillBy(t => t.AdjustData_ID == adjustData.ID);
 
-                List<TTAdjustDataDetail> adjustDetail = new List<TTAdjustDataDetail>();
-
-                if (adjustData != null)
+                if (adjustData.Status_ID == adjustStatusSubmit.ID)
                 {
-                    adjustDetail = repository.adjust.GetAdjustDataDetaillBy(t => t.AdjustData_ID == adjustData.ID);
-
-                    if (adjustData.Status_ID == adjustStatusSubmit.ID)
-                    {
-                        isSubmitted = true;
-                    }
+                    isSubmitted = true;
                 }
 
                 var counterList = repository.masterData.GetCounterListBy(
-                       e => e.Distribution_Channel_ID == request.distributionChannelID
-                       && e.Department_Store_ID == request.departmentStoreID
+                       e => e.Distribution_Channel_ID == adjustData.DistributionChannel_ID
+                       && e.Department_Store_ID == adjustData.DepartmentStore_ID
                        && e.Active_Flag && e.Delete_Flag != true);
 
-                if (request.week != "4")
+                if (adjustData.Week != "4")
                 {
                     // Filter Brand Type Fragrances
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
@@ -248,8 +237,8 @@ namespace MarketData.Processes.Processes
 
                 #region Get Brand Data
                 var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
-                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == request.universe);
-                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe);
+                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == adjustData.Universe);
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe);
                 var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
                 #endregion
 
@@ -257,24 +246,24 @@ namespace MarketData.Processes.Processes
                 var keyInStatusApprove = repository.masterData.GetKeyInStatusBy(e => e.Status_Name == "Approve");
 
                 var baKeyInDataApprove = repository.baKeyIn.GetBAKeyInBy(
-                    c => c.Year == request.year
-                    && c.Month == request.month
-                    && c.Week == request.week
-                    && c.DistributionChannel_ID == request.distributionChannelID
-                    && c.DepartmentStore_ID == request.departmentStoreID
-                    && c.Universe == request.universe
+                    c => c.Year == adjustData.Year
+                    && c.Month == adjustData.Month
+                    && c.Week == adjustData.Week
+                    && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
+                    && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
+                    && c.Universe == adjustData.Universe
                     && c.KeyIn_Status_ID == keyInStatusApprove.ID
                     && onlyBrandLorealID.Contains(c.Brand_ID));
 
-                string previousYear = (int.Parse(request.year) - 1).ToString();
+                string previousYear = (int.Parse(adjustData.Year) - 1).ToString();
 
                 var baKeyInDataApprovePreviousYear = repository.baKeyIn.GetBAKeyInBy(
                     c => c.Year == previousYear
-                    && c.Month == request.month
+                    && c.Month == adjustData.Month
                     && c.Week == "4"
-                    && c.DistributionChannel_ID == request.distributionChannelID
-                    && c.DepartmentStore_ID == request.departmentStoreID
-                    && c.Universe == request.universe
+                    && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
+                    && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
+                    && c.Universe == adjustData.Universe
                     && c.KeyIn_Status_ID == keyInStatusApprove.ID
                     && onlyBrandLorealID.Contains(c.Brand_ID));
 
@@ -286,12 +275,12 @@ namespace MarketData.Processes.Processes
                 #endregion
 
                 var adminKeyInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(
-                   c => c.Year == request.year
-                   && c.Month == request.month
-                   && c.Week == request.week
-                   && c.DistributionChannel_ID == request.distributionChannelID
-                   && c.DepartmentStore_ID == request.departmentStoreID
-                   && c.Universe == request.universe);
+                   c => c.Year == adjustData.Year
+                   && c.Month == adjustData.Month
+                   && c.Week == adjustData.Week
+                   && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
+                   && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
+                   && c.Universe == adjustData.Universe);
 
                 List<AdjustDetailData> listAdjustDetailData = new List<AdjustDetailData>();
 
@@ -460,9 +449,9 @@ namespace MarketData.Processes.Processes
                     rankAdjust += 1;
                 }
 
-                var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == request.departmentStoreID);
+                var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == adjustData.DepartmentStore_ID);
                 var retailerGroup = repository.masterData.FindRetailerGroupBy(e => e.Retailer_Group_ID == departmentData.Retailer_Group_ID);
-                var channelData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == request.distributionChannelID);
+                var channelData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == adjustData.DistributionChannel_ID);
 
                 List<string> brandColumn = new List<string>();
 
@@ -474,15 +463,55 @@ namespace MarketData.Processes.Processes
                     brandColumn.Add($"{brandName}-Rank");
                 }
 
+                var adjustStatus = repository.masterData.GetAdjustStatusBy(e => e.ID == adjustData.Status_ID);
+
+                response.status = adjustStatus.Status_Name;
                 response.brandDataColumn = brandColumn;
-                response.year = request.year;
-                response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(request.month));
-                response.week = request.week;
+                response.year = adjustData.Year;
+                response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(adjustData.Month));
+                response.week = adjustData.Week;
                 response.channel = channelData.Distribution_Channel_Name;
                 response.retailerGroup = retailerGroup.Retailer_Group_Name;
                 response.departmentStore = departmentData.Department_Store_Name;
-                response.universe = request.universe;
+                response.universe = adjustData.Universe;
                 response.data = listAdjustDetailData;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveAdjustDetailResponse> CreateAdjustData(GetAdjustDetailRequest request)
+        {
+            SaveAdjustDetailResponse response = new SaveAdjustDetailResponse();
+
+            try
+            {
+                var adjustData = repository.adjust.FindAdjustDatalBy(
+                    c => c.DistributionChannel_ID == request.distributionChannelID
+                    && c.DepartmentStore_ID == request.departmentStoreID
+                    && c.Year == request.year
+                    && c.Month == request.month
+                    && c.Week == request.week
+                    && c.Universe == request.universe);
+
+                if (adjustData != null)
+                {
+                    response.adjustDataID = adjustData.ID;
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    var createAdjustDataResponse = await repository.adjust.CreateAdjustData(request);
+                    if (createAdjustDataResponse != null)
+                    {
+                        response.adjustDataID = createAdjustDataResponse.ID;
+                        response.isSuccess = true;
+                    }
+                }
             }
             catch (Exception ex)
             {
