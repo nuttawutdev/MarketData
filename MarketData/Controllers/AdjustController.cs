@@ -105,7 +105,7 @@ namespace MarketData.Controllers
                     status = "Pending",
                     brandDataColumn = new List<string>
                     {
-                        { "LAN-Amt.Sales"},{"LAN-Rank"}
+                        { "LAN-Amt.Sales"},{"LAN-Rank"}, { "BIO-Amt.Sales"},{"BIO-Rank"}
                     },
                     data = new List<AdjustDetailViewData>()
                     {
@@ -126,11 +126,11 @@ namespace MarketData.Controllers
                             percentGrowth = 20,
                            brandKeyInAmount = new Dictionary<string, decimal?>()
                            {
-                               { "LAN",50000},
+                               { "LAN",50000},{ "BIO",40000},
                            },
                            brandKeyInRank = new Dictionary<string, string>()
                            {
-                                { "LAN","1"},
+                                { "LAN","1"},{ "BIO","1"},
                            }
                         },
                         new AdjustDetailViewData
@@ -150,11 +150,11 @@ namespace MarketData.Controllers
                             percentGrowth = null,
                            brandKeyInAmount = new Dictionary<string, decimal?>()
                            {
-                               { "LAN",null},
+                               { "LAN",null},{ "BIO",null},
                            },
                            brandKeyInRank = new Dictionary<string, string>()
                            {
-                                { "LAN",null},
+                                { "LAN",null},{ "BIO",null},
                            }
                         },
                         new AdjustDetailViewData
@@ -174,11 +174,11 @@ namespace MarketData.Controllers
                             percentGrowth = null,
                            brandKeyInAmount = new Dictionary<string, decimal?>()
                            {
-                               { "LAN",40000},
+                               { "LAN",40000},{ "BIO",3000},
                            },
                            brandKeyInRank = new Dictionary<string, string>()
                            {
-                                { "LAN","2"},
+                                { "LAN","2"},  { "BIO","2"},
                            }
                         },
                     }

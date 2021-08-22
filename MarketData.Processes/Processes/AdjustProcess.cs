@@ -493,6 +493,7 @@ namespace MarketData.Processes.Processes
                 var adjustData = repository.adjust.FindAdjustDatalBy(
                     c => c.DistributionChannel_ID == request.distributionChannelID
                     && c.DepartmentStore_ID == request.departmentStoreID
+                    && c.RetailerGroup_ID == request.retailerGroupID
                     && c.Year == request.year
                     && c.Month == request.month
                     && c.Week == request.week
