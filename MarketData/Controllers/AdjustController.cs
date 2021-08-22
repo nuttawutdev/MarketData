@@ -21,18 +21,6 @@ namespace MarketData.Controllers
 
         public IActionResult Index()
         {
-            GetAdjustDetailRequest request = new GetAdjustDetailRequest
-            {
-                departmentStoreID = new Guid("EE875D7E-F348-462D-8CAF-696C350DBCE9"),
-                distributionChannelID = new Guid("E674738F-F188-4E4D-AC74-B349C9479F5E"),
-                year = "2021",
-                month = "08",
-                week = "2",
-                universe = "LPD"
-            };
-
-            var adjDetail = process.adjust.GetAdjustDataDetail(request);
-
             var role = HttpContext.Session.GetString("role");
             if (role == "Admin")
             {
@@ -196,7 +184,7 @@ namespace MarketData.Controllers
                     }
                 };
 
-                //var adjustDetailData = process.adjust.GetAdjustDataDetail(request);
+                //var adjustDetailData = process.adjust.GetAdjustDataDetail(adjustDataID);
 
                 //AdjustDetailViewModel dataModel = new AdjustDetailViewModel
                 //{
@@ -264,15 +252,13 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetAdjustDataDetail([FromBody] GetAdjustListRequest request)
+        public async Task<IActionResult> GetAdjustDataDetail([FromBody] GetAdjustDetailRequest request)
         {
             SaveAdjustDetailResponse response = new SaveAdjustDetailResponse();
 
             try
             {
-                response.isSuccess = true;
-                response.adjustDataID = Guid.NewGuid();
-
+                response = await process.adjust.CreateAdjustData(request);
                 return Json(response);
             }
             catch (Exception ex)
