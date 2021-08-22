@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketData.Model.Request.Adjust;
+using MarketData.Model.Response.AdjustData;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
@@ -20,17 +21,17 @@ namespace MarketData.Controllers
 
         public IActionResult Index()
         {
-            //GetAdjustDetailRequest request = new GetAdjustDetailRequest
-            //{
-            //    departmentStoreID = new Guid("EE875D7E-F348-462D-8CAF-696C350DBCE9"),
-            //    distributionChannelID = new Guid("E674738F-F188-4E4D-AC74-B349C9479F5E"),
-            //    year = "2021",
-            //    month = "08",
-            //    week = "2",
-            //    universe = "LPD"
-            //};
+            GetAdjustDetailRequest request = new GetAdjustDetailRequest
+            {
+                departmentStoreID = new Guid("EE875D7E-F348-462D-8CAF-696C350DBCE9"),
+                distributionChannelID = new Guid("E674738F-F188-4E4D-AC74-B349C9479F5E"),
+                year = "2021",
+                month = "08",
+                week = "2",
+                universe = "LPD"
+            };
 
-            //var adjDetail = process.adjust.GetAdjustDataDetail(request);
+            var adjDetail = process.adjust.GetAdjustDataDetail(request);
 
             var role = HttpContext.Session.GetString("role");
             if (role == "Admin")
@@ -99,7 +100,7 @@ namespace MarketData.Controllers
 
         }
 
-        public IActionResult Adjust_Edit(GetAdjustDetailRequest request)
+        public IActionResult Adjust_Edit(Guid adjustDataID)
         {
             var role = HttpContext.Session.GetString("role");
             if (role == "Admin")
@@ -226,7 +227,6 @@ namespace MarketData.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-
         }
 
         [HttpPost]
@@ -260,6 +260,24 @@ namespace MarketData.Controllers
             catch (Exception ex)
             {
                 return Json(dataModel);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult GetAdjustDataDetail([FromBody] GetAdjustListRequest request)
+        {
+            SaveAdjustDetailResponse response = new SaveAdjustDetailResponse();
+
+            try
+            {
+                response.isSuccess = true;
+                response.adjustDataID = Guid.NewGuid();
+
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
             }
         }
     }

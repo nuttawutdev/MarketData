@@ -28,5 +28,31 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public TTAdjustData FindAdjustDatalBy(Expression<Func<TTAdjustData, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTAdjustData.Where(expression).FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TTAdjustDataDetail> GetAdjustDataDetaillBy(Expression<Func<TTAdjustDataDetail, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTAdjustDataDetail.Where(expression).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -2,29 +2,23 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MarketData.Model.Response.AdjustData
+namespace MarketData.Model.Request.Adjust
 {
-    public class GetAdjustDetailResponse : BaseResponse
+    public class SaveAdjustDataRequest
     {
-        public List<AdjustDetailData> data { get; set; }
-        public string departmentStore { get; set; }
         public Guid retailerGroupID { get; set; }
         public Guid departmentStoreID { get; set; }
         public Guid distributionChannelID { get; set; }
-        public string retailerGroup { get; set; }
-        public string channel { get; set; }
         public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }
         public string status { get; set; }
         public string universe { get; set; }
-        public List<string> brandDataColumn { get; set; }
     }
 
-    public class AdjustDetailData
+    public class SaveAdjustDetailData
     {
         public Guid brandID { get; set; }
-        public string brandName { get; set; }
         public decimal? amountPreviousYear { get; set; }
         public decimal? adminAmountSale { get; set; }
         public decimal? adjustAmountSale { get; set; }
@@ -35,10 +29,8 @@ namespace MarketData.Model.Response.AdjustData
         public decimal? fg { get; set; }
         public decimal? ot { get; set; }
         public string remark { get; set; }
-        public Dictionary<string,decimal?> brandKeyInAmount { get; set; }
-        public Dictionary<string, string> brandKeyInRank { get; set; }
-
-        // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
         public decimal? percentGrowth { get; set; }
+        public Dictionary<string, decimal?> brandKeyInAmount { get; set; }
+        public Dictionary<string, string> brandKeyInRank { get; set; }
     }
 }

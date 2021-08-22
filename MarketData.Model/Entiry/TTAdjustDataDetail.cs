@@ -21,5 +21,6 @@ namespace MarketData.Model.Entiry
         public decimal? OT { get; set; }
         public string Remark { get; set; }
         public decimal? Percent_Growth { get; set; }
+        public decimal? Adjust_WholeSale { get; set; }
     }
 }
