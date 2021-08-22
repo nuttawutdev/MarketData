@@ -358,7 +358,6 @@
         $('#btnSubmit').on('click', function (e) {
             var frmdata = getDataFromTable();
             frmdata.data.splice(-1);
-            console.log(frmdata)
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
                 $("#blocker").show();
                 $.ajax({

@@ -237,7 +237,6 @@
         $('#channelList').on('change', function (e) {
 
             var txtSearch = $('#channelList option:selected').text();
-            console.log(txtSearch, 'txtSearch')
             if (txtSearch != 'All') {
                 dataTable.column(1).search(txtSearch).draw();
             }

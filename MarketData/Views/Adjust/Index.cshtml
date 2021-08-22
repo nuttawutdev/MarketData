@@ -187,7 +187,6 @@
                     datatype: "json",
                     success: function (data) {
                         $("#blocker").hide();
-                        console.log(data)
                         $('#tblDetails').empty();
                         if (data.data.length > 0) {
 
@@ -215,29 +214,23 @@
                                     '<td >' + data.data[i].year + '</td>' +
                                     '<td >' + data.data[i].month + '</td>' +
                                     '<td >' + data.data[i].week + '</td>' +
-                                    '<td hidden>' + data.data[i].distributionChannelID + '</td>' +
+                                    '<td class="distributionChannelID" hidden>' + data.data[i].distributionChannelID + '</td>' +
                                     '<td >' + data.data[i].distributionChannelName + '</td>' +
                                     '<td hidden>' + data.data[i].retailerGroupID + '</td>' +
                                     '<td >' + data.data[i].retailerGroupName + '</td>' +
-                                    '<td hidden>' + data.data[i].departmentStoreID + '</td>' +
+                                    '<td class="departmentStoreID" hidden>' + data.data[i].departmentStoreID + '</td>' +
                                     '<td >' + data.data[i].departmentStoreName + '</td>';
 
 
                                 var jsonData = data.data[i].brandStatus;
                                 Object.keys(jsonData).forEach(function (key) {
                                     var value = jsonData[key] == null ? "" : jsonData[key];
-                                    console.log('value ', value)
                                     rowTable += '<td data-id=' + key + '>' + value + '</td>';
 
                                 });
-
-                                rowTable += '<td > <a href="#" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a></td > ';
-
+                                rowTable +=   '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
                                 rowTable += '</tr>';
-
-
                             }
-
 
                             $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
 
@@ -270,6 +263,52 @@
 
         $('#retailerGroupList').on('change', function (e) {
             getDepartmentStoreList()
+        });
+
+
+        $(document).on('click', '.btnAdjustEdit', function () {
+            var departmentStoreID = $(this).closest("tr").find(".departmentStoreID").text();
+            var distributionChannelID = $(this).closest("tr").find(".distributionChannelID").text();
+
+            var frmdata = {
+                year: $("#yearList").val(),
+                month: $('#ddlMonth').val(),
+                week: $('#ddlWeek').val(),
+                distributionChannelID: distributionChannelID ,
+                universe: $('#iduniverseList').val(),
+                departmentStoreID:  departmentStoreID
+            };
+            console.log('frmdata', frmdata)
+
+                  $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetAdjustDataDetail", "Adjust")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                     success: function (data) {
+                            if (data.isSuccess) {
+                        if (!data.isSubmited) {
+                            var url = '@Url.Action("Adjust_Edit", "Adjust", new { adjustDataID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.adjustDataID);
+                        }
+                        else {
+                            var url = '@Url.Action("Adjust_Edit", "Adjust", new { adjustDataID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.adjustDataID);
+                        }
+                    }
+                    else {
+                        $("#blocker").hide();
+                        $('#warningModal').modal('show');
+                        $('#myModalWarningResult').text(data.responseError);
+                    }
+
+                        }
+                    ,
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
         });
 
           function getDepartmentStoreList() {

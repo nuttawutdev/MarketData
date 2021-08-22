@@ -183,7 +183,6 @@
         $('#btnSave').on('click', function (e) {
             var frmdata = getDataFromTable();
 
-            console.log(frmdata,'frmdata')
             if (validate_AmountSale_Rank_Save(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
                 $("#blocker").show();
                    $.ajax({
@@ -222,7 +221,7 @@
             var frmdata = getDataFromTable('Submit');
 
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-                console.log(frmdata)
+ 
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",
