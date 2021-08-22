@@ -479,6 +479,7 @@ namespace MarketData.Repositories.Repo
                        universe = e.Universe,
                        active = e.Active_Flag,
                        color = e.Brand_Color,
+                       lorealBrandRank = e.Loreal_Brand_Rank,
                        isLorealBrand = groups != null ? groups.Is_Loreal_Brand : false
                    });
 

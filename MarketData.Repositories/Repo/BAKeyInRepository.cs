@@ -311,8 +311,11 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
+                var keyInStatusApprove = _dbContext.TMKeyInStatus.FirstOrDefault(c => c.Status_Name == "Approve");
+
                 var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
                 baKeyInData.Approved_By = userID;
+                baKeyInData.KeyIn_Status_ID = keyInStatusApprove.ID;
                 baKeyInData.Approved_Date = Utility.GetDateNowThai();
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);

@@ -1,12 +1,15 @@
 ﻿using MarketData.Helper;
 using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Request.Adjust;
 using MarketData.Model.Response.AdjustData;
 using MarketData.Repositories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static MarketData.Helper.Utility;
 
 namespace MarketData.Processes.Processes
 {
@@ -32,7 +35,11 @@ namespace MarketData.Processes.Processes
                     && (!request.distributionChannelID.HasValue || (request.distributionChannelID.HasValue && request.distributionChannelID == c.distributionChannelID)));
 
                 var departmentSoteIDList = departmentStoreByFilter.Select(c => c.departmentStoreID);
-                var counterByDepartmentStoreList = repository.masterData.GetCounterListBy(e => departmentSoteIDList.Contains(e.Department_Store_ID));
+                var counterByDepartmentStoreList = repository.masterData.GetCounterListBy(e =>
+                    departmentSoteIDList.Contains(e.Department_Store_ID)
+                    && e.Active_Flag && e.Delete_Flag != true
+                    && (!request.distributionChannelID.HasValue || (request.distributionChannelID.HasValue && request.distributionChannelID == e.Distribution_Channel_ID)));
+
                 var allBrandByCounter = counterByDepartmentStoreList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
 
                 var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe);
@@ -62,7 +69,7 @@ namespace MarketData.Processes.Processes
                     string statusName = string.Empty;
                     Guid statusID;
 
-                    if(adjustStatusData != null)
+                    if (adjustStatusData != null)
                     {
                         statusID = adjustStatusData.ID;
                         statusName = adjustStatus.FirstOrDefault(c => c.ID == adjustStatusData.ID).Status_Name;
@@ -185,6 +192,248 @@ namespace MarketData.Processes.Processes
         public GetAdjustDetailResponse GetAdjustDataDetail(GetAdjustDetailRequest request)
         {
             GetAdjustDetailResponse response = new GetAdjustDetailResponse();
+
+            try
+            {
+                var counterList = repository.masterData.GetCounterListBy(
+                       e => e.Distribution_Channel_ID == request.distributionChannelID
+                       && e.Department_Store_ID == request.departmentStoreID
+                       && e.Active_Flag && e.Delete_Flag != true);
+
+                if (request.week != "4")
+                {
+                    // Filter Brand Type Fragrances
+                    List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
+
+                    var brandIDCounter = counterList.GroupBy(c => c.Brand_ID).Select(e => e.Key);
+                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID) && c.Active_Flag);
+                    var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
+
+                    foreach (var itemCounter in counterList)
+                    {
+                        var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
+                        var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                        {
+                            listCounterFilterFragrances.Add(itemCounter);
+                        }
+                    }
+
+                    counterList = listCounterFilterFragrances;
+                }
+
+                var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
+
+                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == request.universe);
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe);
+                var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
+
+                #region Get BAKeyIn Data
+                var keyInStatusApprove = repository.masterData.GetKeyInStatusBy(e => e.Status_Name == "Approve");
+
+                var baKeyInDataApprove = repository.baKeyIn.GetBAKeyInBy(
+                    c => c.Year == request.year
+                    && c.Month == request.month
+                    && c.Week == request.week
+                    && c.DistributionChannel_ID == request.distributionChannelID
+                    && c.DepartmentStore_ID == request.departmentStoreID
+                    && c.Universe == request.universe
+                    && c.KeyIn_Status_ID == keyInStatusApprove.ID
+                    && onlyBrandLorealID.Contains(c.Brand_ID));
+
+                string previousYear = (int.Parse(request.year) - 1).ToString();
+
+                var baKeyInDataApprovePreviousYear = repository.baKeyIn.GetBAKeyInBy(
+                    c => c.Year == previousYear
+                    && c.Month == request.month
+                    && c.Week == "4"
+                    && c.DistributionChannel_ID == request.distributionChannelID
+                    && c.DepartmentStore_ID == request.departmentStoreID
+                    && c.Universe == request.universe
+                    && c.KeyIn_Status_ID == keyInStatusApprove.ID
+                    && onlyBrandLorealID.Contains(c.Brand_ID));
+
+                var baKeyInIDApprove = baKeyInDataApprove.Select(t => t.ID);
+                var baKeyInIDApprovePreviousYear = baKeyInDataApprovePreviousYear.Select(t => t.ID);
+
+                var baKeyInDetailApprove = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprove.Contains(p.BAKeyIn_ID));
+                var baKeyInDetailApprovePreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprovePreviousYear.Contains(p.BAKeyIn_ID));
+                #endregion
+
+                var adminKeyInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.Year == request.year
+                   && c.Month == request.month
+                   && c.Week == request.week
+                   && c.DistributionChannel_ID == request.distributionChannelID
+                   && c.DepartmentStore_ID == request.departmentStoreID
+                   && c.Universe == request.universe);
+
+                List<AdjustDetailData> listAdjustDetailData = new List<AdjustDetailData>();
+
+                foreach (var itemBrandInDepartment in allBrandByCounterListData)
+                {
+                    decimal? amountPreviousYear = null;
+                    decimal? adjustAmountSale = null;
+                    decimal? adjustWholeSale = null;
+                    decimal? sk = null;
+                    decimal? mu = null;
+                    decimal? fg = null;
+                    decimal? ot = null;
+                    string remark = null;
+
+                    var keyInDataPreviousYear = baKeyInDetailApprovePreviousYear.Where(c => c.Brand_ID == itemBrandInDepartment.Brand_ID).OrderByDescending(e => e.Amount_Sales).FirstOrDefault();
+                    if (keyInDataPreviousYear != null)
+                    {
+                        // Or ค่าจากการ Adjust ถาม ลูกค้า
+                        amountPreviousYear = keyInDataPreviousYear.Amount_Sales;
+                    }
+
+                    var adminKeyInData = adminKeyInDetailData.FirstOrDefault(a => a.Brand_ID == itemBrandInDepartment.Brand_ID);
+                    var baKeyInBrand = baKeyInDetailApprove.Where(b => b.Brand_ID == itemBrandInDepartment.Brand_ID);
+
+                    if (adminKeyInData != null)
+                    {
+                        adjustAmountSale = adminKeyInData.Amount_Sales;
+                        adjustWholeSale = adminKeyInData.Whole_Sales;
+                        sk = adminKeyInData.SK;
+                        mu = adminKeyInData.MU;
+                        fg = adminKeyInData.FG;
+                        ot = adminKeyInData.OT;
+                        remark = adminKeyInData.Remark;
+                    }
+                    else if (baKeyInBrand.Any())
+                    {
+                        if (baKeyInBrand.Any(c => c.Amount_Sales.HasValue) && baKeyInBrand.Any(c => c.Whole_Sales.HasValue))
+                        {
+                            var mostAmountSale = baKeyInBrand.Where(e => e.Amount_Sales.HasValue).OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Amount_Sales;
+                            var mostWholeSale = baKeyInBrand.Where(e => e.Whole_Sales.HasValue).OrderByDescending(c => c.Whole_Sales).FirstOrDefault().Amount_Sales;
+
+                            adjustAmountSale = mostAmountSale;
+                            adjustWholeSale = mostWholeSale;
+
+                            foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
+                            {
+                                var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
+                                var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+
+                                if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
+                                    || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
+                                {
+                                    sk = keyInDetailBrandLoreal.SK;
+                                    mu = keyInDetailBrandLoreal.MU;
+                                    fg = keyInDetailBrandLoreal.FG;
+                                    ot = keyInDetailBrandLoreal.OT;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
+                            {
+                                var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
+                                var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+
+                                if (!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
+                                {
+                                    remark = keyInDetailBrandLoreal.Remark;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    AdjustDetailData adjustDetailData = new AdjustDetailData
+                    {
+                        brandID = itemBrandInDepartment.Brand_ID,
+                        brandName = itemBrandInDepartment.Brand_Name,
+                        amountPreviousYear = amountPreviousYear,
+                        brandKeyInAmount = new Dictionary<string, decimal?>(),
+                        brandKeyInRank = new Dictionary<string, string>(),
+                        adminAmountSale = adminKeyInData?.Amount_Sales,
+                        adjustAmountSale = adjustAmountSale,
+                        adjustWholeSale = adjustWholeSale,
+                        sk = sk,
+                        mu = mu,
+                        fg = fg,
+                        ot = ot,
+                        remark = remark
+                    };
+
+                    foreach (var itemBrandLoreal in onlyBrandLorel)
+                    {
+                        var baBrandKeyIn = baKeyInDataApprove.FirstOrDefault(c => c.Brand_ID == itemBrandLoreal.brandID);
+
+                        var brandName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
+                        decimal? amountSale = null;
+                        string rank = null;
+
+                        if (baBrandKeyIn != null)
+                        {
+                            var baBrandKeyInDetail = baKeyInDetailApprove.FirstOrDefault(
+                              e => e.Brand_ID == itemBrandInDepartment.Brand_ID
+                              && e.BAKeyIn_ID == baBrandKeyIn.ID);
+
+                            if (baBrandKeyInDetail != null && baBrandKeyInDetail.Amount_Sales.HasValue && baBrandKeyInDetail.Rank.HasValue)
+                            {
+                                amountSale = baBrandKeyInDetail.Amount_Sales;
+                                rank = baBrandKeyInDetail.Rank.Value.ToString();
+                            }
+                        }
+
+                        adjustDetailData.brandKeyInAmount.Add(brandName, amountSale);
+                        adjustDetailData.brandKeyInRank.Add(brandName, rank);
+                    }
+
+                    listAdjustDetailData.Add(adjustDetailData);
+                }
+
+                int rankAdjust = 1;
+
+                foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale))
+                {
+                    itemAdjustData.rank = rankAdjust;
+                    if (itemAdjustData.amountPreviousYear.HasValue)
+                    {
+                        // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
+                        itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYear.GetValueOrDefault()) / itemAdjustData.amountPreviousYear.GetValueOrDefault()) * 100;
+                    }
+                  
+                    rankAdjust += 1;
+                }
+
+                var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == request.departmentStoreID);
+                var retailerGroup = repository.masterData.FindRetailerGroupBy(e => e.Retailer_Group_ID == departmentData.Retailer_Group_ID);
+                var channelData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == request.distributionChannelID);
+
+                List<string> brandColumn = new List<string>();
+
+                foreach(var itemBrandLoreal in onlyBrandLorel)
+                {
+                    string brandName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
+
+                    brandColumn.Add($"{brandName}-Amt.Sales");
+                    brandColumn.Add($"{brandName}-Rank");
+                }
+
+                response.brandDataColumn = brandColumn;
+                response.year = request.year;
+                response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(request.month));
+                response.week = request.week;
+                response.channel = channelData.Distribution_Channel_Name;
+                response.retailerGroup = retailerGroup.Retailer_Group_Name;
+                response.departmentStore = departmentData.Department_Store_Name;
+                response.universe = request.universe;
+                response.data = listAdjustDetailData;
+
+                var jsss = JsonConvert.SerializeObject(response);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
             return response;
         }
     }

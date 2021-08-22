@@ -7,6 +7,15 @@ namespace MarketData.Model.Response.AdjustData
     public class GetAdjustDetailResponse : BaseResponse
     {
         public List<AdjustDetailData> data { get; set; }
+        public string departmentStore { get; set; }
+        public string retailerGroup { get; set; }
+        public string channel { get; set; }
+        public string year { get; set; }
+        public string month { get; set; }
+        public string week { get; set; }
+        public string status { get; set; }
+        public string universe { get; set; }
+        public List<string> brandDataColumn { get; set; }
     }
 
     public class AdjustDetailData
