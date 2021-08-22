@@ -216,7 +216,7 @@
                                     '<td >' + data.data[i].week + '</td>' +
                                     '<td class="distributionChannelID" hidden>' + data.data[i].distributionChannelID + '</td>' +
                                     '<td >' + data.data[i].distributionChannelName + '</td>' +
-                                    '<td hidden>' + data.data[i].retailerGroupID + '</td>' +
+                                    '<td class="retailerGroupID" hidden>' + data.data[i].retailerGroupID + '</td>' +
                                     '<td >' + data.data[i].retailerGroupName + '</td>' +
                                     '<td class="departmentStoreID" hidden>' + data.data[i].departmentStoreID + '</td>' +
                                     '<td >' + data.data[i].departmentStoreName + '</td>';
@@ -269,16 +269,17 @@
         $(document).on('click', '.btnAdjustEdit', function () {
             var departmentStoreID = $(this).closest("tr").find(".departmentStoreID").text();
             var distributionChannelID = $(this).closest("tr").find(".distributionChannelID").text();
+            var retailerGroupID = $(this).closest("tr").find(".retailerGroupID").text();
 
             var frmdata = {
                 year: $("#yearList").val(),
                 month: $('#ddlMonth').val(),
                 week: $('#ddlWeek').val(),
-                distributionChannelID: distributionChannelID ,
+                distributionChannelID: distributionChannelID,
+                retailerGroupID: retailerGroupID,
                 universe: $('#iduniverseList').val(),
                 departmentStoreID:  departmentStoreID
             };
-            console.log('frmdata', frmdata)
 
                   $.ajax({
                     type: "POST",
