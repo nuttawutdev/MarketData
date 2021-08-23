@@ -219,7 +219,7 @@ namespace MarketData.Processes.Processes
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
                     var brandIDCounter = counterList.GroupBy(c => c.Brand_ID).Select(e => e.Key);
-                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID) && c.Active_Flag);
+                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID) && c.Active_Flag && c.Universe == adjustData.Universe);
                     var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
 
                     foreach (var itemCounter in counterList)
@@ -237,15 +237,18 @@ namespace MarketData.Processes.Processes
                 }
 
                 #region Get Brand Data
+
                 var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
-                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == adjustData.Universe);
+                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Active_Flag && c.Universe == adjustData.Universe);
                 var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe);
                 var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
+
                 #endregion
 
                 #region Get BAKeyIn Data
                 var keyInStatusApprove = repository.masterData.GetKeyInStatusBy(e => e.Status_Name == "Approve");
 
+                // BA Key-in ที่ถูก Approve แล้วเฉพาะ Counter ของ Brand Loreal
                 var baKeyInDataApprove = repository.baKeyIn.GetBAKeyInBy(
                     c => c.Year == adjustData.Year
                     && c.Month == adjustData.Month
@@ -258,6 +261,7 @@ namespace MarketData.Processes.Processes
 
                 string previousYear = (int.Parse(adjustData.Year) - 1).ToString();
 
+                // BA Key-in ข้อมูลปีที่แล้ว Week 4 ที่ถูก Approve แล้วเฉพาะ Counter ของ Brand Loreal
                 var baKeyInDataApprovePreviousYear = repository.baKeyIn.GetBAKeyInBy(
                     c => c.Year == previousYear
                     && c.Month == adjustData.Month
@@ -297,33 +301,44 @@ namespace MarketData.Processes.Processes
                     decimal? ot = null;
                     string remark = null;
 
-                    var keyInDataPreviousYear = baKeyInDetailApprovePreviousYear.Where(c => c.Brand_ID == itemBrandInDepartment.Brand_ID).OrderByDescending(e => e.Amount_Sales).FirstOrDefault();
+                    // ค่า Amount Sale มากที่สุดของปีที่แล้ว หรือค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว
+                    var keyInDataPreviousYear = baKeyInDetailApprovePreviousYear.Where(
+                        c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
+                        .OrderByDescending(e => e.Amount_Sales).FirstOrDefault();
+
                     if (keyInDataPreviousYear != null)
                     {
                         // Or ค่าจากการ Adjust ถาม ลูกค้า
                         amountPreviousYear = keyInDataPreviousYear.Amount_Sales;
                     }
 
+                    // ค่าที่ Admin กรอก
                     var adminKeyInData = adminKeyInDetailData.FirstOrDefault(a => a.Brand_ID == itemBrandInDepartment.Brand_ID);
+                   
+                    // ค่าที่ BA ใน Store นั้นกรอกมาและถูก Approve แล้ว
                     var baKeyInBrand = baKeyInDetailApprove.Where(b => b.Brand_ID == itemBrandInDepartment.Brand_ID);
+                   
+                    // ค่าที่เคยทำการ Save Adjust
                     var adjustBrandData = adjustDetail.FirstOrDefault(e => e.Brand_ID == itemBrandInDepartment.Brand_ID);
 
+                    // ถ้ายังไม่ Submit ยังเอาค่าของ Counter ที่ถูก Approve มาหาค่ามากสุดอยู่ ?
                     if (!isSubmitted)
                     {
-                        //if (adjustBrandData != null)
-                        //{
-                        //    adminAmountSale = adjustBrandData.Admin_AmountSale;
-                        //    adjustAmountSale = adjustBrandData.Adjust_AmountSale;
-                        //    adjustWholeSale = adjustBrandData.Adjust_WholeSale;
-                        //    sk = adjustBrandData.SK;
-                        //    mu = adjustBrandData.MU;
-                        //    fg = adjustBrandData.FG;
-                        //    ot = adjustBrandData.OT;
-                        //    remark = adjustBrandData.Remark;
-                        //}
+                        if (adjustBrandData != null)
+                        {
+                            adminAmountSale = adjustBrandData.Admin_AmountSale;
+                            adjustAmountSale = adjustBrandData.Adjust_AmountSale;
+                            adjustWholeSale = adjustBrandData.Adjust_WholeSale;
+                            sk = adjustBrandData.SK;
+                            mu = adjustBrandData.MU;
+                            fg = adjustBrandData.FG;
+                            ot = adjustBrandData.OT;
+                            remark = adjustBrandData.Remark;
+                        }
+                        // ถ้า Admin กรอกมาใช้ค่าของ Admin
                         // Brand Loreal ค่าว่างไหมถ้า Admin ยังไม่กรอก
                         // เอาค่าของ Admin หรือค่าที่เคย Adjust
-                        if (adminKeyInData != null)
+                        else if (adminKeyInData != null)
                         {
                             adminAmountSale = adminKeyInData.Amount_Sales;
                             adjustAmountSale = adminKeyInData.Amount_Sales;
@@ -337,14 +352,23 @@ namespace MarketData.Processes.Processes
                         // เอาค่าที่มากสุด หรือค่าที่เคย Adjust
                         else if (baKeyInBrand.Any())
                         {
+                            // มีค่า Amount Sale และ Whole Sale
                             if (baKeyInBrand.Any(c => c.Amount_Sales.HasValue) && baKeyInBrand.Any(c => c.Whole_Sales.HasValue))
                             {
-                                var mostAmountSale = baKeyInBrand.Where(e => e.Amount_Sales.HasValue).OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Amount_Sales;
-                                var mostWholeSale = baKeyInBrand.Where(e => e.Whole_Sales.HasValue).OrderByDescending(c => c.Whole_Sales).FirstOrDefault().Amount_Sales;
+                                // ค่า Amount Sale มากที่สุดของแต่ละ Counter
+                                var mostAmountSale = baKeyInBrand.Where(
+                                    e => e.Amount_Sales.HasValue)
+                                    .OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Amount_Sales;
+
+                                // ค่า Whole Sale มากที่สุดของแต่ละ Counter
+                                var mostWholeSale = baKeyInBrand.Where(
+                                    e => e.Whole_Sales.HasValue)
+                                    .OrderByDescending(c => c.Whole_Sales).FirstOrDefault().Amount_Sales;
 
                                 adjustAmountSale = mostAmountSale;
                                 adjustWholeSale = mostWholeSale;
 
+                                // หาค่า sk mu fg ot จาก Brand ที่ Rank สูงที่สุดของ Loreal
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
                                     var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
@@ -363,6 +387,7 @@ namespace MarketData.Processes.Processes
                             }
                             else
                             {
+                                // หาค่า Remark จาก Brand ที่ Rank สูงที่สุดของ Loreal
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
                                     var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
@@ -379,6 +404,7 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
+                        // ถ้า Submit ไปแล้วใช้ค่าจากที่เคยทำการ Adjust
                         if (adjustBrandData != null)
                         {
                             adminAmountSale = adjustBrandData.Admin_AmountSale;
@@ -466,6 +492,7 @@ namespace MarketData.Processes.Processes
 
                 var adjustStatus = repository.masterData.GetAdjustStatusBy(e => e.ID == adjustData.Status_ID);
 
+                response.adjustDataID = adjustData.ID;
                 response.status = adjustStatus.Status_Name;
                 response.brandDataColumn = brandColumn;
                 response.year = adjustData.Year;
