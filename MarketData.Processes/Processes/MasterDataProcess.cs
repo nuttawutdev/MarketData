@@ -710,6 +710,7 @@ namespace MarketData.Processes.Processes
                         saveBrandRequest.brandTypeID = brandTypeData.FirstOrDefault(c => c.Key == saveBrandRequest.brandTypeName).Value;
                         saveBrandRequest.active = true;
                         saveBrandRequest.userID = request.userID;
+                        saveBrandRequest.universe = "LPD";
 
                         if (!string.IsNullOrWhiteSpace(saveBrandRequest.brandName)
                             && saveBrandRequest.brandGroupID != Guid.Empty
