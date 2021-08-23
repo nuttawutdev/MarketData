@@ -1,4 +1,9 @@
-﻿input::-webkit-outer-spin-button,
+﻿.table td {
+    vertical-align:middle!important
+}
+
+
+input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;

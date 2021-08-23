@@ -94,11 +94,26 @@
     </div>
 
 </div>
+<div class="container-xl" style="overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px">
 
+
+    <div style="padding-top: 20px; text-align:right">
+        <button id="btnSave" class="btn btn-danger " type="button">Save</button>
+        <button id="btnAdjust" class="btn btn-primary text-white" type="button">Adjust</button>
+        <a href="Index" class="btn btn-outline-danger">Cancel</a>
+    </div>
+
+</div>
 <script type="text/javascript">
     $(document).ready(function () {
+
+
         $("#container").removeClass("container");
-        var model = @Html.Raw(Json.Serialize(Model));
+        DrawTable();
+
+
+        function DrawTable() {
+             var model = @Html.Raw(Json.Serialize(Model));
         console.log(model)
         var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
         console.log(lastYear)
@@ -166,21 +181,20 @@
             var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
 
             rowTable += '  <td >' + adminAmountSale + '</td>' +
-                '  <td >' + adjustAmountSale + '</td>' +
-                '  <td >' + adjustWholeSale + '</td>' +
+                '  <td > <input  type="number" class="form-control input-sm adjustAmountSale" value=' + adjustAmountSale + '></td>' +
+                '  <td > <input  type="number" class="form-control input-sm adjustWholeSale" value=' + adjustWholeSale + '></td>' +
                 '  <td >' + rank + '</td>' +
-                '  <td >' + sk+ '</td>' +
-                '  <td >' + mu + '</td>' +
-                '  <td >' + fg  + '</td>' +
-                '  <td >' + ot + '</td>' +
-                '  <td >' + remark  + '</td>' +
+                '  <td > <input  type="number" class="form-control input-sm sk" value=' + sk + '></td>' +
+                '  <td > <input  type="number" class="form-control input-sm mu" value=' + mu + '></td>' +
+                '  <td > <input  type="number" class="form-control input-sm fg" value=' + fg + '></td>' +
+                '  <td > <input  type="number" class="form-control input-sm ot" value=' + ot + '></td>' +
+                '  <td >' + remark + '</td>' +
                 '  <td >' + percentGrowth + '</td>' +
             '</tr>';
         }
 
         $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
-                        
-                  
-              
+
+        }
         });
 </script>
