@@ -95,5 +95,77 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+    
+        public async Task<bool> UpdateAdjustData(Guid adjustDataID,Guid userID,Guid statusID)
+        {
+            try
+            {
+                var adjustData = _dbContext.TTAdjustData.Find(adjustDataID);
+                adjustData.Status_ID = statusID;
+                adjustData.Update_By = userID;
+                adjustData.Update_Date = Utility.GetDateNowThai();
+
+                _dbContext.TTAdjustData.Update(adjustData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RemoveAllAdjustDetailByID(Guid adjustDataID)
+        {
+            try
+            {
+                var adjustDataDetail = _dbContext.TTAdjustDataDetail.Where(c=>c.AdjustData_ID == adjustDataID);   
+                _dbContext.TTAdjustDataDetail.RemoveRange(adjustDataDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RemoveAllAdjustBrandDetailByID(Guid adjustDataID)
+        {
+            try
+            {
+                var adjustDataBrandDetail = _dbContext.TTAdjustDataBrandDetail.Where(c => c.AdjustData_ID == adjustDataID);
+                _dbContext.TTAdjustDataBrandDetail.RemoveRange(adjustDataBrandDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> InsertAdjustDataDetail(List<TTAdjustDataDetail> adjustDataDetailList)
+        {
+            try
+            {
+                _dbContext.TTAdjustDataDetail.AddRange(adjustDataDetailList);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> InsertAdjustDataBrandDetail(List<TTAdjustDataBrandDetail> adjustDataBrandDetailList)
+        {
+            try
+            {
+                _dbContext.TTAdjustDataBrandDetail.AddRange(adjustDataBrandDetailList);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

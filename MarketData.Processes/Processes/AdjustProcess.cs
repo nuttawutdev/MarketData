@@ -2,6 +2,7 @@
 using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.Adjust;
+using MarketData.Model.Response;
 using MarketData.Model.Response.AdjustData;
 using MarketData.Repositories;
 using Newtonsoft.Json;
@@ -521,5 +522,137 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public async Task<SaveDataResponse> SaveAdjustDataDetail(SaveAdjustDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var inprogressStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "In-Progress");
+                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, inprogressStatus.ID);              
+
+                if (updateAdjustData)
+                {
+                    response = await SaveAdjustData(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> SubmitAdjustDataDetail(SaveAdjustDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var submitStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
+                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, submitStatus.ID);
+
+                if (updateAdjustData)
+                {
+                    response = await SaveAdjustData(request);
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        private async Task<SaveDataResponse> SaveAdjustData(SaveAdjustDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var brandList = request.adjustDataDetail.SelectMany(c => c.brandKeyInAmount).GroupBy(g => g.Key).Select(c => c.Key);
+                var brandDataList = repository.masterData.GetBrandListBy(e => brandList.Equals(e.Brand_Short_Name) || brandList.Equals(e.Brand_Name));
+               
+                await repository.adjust.RemoveAllAdjustDetailByID(request.adjustDataID);
+                await repository.adjust.RemoveAllAdjustBrandDetailByID(request.adjustDataID);
+
+                List<TTAdjustDataDetail> listInsertAdjustDataDetail = new List<TTAdjustDataDetail>();
+                List<TTAdjustDataBrandDetail> listInsertAdjustDataBrandDetail = new List<TTAdjustDataBrandDetail>();
+
+                foreach (var itemAdjustDetail in request.adjustDataDetail)
+                {
+                    TTAdjustDataDetail adjustDataItem = new TTAdjustDataDetail
+                    {
+                        ID = Guid.NewGuid(),
+                        AdjustData_ID = request.adjustDataID,
+                        Adjust_AmountSale = itemAdjustDetail.adjustAmountSale,
+                        Adjust_WholeSale = itemAdjustDetail.adjustWholeSale,
+                        Admin_AmountSale = itemAdjustDetail.adminAmountSale,
+                        Amount_PreviousYear = itemAdjustDetail.amountPreviousYear,
+                        Brand_ID = itemAdjustDetail.brandID,
+                        FG = itemAdjustDetail.fg,
+                        MU = itemAdjustDetail.mu,
+                        OT = itemAdjustDetail.ot,
+                        SK = itemAdjustDetail.sk,
+                        Rank = itemAdjustDetail.rank,
+                        Percent_Growth = itemAdjustDetail.percentGrowth,
+                        Remark = itemAdjustDetail.remark
+                    };
+
+                    foreach (var brandData in brandDataList)
+                    {
+                        var amountSale = itemAdjustDetail.brandKeyInAmount.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
+                        var rank = itemAdjustDetail.brandKeyInRank.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
+
+                        TTAdjustDataBrandDetail adjustBrandDetail = new TTAdjustDataBrandDetail
+                        {
+                            ID = Guid.NewGuid(),
+                            AdjustDataDetail_ID = adjustDataItem.ID,
+                            AdjustData_ID = request.adjustDataID,
+                            Amount_Sale = amountSale.Value,
+                            Rank = int.Parse(rank.Value),
+                            Brand_ID = brandData.Brand_ID
+                        };
+
+                        listInsertAdjustDataBrandDetail.Add(adjustBrandDetail);
+                    }
+
+                    listInsertAdjustDataDetail.Add(adjustDataItem);
+                }
+
+                var saveAdjustDetailResult = await repository.adjust.InsertAdjustDataDetail(listInsertAdjustDataDetail);
+                var saveAdjustBrandDetailResult = await repository.adjust.InsertAdjustDataBrandDetail(listInsertAdjustDataBrandDetail);
+
+                if (saveAdjustDetailResult && saveAdjustBrandDetailResult)
+                {
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        } 
     }
 }

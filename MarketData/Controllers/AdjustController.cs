@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketData.Model.Request.Adjust;
+using MarketData.Model.Response;
 using MarketData.Model.Response.AdjustData;
 using MarketData.Models;
 using MarketData.Processes;
@@ -259,6 +260,38 @@ namespace MarketData.Controllers
             try
             {
                 response = await process.adjust.CreateAdjustData(request);
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response = await process.adjust.SaveAdjustDataDetail(request);
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response = await process.adjust.SubmitAdjustDataDetail(request);
                 return Json(response);
             }
             catch (Exception ex)

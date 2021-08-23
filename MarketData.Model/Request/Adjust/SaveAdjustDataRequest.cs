@@ -7,6 +7,8 @@ namespace MarketData.Model.Request.Adjust
     public class SaveAdjustDataRequest
     {
         public Guid adjustDataID { get; set; }
+        public List<SaveAdjustDetailData> adjustDataDetail { get; set; }
+        public Guid userID { get; set; }
     }
 
     public class SaveAdjustDetailData
