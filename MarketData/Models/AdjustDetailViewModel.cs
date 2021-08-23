@@ -8,6 +8,7 @@ namespace MarketData.Models
     public class AdjustDetailViewModel
     {
         public List<AdjustDetailViewData> data { get; set; }
+        public Guid adjustDataID { get; set; }
         public string departmentStore { get; set; }
         public string retailerGroup { get; set; }
         public string channel { get; set; }

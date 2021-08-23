@@ -96,6 +96,7 @@ namespace MarketData.Controllers
             {
                 AdjustDetailViewModel dataModel = new AdjustDetailViewModel
                 {
+                    adjustDataID = Guid.NewGuid(),
                     departmentStore = "The Mall Bangkae",
                     channel = "Counter",
                     year = "2021",
@@ -189,6 +190,16 @@ namespace MarketData.Controllers
 
                 //AdjustDetailViewModel dataModel = new AdjustDetailViewModel
                 //{
+                //    adjustDataID = adjustDetailData.adjustDataID,
+                //    brandDataColumn = adjustDetailData.brandDataColumn,
+                //    channel = adjustDetailData.channel,
+                //    departmentStore = adjustDetailData.departmentStore,
+                //    month = adjustDetailData.month,
+                //    status = adjustDetailData.status,
+                //    retailerGroup = adjustDetailData.retailerGroup,
+                //    universe = adjustDetailData.universe,
+                //    week = adjustDetailData.week,
+                //    year = adjustDetailData.year,
                 //    data = adjustDetailData.data.Select(c => new AdjustDetailViewData
                 //    {
                 //        brandID = c.brandID,
