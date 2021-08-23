@@ -73,8 +73,8 @@ namespace MarketData.Processes.Processes
 
                     if (adjustStatusData != null)
                     {
-                        statusID = adjustStatusData.ID;
-                        statusName = adjustStatus.FirstOrDefault(c => c.ID == adjustStatusData.ID).Status_Name;
+                        statusID = adjustStatusData.Status_ID;
+                        statusName = adjustStatus.FirstOrDefault(c => c.ID == adjustStatusData.Status_ID).Status_Name;
                     }
                     else
                     {
@@ -475,7 +475,7 @@ namespace MarketData.Processes.Processes
                 response.retailerGroup = retailerGroup.Retailer_Group_Name;
                 response.departmentStore = departmentData.Department_Store_Name;
                 response.universe = adjustData.Universe;
-                response.data = listAdjustDetailData;
+                response.data = listAdjustDetailData.OrderBy(e => e.rank).ToList();
             }
             catch (Exception ex)
             {
@@ -530,7 +530,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var inprogressStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "In-Progress");
-                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, inprogressStatus.ID);              
+                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, inprogressStatus.ID);
 
                 if (updateAdjustData)
                 {
@@ -585,7 +585,7 @@ namespace MarketData.Processes.Processes
             {
                 var brandList = request.adjustDataDetail.SelectMany(c => c.brandKeyInAmount).GroupBy(g => g.Key).Select(c => c.Key);
                 var brandDataList = repository.masterData.GetBrandListBy(e => brandList.Equals(e.Brand_Short_Name) || brandList.Equals(e.Brand_Name));
-               
+
                 await repository.adjust.RemoveAllAdjustDetailByID(request.adjustDataID);
                 await repository.adjust.RemoveAllAdjustBrandDetailByID(request.adjustDataID);
 
@@ -646,13 +646,13 @@ namespace MarketData.Processes.Processes
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.isSuccess = false;
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
 
             return response;
-        } 
+        }
     }
 }
