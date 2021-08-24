@@ -318,10 +318,10 @@ namespace MarketData.Processes.Processes
 
                     // ค่าที่ Admin กรอก
                     var adminKeyInData = adminKeyInDetailData.FirstOrDefault(a => a.Brand_ID == itemBrandInDepartment.Brand_ID);
-                   
+
                     // ค่าที่ BA ใน Store นั้นกรอกมาและถูก Approve แล้ว
                     var baKeyInBrand = baKeyInDetailApprove.Where(b => b.Brand_ID == itemBrandInDepartment.Brand_ID);
-                   
+
                     // ค่าที่เคยทำการ Save Adjust
                     var adjustBrandData = adjustDetail.FirstOrDefault(e => e.Brand_ID == itemBrandInDepartment.Brand_ID);
 
@@ -340,7 +340,13 @@ namespace MarketData.Processes.Processes
                             remark = adjustBrandData.Remark;
                         }
                         // ถ้า Admin กรอกมาใช้ค่าของ Admin
-                        else if (adminKeyInData != null)
+                        else if (adminKeyInData != null && (adminKeyInData.Amount_Sales.HasValue
+                            || adminKeyInData.Whole_Sales.HasValue
+                            || adminKeyInData.FG.HasValue
+                            || adminKeyInData.MU.HasValue
+                            || adminKeyInData.OT.HasValue
+                            || adminKeyInData.SK.HasValue
+                            || !string.IsNullOrWhiteSpace(adminKeyInData.Remark)))
                         {
                             adminAmountSale = adminKeyInData.Amount_Sales;
                             adjustAmountSale = adminKeyInData.Amount_Sales;
