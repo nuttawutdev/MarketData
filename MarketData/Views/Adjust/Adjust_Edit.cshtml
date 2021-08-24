@@ -87,6 +87,7 @@
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
+                <input type="hidden" value="@Model.adjustDataID" id="adjustDataID" />
                 <table class="table table-hover " id="tblDetails">
                 </table>
             </div>
@@ -113,7 +114,7 @@
 
 
         function DrawTable() {
-             var model = @Html.Raw(Json.Serialize(Model));
+        var model = @Html.Raw(Json.Serialize(Model));
         console.log(model)
         var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
         console.log(lastYear)
@@ -139,23 +140,28 @@
 
 
         $('#tblDetails').empty();
-        var rowTable = ' <tbody>';
+            var rowTable = ' <tbody>';
+            var rowTotal = '<tr class="table-secondary" > <td>Total</td>';
         for (var i = 0; i < model.data.length; i++) {
 
             var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : model.data[i].amountPreviousYear;
 
             rowTable += '<tr >' +
-                '<td hidden>' + model.data[i].brandID + '</td>' +
+                '<td hidden class="brandID">' + model.data[i].brandID + '</td>' +
                 '<td >' + model.data[i].brandName + '</td>' +
-                '<td >' + amountPreviousYear + '</td>';
+                '<td class="amountPreviousYear">' + amountPreviousYear + '</td>' +
+                '<td hidden class="week">' + model.data[i].week + '</td>';
+
+            rowTotal += '<td class="totalAmountPreviousYear"></td>';
 
             var brandKeyInAmount = model.data[i].brandKeyInAmount;
             Object.keys(brandKeyInAmount).forEach(function (key) {
                 var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
                 var keyBrandKeyInAmount = key;
 
-                rowTable += '<td data-id=' + keyBrandKeyInAmount + '>' + valueBrandKeyInAmount + '</td>';
+                rowTable += '<td data-id=' + keyBrandKeyInAmount + ' class="brandKeyInAmount">' + valueBrandKeyInAmount + '</td>';
 
+                rowTotal += '<td data-id=' + keyBrandKeyInAmount + ' class="totalbrandKeyInAmount"></td>';
 
              var brandKeyInRank = model.data[i].brandKeyInRank;
             Object.keys(brandKeyInRank).forEach(function (keys) {
@@ -163,9 +169,11 @@
                 var keyBrandKeyInRank = keys;
 
                 if (keyBrandKeyInRank == keyBrandKeyInAmount) {
-                    rowTable += '<td data-id=' + keyBrandKeyInRank + '>' + valueBrandKeyInRank + '</td>';
-                }
+                    rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank" >' + valueBrandKeyInRank + '</td>';
 
+                    rowTotal += '<td></td>';
+
+                }
             });
             });
 
@@ -180,21 +188,254 @@
             var remark = model.data[i].remark == null ? "" : model.data[i].remark;
             var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
 
-            rowTable += '  <td >' + adminAmountSale + '</td>' +
-                '  <td > <input  type="number" class="form-control input-sm adjustAmountSale" value=' + adjustAmountSale + '></td>' +
-                '  <td > <input  type="number" class="form-control input-sm adjustWholeSale" value=' + adjustWholeSale + '></td>' +
-                '  <td >' + rank + '</td>' +
-                '  <td > <input  type="number" class="form-control input-sm sk" value=' + sk + '></td>' +
-                '  <td > <input  type="number" class="form-control input-sm mu" value=' + mu + '></td>' +
-                '  <td > <input  type="number" class="form-control input-sm fg" value=' + fg + '></td>' +
-                '  <td > <input  type="number" class="form-control input-sm ot" value=' + ot + '></td>' +
-                '  <td >' + remark + '</td>' +
-                '  <td >' + percentGrowth + '</td>' +
-            '</tr>';
+            rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
+                '  <td > <input data-id="adjustAmountSale" type="number" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
+                '  <td > <input data-id="adjustWholeSale" type="number" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '  <td class="rank" >' + rank + '</td>' +
+                '  <td > <input data-id="sk" type="number" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
+                '  <td > <input data-id="mu" type="number" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
+                '  <td > <input data-id="fg" type="number" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
+                '  <td > <input data-id="ot" type="number" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
+                '  <td class="remark">' + remark + '</td>' +
+                '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
+                '</tr>';
+
+            rowTotal += '<td class="totalAdminAmountSale"></td>' +
+                '<td class="totalAdjustAmountSale"></td>' +
+                '<td class="totalAdjustWholeSale"></td>' +
+                '<td></td>' +
+                '<td class="totalsk"></td>' +
+                '<td class="totalmu"></td>' +
+                '<td class="totalfg"></td>' +
+                '<td class="totalot"></td>' +
+                '<td></td>' +
+                '<td class="percentGrowth"></td><tr/>';
         }
 
-        $('#tblDetails').append(titleTable + rowTable + ' </tbody>');
+            $('#tblDetails').append(titleTable + rowTable + rowTotal+' </tbody>');
 
         }
+
+        $('#btnSave').on('click', function (e) {
+
+            var frmdata = getDataFromTable();
+            console.log(frmdata)
+            validate_Sum_Percent(frmdata)
+            validate_WholeSales(frmdata)
+            validate_WholeSales_AmountSales(frmdata)
+            validate_AmountSales_Lessthan_Previouse(frmdata)
         });
+
+        $(document).on('change', '.adjustAmountSale', function () {
+            var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
+            var row = $(this).closest("tr");
+         
+            var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text());
+            var percentGrowth = ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) * 100;
+            row.find(".percentGrowth").text(percentGrowth);
+        })
+
+    
+  //    var sk = isNaN(parseFloat(row.find(".sk").val())) ? 0 : parseFloat(row.find(".sk").val());
+        //    var mu = isNaN(parseFloat(row.find(".mu").val())) ? 0 : parseFloat(row.find(".mu").val());
+        //    var fg = isNaN(parseFloat(row.find(".fg").val())) ? 0 : parseFloat(row.find(".fg").val());
+        //    var ot = isNaN(parseFloat(row.find(".ot").val())) ? 0 : parseFloat(row.find(".ot").val());
+
+
+        //    var currentRow = row.find(".brandID").text();
+
+        //    console.log(currentRow)
+        //    console.log(sk)
+
+        //    var checkCase = $(this).data('id');
+
+        //    if ($("#currentRow").val() == "") {
+        //        $("#currentRow").val(currentRow);
+        //    }
+
+        //    if ((checkCase == "sk" || checkCase == "mu" || checkCase == "fg" || checkCase == "ot")  ) { 
+        //        //check sum 100% when change row
+        //        var sum = sk + mu + fg + ot;
+        //        if (sum != 0 && sum != 100 && $("#currentRow").val() != currentRow) {
+        //            showWarningAlert('100Percent');
+        //            $(this).val('')
+        //        } else {
+        //            console.log('else')
+        //            $("#currentRow").val(currentRow);
+        //        }
+        //    }
+
+
+
+
+        function getDataFromTable(type) {
+            var model = @Html.Raw(Json.Serialize(Model));
+            var frmdata  = {};
+            var memberDetails = new Array();
+            var adjustDataID = $('#adjustDataID').val();
+
+            console.log(model)
+            //let bigCities = model.data.filter(function (e) {
+            //    return e.brandID =='70e012b1-d217-4192-a088-7f5e7e6636fe';
+            //});
+            //console.log(bigCities)
+            $("#tblDetails TBODY TR").each(function (index, el) {
+                //debugger;
+         
+                //var brandKeyInAmounts = new Array();
+                //$("td.brandKeyInAmount").each(function () {
+                //    var ids = $(this).data('id');
+                //    var value = $(this).text();
+                //    var brandKeyInAmount = {
+                //        ids : value
+                //    };
+                //    //console.log('brandKeyInAmount ', $(this).text())
+                //    //console.log('brandKeyInAmount val ', $(this).data('id'))
+                //    brandKeyInAmounts.push(brandKeyInAmount);
+
+                //})
+
+                //console.log(score2)
+                var memberDetail = {};
+                var rank = $(el).find(".rank").text();
+                var percentGrowth = $(el).find(".percentGrowth").text();
+                var sk = $(el).find(".sk").val();
+                var mu = $(el).find(".mu").val();
+                var fg = $(el).find(".fg").val();
+                var ot = $(el).find(".ot").val();
+                var amountPreviousYear = $(el).find('.amountPreviousYear').text();
+                var adminAmountSale = $(el).find('.adminAmountSale').text();
+                var adjustAmountSale = $(el).find(".adjustAmountSale").val();
+                var adjustWholeSale = $(el).find(".adjustWholeSale").val();
+                var remark = $(el).find(".remark").text();
+
+                //memberDetail.brandID = model.brandID;
+                //memberDetail.amountPreviousYear = model.amountPreviousYear;
+                //memberDetail.adminAmountSale = model.adminAmountSale;
+                memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale) : null;
+                memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale) : null;
+                memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth) : null;
+                memberDetail.rank = rank ? parseInt(rank) : null;
+                memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
+                memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
+                memberDetail.fg = fg ? parseFloat(fg.replace(/\,/g, "")) : null;
+                memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
+                memberDetail.week = $(el).find(".week").text();
+                //memberDetail.remark = model.remark;
+                //memberDetail.brandKeyInAmount = model.brandKeyInAmounts;
+                //memberDetail.brandKeyInRank = model.brandKeyInRank;
+                memberDetails.push(memberDetail);
+            });
+
+              frmdata.adjustDataDetail = memberDetails;
+              frmdata.adjustDataID = adjustDataID;
+            //frmdata.userID = ;
+            return frmdata;
+        };
+
+        function showWarningAlert(typeWarning) {
+            var msg = '';
+            switch (typeWarning) {
+                case 'NullAmount':
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    break;
+                case '100Percent':
+                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100% เท่านั้น';
+                    break;
+                case 'NullWholeSales':
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    break;
+                case 'NullWholeSales_AmountSales':
+                    msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
+                    break;
+                case 'DuplicateRank':
+                    msg = 'Duplicate Rank!';
+                    break;
+                case 'IncorrectAmountRank':
+                    msg = 'ข้อมูล Amount sales และ Rank ไม่สอดคล้องกัน';
+                    break;
+                case 'AmountSales_Lessthan_Previouse':
+                    msg = 'ค่า Amount sales ต้องมากกว่า ค่า Amount sales ของ Rank ถัดไป'
+                    break;
+                default:
+            }
+
+
+            $('#warningModal').modal('show');
+
+            $('#myModalWarningResult').text(msg);
+
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.adjustDataDetail.some(function (i) {
+                var sk = isNaN(parseFloat(i.sk)) ? 0 : parseFloat(i.sk);
+                var mu = isNaN(parseFloat(i.mu)) ? 0 : parseFloat(i.mu);
+                var fg = isNaN(parseFloat(i.fg)) ? 0 : parseFloat(i.fg);
+                var ot = isNaN(parseFloat(i.ot)) ? 0 : parseFloat(i.ot);
+
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+
+        function validate_WholeSales(data) {
+
+            var validateData = data.adjustDataDetail.some(function (i) {
+                return i.week == 4 && i.wholeSale == null
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales_AmountSales(data) {
+         
+            var validateData = data.adjustDataDetail.some(function (i) {
+                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale)) ? 0 : parseFloat(i.adjustWholeSale);
+                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale)) ? 0 : parseFloat(i.adjustAmountSale);
+                return adjustAmountSale < adjustWholeSale;
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales_AmountSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_AmountSales_Lessthan_Previouse(data) {
+        
+            var orderByList = data.adjustDataDetail.sort(function (a, b) {
+                return parseFloat(a.rank) - parseFloat(b.rank);
+            });
+            var validateData = false;
+            for (var i = 0; i < orderByList.length; i++) {
+
+                if (i != orderByList.length - 1) {
+                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale);
+
+                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i+1].adjustAmountSale);
+                    if (adjustAmountSale < adjustAmountSaleNext) {
+                        validateData = true;
+                        break;
+                    }
+
+                }
+            }
+
+            if (validateData) {
+                showWarningAlert('AmountSales_Lessthan_Previouse');
+                return 0;
+            } else return 1;
+        }
+    });
+
 </script>
