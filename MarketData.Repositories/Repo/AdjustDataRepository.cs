@@ -32,11 +32,24 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public TTAdjustData FindAdjustDatalBy(Expression<Func<TTAdjustData, bool>> expression)
+        public TTAdjustData FindAdjustDataBy(Expression<Func<TTAdjustData, bool>> expression)
         {
             try
             {
                 return _dbContext.TTAdjustData.Where(expression).FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TTAdjustDataDetail FindAdjustDataDetailBy(Expression<Func<TTAdjustDataDetail, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTAdjustDataDetail.Where(expression).FirstOrDefault();
 
             }
             catch (Exception ex)
@@ -119,6 +132,19 @@ namespace MarketData.Repositories.Repo
             try
             {
                 var adjustDataDetail = _dbContext.TTAdjustDataDetail.Where(c=>c.AdjustData_ID == adjustDataID);   
+                _dbContext.TTAdjustDataDetail.RemoveRange(adjustDataDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RemoveAdjustDetai(List<TTAdjustDataDetail> adjustDataDetail)
+        {
+            try
+            {
                 _dbContext.TTAdjustDataDetail.RemoveRange(adjustDataDetail);
                 return await _dbContext.SaveChangesAsync() > 0;
             }

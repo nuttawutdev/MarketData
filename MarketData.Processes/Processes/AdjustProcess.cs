@@ -200,7 +200,7 @@ namespace MarketData.Processes.Processes
                 bool isSubmitted = false;
                 var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
 
-                var adjustData = repository.adjust.FindAdjustDatalBy(c => c.ID == adjustDataID);
+                var adjustData = repository.adjust.FindAdjustDataBy(c => c.ID == adjustDataID);
                 var adjustDetail = repository.adjust.GetAdjustDataDetaillBy(t => t.AdjustData_ID == adjustData.ID);
 
                 if (adjustData.Status_ID == adjustStatusSubmit.ID)
@@ -262,21 +262,26 @@ namespace MarketData.Processes.Processes
                 string previousYear = (int.Parse(adjustData.Year) - 1).ToString();
 
                 // BA Key-in ข้อมูลปีที่แล้ว Week 4 ที่ถูก Approve แล้วเฉพาะ Counter ของ Brand Loreal
-                var baKeyInDataApprovePreviousYear = repository.baKeyIn.GetBAKeyInBy(
+                var adjustDataPreviousYear = repository.adjust.FindAdjustDataBy(
                     c => c.Year == previousYear
                     && c.Month == adjustData.Month
                     && c.Week == "4"
                     && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
                     && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
                     && c.Universe == adjustData.Universe
-                    && c.KeyIn_Status_ID == keyInStatusApprove.ID
-                    && onlyBrandLorealID.Contains(c.Brand_ID));
+                    && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
+                    && c.Status_ID == adjustStatusSubmit.ID);
 
                 var baKeyInIDApprove = baKeyInDataApprove.Select(t => t.ID);
-                var baKeyInIDApprovePreviousYear = baKeyInDataApprovePreviousYear.Select(t => t.ID);
 
                 var baKeyInDetailApprove = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprove.Contains(p.BAKeyIn_ID));
-                var baKeyInDetailApprovePreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprovePreviousYear.Contains(p.BAKeyIn_ID));
+
+                List<TTAdjustDataDetail> adjustDetailPreviousYear = new List<TTAdjustDataDetail>();
+                if(adjustDataPreviousYear != null)
+                {
+                    adjustDetailPreviousYear = repository.adjust.GetAdjustDataDetaillBy(p => p.AdjustData_ID == adjustDataPreviousYear.ID);
+                }
+                 
                 #endregion
 
                 var adminKeyInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(
@@ -301,15 +306,14 @@ namespace MarketData.Processes.Processes
                     decimal? ot = null;
                     string remark = null;
 
-                    // ค่า Amount Sale มากที่สุดของปีที่แล้ว หรือค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว
-                    var keyInDataPreviousYear = baKeyInDetailApprovePreviousYear.Where(
+                    // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว
+                    var adjustKeyDataPreviousYear = adjustDetailPreviousYear.Where(
                         c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
-                        .OrderByDescending(e => e.Amount_Sales).FirstOrDefault();
+                        .OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
 
-                    if (keyInDataPreviousYear != null)
+                    if (adjustKeyDataPreviousYear != null)
                     {
-                        // Or ค่าจากการ Adjust ถาม ลูกค้า
-                        amountPreviousYear = keyInDataPreviousYear.Amount_Sales;
+                        amountPreviousYear = adjustKeyDataPreviousYear.Adjust_AmountSale;
                     }
 
                     // ค่าที่ Admin กรอก
@@ -336,8 +340,6 @@ namespace MarketData.Processes.Processes
                             remark = adjustBrandData.Remark;
                         }
                         // ถ้า Admin กรอกมาใช้ค่าของ Admin
-                        // Brand Loreal ค่าว่างไหมถ้า Admin ยังไม่กรอก
-                        // เอาค่าของ Admin หรือค่าที่เคย Adjust
                         else if (adminKeyInData != null)
                         {
                             adminAmountSale = adminKeyInData.Amount_Sales;
@@ -349,7 +351,6 @@ namespace MarketData.Processes.Processes
                             ot = adminKeyInData.OT;
                             remark = adminKeyInData.Remark;
                         }
-                        // เอาค่าที่มากสุด หรือค่าที่เคย Adjust
                         else if (baKeyInBrand.Any())
                         {
                             // มีค่า Amount Sale และ Whole Sale
@@ -518,7 +519,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var adjustData = repository.adjust.FindAdjustDatalBy(
+                var adjustData = repository.adjust.FindAdjustDataBy(
                     c => c.DistributionChannel_ID == request.distributionChannelID
                     && c.DepartmentStore_ID == request.departmentStoreID
                     && c.RetailerGroup_ID == request.retailerGroupID
@@ -647,11 +648,11 @@ namespace MarketData.Processes.Processes
                         TTAdjustDataBrandDetail adjustBrandDetail = new TTAdjustDataBrandDetail
                         {
                             ID = Guid.NewGuid(),
-                            AdjustDataDetail_ID = adjustDataItem.ID,
+                            BrandCounter_ID = brandData.Brand_ID,
                             AdjustData_ID = request.adjustDataID,
                             Amount_Sale = amountSale.Value,
                             Rank = int.Parse(rank.Value),
-                            Brand_ID = brandData.Brand_ID
+                            Brand_ID = itemAdjustDetail.brandID
                         };
 
                         listInsertAdjustDataBrandDetail.Add(adjustBrandDetail);

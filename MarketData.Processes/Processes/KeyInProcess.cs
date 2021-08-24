@@ -410,15 +410,15 @@ namespace MarketData.Processes.Processes
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
-                response.data = BAKeyInDetailList.OrderBy(c=>c.brandName).ToList();
+                response.data = BAKeyInDetailList.OrderBy(c => c.brandName).ToList();
 
                 var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(r => r.Status_Name == "Reject");
                 var approveData = repository.approve.GetApproveKeyInBy(c => c.BAKeyIn_ID == BAKeyInData.ID).OrderByDescending(d => d.Action_Date).FirstOrDefault();
-                
-                if(approveData != null && approveData.Status_ID == rejectStatus.ID)
+
+                if (approveData != null && approveData.Status_ID == rejectStatus.ID)
                 {
                     response.rejectReason = approveData.Remark;
-                }         
+                }
             }
             catch (Exception ex)
             {
@@ -587,6 +587,8 @@ namespace MarketData.Processes.Processes
                 bool addDetailResult = true;
                 bool updateDetailResult = true;
 
+                List<TTAdminKeyInDetail> listSaveData = new List<TTAdminKeyInDetail>();
+
                 if (updateAdminKeyInDetailID.Any())
                 {
                     var adminInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => updateAdminKeyInDetailID.Contains(c.ID));
@@ -607,6 +609,7 @@ namespace MarketData.Processes.Processes
                     }
 
                     updateDetailResult = await repository.adminKeyIn.UpdateAdminKeyInDetail(adminInDetailData);
+                    listSaveData.AddRange(adminInDetailData);
                 }
 
                 if (newAdminKeyInDetail.Any())
@@ -636,11 +639,63 @@ namespace MarketData.Processes.Processes
                     }).ToList();
 
                     addDetailResult = await repository.adminKeyIn.AddAdminKeyInDetail(listNewAdminDetail);
+                    listSaveData.AddRange(listNewAdminDetail);
                 }
 
                 if (updateDetailResult && addDetailResult)
                 {
                     response.isSuccess = true;
+
+                    #region Remove old adjust data
+                    var groupDataKeyIn = listSaveData.GroupBy(
+                        x => new
+                        {
+                            x.Year,
+                            x.Month,
+                            x.Week,
+                            x.DistributionChannel_ID,
+                            x.RetailerGroup_ID,
+                            x.DepartmentStore_ID,
+                            x.Universe
+                        })
+                        .Select(b => new
+                        {
+                            year = b.Key.Year,
+                            month = b.Key.Month,
+                            week = b.Key.Week,
+                            DistributionChannel_ID = b.Key.DistributionChannel_ID,
+                            RetailerGroup_ID = b.Key.RetailerGroup_ID,
+                            DepartmentStore_ID = b.Key.DepartmentStore_ID,
+                            Universe = b.Key.Universe,
+                            brandKeyInData = b
+                        });
+
+                    foreach (var itemGrpup in groupDataKeyIn)
+                    {
+                        var adjustDataKeyIn = repository.adjust.FindAdjustDataBy(
+                                 c => c.Year == itemGrpup.year
+                                 && c.Month == itemGrpup.month
+                                 && c.Week == itemGrpup.week
+                                 && c.DistributionChannel_ID == itemGrpup.DistributionChannel_ID
+                                 && c.DepartmentStore_ID == itemGrpup.DepartmentStore_ID
+                                 && c.RetailerGroup_ID == itemGrpup.RetailerGroup_ID
+                                 && c.Universe == itemGrpup.Universe);
+
+                        var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Submit");
+
+                        if (adjustDataKeyIn != null && adjustDataKeyIn.Status_ID != adjustStatusSubmit.ID)
+                        {
+                            var brandIDKeyIn = itemGrpup.brandKeyInData.Select(c => c.Brand_ID);
+
+                            var adjustDataDetailListRemove = repository.adjust.GetAdjustDataDetaillBy(
+                                e => e.AdjustData_ID == adjustDataKeyIn.ID
+                                && brandIDKeyIn.Contains(e.Brand_ID));
+
+                            await repository.adjust.RemoveAdjustDetai(adjustDataDetailListRemove);
+                        }
+                    }
+
+                    #endregion
                 }
                 else
                 {

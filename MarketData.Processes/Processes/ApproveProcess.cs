@@ -187,7 +187,6 @@ namespace MarketData.Processes.Processes
                     if (updateApproveResult)
                     {
                         var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.BAKeyIn_ID == approveData.BAKeyIn_ID);
-
                         List<TTApproveKeyInDetail> approveKeyInDetail = baKeyInDetail.Select(c => new TTApproveKeyInDetail
                         {
                             ID = Guid.NewGuid(),
@@ -211,8 +210,30 @@ namespace MarketData.Processes.Processes
                             Created_Date = Utility.GetDateNowThai()
                         }).ToList();
 
+                        var insertApproveDetailResult = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
 
-                        response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
+                        if (insertApproveDetailResult)
+                        {
+                            var baKeyInData = repository.baKeyIn.FindBAKeyInBy(c => c.ID == approveData.BAKeyIn_ID);
+                            var adjustData = repository.adjust.FindAdjustDataBy(
+                                c => c.Year == baKeyInData.Year
+                                && c.Month == baKeyInData.Month
+                                && c.Week == baKeyInData.Week
+                                && c.DistributionChannel_ID == baKeyInData.DistributionChannel_ID
+                                && c.DepartmentStore_ID == baKeyInData.DepartmentStore_ID
+                                && c.RetailerGroup_ID == baKeyInData.RetailerGroup_ID
+                                && c.Universe == baKeyInData.Universe);
+
+                            var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Submit");
+
+                            if (adjustData != null && adjustData.Status_ID != adjustStatusSubmit?.ID)
+                            {
+                                await repository.adjust.RemoveAllAdjustDetailByID(adjustData.ID);
+                                await repository.adjust.RemoveAllAdjustBrandDetailByID(adjustData.ID);
+                            }
+
+                            response.isSuccess = true;
+                        }
                     }
                     else
                     {
