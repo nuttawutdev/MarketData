@@ -428,6 +428,10 @@ namespace MarketData.Processes.Processes
                     AdjustDetailData adjustDetailData = new AdjustDetailData
                     {
                         brandID = itemBrandInDepartment.Brand_ID,
+                        brandColor = itemBrandInDepartment.Brand_Color,
+                        year = adjustData.Year,
+                        month = adjustData.Month,
+                        week = adjustData.Week,
                         brandName = itemBrandInDepartment.Brand_Name,
                         amountPreviousYear = amountPreviousYear,
                         brandKeyInAmount = new Dictionary<string, decimal?>(),

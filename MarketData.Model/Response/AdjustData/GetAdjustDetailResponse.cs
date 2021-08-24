@@ -27,6 +27,10 @@ namespace MarketData.Model.Response.AdjustData
         public decimal? adminAmountSale { get; set; }
         public decimal? adjustAmountSale { get; set; }
         public decimal? adjustWholeSale { get; set; }
+        public string brandColor { get; set; }
+        public string year { get; set; }
+        public string month { get; set; }
+        public string week { get; set; }
         public int rank { get; set; }
         public decimal? sk { get; set; }
         public decimal? mu { get; set; }

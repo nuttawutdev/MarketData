@@ -114,6 +114,10 @@ namespace MarketData.Controllers
                         new AdjustDetailViewData
                         {
                             brandID = new Guid("70e012b1-d217-4192-a088-7f5e7e6636fe"),
+                            brandColor = "#e65b5b",
+                            year = "2021",
+                            month = "08",
+                            week = "2",
                             brandName = "Covermark",
                             amountPreviousYear= 40000,
                             adminAmountSale = 500000,
@@ -138,11 +142,15 @@ namespace MarketData.Controllers
                         new AdjustDetailViewData
                         {
                             brandID = new Guid("269e27cb-d386-4b9a-933c-81e77db2a36d"),
+                            brandColor = null,
                             brandName = "Tell ME",
                             amountPreviousYear= null,
                             adminAmountSale = null,
                             adjustAmountSale = null,
                             adjustWholeSale = null,
+                            year = "2021",
+                            month = "08",
+                            week = "2",
                             rank = 3,
                             sk = null,
                             mu = null,
@@ -163,6 +171,10 @@ namespace MarketData.Controllers
                         {
                             brandID = new Guid("36680587-1abe-474c-878b-9ea94e02ba0b"),
                             brandName = "Lancome",
+                            brandColor = "#f708e3",
+                            year = "2021",
+                            month = "08",
+                            week = "2",
                             amountPreviousYear= null,
                             adminAmountSale = 45000,
                             adjustAmountSale = 45000,
@@ -203,6 +215,10 @@ namespace MarketData.Controllers
                 //    data = adjustDetailData.data.Select(c => new AdjustDetailViewData
                 //    {
                 //        brandID = c.brandID,
+                //        brandColor = c.brandColor,
+                //        month = c.month,
+                //        week = c.week,
+                //        year = c.year,
                 //        adjustAmountSale = c.adjustAmountSale,
                 //        adjustWholeSale = c.adjustWholeSale,
                 //        adminAmountSale = c.adminAmountSale,
