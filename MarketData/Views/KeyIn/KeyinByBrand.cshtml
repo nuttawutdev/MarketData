@@ -368,8 +368,8 @@
                     datatype: "json",
                         success: function (data) {
                         $("#blocker").hide();
-                        if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "KeyinByBrand");
+                          if (data.isSuccess) {
+                            $('#successModalHref').attr("data-dismiss", "modal");
                             $('#successModal').modal('show');
                         } else if (data.isDuplicated) {
                             $('#failedModal').modal('show');
