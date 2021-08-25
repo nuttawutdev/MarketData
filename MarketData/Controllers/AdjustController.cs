@@ -234,7 +234,6 @@ namespace MarketData.Controllers
                         remark = c.remark,
                         rank = c.rank,
                         percentGrowth = c.percentGrowth
-
                     }).ToList()
                 };
 

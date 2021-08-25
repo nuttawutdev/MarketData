@@ -277,11 +277,11 @@ namespace MarketData.Processes.Processes
                 var baKeyInDetailApprove = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprove.Contains(p.BAKeyIn_ID));
 
                 List<TTAdjustDataDetail> adjustDetailPreviousYear = new List<TTAdjustDataDetail>();
-                if(adjustDataPreviousYear != null)
+                if (adjustDataPreviousYear != null)
                 {
                     adjustDetailPreviousYear = repository.adjust.GetAdjustDataDetaillBy(p => p.AdjustData_ID == adjustDataPreviousYear.ID);
                 }
-                 
+
                 #endregion
 
                 var adminKeyInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(
@@ -567,10 +567,21 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var inprogressStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "In-Progress");
-                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, inprogressStatus.ID);
+                bool updateAdjustDataResult = true;
+                var adjustData = repository.adjust.FindAdjustDataBy(c => c.ID == request.adjustDataID);
+                var submitStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
 
-                if (updateAdjustData)
+                if(adjustData.Status_ID == submitStatus.ID)
+                {
+                    updateAdjustDataResult = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, submitStatus.ID);
+                }
+                else
+                {
+                    var inprogressStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "In-Progress");
+                    updateAdjustDataResult = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, inprogressStatus.ID);
+                }
+
+                if (updateAdjustDataResult)
                 {
                     response = await SaveAdjustData(request);
                 }
@@ -622,7 +633,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var brandList = request.adjustDataDetail.SelectMany(c => c.brandKeyInAmount).GroupBy(g => g.Key).Select(c => c.Key);
-                var brandDataList = repository.masterData.GetBrandListBy(e => brandList.Equals(e.Brand_Short_Name) || brandList.Equals(e.Brand_Name));
+                var brandDataList = repository.masterData.GetBrandListBy(e => brandList.Contains(e.Brand_Short_Name) || brandList.Contains(e.Brand_Name));
 
                 await repository.adjust.RemoveAllAdjustDetailByID(request.adjustDataID);
                 await repository.adjust.RemoveAllAdjustBrandDetailByID(request.adjustDataID);
