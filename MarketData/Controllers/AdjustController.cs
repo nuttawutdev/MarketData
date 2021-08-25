@@ -94,148 +94,149 @@ namespace MarketData.Controllers
             var role = HttpContext.Session.GetString("role");
             if (role == "Admin")
             {
-                AdjustDetailViewModel dataModel = new AdjustDetailViewModel
-                {
-                    adjustDataID = Guid.NewGuid(),
-                    departmentStore = "The Mall Bangkae",
-                    channel = "Counter",
-                    year = "2021",
-                    month = "August",
-                    week = "2",
-                    retailerGroup = "The Mall",
-                    universe = "LPD",
-                    status = "Pending",
-                    brandDataColumn = new List<string>
-                    {
-                        { "LAN-Amt.Sales"},{"LAN-Rank"}, { "BIO-Amt.Sales"},{"BIO-Rank"}
-                    },
-                    data = new List<AdjustDetailViewData>()
-                    {
-                        new AdjustDetailViewData
-                        {
-                            brandID = new Guid("70e012b1-d217-4192-a088-7f5e7e6636fe"),
-                            brandColor = "#e65b5b",
-                            year = "2021",
-                            month = "08",
-                            week = "2",
-                            brandName = "Covermark",
-                            amountPreviousYear= 40000,
-                            adminAmountSale = 500000,
-                            adjustAmountSale = 500000,
-                            adjustWholeSale = 30000,
-                            rank = 1,
-                            sk = 25,
-                            mu = 25,
-                            fg = 25,
-                            ot = 25,
-                            remark = "",
-                            percentGrowth = 20,
-                           brandKeyInAmount = new Dictionary<string, decimal?>()
-                           {
-                               { "LAN",50000},{ "BIO",40000},
-                           },
-                           brandKeyInRank = new Dictionary<string, string>()
-                           {
-                                { "LAN","1"},{ "BIO","1"},
-                           }
-                        },
-                        new AdjustDetailViewData
-                        {
-                            brandID = new Guid("269e27cb-d386-4b9a-933c-81e77db2a36d"),
-                            brandColor = null,
-                            brandName = "Tell ME",
-                            amountPreviousYear= null,
-                            adminAmountSale = null,
-                            adjustAmountSale = null,
-                            adjustWholeSale = null,
-                            year = "2021",
-                            month = "08",
-                            week = "2",
-                            rank = 3,
-                            sk = null,
-                            mu = null,
-                            fg = null,
-                            ot = null,
-                            remark = "ไม่มียอดขาย",
-                            percentGrowth = null,
-                           brandKeyInAmount = new Dictionary<string, decimal?>()
-                           {
-                               { "LAN",null},{ "BIO",null},
-                           },
-                           brandKeyInRank = new Dictionary<string, string>()
-                           {
-                                { "LAN",null},{ "BIO",null},
-                           }
-                        },
-                        new AdjustDetailViewData
-                        {
-                            brandID = new Guid("36680587-1abe-474c-878b-9ea94e02ba0b"),
-                            brandName = "Lancome",
-                            brandColor = "#f708e3",
-                            year = "2021",
-                            month = "08",
-                            week = "2",
-                            amountPreviousYear= null,
-                            adminAmountSale = 45000,
-                            adjustAmountSale = 45000,
-                            adjustWholeSale = 20000,
-                            rank = 2,
-                            sk = null,
-                            mu = null,
-                            fg = null,
-                            ot = null,
-                            remark = "",
-                            percentGrowth = null,
-                           brandKeyInAmount = new Dictionary<string, decimal?>()
-                           {
-                               { "LAN",40000},{ "BIO",3000},
-                           },
-                           brandKeyInRank = new Dictionary<string, string>()
-                           {
-                                { "LAN","2"},  { "BIO","2"},
-                           }
-                        },
-                    }
-                };
-
-                //var adjustDetailData = process.adjust.GetAdjustDataDetail(adjustDataID);
-
+                #region Mock Data
                 //AdjustDetailViewModel dataModel = new AdjustDetailViewModel
                 //{
-                //    adjustDataID = adjustDetailData.adjustDataID,
-                //    brandDataColumn = adjustDetailData.brandDataColumn,
-                //    channel = adjustDetailData.channel,
-                //    departmentStore = adjustDetailData.departmentStore,
-                //    month = adjustDetailData.month,
-                //    status = adjustDetailData.status,
-                //    retailerGroup = adjustDetailData.retailerGroup,
-                //    universe = adjustDetailData.universe,
-                //    week = adjustDetailData.week,
-                //    year = adjustDetailData.year,
-                //    data = adjustDetailData.data.Select(c => new AdjustDetailViewData
+                //    adjustDataID = Guid.NewGuid(),
+                //    departmentStore = "The Mall Bangkae",
+                //    channel = "Counter",
+                //    year = "2021",
+                //    month = "August",
+                //    week = "2",
+                //    retailerGroup = "The Mall",
+                //    universe = "LPD",
+                //    status = "Pending",
+                //    brandDataColumn = new List<string>
                 //    {
-                //        brandID = c.brandID,
-                //        brandColor = c.brandColor,
-                //        month = c.month,
-                //        week = c.week,
-                //        year = c.year,
-                //        adjustAmountSale = c.adjustAmountSale,
-                //        adjustWholeSale = c.adjustWholeSale,
-                //        adminAmountSale = c.adminAmountSale,
-                //        amountPreviousYear = c.amountPreviousYear,
-                //        brandKeyInAmount = c.brandKeyInAmount,
-                //        brandKeyInRank = c.brandKeyInRank,
-                //        fg = c.fg,
-                //        mu = c.mu,
-                //        ot = c.ot,
-                //        sk = c.sk,
-                //        brandName = c.brandName,
-                //        remark = c.remark,
-                //        rank = c.rank,
-                //        percentGrowth = c.percentGrowth
-
-                //    }).ToList()
+                //        { "LAN-Amt.Sales"},{"LAN-Rank"}, { "BIO-Amt.Sales"},{"BIO-Rank"}
+                //    },
+                //    data = new List<AdjustDetailViewData>()
+                //    {
+                //        new AdjustDetailViewData
+                //        {
+                //            brandID = new Guid("70e012b1-d217-4192-a088-7f5e7e6636fe"),
+                //            brandColor = "#e65b5b",
+                //            year = "2021",
+                //            month = "08",
+                //            week = "2",
+                //            brandName = "Covermark",
+                //            amountPreviousYear= 40000,
+                //            adminAmountSale = 500000,
+                //            adjustAmountSale = 500000,
+                //            adjustWholeSale = 30000,
+                //            rank = 1,
+                //            sk = 25,
+                //            mu = 25,
+                //            fg = 25,
+                //            ot = 25,
+                //            remark = "",
+                //            percentGrowth = 20,
+                //           brandKeyInAmount = new Dictionary<string, decimal?>()
+                //           {
+                //               { "LAN",50000},{ "BIO",40000},
+                //           },
+                //           brandKeyInRank = new Dictionary<string, string>()
+                //           {
+                //                { "LAN","1"},{ "BIO","1"},
+                //           }
+                //        },
+                //        new AdjustDetailViewData
+                //        {
+                //            brandID = new Guid("36680587-1abe-474c-878b-9ea94e02ba0b"),
+                //            brandName = "Lancome",
+                //            brandColor = "#f708e3",
+                //            year = "2021",
+                //            month = "08",
+                //            week = "2",
+                //            amountPreviousYear= null,
+                //            adminAmountSale = 45000,
+                //            adjustAmountSale = 45000,
+                //            adjustWholeSale = 20000,
+                //            rank = 2,
+                //            sk = null,
+                //            mu = null,
+                //            fg = null,
+                //            ot = null,
+                //            remark = "",
+                //            percentGrowth = null,
+                //           brandKeyInAmount = new Dictionary<string, decimal?>()
+                //           {
+                //               { "LAN",40000},{ "BIO",3000},
+                //           },
+                //           brandKeyInRank = new Dictionary<string, string>()
+                //           {
+                //                { "LAN","2"},  { "BIO","2"},
+                //           }
+                //        },
+                //        new AdjustDetailViewData
+                //        {
+                //            brandID = new Guid("269e27cb-d386-4b9a-933c-81e77db2a36d"),
+                //            brandColor = null,
+                //            brandName = "Tell ME",
+                //            amountPreviousYear= null,
+                //            adminAmountSale = null,
+                //            adjustAmountSale = null,
+                //            adjustWholeSale = null,
+                //            year = "2021",
+                //            month = "08",
+                //            week = "2",
+                //            rank = 3,
+                //            sk = null,
+                //            mu = null,
+                //            fg = null,
+                //            ot = null,
+                //            remark = "ไม่มียอดขาย",
+                //            percentGrowth = null,
+                //           brandKeyInAmount = new Dictionary<string, decimal?>()
+                //           {
+                //               { "LAN",null},{ "BIO",null},
+                //           },
+                //           brandKeyInRank = new Dictionary<string, string>()
+                //           {
+                //                { "LAN",null},{ "BIO",null},
+                //           }
+                //        }
+                //    }
                 //};
+                #endregion 
+
+                var adjustDetailData = process.adjust.GetAdjustDataDetail(adjustDataID);
+                AdjustDetailViewModel dataModel = new AdjustDetailViewModel
+                {
+                    adjustDataID = adjustDetailData.adjustDataID,
+                    brandDataColumn = adjustDetailData.brandDataColumn,
+                    channel = adjustDetailData.channel,
+                    departmentStore = adjustDetailData.departmentStore,
+                    month = adjustDetailData.month,
+                    status = adjustDetailData.status,
+                    retailerGroup = adjustDetailData.retailerGroup,
+                    universe = adjustDetailData.universe,
+                    week = adjustDetailData.week,
+                    year = adjustDetailData.year,
+                    data = adjustDetailData.data.Select(c => new AdjustDetailViewData
+                    {
+                        brandID = c.brandID,
+                        brandColor = c.brandColor,
+                        month = c.month,
+                        week = c.week,
+                        year = c.year,
+                        adjustAmountSale = c.adjustAmountSale,
+                        adjustWholeSale = c.adjustWholeSale,
+                        adminAmountSale = c.adminAmountSale,
+                        amountPreviousYear = c.amountPreviousYear,
+                        brandKeyInAmount = c.brandKeyInAmount,
+                        brandKeyInRank = c.brandKeyInRank,
+                        fg = c.fg,
+                        mu = c.mu,
+                        ot = c.ot,
+                        sk = c.sk,
+                        brandName = c.brandName,
+                        remark = c.remark,
+                        rank = c.rank,
+                        percentGrowth = c.percentGrowth
+
+                    }).ToList()
+                };
 
                 return View(dataModel);
             }
