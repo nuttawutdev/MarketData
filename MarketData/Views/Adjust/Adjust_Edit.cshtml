@@ -217,56 +217,78 @@
         }
 
         $('#btnSave').on('click', function (e) {
-
-            var frmdata = getDataFromTable();
-            console.log(frmdata)
-            validate_Sum_Percent(frmdata)
-            validate_WholeSales(frmdata)
-            validate_WholeSales_AmountSales(frmdata)
-            validate_AmountSales_Lessthan_Previouse(frmdata)
+            save('btnSave');
         });
+
+        $('#btnAdjust').on('click', function (e) {
+            save('btnAdjust');
+        });
+
+        $(document).on('change', '.checkInput', function () {
+            save('save');
+        })
+
 
         $(document).on('change', '.adjustAmountSale', function () {
             var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
             var row = $(this).closest("tr");
-         
+
             var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text());
             var percentGrowth = ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) * 100;
             row.find(".percentGrowth").text(percentGrowth);
         })
 
-    
-  //    var sk = isNaN(parseFloat(row.find(".sk").val())) ? 0 : parseFloat(row.find(".sk").val());
-        //    var mu = isNaN(parseFloat(row.find(".mu").val())) ? 0 : parseFloat(row.find(".mu").val());
-        //    var fg = isNaN(parseFloat(row.find(".fg").val())) ? 0 : parseFloat(row.find(".fg").val());
-        //    var ot = isNaN(parseFloat(row.find(".ot").val())) ? 0 : parseFloat(row.find(".ot").val());
+        function save(type) {
+            var frmdata = getDataFromTable();
+            console.log(frmdata)
+            if (validate_Sum_Percent(frmdata) &&
+                validate_WholeSales(frmdata) &&
+                validate_WholeSales_AmountSales(frmdata) &&
+                validate_AmountSales_Lessthan_Previouse(frmdata)) {
+
+                var urlAction = '';
+                if (type == 'btnAdjust') {
+                     urlAction = '@Url.Action("SubmitAdjustDataDetail", "Adjust")';
+                } else {
+
+                    urlAction = '@Url.Action("SaveAdjustDataDetail", "Adjust")';
+                }
+
+                //$("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: urlAction,
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                        success: function (data) {
+                            $("#blocker").hide();
+
+                            if (data.isSuccess) {
+                                if (type != 'save'){
+                                    $('#successModalHref').attr("href", "Index");
+                                    $('#successModal').modal('show');                              
+                                }
+
+                            } else if (data.isDuplicated) {
+                                $('#failedModal').modal('show');
+                                $('#myModalFailedResult').text('Duplicate data!');
+                            } else {
+                                $('#failedModal').modal('show');
+                                $('#myModalFailedResult').text(data.responseError != ""
+                                    && data.responseError != null ? data.responseError : 'Save data failed');
+                            }
+                            $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        //$("#blocker").hide();
+                    }
+                });
+    }
 
 
-        //    var currentRow = row.find(".brandID").text();
-
-        //    console.log(currentRow)
-        //    console.log(sk)
-
-        //    var checkCase = $(this).data('id');
-
-        //    if ($("#currentRow").val() == "") {
-        //        $("#currentRow").val(currentRow);
-        //    }
-
-        //    if ((checkCase == "sk" || checkCase == "mu" || checkCase == "fg" || checkCase == "ot")  ) { 
-        //        //check sum 100% when change row
-        //        var sum = sk + mu + fg + ot;
-        //        if (sum != 0 && sum != 100 && $("#currentRow").val() != currentRow) {
-        //            showWarningAlert('100Percent');
-        //            $(this).val('')
-        //        } else {
-        //            console.log('else')
-        //            $("#currentRow").val(currentRow);
-        //        }
-        //    }
-
-
-
+        }
 
         function getDataFromTable(type) {
             var model = @Html.Raw(Json.Serialize(Model));
@@ -275,56 +297,40 @@
             var adjustDataID = $('#adjustDataID').val();
 
             console.log(model)
-            //let bigCities = model.data.filter(function (e) {
-            //    return e.brandID =='70e012b1-d217-4192-a088-7f5e7e6636fe';
-            //});
-            //console.log(bigCities)
+
             $("#tblDetails TBODY TR").each(function (index, el) {
-                //debugger;
-         
-                //var brandKeyInAmounts = new Array();
-                //$("td.brandKeyInAmount").each(function () {
-                //    var ids = $(this).data('id');
-                //    var value = $(this).text();
-                //    var brandKeyInAmount = {
-                //        ids : value
-                //    };
-                //    //console.log('brandKeyInAmount ', $(this).text())
-                //    //console.log('brandKeyInAmount val ', $(this).data('id'))
-                //    brandKeyInAmounts.push(brandKeyInAmount);
+                var brandID = $(el).find(".brandID").text();
+                for (var i = 0; i < model.data.length; i++) {
+                    if ( model.data[i].brandID == brandID) {
+                        var memberDetail = {};
 
-                //})
+                        var percentGrowth = $(el).find(".percentGrowth").text();
+                        var sk = $(el).find(".sk").val();
+                        var mu = $(el).find(".mu").val();
+                        var fg = $(el).find(".fg").val();
+                        var ot = $(el).find(".ot").val();
+                        var adjustAmountSale = $(el).find(".adjustAmountSale").val();
+                        var adjustWholeSale = $(el).find(".adjustWholeSale").val();
 
-                //console.log(score2)
-                var memberDetail = {};
-                var rank = $(el).find(".rank").text();
-                var percentGrowth = $(el).find(".percentGrowth").text();
-                var sk = $(el).find(".sk").val();
-                var mu = $(el).find(".mu").val();
-                var fg = $(el).find(".fg").val();
-                var ot = $(el).find(".ot").val();
-                var amountPreviousYear = $(el).find('.amountPreviousYear').text();
-                var adminAmountSale = $(el).find('.adminAmountSale').text();
-                var adjustAmountSale = $(el).find(".adjustAmountSale").val();
-                var adjustWholeSale = $(el).find(".adjustWholeSale").val();
-                var remark = $(el).find(".remark").text();
+                        memberDetail.brandID =  model.data[i].brandID;
+                        memberDetail.amountPreviousYear =  model.data[i].amountPreviousYear;
+                        memberDetail.adminAmountSale =  model.data[i].adminAmountSale;
+                        memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale) : null;
+                        memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale) : null;
+                        memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth) : null;
+                        memberDetail.rank =  model.data[i].rank;
+                        memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
+                        memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
+                        memberDetail.fg = fg ? parseFloat(fg.replace(/\,/g, "")) : null;
+                        memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
+                        memberDetail.week =  model.data[i].week;
+                        memberDetail.remark =  model.data[i].remark;
+                        memberDetail.brandKeyInAmount =  model.data[i].brandKeyInAmount;
+                        memberDetail.brandKeyInRank =  model.data[i].brandKeyInRank;
+                        memberDetails.push(memberDetail);
+                    }
+                }
 
-                //memberDetail.brandID = model.brandID;
-                //memberDetail.amountPreviousYear = model.amountPreviousYear;
-                //memberDetail.adminAmountSale = model.adminAmountSale;
-                memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale) : null;
-                memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale) : null;
-                memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth) : null;
-                memberDetail.rank = rank ? parseInt(rank) : null;
-                memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
-                memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
-                memberDetail.fg = fg ? parseFloat(fg.replace(/\,/g, "")) : null;
-                memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
-                memberDetail.week = $(el).find(".week").text();
-                //memberDetail.remark = model.remark;
-                //memberDetail.brandKeyInAmount = model.brandKeyInAmounts;
-                //memberDetail.brandKeyInRank = model.brandKeyInRank;
-                memberDetails.push(memberDetail);
             });
 
               frmdata.adjustDataDetail = memberDetails;
@@ -384,7 +390,6 @@
             } else return 1;
         }
 
-
         function validate_WholeSales(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
@@ -398,7 +403,7 @@
         }
 
         function validate_WholeSales_AmountSales(data) {
-         
+
             var validateData = data.adjustDataDetail.some(function (i) {
                 var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale)) ? 0 : parseFloat(i.adjustWholeSale);
                 var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale)) ? 0 : parseFloat(i.adjustAmountSale);
@@ -412,7 +417,7 @@
         }
 
         function validate_AmountSales_Lessthan_Previouse(data) {
-        
+
             var orderByList = data.adjustDataDetail.sort(function (a, b) {
                 return parseFloat(a.rank) - parseFloat(b.rank);
             });
