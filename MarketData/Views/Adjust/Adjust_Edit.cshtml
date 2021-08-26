@@ -107,20 +107,28 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+        initial();
 
+        function initial() {
+            $("#container").removeClass("container");
 
-        $("#container").removeClass("container");
-        DrawTable();
+            var model = @Html.Raw(Json.Serialize(Model));
+            if (model.status =="Submit") {
+                $("#btnSave").hide();
+            }
 
+            DrawTable();
+            FooterTotal();
+        }
 
         function DrawTable() {
         var model = @Html.Raw(Json.Serialize(Model));
         console.log(model)
         var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
-        console.log(lastYear)
+
         var titleTable = '<thead class="table-secondary">' +
             '    <th >Brand</th>' +
-            '    <th >Amt. (' + lastYear+')</th>';
+            '    <th >Amt. (' + lastYear +')</th>';
 
         for (var i = 0; i < model.brandDataColumn.length; i++) {
             titleTable += '    <th >' + model.brandDataColumn[i] + '</th>';
@@ -142,17 +150,18 @@
         $('#tblDetails').empty();
             var rowTable = ' <tbody>';
             var rowTotal = '<tr class="table-secondary" > <td>Total</td>';
-        for (var i = 0; i < model.data.length; i++) {
 
-            var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : model.data[i].amountPreviousYear;
+            for (var i = 0; i < model.data.length; i++) {
+                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : model.data[i].amountPreviousYear;
 
-            rowTable += '<tr >' +
+                rowTable += '<tr >' +
                 '<td hidden class="brandID">' + model.data[i].brandID + '</td>' +
                 '<td >' + model.data[i].brandName + '</td>' +
                 '<td class="amountPreviousYear">' + amountPreviousYear + '</td>' +
                 '<td hidden class="week">' + model.data[i].week + '</td>';
 
-            rowTotal += '<td class="totalAmountPreviousYear"></td>';
+
+                rowTotal += i != 0 ? "" : '<td class="totalAmountPreviousYear"></td>';
 
             var brandKeyInAmount = model.data[i].brandKeyInAmount;
             Object.keys(brandKeyInAmount).forEach(function (key) {
@@ -161,7 +170,7 @@
 
                 rowTable += '<td data-id=' + keyBrandKeyInAmount + ' class="brandKeyInAmount">' + valueBrandKeyInAmount + '</td>';
 
-                rowTotal += '<td data-id=' + keyBrandKeyInAmount + ' class="totalbrandKeyInAmount"></td>';
+                rowTotal += i != 0 ? "" :  '<td data-id=' + keyBrandKeyInAmount + ' class="totalbrandKeyInAmount"></td>';
 
              var brandKeyInRank = model.data[i].brandKeyInRank;
             Object.keys(brandKeyInRank).forEach(function (keys) {
@@ -171,7 +180,7 @@
                 if (keyBrandKeyInRank == keyBrandKeyInAmount) {
                     rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank" >' + valueBrandKeyInRank + '</td>';
 
-                    rowTotal += '<td></td>';
+                    rowTotal += i != 0 ? "" : '<td></td>';
 
                 }
             });
@@ -200,7 +209,7 @@
                 '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
                 '</tr>';
 
-            rowTotal += '<td class="totalAdminAmountSale"></td>' +
+            rowTotal += i != 0 ? "" : '<td class="totalAdminAmountSale"></td>' +
                 '<td class="totalAdjustAmountSale"></td>' +
                 '<td class="totalAdjustWholeSale"></td>' +
                 '<td></td>' +
@@ -209,7 +218,7 @@
                 '<td class="totalfg"></td>' +
                 '<td class="totalot"></td>' +
                 '<td></td>' +
-                '<td class="percentGrowth"></td><tr/>';
+                '<td class="totalpercentGrowth"></td><tr/>';
         }
 
             $('#tblDetails').append(titleTable + rowTable + rowTotal+' </tbody>');
@@ -227,7 +236,6 @@
         $(document).on('change', '.checkInput', function () {
             save('save');
         })
-
 
         $(document).on('change', '.adjustAmountSale', function () {
             var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
@@ -254,49 +262,50 @@
                     urlAction = '@Url.Action("SaveAdjustDataDetail", "Adjust")';
                 }
 
-                //$("#blocker").show();
-                $.ajax({
-                    type: "POST",
-                    url: urlAction,
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(frmdata),
-                    datatype: "json",
-                        success: function (data) {
-                            $("#blocker").hide();
+                ////$("#blocker").show();
+                //$.ajax({
+                //    type: "POST",
+                //    url: urlAction,
+                //    contentType: "application/json; charset=utf-8",
+                //    data: JSON.stringify(frmdata),
+                //    datatype: "json",
+                //        success: function (data) {
+                //            $("#blocker").hide();
 
-                            if (data.isSuccess) {
-                                if (type != 'save'){
-                                    $('#successModalHref').attr("href", "Index");
-                                    $('#successModal').modal('show');                              
-                                }
+                //            if (data.isSuccess) {
+                //                if (type != 'save'){
+                //                    $('#successModalHref').attr("href", "Index");
+                //                    $('#successModal').modal('show');
+                //                }
 
-                            } else if (data.isDuplicated) {
-                                $('#failedModal').modal('show');
-                                $('#myModalFailedResult').text('Duplicate data!');
-                            } else {
-                                $('#failedModal').modal('show');
-                                $('#myModalFailedResult').text(data.responseError != ""
-                                    && data.responseError != null ? data.responseError : 'Save data failed');
-                            }
-                            $('#confirmID').val('');
-                        $('#myModalFailedResult').val('');
-                    },
-                    error: function () {
-                        //$("#blocker").hide();
-                    }
-                });
+                //            } else if (data.isDuplicated) {
+                //                $('#failedModal').modal('show');
+                //                $('#myModalFailedResult').text('Duplicate data!');
+                //            } else {
+                //                $('#failedModal').modal('show');
+                //                $('#myModalFailedResult').text(data.responseError != ""
+                //                    && data.responseError != null ? data.responseError : 'Save data failed');
+                //            }
+                //            $('#confirmID').val('');
+                //        $('#myModalFailedResult').val('');
+                //    },
+                //    error: function () {
+                //        //$("#blocker").hide();
+                //    }
+                //});
     }
 
 
         }
 
-        function getDataFromTable(type) {
+        function getDataFromTable() {
             var model = @Html.Raw(Json.Serialize(Model));
             var frmdata  = {};
             var memberDetails = new Array();
             var adjustDataID = $('#adjustDataID').val();
 
             console.log(model)
+
 
             $("#tblDetails TBODY TR").each(function (index, el) {
                 var brandID = $(el).find(".brandID").text();
@@ -328,14 +337,20 @@
                         memberDetail.brandKeyInAmount =  model.data[i].brandKeyInAmount;
                         memberDetail.brandKeyInRank =  model.data[i].brandKeyInRank;
                         memberDetails.push(memberDetail);
+
                     }
                 }
+
 
             });
 
               frmdata.adjustDataDetail = memberDetails;
               frmdata.adjustDataID = adjustDataID;
             //frmdata.userID = ;
+
+            //cal Total
+            FooterTotal();
+
             return frmdata;
         };
 
@@ -440,6 +455,70 @@
                 showWarningAlert('AmountSales_Lessthan_Previouse');
                 return 0;
             } else return 1;
+        }
+
+        function FooterTotal() {
+                var model = @Html.Raw(Json.Serialize(Model));
+            var totalAmountPreviousYear = 0;
+            var totalAdminAmountSale = 0;
+            var totalAdjustAmountSale = 0;
+            var totalAdjustWholeSale = 0;
+            var totalpercentGrowth = 0;
+
+
+            $("#tblDetails TBODY TR").each(function (index, el) {
+                var brandID = $(el).find(".brandID").text();
+
+                for (var i = 0; i < model.data.length; i++) {
+                    if (model.data[i].brandID == brandID) {
+                        //debugger;
+
+                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text());
+                        totalAmountPreviousYear += amountPreviousYear;
+                
+
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text());
+                        totalAdminAmountSale += adminAmountSale;
+                  
+
+                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val());
+                        totalAdjustAmountSale += adjustAmountSale;
+                   
+
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val());
+                        totalAdjustWholeSale += adjustWholeSale;
+                  
+
+                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text());
+                        totalpercentGrowth += percentGrowth;
+
+                        var brand = $(el).find("td");
+
+                        //.find('a').attr('data-id')
+                        console.log(brand)
+                        //if()
+                        //var brandKeyInAmount = model.data[i].brandKeyInAmount;
+                        //Object.keys(brandKeyInAmount).forEach(function (key) {
+                        //    var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
+                        //    var keyBrandKeyInAmount = key;
+                        //    var brand = 
+                        //    //if (model.data[i].brandID == brandID)
+                        
+                        //});
+
+
+                    }
+
+                }
+                $(el).find(".totalAmountPreviousYear").text(totalAmountPreviousYear);
+                $(el).find(".totalAdminAmountSale").text(totalAdminAmountSale);
+                $(el).find(".totalAdjustAmountSale").text(totalAdjustAmountSale);
+                $(el).find(".totalAdjustWholeSale").text(totalAdjustWholeSale);
+                $(el).find(".totalpercentGrowth").text(totalpercentGrowth);
+
+            });
+
+
         }
     });
 
