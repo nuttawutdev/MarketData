@@ -17,6 +17,7 @@ namespace MarketData.Model.Response.AdjustData
         public string status { get; set; }
         public string universe { get; set; }
         public List<string> brandDataColumn { get; set; }
+        public Dictionary<string,decimal?> brandTotalAmount { get; set; }
     }
 
     public class AdjustDetailData

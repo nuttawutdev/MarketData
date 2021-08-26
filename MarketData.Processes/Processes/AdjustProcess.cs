@@ -497,6 +497,15 @@ namespace MarketData.Processes.Processes
                     rankAdjust += 1;
                 }
 
+                var brandAmountSale = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).GroupBy(e=>e.Key);
+                Dictionary<string, decimal?> summaryBrandAmount = new Dictionary<string, decimal?>();
+
+                foreach(var itemGroupBrand in brandAmountSale)
+                {
+                    var summaryAmount = itemGroupBrand.Sum(c => c.Value.GetValueOrDefault());
+                    summaryBrandAmount.Add(itemGroupBrand.Key, summaryAmount);               
+                }
+
                 var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == adjustData.DepartmentStore_ID);
                 var retailerGroup = repository.masterData.FindRetailerGroupBy(e => e.Retailer_Group_ID == departmentData.Retailer_Group_ID);
                 var channelData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == adjustData.DistributionChannel_ID);
@@ -513,6 +522,7 @@ namespace MarketData.Processes.Processes
 
                 var adjustStatus = repository.masterData.GetAdjustStatusBy(e => e.ID == adjustData.Status_ID);
 
+                response.brandTotalAmount = summaryBrandAmount;
                 response.adjustDataID = adjustData.ID;
                 response.status = adjustStatus.Status_Name;
                 response.brandDataColumn = brandColumn;

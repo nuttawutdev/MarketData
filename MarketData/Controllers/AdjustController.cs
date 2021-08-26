@@ -213,6 +213,7 @@ namespace MarketData.Controllers
                     universe = adjustDetailData.universe,
                     week = adjustDetailData.week,
                     year = adjustDetailData.year,
+                    brandTotalAmount = adjustDetailData.brandTotalAmount,
                     data = adjustDetailData.data.Select(c => new AdjustDetailViewData
                     {
                         brandID = c.brandID,
