@@ -681,9 +681,9 @@ namespace MarketData.Processes.Processes
                                  && c.RetailerGroup_ID == itemGrpup.RetailerGroup_ID
                                  && c.Universe == itemGrpup.Universe);
 
-                        var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Submit");
+                        var adjustStatusAdjusted = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Adjusted");
 
-                        if (adjustDataKeyIn != null && adjustDataKeyIn.Status_ID != adjustStatusSubmit.ID)
+                        if (adjustDataKeyIn != null && adjustDataKeyIn.Status_ID != adjustStatusAdjusted.ID)
                         {
                             var brandIDKeyIn = itemGrpup.brandKeyInData.Select(c => c.Brand_ID);
 

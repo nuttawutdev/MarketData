@@ -224,9 +224,9 @@ namespace MarketData.Processes.Processes
                                 && c.RetailerGroup_ID == baKeyInData.RetailerGroup_ID
                                 && c.Universe == baKeyInData.Universe);
 
-                            var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Submit");
+                            var adjustStatusAdjusted = repository.masterData.GetAdjustStatusBy(e => e.Status_Name == "Adjusted");
 
-                            if (adjustData != null && adjustData.Status_ID != adjustStatusSubmit?.ID)
+                            if (adjustData != null && adjustData.Status_ID != adjustStatusAdjusted?.ID)
                             {
                                 await repository.adjust.RemoveAllAdjustDetailByID(adjustData.ID);
                                 await repository.adjust.RemoveAllAdjustBrandDetailByID(adjustData.ID);

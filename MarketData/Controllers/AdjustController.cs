@@ -298,6 +298,8 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
+            var userID = HttpContext.Session.GetString("userID");
+            request.userID = new Guid(userID);
             SaveDataResponse response = new SaveDataResponse();
 
             try
@@ -314,6 +316,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
+            var userID = HttpContext.Session.GetString("userID");
+            request.userID = new Guid(userID);
+
             SaveDataResponse response = new SaveDataResponse();
 
             try

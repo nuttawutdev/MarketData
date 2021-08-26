@@ -19,7 +19,7 @@ namespace MarketData.Repositories.Repo
             _dbContext = dbContext;
         }
 
-        public List<TTAdjustData> GetAdjustDatalBy(Expression<Func<TTAdjustData, bool>> expression)
+        public List<TTAdjustData> GetAdjustDataBy(Expression<Func<TTAdjustData, bool>> expression)
         {
             try
             {

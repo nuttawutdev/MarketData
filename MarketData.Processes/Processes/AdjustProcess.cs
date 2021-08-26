@@ -53,7 +53,7 @@ namespace MarketData.Processes.Processes
 
                 var adjustStatus = repository.masterData.GetAdjustStatusList();
                 var adjustStatusPending = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Pending");
-                var listAdjustData = repository.adjust.GetAdjustDatalBy(
+                var listAdjustData = repository.adjust.GetAdjustDataBy(
                     c => c.Year == request.year
                     && c.Month == request.month
                     && c.Week == request.week
@@ -172,9 +172,9 @@ namespace MarketData.Processes.Processes
 
                 yearList.Add(currentYear);
 
-                var baKeyInData = repository.baKeyIn.GetBAKeyInBy(c => c.ID != Guid.Empty);
+                var adjustData = repository.adjust.GetAdjustDataBy(c => c.ID != Guid.Empty);
 
-                var olldYearList = baKeyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+                var olldYearList = adjustData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
 
                 if (olldYearList.Any())
                 {
@@ -197,15 +197,15 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                bool isSubmitted = false;
-                var adjustStatusSubmit = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
+                bool isAdjusted = false;
+                var adjustStatusAdjusted = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Adjusted");
 
                 var adjustData = repository.adjust.FindAdjustDataBy(c => c.ID == adjustDataID);
                 var adjustDetail = repository.adjust.GetAdjustDataDetaillBy(t => t.AdjustData_ID == adjustData.ID);
 
-                if (adjustData.Status_ID == adjustStatusSubmit.ID)
+                if (adjustData.Status_ID == adjustStatusAdjusted.ID)
                 {
-                    isSubmitted = true;
+                    isAdjusted = true;
                 }
 
                 var counterList = repository.masterData.GetCounterListBy(
@@ -270,7 +270,7 @@ namespace MarketData.Processes.Processes
                     && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
                     && c.Universe == adjustData.Universe
                     && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
-                    && c.Status_ID == adjustStatusSubmit.ID);
+                    && c.Status_ID == adjustStatusAdjusted.ID);
 
                 var baKeyInIDApprove = baKeyInDataApprove.Select(t => t.ID);
 
@@ -326,7 +326,7 @@ namespace MarketData.Processes.Processes
                     var adjustBrandData = adjustDetail.FirstOrDefault(e => e.Brand_ID == itemBrandInDepartment.Brand_ID);
 
                     // ถ้ายังไม่ Submit ยังเอาค่าของ Counter ที่ถูก Approve มาหาค่ามากสุดอยู่ ?
-                    if (!isSubmitted)
+                    if (!isAdjusted)
                     {
                         if (adjustBrandData != null)
                         {
@@ -482,6 +482,7 @@ namespace MarketData.Processes.Processes
                     {
                         // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
                         itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYear.GetValueOrDefault()) / itemAdjustData.amountPreviousYear.GetValueOrDefault()) * 100;
+                        itemAdjustData.percentGrowth = Math.Round(itemAdjustData.percentGrowth.Value, 2);
                     }
 
                     rankAdjust += 1;
@@ -569,11 +570,11 @@ namespace MarketData.Processes.Processes
             {
                 bool updateAdjustDataResult = true;
                 var adjustData = repository.adjust.FindAdjustDataBy(c => c.ID == request.adjustDataID);
-                var submitStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
+                var adjustesStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Adjusted");
 
-                if(adjustData.Status_ID == submitStatus.ID)
+                if(adjustData.Status_ID == adjustesStatus.ID)
                 {
-                    updateAdjustDataResult = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, submitStatus.ID);
+                    updateAdjustDataResult = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, adjustesStatus.ID);
                 }
                 else
                 {
@@ -605,8 +606,8 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var submitStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Submit");
-                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, submitStatus.ID);
+                var adjustedStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Adjusted");
+                var updateAdjustData = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, adjustedStatus.ID);
 
                 if (updateAdjustData)
                 {
