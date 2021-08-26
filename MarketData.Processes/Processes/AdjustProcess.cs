@@ -379,17 +379,22 @@ namespace MarketData.Processes.Processes
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
                                     var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
-                                    var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
 
-                                    if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
-                                        || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
+                                    if (brandLorealKeyIn != null)
                                     {
-                                        sk = keyInDetailBrandLoreal.SK;
-                                        mu = keyInDetailBrandLoreal.MU;
-                                        fg = keyInDetailBrandLoreal.FG;
-                                        ot = keyInDetailBrandLoreal.OT;
-                                        break;
+                                        var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+
+                                        if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
+                                            || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
+                                        {
+                                            sk = keyInDetailBrandLoreal.SK;
+                                            mu = keyInDetailBrandLoreal.MU;
+                                            fg = keyInDetailBrandLoreal.FG;
+                                            ot = keyInDetailBrandLoreal.OT;
+                                            break;
+                                        }
                                     }
+
                                 }
                             }
                             else
@@ -398,12 +403,16 @@ namespace MarketData.Processes.Processes
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
                                     var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
-                                    var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
 
-                                    if (!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
+                                    if (brandLorealKeyIn != null)
                                     {
-                                        remark = keyInDetailBrandLoreal.Remark;
-                                        break;
+                                        var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+
+                                        if (!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
+                                        {
+                                            remark = keyInDetailBrandLoreal.Remark;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -572,7 +581,7 @@ namespace MarketData.Processes.Processes
                 var adjustData = repository.adjust.FindAdjustDataBy(c => c.ID == request.adjustDataID);
                 var adjustesStatus = repository.masterData.GetAdjustStatusBy(c => c.Status_Name == "Adjusted");
 
-                if(adjustData.Status_ID == adjustesStatus.ID)
+                if (adjustData.Status_ID == adjustesStatus.ID)
                 {
                     updateAdjustDataResult = await repository.adjust.UpdateAdjustData(request.adjustDataID, request.userID, adjustesStatus.ID);
                 }
