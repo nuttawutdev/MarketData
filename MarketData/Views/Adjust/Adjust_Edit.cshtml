@@ -503,23 +503,23 @@
                     if (model.data[i].brandID == brandID) {
                         //debugger;
 
-                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text());
+                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
                         totalAmountPreviousYear += amountPreviousYear;
 
 
-                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text());
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
                         totalAdminAmountSale += adminAmountSale;
 
 
-                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val());
+                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
                         totalAdjustAmountSale += adjustAmountSale;
 
 
-                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val());
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
                         totalAdjustWholeSale += adjustWholeSale;
 
 
-                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text());
+                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""));
                         totalpercentGrowth += percentGrowth;
 
                     }
