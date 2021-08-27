@@ -107,6 +107,9 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+        var rowClick = 0;
+        var editData = false;
+
         initial();
 
         function initial() {
@@ -198,13 +201,13 @@
             var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
 
             rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
-                '  <td > <input data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
-                '  <td > <input  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
+                '  <td > <input data-index=' + i +'  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank" >' + rank + '</td>' +
-                '  <td > <input  data-id="sk" type="text" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
-                '  <td > <input  data-id="mu" type="text" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
-                '  <td > <input  data-id="fg" type="text" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
-                '  <td > <input  data-id="ot" type="text" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
+                '  <td > <input data-index=' + i +'  data-id="sk" type="text" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
+                '  <td > <input data-index=' + i +'  data-id="mu" type="text" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
+                '  <td > <input data-index=' + i +'  data-id="fg" type="text" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
+                '  <td > <input data-index=' + i +'  data-id="ot" type="text" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
                 '  <td class="remark">' + remark + '</td>' +
                 '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
                 '</tr>';
@@ -225,6 +228,41 @@
 
         }
 
+
+        $('#tblDetails tbody').on('click', 'tr', function () {
+            if (rowClick == 0) {
+                rowClick = ($(this).index() + 1);
+            }
+            else if (rowClick != ($(this).index() + 1) && editData) {
+                rowClick = ($(this).index() + 1);
+                editData = false;
+                save('save');
+
+            }
+            //alert('You clicked row ' + ($(this).index() + 1));
+        });
+
+        $(document).on("keypress", "input[data-id='adjustAmountSale']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('btnSave');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustAmountSale"]').focus();
+            }
+        });
+
+        $(document).on("keypress", "input[data-id='adjustWholeSale']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('btnSave');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustWholeSale"]').focus();
+            }
+        });
+
+
         $('#btnSave').on('click', function (e) {
             save('btnSave');
         });
@@ -234,7 +272,7 @@
         });
 
         $(document).on('change', '.checkInput', function () {
-            save('save');
+            editData = true;
         })
 
         $(document).on('change', '.adjustAmountSale', function () {
@@ -324,9 +362,9 @@
                         memberDetail.brandID =  model.data[i].brandID;
                         memberDetail.amountPreviousYear =  model.data[i].amountPreviousYear;
                         memberDetail.adminAmountSale =  model.data[i].adminAmountSale;
-                        memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale) : null;
-                        memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale) : null;
-                        memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth) : null;
+                        memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale.replace(/\,/g, "")) : null;
+                        memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale.replace(/\,/g, "")) : null;
+                        memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth.replace(/\,/g, "")) : null;
                         memberDetail.rank =  model.data[i].rank;
                         memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
                         memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
@@ -475,19 +513,19 @@
 
                         var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text());
                         totalAmountPreviousYear += amountPreviousYear;
-                
+
 
                         var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text());
                         totalAdminAmountSale += adminAmountSale;
-                  
+
 
                         var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val());
                         totalAdjustAmountSale += adjustAmountSale;
-                   
+
 
                         var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val());
                         totalAdjustWholeSale += adjustWholeSale;
-                  
+
 
                         var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text());
                         totalpercentGrowth += percentGrowth;
@@ -501,14 +539,14 @@
                         //Object.keys(brandKeyInAmount).forEach(function (key) {
                         //    var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
                         //    var keyBrandKeyInAmount = key;
-                           
+
                         //    //if (model.data[i].brandID == brandID)
 
                         //    var s = $(el).find("td[data-count-id='" + keyBrandKeyInAmount + "']").text();
                         //    console.log(s)
                         //});
                         //for(var )
-                     
+
                     }
 
                 }
