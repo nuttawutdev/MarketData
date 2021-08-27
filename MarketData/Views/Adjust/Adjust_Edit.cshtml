@@ -159,7 +159,7 @@
             var rowTotal = '<tr class="table-secondary" > <td>Total</td>';
 
             for (var i = 0; i < model.data.length; i++) {
-                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "2,000,000.00" : formatCurrencyText(model.data[i].amountPreviousYear.toString());
+                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : formatCurrencyText(model.data[i].amountPreviousYear.toString());
                 var background = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? model.data[i].brandColor : "";
                 var color = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? "white" : "black";
 
