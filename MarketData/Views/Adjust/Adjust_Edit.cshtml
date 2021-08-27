@@ -121,7 +121,7 @@
             }
 
             DrawTable();
-            FooterTotal();
+            CalFooterTotal();
         }
 
         function DrawTable() {
@@ -155,7 +155,7 @@
             var rowTotal = '<tr class="table-secondary" > <td>Total</td>';
 
             for (var i = 0; i < model.data.length; i++) {
-                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : model.data[i].amountPreviousYear;
+                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : formatCurrencyText(model.data[i].amountPreviousYear.toString());
 
                 rowTable += '<tr >' +
                 '<td hidden class="brandID">' + model.data[i].brandID + '</td>' +
@@ -168,12 +168,12 @@
 
             var brandKeyInAmount = model.data[i].brandKeyInAmount;
             Object.keys(brandKeyInAmount).forEach(function (key) {
-                var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
+                var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : formatCurrencyText(brandKeyInAmount[key].toString());
                 var keyBrandKeyInAmount = key;
 
                 rowTable += '<td data-id=' + keyBrandKeyInAmount + ' class="brandKeyInAmount">' + valueBrandKeyInAmount + '</td>';
 
-                rowTotal += i != 0 ? "" :  '<td data-id=' + keyBrandKeyInAmount + ' class="totalbrandKeyInAmount"></td>';
+                rowTotal += i != 0 ? "" : '<td class="totalbrandKeyInAmount" data-id=' + keyBrandKeyInAmount + ' ></td>';
 
              var brandKeyInRank = model.data[i].brandKeyInRank;
             Object.keys(brandKeyInRank).forEach(function (keys) {
@@ -189,25 +189,27 @@
             });
             });
 
-            var adminAmountSale = model.data[i].adminAmountSale == null ? "" : model.data[i].adminAmountSale;
-            var adjustAmountSale = model.data[i].adjustAmountSale == null ? "" : model.data[i].adjustAmountSale;
-            var adjustWholeSale = model.data[i].adjustWholeSale == null ? "" : model.data[i].adjustWholeSale
-            var rank = model.data[i].rank == null ? "" : model.data[i].rank;
-            var sk = model.data[i].sk == null ? "" : model.data[i].sk;
-            var mu = model.data[i].mu == null ? "" : model.data[i].mu;
-            var fg = model.data[i].fg == null ? "" : model.data[i].fg;
-            var ot = model.data[i].ot == null ? "" : model.data[i].ot;
-            var remark = model.data[i].remark == null ? "" : model.data[i].remark;
-            var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
+                var adminAmountSale = model.data[i].adminAmountSale == null ? "" : formatCurrencyText(model.data[i].adminAmountSale.toString());
+                var adjustAmountSale = model.data[i].adjustAmountSale == null ? "" : formatCurrencyText(model.data[i].adjustAmountSale.toString());
+                var adjustWholeSale = model.data[i].adjustWholeSale == null ? "" : formatCurrencyText(model.data[i].adjustWholeSale.toString());
 
-            rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
+
+                var rank = model.data[i].rank == null ? "" : model.data[i].rank;
+                var sk = model.data[i].sk == null ? "" : formatCurrencyText(model.data[i].sk.toString());
+                var mu = model.data[i].mu == null ? "" : formatCurrencyText(model.data[i].mu.toString());
+                var fg = model.data[i].fg == null ? "" : formatCurrencyText(model.data[i].fg.toString());
+                var ot = model.data[i].ot == null ? "" : formatCurrencyText(model.data[i].ot.toString());
+                var remark = model.data[i].remark == null ? "" : model.data[i].remark;
+                var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
+
+                rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
                 '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
                 '  <td > <input data-index=' + i +'  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank" >' + rank + '</td>' +
-                '  <td > <input data-index=' + i +'  data-id="sk" type="text" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
-                '  <td > <input data-index=' + i +'  data-id="mu" type="text" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
-                '  <td > <input data-index=' + i +'  data-id="fg" type="text" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
-                '  <td > <input data-index=' + i +'  data-id="ot" type="text" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="fg" type="text" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="ot" type="text" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
                 '  <td class="remark">' + remark + '</td>' +
                 '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
                 '</tr>';
@@ -317,9 +319,10 @@
             var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
             var row = $(this).closest("tr");
 
-            var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text());
+            var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text().replace(/\,/g, ""));
             var percentGrowth = ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) * 100;
             row.find(".percentGrowth").text(percentGrowth);
+            console.log('amountPreviousYear :', amountPreviousYear)
         })
 
         function save(type) {
@@ -430,7 +433,7 @@
             //frmdata.userID = ;
 
             //cal Total
-            FooterTotal();
+            CalFooterTotal();
 
             return frmdata;
         };
@@ -472,10 +475,10 @@
         function validate_Sum_Percent(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
-                var sk = isNaN(parseFloat(i.sk)) ? 0 : parseFloat(i.sk);
-                var mu = isNaN(parseFloat(i.mu)) ? 0 : parseFloat(i.mu);
-                var fg = isNaN(parseFloat(i.fg)) ? 0 : parseFloat(i.fg);
-                var ot = isNaN(parseFloat(i.ot)) ? 0 : parseFloat(i.ot);
+                var sk = isNaN(parseFloat(i.sk.replace(/\,/g, ""))) ? 0 : parseFloat(i.sk.replace(/\,/g, ""));
+                var mu = isNaN(parseFloat(i.mu.replace(/\,/g, ""))) ? 0 : parseFloat(i.mu.replace(/\,/g, ""));
+                var fg = isNaN(parseFloat(i.fg.replace(/\,/g, ""))) ? 0 : parseFloat(i.fg.replace(/\,/g, ""));
+                var ot = isNaN(parseFloat(i.ot.replace(/\,/g, ""))) ? 0 : parseFloat(i.ot.replace(/\,/g, ""));
 
                 var sum = sk + mu + fg + ot;
                 return sum != 0 && sum != 100;
@@ -501,8 +504,9 @@
         function validate_WholeSales_AmountSales(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
-                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale)) ? 0 : parseFloat(i.adjustWholeSale);
-                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale)) ? 0 : parseFloat(i.adjustAmountSale);
+                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale.replace(/\,/g, ""))) ? 0 : parseFloat(i.adjustWholeSale.replace(/\,/g, ""));
+                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(i.adjustAmountSale.replace(/\,/g, ""));
+
                 return adjustAmountSale < adjustWholeSale;
             })
 
@@ -521,9 +525,9 @@
             for (var i = 0; i < orderByList.length; i++) {
 
                 if (i != orderByList.length - 1) {
-                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale);
+                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale.replace(/\,/g, ""));
 
-                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i+1].adjustAmountSale);
+                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale.replace(/\,/g, ""));
                     if (adjustAmountSale < adjustAmountSaleNext) {
                         validateData = true;
                         break;
@@ -538,7 +542,7 @@
             } else return 1;
         }
 
-        function FooterTotal() {
+        function CalFooterTotal() {
                 var model = @Html.Raw(Json.Serialize(Model));
             var totalAmountPreviousYear = 0;
             var totalAdminAmountSale = 0;
@@ -546,7 +550,7 @@
             var totalAdjustWholeSale = 0;
             var totalpercentGrowth = 0;
 
-
+            console.log('cal')
             $("#tblDetails TBODY TR").each(function (index, el) {
                 var brandID = $(el).find(".brandID").text();
 
@@ -554,51 +558,46 @@
                     if (model.data[i].brandID == brandID) {
                         //debugger;
 
-                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text());
+                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
                         totalAmountPreviousYear += amountPreviousYear;
 
 
-                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text());
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
                         totalAdminAmountSale += adminAmountSale;
 
 
-                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val());
+                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
                         totalAdjustAmountSale += adjustAmountSale;
 
 
-                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val());
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
                         totalAdjustWholeSale += adjustWholeSale;
 
 
-                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text());
+                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""));
                         totalpercentGrowth += percentGrowth;
-
-                        var brand = $(el).find("td");
-
-                        //.find('a').attr('data-id')
-                        //console.log(brand)
-                        ////if()
-                        //var brandKeyInAmount = model.data[i].brandKeyInAmount;
-                        //Object.keys(brandKeyInAmount).forEach(function (key) {
-                        //    var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : brandKeyInAmount[key];
-                        //    var keyBrandKeyInAmount = key;
-
-                        //    //if (model.data[i].brandID == brandID)
-
-                        //    var s = $(el).find("td[data-count-id='" + keyBrandKeyInAmount + "']").text();
-                        //    console.log(s)
-                        //});
-                        //for(var )
 
                     }
 
                 }
-                $(el).find(".totalAmountPreviousYear").text(totalAmountPreviousYear);
-                $(el).find(".totalAdminAmountSale").text(totalAdminAmountSale);
-                $(el).find(".totalAdjustAmountSale").text(totalAdjustAmountSale);
-                $(el).find(".totalAdjustWholeSale").text(totalAdjustWholeSale);
+                $(el).find(".totalAmountPreviousYear").text(formatCurrencyText(totalAmountPreviousYear.toString()));
+                $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
+                $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));
+                $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
                 $(el).find(".totalpercentGrowth").text(totalpercentGrowth);
 
+
+                var brandTotalAmount = model.brandTotalAmount;
+                Object.keys(brandTotalAmount).forEach(function (key) {
+                    var valueBrandTotalAmount = brandTotalAmount[key] == null ? "" : formatCurrencyText(brandTotalAmount[key].toString());
+                    var keyBrandTotalAmount = key;
+
+                    $(el).find('.totalbrandKeyInAmount[data-id=' + key + ']').text(valueBrandTotalAmount);
+
+                  
+                });
+
+               
             });
 
 
@@ -679,6 +678,59 @@
             var updated_len = input_val.length;
             caret_pos = updated_len - original_len + caret_pos;
             input[0].setSelectionRange(caret_pos, caret_pos);
+        }
+
+        function formatCurrencyText(text) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = text;
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position
+            //var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+               
+                right_side += "00";
+                
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side + "." + right_side;
+
+            } else {
+                input_val = formatNumber(input_val);
+                input_val = input_val;               
+                input_val += ".00";
+            }
+
+            return input_val;
         }
 
         function formatNumber(n) {
