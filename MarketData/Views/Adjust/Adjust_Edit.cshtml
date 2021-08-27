@@ -107,7 +107,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
-        var rowClick = 0;
+        var rowClick = null;
         var editData = false;
 
         initial();
@@ -231,77 +231,26 @@
         }
 
         $('#tblDetails tbody').on('click', 'tr', function () {
-            console.log(rowClick, 'rowClick')
-            console.log(($(this).index() + 1), 'rowClickCurrent')
-            console.log(editData, 'editData')
-
-            if (rowClick != ($(this).index() + 1) && editData) {
+            if (rowClick != ($(this).index()) && editData) {
                 editData = false;
                 save('save');
             }
 
-            rowClick = ($(this).index() + 1);
-            //alert('You clicked row ' + ($(this).index() + 1));
+            rowClick = ($(this).index());
         });
 
-        $(document).on("keypress", "input[data-id='adjustAmountSale']", function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keycode == '13') {
-                save('save');
-                var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustAmountSale"]').focus();
-            }
-        });
-
-        $(document).on("keypress", "input[data-id='adjustWholeSale']", function (event) {
+        $(document).on('keydown', '.checkInput', function (event) {
+            editData = true;
             var keycode = (event.keyCode ? event.keyCode : event.which);
 
             if (keycode == '13') {
                 save('save');
                 var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustWholeSale"]').focus();
+                var dataID = $(event.target).attr('data-id');
+                rowClick = currentIndex + 1;
+                $('input[data-index=' + (currentIndex + 1) + '][data-id=' + dataID + ']').focus();
             }
-        });
-
-        $(document).on("keypress", "input[data-id='sk']", function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-
-            if (keycode == '13') {
-                save('save');
-                var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="sk"]').focus();
-            }
-        });
-
-        $(document).on("keypress", "input[data-id='mu']", function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-
-            if (keycode == '13') {
-                save('save');
-                var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="mu"]').focus();
-            }
-        });
-
-        $(document).on("keypress", "input[data-id='fg']", function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-
-            if (keycode == '13') {
-                save('save');
-                var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="fg"]').focus();
-            }
-        });
-
-        $(document).on("keypress", "input[data-id='ot']", function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-
-            if (keycode == '13') {
-                save('save');
-                var currentIndex = parseFloat($(event.target).attr('data-index'));
-                $('input[data-index=' + (currentIndex + 1) + '][data-id="ot"]').focus();
-            }
-        });
+        })
 
         $('#btnSave').on('click', function (e) {
             save('btnSave');
@@ -310,10 +259,6 @@
         $('#btnAdjust').on('click', function (e) {
             save('btnAdjust');
         });
-
-        $(document).on('change', '.checkInput', function () {
-            editData = true;
-        })
 
         $(document).on('change', '.adjustAmountSale', function () {
             var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
@@ -475,10 +420,10 @@
         function validate_Sum_Percent(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
-                var sk = isNaN(parseFloat(i.sk.replace(/\,/g, ""))) ? 0 : parseFloat(i.sk.replace(/\,/g, ""));
-                var mu = isNaN(parseFloat(i.mu.replace(/\,/g, ""))) ? 0 : parseFloat(i.mu.replace(/\,/g, ""));
-                var fg = isNaN(parseFloat(i.fg.replace(/\,/g, ""))) ? 0 : parseFloat(i.fg.replace(/\,/g, ""));
-                var ot = isNaN(parseFloat(i.ot.replace(/\,/g, ""))) ? 0 : parseFloat(i.ot.replace(/\,/g, ""));
+                var sk = isNaN(parseFloat(i.sk)) ? 0 : parseFloat(i.sk);
+                var mu = isNaN(parseFloat(i.mu)) ? 0 : parseFloat(i.mu);
+                var fg = isNaN(parseFloat(i.fg)) ? 0 : parseFloat(i.fg);
+                var ot = isNaN(parseFloat(i.ot)) ? 0 : parseFloat(i.ot);
 
                 var sum = sk + mu + fg + ot;
                 return sum != 0 && sum != 100;
@@ -504,8 +449,8 @@
         function validate_WholeSales_AmountSales(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
-                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale.replace(/\,/g, ""))) ? 0 : parseFloat(i.adjustWholeSale.replace(/\,/g, ""));
-                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(i.adjustAmountSale.replace(/\,/g, ""));
+                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale)) ? 0 : parseFloat(i.adjustWholeSale);
+                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale)) ? 0 : parseFloat(i.adjustAmountSale);
 
                 return adjustAmountSale < adjustWholeSale;
             })
@@ -525,9 +470,9 @@
             for (var i = 0; i < orderByList.length; i++) {
 
                 if (i != orderByList.length - 1) {
-                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale.replace(/\,/g, ""));
+                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale);
 
-                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale.replace(/\,/g, ""));
+                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale);
                     if (adjustAmountSale < adjustAmountSaleNext) {
                         validateData = true;
                         break;
@@ -558,23 +503,23 @@
                     if (model.data[i].brandID == brandID) {
                         //debugger;
 
-                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
+                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text());
                         totalAmountPreviousYear += amountPreviousYear;
 
 
-                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text());
                         totalAdminAmountSale += adminAmountSale;
 
 
-                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
+                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val());
                         totalAdjustAmountSale += adjustAmountSale;
 
 
-                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val());
                         totalAdjustWholeSale += adjustWholeSale;
 
 
-                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""));
+                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text());
                         totalpercentGrowth += percentGrowth;
 
                     }
