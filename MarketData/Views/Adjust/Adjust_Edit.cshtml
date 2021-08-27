@@ -200,7 +200,7 @@
                 var fg = model.data[i].fg == null ? "" : formatCurrencyText(model.data[i].fg.toString());
                 var ot = model.data[i].ot == null ? "" : formatCurrencyText(model.data[i].ot.toString());
                 var remark = model.data[i].remark == null ? "" : model.data[i].remark;
-                var percentGrowth = model.data[i].percentGrowth == null ? "" : model.data[i].percentGrowth;
+                var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.ot.toString());
 
                 rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
                 '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
@@ -529,7 +529,7 @@
                 $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
                 $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));
                 $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
-                $(el).find(".totalpercentGrowth").text(totalpercentGrowth);
+                $(el).find(".totalpercentGrowth").text(formatCurrencyText(totalpercentGrowth.toString()));
 
 
                 var brandTotalAmount = model.brandTotalAmount;
