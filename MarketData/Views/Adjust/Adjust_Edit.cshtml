@@ -228,25 +228,24 @@
 
         }
 
-
         $('#tblDetails tbody').on('click', 'tr', function () {
-            if (rowClick == 0) {
-                rowClick = ($(this).index() + 1);
-            }
-            else if (rowClick != ($(this).index() + 1) && editData) {
-                rowClick = ($(this).index() + 1);
+            console.log(rowClick, 'rowClick')
+            console.log(($(this).index() + 1), 'rowClickCurrent')
+            console.log(editData, 'editData')
+
+            if (rowClick != ($(this).index() + 1) && editData) {
                 editData = false;
                 save('save');
-
             }
+
+            rowClick = ($(this).index() + 1);
             //alert('You clicked row ' + ($(this).index() + 1));
         });
 
         $(document).on("keypress", "input[data-id='adjustAmountSale']", function (event) {
             var keycode = (event.keyCode ? event.keyCode : event.which);
-
             if (keycode == '13') {
-                save('btnSave');
+                save('save');
                 var currentIndex = parseFloat($(event.target).attr('data-index'));
                 $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustAmountSale"]').focus();
             }
@@ -256,12 +255,51 @@
             var keycode = (event.keyCode ? event.keyCode : event.which);
 
             if (keycode == '13') {
-                save('btnSave');
+                save('save');
                 var currentIndex = parseFloat($(event.target).attr('data-index'));
                 $('input[data-index=' + (currentIndex + 1) + '][data-id="adjustWholeSale"]').focus();
             }
         });
 
+        $(document).on("keypress", "input[data-id='sk']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="sk"]').focus();
+            }
+        });
+
+        $(document).on("keypress", "input[data-id='mu']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="mu"]').focus();
+            }
+        });
+
+        $(document).on("keypress", "input[data-id='fg']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="fg"]').focus();
+            }
+        });
+
+        $(document).on("keypress", "input[data-id='ot']", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                $('input[data-index=' + (currentIndex + 1) + '][data-id="ot"]').focus();
+            }
+        });
 
         $('#btnSave').on('click', function (e) {
             save('btnSave');
@@ -286,12 +324,13 @@
 
         function save(type) {
             var frmdata = getDataFromTable();
-            console.log(frmdata)
+            console.log(frmdata,'Save')
             if (validate_Sum_Percent(frmdata) &&
                 validate_WholeSales(frmdata) &&
                 validate_WholeSales_AmountSales(frmdata) &&
                 validate_AmountSales_Lessthan_Previouse(frmdata)) {
 
+                editData = false;
                 var urlAction = '';
                 if (type == 'btnAdjust') {
                      urlAction = '@Url.Action("SubmitAdjustDataDetail", "Adjust")';
@@ -300,7 +339,7 @@
                     urlAction = '@Url.Action("SaveAdjustDataDetail", "Adjust")';
                 }
 
-                ////$("#blocker").show();
+                //$("#blocker").show();
                 //$.ajax({
                 //    type: "POST",
                 //    url: urlAction,
@@ -311,8 +350,12 @@
                 //            $("#blocker").hide();
 
                 //            if (data.isSuccess) {
-                //                if (type != 'save'){
+                //                if (type != 'save') {
                 //                    $('#successModalHref').attr("href", "Index");
+                //                    $('#successModal').modal('show');
+                //                }
+                //                else {
+                //                    $('#successModalHref').attr("data-dismiss", "modal");
                 //                    $('#successModal').modal('show');
                 //                }
 
@@ -328,7 +371,7 @@
                 //        $('#myModalFailedResult').val('');
                 //    },
                 //    error: function () {
-                //        //$("#blocker").hide();
+                //        $("#blocker").hide();
                 //    }
                 //});
     }
