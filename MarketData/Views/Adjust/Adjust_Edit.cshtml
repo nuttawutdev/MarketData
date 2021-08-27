@@ -8,7 +8,11 @@
     Html.RenderPartial("_FailedModal");
 }
 
-
+<style>
+    .width70 {
+        width:70px!important
+    }
+</style>
 <h3 style="padding-left:20px;padding-right:20px">
     @ViewData["Title"]
 
@@ -141,10 +145,10 @@
             '    <th >Adj.Amt.Sales</th>' +
             '    <th >Adj.Whole Sales</th>' +
             '    <th >Rank</th>' +
-            '    <th >SK (%)</th>' +
-            '    <th >MU (%)</th>' +
-            '    <th >FG (%)</th>' +
-            '    <th >OT (%)</th>' +
+            '    <th class="width70">SK (%)</th>' +
+            '    <th class="width70">MU (%)</th>' +
+            '    <th class="width70">FG (%)</th>' +
+            '    <th class="width70">OT (%)</th>' +
             '    <th >Remark</th>' +
             '    <th >Growth (%)</th>' +
             '</tr></thead>';
@@ -164,7 +168,6 @@
                 '<td >' + model.data[i].brandName + '</td>' +
                 '<td class="amountPreviousYear">' + amountPreviousYear + '</td>' +
                 '<td hidden class="week">' + model.data[i].week + '</td>';
-
 
                 rowTotal += i != 0 ? "" : '<td class="totalAmountPreviousYear"></td>';
 
@@ -208,10 +211,10 @@
                 '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
                 '  <td > <input data-index=' + i +'  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank" >' + rank + '</td>' +
-                '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk" value=' + sk + '></td>' +
-                '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu" value=' + mu + '></td>' +
-                '  <td > <input data-index=' + i +'  data-type="currency" data-id="fg" type="text" class="form-control input-sm checkInput fg" value=' + fg + '></td>' +
-                '  <td > <input data-index=' + i +'  data-type="currency" data-id="ot" type="text" class="form-control input-sm checkInput ot" value=' + ot + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk width70" value=' + sk + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu width70" value=' + mu + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="fg" type="text" class="form-control input-sm checkInput fg width70" value=' + fg + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="ot" type="text" class="form-control input-sm checkInput ot width70" value=' + ot + '></td>' +
                 '  <td class="remark">' + remark + '</td>' +
                 '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
                 '</tr>';
