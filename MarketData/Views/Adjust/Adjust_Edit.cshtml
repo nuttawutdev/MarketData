@@ -205,11 +205,11 @@
                 var fg = model.data[i].fg == null ? "" : formatCurrencyText(model.data[i].fg.toString());
                 var ot = model.data[i].ot == null ? "" : formatCurrencyText(model.data[i].ot.toString());
                 var remark = model.data[i].remark == null ? "" : model.data[i].remark;
-                var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.ot.toString());
+                var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.toString());
 
                 rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
                 '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
-                '  <td > <input data-index=' + i +'  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '  <td > <input data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank" >' + rank + '</td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk width70" value=' + sk + '></td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu width70" value=' + mu + '></td>' +
@@ -257,6 +257,10 @@
             }
         })
 
+        $(document).on('change', '.checkInput', function (event) {
+            CalFooterTotal();
+        })
+
         $('#btnSave').on('click', function (e) {
             save('btnSave');
         });
@@ -276,14 +280,13 @@
         })
 
         function save(type) {
+            editData = false;
             var frmdata = getDataFromTable();
             console.log(frmdata,'Save')
             if (validate_Sum_Percent(frmdata) &&
                 validate_WholeSales(frmdata) &&
                 validate_WholeSales_AmountSales(frmdata) &&
                 validate_AmountSales_Lessthan_Previouse(frmdata)) {
-
-                editData = false;
                 var urlAction = '';
                 if (type == 'btnAdjust') {
                      urlAction = '@Url.Action("SubmitAdjustDataDetail", "Adjust")';
@@ -492,7 +495,7 @@
             } else return 1;
         }
 
-        function CalFooterTotal() {
+       function CalFooterTotal() {
                 var model = @Html.Raw(Json.Serialize(Model));
             var totalAmountPreviousYear = 0;
             var totalAdminAmountSale = 0;
@@ -508,23 +511,23 @@
                     if (model.data[i].brandID == brandID) {
                         //debugger;
 
-                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text())) ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
+                        var amountPreviousYear = $(el).find(".amountPreviousYear").text() == null ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
                         totalAmountPreviousYear += amountPreviousYear;
 
 
-                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text())) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
                         totalAdminAmountSale += adminAmountSale;
 
 
-                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val())) ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
+                        var adjustAmountSale = $(el).find(".adjustAmountSale").val() == null ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
                         totalAdjustAmountSale += adjustAmountSale;
 
 
-                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val())) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
                         totalAdjustWholeSale += adjustWholeSale;
 
 
-                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text())) ? 0 : parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""));
+                        var percentGrowth = isNaN(parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".percentGrowth").text().replace(/\,/g, ""));
                         totalpercentGrowth += percentGrowth;
 
                     }
@@ -534,7 +537,7 @@
                 $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
                 $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));
                 $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
-                $(el).find(".totalpercentGrowth").text(formatCurrencyText(totalpercentGrowth.toString()));
+                $(el).find(".totalpercentGrowth").text(totalpercentGrowth);
 
 
                 var brandTotalAmount = model.brandTotalAmount;
