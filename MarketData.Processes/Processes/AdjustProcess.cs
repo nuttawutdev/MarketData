@@ -687,7 +687,7 @@ namespace MarketData.Processes.Processes
                         var amountSale = itemAdjustDetail.brandKeyInAmount.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
                         var rank = itemAdjustDetail.brandKeyInRank.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
                         decimal? amountSaleValue = null;
-                        string rankValue = null;
+                        int? rankValue = null;
 
                         if(amountSale.Value != null)
                         {
@@ -696,7 +696,7 @@ namespace MarketData.Processes.Processes
 
                         if(rank.Value != null)
                         {
-                            rankValue = rank.Value;
+                            rankValue = int.Parse(rank.Value);
                         }
                         TTAdjustDataBrandDetail adjustBrandDetail = new TTAdjustDataBrandDetail
                         {
@@ -704,7 +704,7 @@ namespace MarketData.Processes.Processes
                             BrandCounter_ID = brandData.Brand_ID,
                             AdjustData_ID = request.adjustDataID,
                             Amount_Sale = amountSaleValue,
-                            Rank = rankValue != null ? int.Parse(rankValue) : 0,
+                            Rank = rankValue,
                             Brand_ID = itemAdjustDetail.brandID
                         };
 

@@ -270,7 +270,7 @@
         });
 
         $(document).on('change', '.adjustAmountSale', function () {
-            var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val());
+            var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val().replace(/\,/g, ""));
             var row = $(this).closest("tr");
 
             var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text().replace(/\,/g, ""));

@@ -584,67 +584,81 @@ namespace MarketData.Processes.Processes
             DateTime dateNoew = Utility.GetDateNowThai();
 
             try
-            {
-                var updateAdminKeyInDetailID = request.data.Where(e => e.ID != Guid.Empty).Select(c => c.ID);
-                var newAdminKeyInDetail = request.data.Where(e => e.ID == Guid.Empty
-                    && (e.amountSale.HasValue || e.wholeSale.HasValue || e.rank.HasValue || e.sk.HasValue || e.mu.HasValue || e.fg.HasValue || e.ot.HasValue || !string.IsNullOrWhiteSpace(e.remark)));
-
+            {          
                 bool addDetailResult = true;
                 bool updateDetailResult = true;
 
                 List<TTAdminKeyInDetail> listSaveData = new List<TTAdminKeyInDetail>();
+                List<TTAdminKeyInDetail> listUpdateData = new List<TTAdminKeyInDetail>();
+                List<TTAdminKeyInDetail> listAddNewData = new List<TTAdminKeyInDetail>();
 
-                if (updateAdminKeyInDetailID.Any())
+                foreach (var itemRequest in request.data.Where(e => e.amountSale.HasValue || e.wholeSale.HasValue || e.rank.HasValue || e.sk.HasValue || e.mu.HasValue || e.fg.HasValue || e.ot.HasValue || !string.IsNullOrWhiteSpace(e.remark)))
                 {
-                    var adminInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => updateAdminKeyInDetailID.Contains(c.ID));
+                    var existData = repository.adminKeyIn.FindAdminKeyInDetailBy(
+                        c => c.Year == itemRequest.year
+                        && c.Month == itemRequest.month
+                        && c.Week == itemRequest.week
+                        && c.DistributionChannel_ID == itemRequest.distributionChannelID
+                        && c.RetailerGroup_ID == itemRequest.retailerGroupID
+                        && c.DepartmentStore_ID == itemRequest.departmentStoreID
+                        && c.Brand_ID == itemRequest.brandID
+                        && c.Universe == itemRequest.universe);
 
-                    foreach (var itemDetail in adminInDetailData)
+                    if (existData != null)
                     {
-                        var adminKeyInDetailUpdate = request.data.FirstOrDefault(c => c.ID == itemDetail.ID);
-                        itemDetail.Rank = adminKeyInDetailUpdate.rank;
-                        itemDetail.Amount_Sales = adminKeyInDetailUpdate.amountSale;
-                        itemDetail.Whole_Sales = adminKeyInDetailUpdate.wholeSale;
-                        itemDetail.SK = adminKeyInDetailUpdate.sk;
-                        itemDetail.MU = adminKeyInDetailUpdate.mu;
-                        itemDetail.FG = adminKeyInDetailUpdate.fg;
-                        itemDetail.OT = adminKeyInDetailUpdate.ot;
-                        itemDetail.Remark = adminKeyInDetailUpdate.remark;
-                        itemDetail.Updated_By = request.userID;
-                        itemDetail.Updated_Date = dateNoew;
-                    }
+                        existData.Rank = itemRequest.rank;
+                        existData.Amount_Sales = itemRequest.amountSale;
+                        existData.Whole_Sales = itemRequest.wholeSale;
+                        existData.SK = itemRequest.sk;
+                        existData.MU = itemRequest.mu;
+                        existData.FG = itemRequest.fg;
+                        existData.OT = itemRequest.ot;
+                        existData.Remark = itemRequest.remark;
+                        existData.Updated_By = request.userID;
+                        existData.Updated_Date = dateNoew;
 
-                    updateDetailResult = await repository.adminKeyIn.UpdateAdminKeyInDetail(adminInDetailData);
-                    listSaveData.AddRange(adminInDetailData);
+                        listUpdateData.Add(existData);
+                        listSaveData.Add(existData);
+                    }
+                    else
+                    {
+                        TTAdminKeyInDetail newAdminDetail = new TTAdminKeyInDetail
+                        {
+                            ID = Guid.NewGuid(),
+                            DepartmentStore_ID = itemRequest.departmentStoreID,
+                            DistributionChannel_ID = itemRequest.distributionChannelID,
+                            Brand_ID = itemRequest.brandID,
+                            Counter_ID = itemRequest.counterID,
+                            RetailerGroup_ID = itemRequest.retailerGroupID,
+                            FG = itemRequest.fg,
+                            MU = itemRequest.mu,
+                            OT = itemRequest.ot,
+                            SK = itemRequest.sk,
+                            Amount_Sales = itemRequest.amountSale,
+                            Whole_Sales = itemRequest.wholeSale,
+                            Month = itemRequest.month,
+                            Year = itemRequest.year,
+                            Week = itemRequest.week,
+                            Rank = itemRequest.rank,
+                            Remark = itemRequest.remark,
+                            Universe = itemRequest.universe,
+                            Created_By = request.userID.GetValueOrDefault(),
+                            Created_Date = dateNoew
+                        };
+
+                        listSaveData.Add(newAdminDetail);
+                        listAddNewData.Add(newAdminDetail);
+                    }
                 }
 
-                if (newAdminKeyInDetail.Any())
+                if (listAddNewData.Any())
                 {
-                    List<TTAdminKeyInDetail> listNewAdminDetail = newAdminKeyInDetail.Select(c => new TTAdminKeyInDetail
-                    {
-                        ID = Guid.NewGuid(),
-                        DepartmentStore_ID = c.departmentStoreID,
-                        DistributionChannel_ID = c.distributionChannelID,
-                        Brand_ID = c.brandID,
-                        Counter_ID = c.counterID,
-                        RetailerGroup_ID = c.retailerGroupID,
-                        FG = c.fg,
-                        MU = c.mu,
-                        OT = c.ot,
-                        SK = c.sk,
-                        Amount_Sales = c.amountSale,
-                        Whole_Sales = c.wholeSale,
-                        Month = c.month,
-                        Year = c.year,
-                        Week = c.week,
-                        Rank = c.rank,
-                        Remark = c.remark,
-                        Universe = c.universe,
-                        Created_By = request.userID.GetValueOrDefault(),
-                        Created_Date = dateNoew
-                    }).ToList();
+                    addDetailResult = await repository.adminKeyIn.AddAdminKeyInDetail(listAddNewData);
+                }
 
-                    addDetailResult = await repository.adminKeyIn.AddAdminKeyInDetail(listNewAdminDetail);
-                    listSaveData.AddRange(listNewAdminDetail);
+                if (listUpdateData.Any())
+                {
+                    updateDetailResult = await repository.adminKeyIn.UpdateAdminKeyInDetail(listUpdateData);
                 }
 
                 if (updateDetailResult && addDetailResult)
@@ -892,7 +906,7 @@ namespace MarketData.Processes.Processes
 
             string previousYear = (int.Parse(request.year) - 1).ToString();
 
-            var BAKeyInDetailPreviousYear = allBAKeyInDetail.FirstOrDefault(
+            var adminKeyInDetailPreviousYear = allAdminKeyInData.FirstOrDefault(
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
                && c.DistributionChannel_ID == itemCounter.distributionChannelID
                && c.Brand_ID == itemCounter.brandID
@@ -922,7 +936,7 @@ namespace MarketData.Processes.Processes
                 rank = adminKeyInData != null ? adminKeyInData.Rank : null,
                 remark = adminKeyInData != null ? adminKeyInData.Remark : null,
                 universe = request.universe,
-                amountSalePreviousYear = BAKeyInDetailPreviousYear != null ? BAKeyInDetailPreviousYear.Amount_Sales : null
+                amountSalePreviousYear = adminKeyInDetailPreviousYear != null ? adminKeyInDetailPreviousYear.Amount_Sales : null
             };
 
             return dataDetail;
