@@ -136,18 +136,15 @@ namespace MarketData.Processes.Processes
 
                 response.year.Add(currentYear);
 
-                string previousYear = (Utility.GetDateNowThai().Year - 1).ToString();
+                if (listBAKeyIn.Any())
+                {
+                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != currentYear);
 
-                response.year.Add(previousYear);
-                //if (listBAKeyIn.Any())
-                //{
-                //    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != currentYear);
-
-                //    foreach (var itemGroupYear in groupByYear)
-                //    {
-                //        response.year.Add(itemGroupYear.Key);
-                //    }
-                //}
+                    foreach (var itemGroupYear in groupByYear)
+                    {
+                        response.year.Add(itemGroupYear.Key);
+                    }
+                }
 
                 response.channel = channelBA;
                 response.departmentStore = departmentStoreBA;
@@ -384,21 +381,30 @@ namespace MarketData.Processes.Processes
 
                 string previousYear = (Int32.Parse(BAKeyInData.Year) - 1).ToString();
 
-                foreach (var itemBADetail in BAKeyInDetailList)
-                {
-                    var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
-                        c => c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
-                        && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
-                        && c.Brand_ID == itemBADetail.brandID
-                        && c.Year == previousYear
-                        && c.Month == BAKeyInData.Month
-                        && c.Week == "4").FirstOrDefault();
+                var baKeyInDataApprovePreViousYear = repository.baKeyIn.FindBAKeyInBy(
+                    c => c.Year == previousYear
+                    && c.Month == BAKeyInData.Month
+                    && c.Week == "4"
+                    && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
+                    && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
+                    && c.Brand_ID == BAKeyInData.Brand_ID
+                    && c.Universe == BAKeyInData.Universe);
 
-                    if (BAKeyInDetailPreviousYear != null)
+                if(baKeyInDataApprovePreViousYear != null)
+                {
+                    foreach (var itemBADetail in BAKeyInDetailList)
                     {
-                        itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.Amount_Sales;
+                        var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
+                            c => c.BAKeyIn_ID == baKeyInDataApprovePreViousYear.ID
+                            && c.Brand_ID == itemBADetail.brandID).FirstOrDefault();
+
+                        if (BAKeyInDetailPreviousYear != null)
+                        {
+                            itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.Amount_Sales;
+                        }
                     }
                 }
+               
 
                 var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == BAKeyInData.Brand_ID);
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
