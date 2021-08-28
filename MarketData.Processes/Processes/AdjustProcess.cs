@@ -143,6 +143,7 @@ namespace MarketData.Processes.Processes
                 var getRetailerResponse = repository.masterData.GetRetailerGroupList().Where(c => c.Active_Flag);
                 var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
                 var getChannelResponse = repository.masterData.GetDistributionChannelList().Where(c => c.Active_Flag);
+                var keyInStatusApprove = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "Approve");
 
                 response.channel = getChannelResponse.Select(c => new DistributionChannelData
                 {
@@ -172,9 +173,9 @@ namespace MarketData.Processes.Processes
 
                 yearList.Add(currentYear);
 
-                var adjustData = repository.adjust.GetAdjustDataBy(c => c.ID != Guid.Empty);
+                var keyInApproveData = repository.baKeyIn.GetBAKeyInBy(c => c.KeyIn_Status_ID == keyInStatusApprove.ID);
 
-                var olldYearList = adjustData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+                var olldYearList = keyInApproveData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
 
                 if (olldYearList.Any())
                 {
@@ -360,7 +361,7 @@ namespace MarketData.Processes.Processes
                         else if (baKeyInBrand.Any())
                         {
                             // มีค่า Amount Sale และ Whole Sale
-                            if (baKeyInBrand.Any(c => c.Amount_Sales.HasValue) && baKeyInBrand.Any(c => c.Whole_Sales.HasValue))
+                            if (baKeyInBrand.Any(c => c.Amount_Sales.HasValue))
                             {
                                 // ค่า Amount Sale มากที่สุดของแต่ละ Counter
                                 var mostAmountSale = baKeyInBrand.Where(
@@ -370,7 +371,7 @@ namespace MarketData.Processes.Processes
                                 // ค่า Whole Sale มากที่สุดของแต่ละ Counter
                                 var mostWholeSale = baKeyInBrand.Where(
                                     e => e.Whole_Sales.HasValue)
-                                    .OrderByDescending(c => c.Whole_Sales).FirstOrDefault().Amount_Sales;
+                                    .OrderByDescending(c => c.Whole_Sales).FirstOrDefault()?.Whole_Sales;
 
                                 adjustAmountSale = mostAmountSale;
                                 adjustWholeSale = mostWholeSale;
@@ -685,14 +686,25 @@ namespace MarketData.Processes.Processes
                     {
                         var amountSale = itemAdjustDetail.brandKeyInAmount.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
                         var rank = itemAdjustDetail.brandKeyInRank.FirstOrDefault(e => e.Key == brandData.Brand_Short_Name || e.Key == brandData.Brand_Name);
+                        decimal? amountSaleValue = null;
+                        string rankValue = null;
 
+                        if(amountSale.Value != null)
+                        {
+                            amountSaleValue = amountSale.Value;
+                        }
+
+                        if(rank.Value != null)
+                        {
+                            rankValue = rank.Value;
+                        }
                         TTAdjustDataBrandDetail adjustBrandDetail = new TTAdjustDataBrandDetail
                         {
                             ID = Guid.NewGuid(),
                             BrandCounter_ID = brandData.Brand_ID,
                             AdjustData_ID = request.adjustDataID,
-                            Amount_Sale = amountSale.Value,
-                            Rank = int.Parse(rank.Value),
+                            Amount_Sale = amountSaleValue,
+                            Rank = rankValue != null ? int.Parse(rankValue) : 0,
                             Brand_ID = itemAdjustDetail.brandID
                         };
 

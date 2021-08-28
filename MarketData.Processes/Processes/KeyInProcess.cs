@@ -132,17 +132,22 @@ namespace MarketData.Processes.Processes
                     listBAKeyIn.AddRange(baKeyInByCounter);
                 }
 
-                response.year.Add(Utility.GetDateNowThai().Year.ToString());
+                string currentYear = Utility.GetDateNowThai().Year.ToString();
 
-                if (listBAKeyIn.Any())
-                {
-                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != Utility.GetDateNowThai().Year.ToString());
+                response.year.Add(currentYear);
 
-                    foreach (var itemGroupYear in groupByYear)
-                    {
-                        response.year.Add(itemGroupYear.Key);
-                    }
-                }
+                string previousYear = (Utility.GetDateNowThai().Year - 1).ToString();
+
+                response.year.Add(previousYear);
+                //if (listBAKeyIn.Any())
+                //{
+                //    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != currentYear);
+
+                //    foreach (var itemGroupYear in groupByYear)
+                //    {
+                //        response.year.Add(itemGroupYear.Key);
+                //    }
+                //}
 
                 response.channel = channelBA;
                 response.departmentStore = departmentStoreBA;
@@ -750,9 +755,9 @@ namespace MarketData.Processes.Processes
 
                 yearList.Add(currentYear);
 
-                var adminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.ID != Guid.Empty);
+                var keyInData = repository.baKeyIn.GetBAKeyInBy(c => c.ID != Guid.Empty);
 
-                var olldYearList = adminKeyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+                var olldYearList = keyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
 
                 if (olldYearList.Any())
                 {

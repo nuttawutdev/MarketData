@@ -869,6 +869,7 @@ namespace MarketData.Controllers
                     listView.data = response.data.Select(c => new CounterViewModel
                     {
                         counterID = c.counterID,
+                        retailerGroupID = c.retailerGroupID,
                         retailerGroupName = c.retailerGroupName,
                         distributionChannelID = c.distributionChannelID,
                         distributionChannelName = c.distributionChannelName,

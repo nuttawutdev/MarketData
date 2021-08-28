@@ -447,7 +447,7 @@
         function validate_WholeSales(data) {
 
             var validateData = data.adjustDataDetail.some(function (i) {
-                return i.week == 4 && i.wholeSale == null
+                return i.week == 4 && i.adjustWholeSale == null
             })
 
             if (validateData) {
@@ -512,15 +512,13 @@
                 for (var i = 0; i < model.data.length; i++) {
                     if (model.data[i].brandID == brandID) {
 
-                        var amountPreviousYear = $(el).find(".amountPreviousYear").text() == null ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
+                        var amountPreviousYear = $(el).find(".amountPreviousYear").text() == "" ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
                         totalAmountPreviousYear += amountPreviousYear;
-
 
                         var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
                         totalAdminAmountSale += adminAmountSale;
 
-
-                        var adjustAmountSale = $(el).find(".adjustAmountSale").val() == null ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
+                        var adjustAmountSale = $(el).find(".adjustAmountSale").val() == "" ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
                         totalAdjustAmountSale += adjustAmountSale;
 
 
@@ -529,17 +527,21 @@
 
 
                     }
-
                 }
 
                 var row = $(this).closest("tr");
                 var totalpercentGrowth = 0;
 
-                if (totalAmountPreviousYear) {
+                console.log(totalAmountPreviousYear,'totalAmountPreviousYear')
+                if (totalAmountPreviousYear > 0) {
                     totalpercentGrowth = ((totalAdjustAmountSale - totalAmountPreviousYear) / totalAmountPreviousYear) * 100;
                 }
 
-                $(el).find(".totalAmountPreviousYear").text(formatCurrencyText(totalAmountPreviousYear.toString()));
+
+                if (totalAmountPreviousYear > 0) {
+                    $(el).find(".totalAmountPreviousYear").text(formatCurrencyText(totalAmountPreviousYear.toString()));
+                }
+           
                 $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
                 $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));
                 $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
@@ -553,13 +555,8 @@
 
                     $(el).find('.totalbrandKeyInAmount[data-id=' + key + ']').text(valueBrandTotalAmount);
 
-
                 });
-
-
             });
-
-
         }
 
         $("input[data-type='currency']").on({

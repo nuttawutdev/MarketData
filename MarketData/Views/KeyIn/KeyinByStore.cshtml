@@ -206,7 +206,7 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        if (row.statusID.toUpperCase() != 'D66D23BB-DF1F-490F-A740-64CC357D6DE4') {
+                        if (row.statusID.toUpperCase() != 'D66D23BB-DF1F-490F-A740-64CC357D6DE4' && row.statusID.toUpperCase() != '2F3658E4-AB9F-4935-9186-501AD1B9B507') {
                             return '<a href="KeyinByStore_Edit?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                         }else{
                             return '<a href="KeyinByStore_Edit_View?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
