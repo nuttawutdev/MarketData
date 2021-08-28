@@ -136,18 +136,15 @@ namespace MarketData.Processes.Processes
 
                 response.year.Add(currentYear);
 
-                string previousYear = (Utility.GetDateNowThai().Year - 1).ToString();
+                if (listBAKeyIn.Any())
+                {
+                    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != currentYear);
 
-                response.year.Add(previousYear);
-                //if (listBAKeyIn.Any())
-                //{
-                //    var groupByYear = listBAKeyIn.GroupBy(e => e.Year).Where(c => c.Key != currentYear);
-
-                //    foreach (var itemGroupYear in groupByYear)
-                //    {
-                //        response.year.Add(itemGroupYear.Key);
-                //    }
-                //}
+                    foreach (var itemGroupYear in groupByYear)
+                    {
+                        response.year.Add(itemGroupYear.Key);
+                    }
+                }
 
                 response.channel = channelBA;
                 response.departmentStore = departmentStoreBA;
