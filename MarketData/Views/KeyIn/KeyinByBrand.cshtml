@@ -159,6 +159,7 @@
                 $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายแบรนด์');
                 $("#blocker").hide();
             } else {
+             
                 var model = @Html.Raw(Json.Serialize(Model));
                 var model2 = @Html.Raw(Json.Serialize(Model.remarkList));
                 var frmdata = {
@@ -180,11 +181,11 @@
                     success: function (data) {
                         $("#blocker").hide();
                         if (data.data != null) {
-
+                    
                             var titleTable = '<thead class="table-secondary">' +
                                 '    <th class="col-1">Brand</th>' +
                                 '    <th class="col-1">Department Store</th>' +
-                                '    <th class="col-2">Amount Sales (' + parseInt(data.year) + " " + $('#ddlMonth option:selected').text() + ' week 4)</th>' +
+                                '    <th class="col-2">Amount Sales (' + (parseInt(data.year)-1) + " " + $('#ddlMonth option:selected').text() + ' week 4)</th>' +
                                 '    <th class="col-1">Rank</th>' +
                                 '    <th class="col-1">Amount Sales</th>' +
                                 '    <th class="col-1">Whole Sales</th>' +
@@ -252,7 +253,7 @@
                             rowTable += '<tr>' +
                                 '<td class="col-1">Total</td>' +
                                 '<td class="col-1"></td>' +
-                                '<td class="col-2">' + data.totalAmountPreviosYear+'</td>' +
+                                '<td class="col-2">' + formatCurrencyText(data.totalAmountPreviosYear.toString()) +'</td>' +
                                 '<td class="col-1" style=" align-items:center"></td>' +
                                 '<td class="col-1" style=" align-items:center"></td>' +
                                 '<td class="col-1" style=" align-items:center"></td>' +
@@ -285,7 +286,11 @@
 
         function formatNumber(n) {
             // format number 1000000 to 1,234,567
-            return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            if (n < 0) {
+                return "-" + n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            } else {
+                return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
         }
 
         function formatCurrency(input, blur) {
@@ -355,6 +360,58 @@
             input[0].setSelectionRange(caret_pos, caret_pos);
         }
 
+        function formatCurrencyText(text) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = text;
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position
+            //var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+
+                right_side += "00";
+
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side + "." + right_side;
+
+            } else {
+                input_val = formatNumber(input_val);
+                input_val = input_val;
+                input_val += ".00";
+            }
+
+            return input_val;
+        }
         $('#btnSubmit').on('click', function (e) {
             var frmdata = getDataFromTable();
             frmdata.data.splice(-1);
