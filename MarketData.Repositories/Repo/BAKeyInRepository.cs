@@ -89,8 +89,8 @@ namespace MarketData.Repositories.Repo
                       distributionChannelName = channel.Distribution_Channel_Name,
                       statusID = e.KeyIn_Status_ID,
                       statusName = status.Status_Name,
-                      lastEdit = updateBy != null ? updateBy.UserName : createBy != null ? createBy.UserName : string.Empty,
-                      approver = approver != null ? approver.UserName : string.Empty,
+                      lastEdit = updateBy != null ? updateBy.DisplayName : createBy != null ? createBy.DisplayName : string.Empty,
+                      approver = approver != null ? approver.DisplayName : string.Empty,
                       approveDate = e.Approved_Date.HasValue ? e.Approved_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                       submitDate = e.Submited_Date.HasValue ? e.Submited_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                       remark = e.Remark

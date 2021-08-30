@@ -22,7 +22,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var userData = repository.user.FindUserBy(c => c.UserName.ToLower() == request.userName.ToLower());
+                var userData = repository.user.FindUserBy(c => c.Email.ToLower() == request.userName.ToLower());
 
                 if (userData != null)
                 {
