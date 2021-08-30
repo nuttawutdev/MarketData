@@ -26,5 +26,29 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<TMUser> GetUserBy(Expression<Func<TMUser, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMUser.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMUserCounter> GetUserCounterBy(Expression<Func<TMUserCounter, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMUserCounter.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
