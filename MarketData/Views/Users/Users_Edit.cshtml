@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MarketData.Models.UserDetailViewModel;
+
+@{
     ViewData["Title"] = "Add Users";
 }
 
@@ -8,190 +10,362 @@
 
 <br />
 
-<form>
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Email	</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
-        </div>
-        <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Display Name	</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
-        </div>
+<div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Email	</label>
+        <input type="text" class="form-control input-sm" id="Email" value="@Model.email">
+    </div>
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Display Name	</label>
+        <input type="text" class="form-control input-sm" id="DisplayName" value="@Model.displayName">
+    </div>
+
+</div>
+<div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">First Name</label>
+        <input type="text" class="form-control input-sm" id="FirstName" value="@Model.firstName">
+    </div>
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Last Name</label>
+        <input type="text" class="form-control input-sm" id="LastName" value="@Model.lastName">
+    </div>
+
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+        <label>
+            @if (Model.active)
+            {
+                <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+            }
+            Active
+        </label>
+    </div>
+    <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.validateEmail)
+            {
+                <input value="" id="flagValidateEmail" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagValidateEmail" type="checkbox" data-toggle="toggle">
+            }
+            Validated Email
+        </label>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+    <div class="col-md-12 col-sm-12">
+        <h6>Permission</h6>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+        <label>
+            @if (Model.viewMaster)
+            {
+                <input value="" id="flagViewMaster" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewMasterv" type="checkbox" data-toggle="toggle">
+            }
+            View Master
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.editMaster)
+            {
+                <input value="" id="flagEditMaster" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagEditMaster" type="checkbox" data-toggle="toggle">
+            }
+            Edit Master
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.editUser)
+            {
+                <input value="" id="flagEditUser" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagEditUser" type="checkbox" data-toggle="toggle">
+            }
+            Edit Users
+        </label>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.viewData)
+            {
+                <input value="" id="flagViewData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewData" type="checkbox" data-toggle="toggle">
+            }
+            View Data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.keyInData)
+            {
+                <input value="" id="flagKeyInData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagKeyInData" type="checkbox" data-toggle="toggle">
+            }
+            Key-in Data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+        <label>
+            @if (Model.approveData)
+            {
+                <input value="" id="flagApproveData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagApproveData" type="checkbox" data-toggle="toggle">
+            }
+            Approve data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+
+        <label>
+            @if (Model.viewReport)
+            {
+                <input value="" id="flagViewReport" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewReport" type="checkbox" data-toggle="toggle">
+            }
+            View Report
+        </label>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12 ">
+    <div class=" col-md-12 col-sm-12">
+        <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Resend welcome email</a>
+        <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Reset password</a>
+    </div>
+</div>
+<br />
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+        <label>Department Store</label>
+        @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Please select", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
 
     </div>
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label for="name">First Name</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
-        </div>
-        <div class="form-group col-md-6 col-sm-6">
-            <label for="name">Last Name</label>
-            <input type="text" class="form-control input-sm" id="name" placeholder="">
-        </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+        <label>Brand</label>
+        @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control col-sm-12" })
 
     </div>
-    <div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-3 col-sm-3">
+        <label>Distribution Chanels</label>
+        @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
 
-        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Active
-            </label>
-        </div>
-        <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Validated Email
-            </label>
-        </div>
-    </div>
-    <div class="row col-md-12 col-sm-12">
-        <div class="col-md-12 col-sm-12">
-            <h6>Permission</h6>
-        </div>
-    </div>
-    <div class="row col-md-12 col-sm-12">
+    </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+    <button id="Add" class="btn btn-danger " type="button">Add</button>
+</div>
+</div>
 
-        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                View Master
-            </label>
-        </div>
-        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Edit Master
-            </label>
-        </div>
-        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Edit Users
-            </label>
-        </div>
-    </div>
-    <div class="row col-md-12 col-sm-12">
-
-        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                View Data
-            </label>
-        </div>
-        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Key-in Data
-            </label>
-        </div>
-        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                Approve data
-            </label>
-        </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label for="pincode">
-                <input type="checkbox" checked data-toggle="toggle" class="custom-checkbox">
-                View Report
-            </label>
-        </div>
-    </div>
-    <div class="row col-md-12 col-sm-12 ">
-        <div class=" col-md-12 col-sm-12">
-            <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Resend welcome email</a>
-            <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Reset password</a>
-        </div>
-    </div><br />
-    <div class="row col-md-12 col-sm-12">
-
-        <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
-            <label>Department Store</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Central Bangna</option>
-                <option>The Mall Bangkae</option>
-                <option>Robinson Bangrak</option>
-            </select>
-        </div>
-        <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <label>Brand</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>LOREAL</option>
-                <option>SHISEDO</option>
-                <option>Lux Asia</option>
-            </select>
-        </div>
-        <div class="form-group col-md-3 col-sm-3">
-            <label>Distribution Chanels</label>
-            <select class="form-control">
-                <option>Please select</option>
-                <option>Counter</option>
-                <option>Boutique</option>
-                <option>Online</option>
-            </select>
-        </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
-            <a href="#" class="btn btn-danger">Add</a>
-        </div>
-    </div>
-    <div class="table-responsive">
+<div class="container-xl" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
+    <div class="table-responsive table-sm">
         <div class="table-wrapper">
+            <div style=" overflow-x: auto;">
+                <table class="table  table-hover " id="tblDetails">
+                    <thead class="table-secondary">
+                        <tr class="row m-0">
+                            <th class="col-4">Department Store</th>
+                            <th class="col-4">Brand</th>
+                            <th class="col-2">Distribution Chanels</th>
+                            <th class="col-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model.userCounter)
+                            {
+                                <tr class="row m-0">
+                                    <td class="" hidden>@item.userCounterID</td>
+                                    <td class="col-4">@item.departmentStoreName</td>
+                                    <td class="col-2" hidden>@item.departmentStoreID</td>
+                                    <td class="col-4">@item.brandName</td>
+                                    <td class="col-2" hidden>@item.brandID</td>
+                                    <td class="col-2">@item.channelName</td>
+                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="col-2">
+                                        <a data-id="@item.userCounterID" class="delete-user buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>
+                                    </td>
+                                </tr>
+                            }
 
-            <table class="table table-striped table-hover ">
-                <thead class="table-secondary">
-                    <tr class="row m-0">
-                        <th class="col-4">Department Store</th>
-                        <th class="col-4">Brand</th>
-                        <th class="col-2">Distribution Chanels</th>
-                        <th class="col-2 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="row m-0">
-                        <td class="col-4">
-                            Central Ladprao
-                        </td>
-                        <td class="col-4">
-                            SHU
-                        </td>
-                        <td class="col-2 ">
-                            Couter
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
+                        }
 
-                        </td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="col-4">
-                            Central Ladprao
-                        </td>
-                        <td class="col-4">
-                            LANCOME
-                        </td>
-                        <td class="col-2">
-                            Couter
-                        </td>
-                        <td class="col-2 text-center">
-                            <a href="#deleteModal" class="btn btn-danger col-sm-12 col-md-3 btn-sm" data-toggle="modal">
-                                <i class="ion-android-delete text-white"></i>
-                            </a>
 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="modal-footer">
-        <a href="Users" class="btn btn-danger">Save</a>
-        <a href="Users" class="btn btn-outline-danger">Cancel</a>
+<div class="modal-footer">
+    <button id="save" class="btn btn-danger " type="button">Save</button>
+    <a href="Users" class="btn btn-outline-danger">Cancel</a>
 
-    </div>
-</form>
+</div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $(document).on('click', '.delete-user', function () {
+            $(this).closest('tr').remove();
+        })
+
+         $("#Add").click(function () {
+            if ($('#departmentStoreList').val() != "" && $('#brandList').val() != "" && $('#channelList').val() != "") {
+                 //check duplicate user
+                var newRow = '<tr class="row m-0">'
+                    + '<td class="col-4 departmentStoreName">' + $('#departmentStoreList option:selected').text() + '</td>'
+                    + '<td class="departmentStoreID" hidden>' + $('#departmentStoreList').val() + '</td>'
+                    + '<td class="col-4 brandName">' + $('#brandList option:selected').text() + '</td>'
+                    + '<td class="brandID" hidden>' + $('#brandList').val() + '</td>'
+                    + '<td class="col-2 channelName">' + $('#channelList option:selected').text() + '</td>'
+                    + '<td class="channelID" hidden >' + $('#channelList').val() + '</td>'
+                    + '<td class="col-2"><a class="delete-user buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a></td>'
+                    + ' </tr>';
+                $('#tblDetails tr:last').after(newRow);
+
+            } else {
+
+            }
+        })
+
+        $("#save").click(function () {
+
+            
+            $("#blocker").show();
+            var model = @Html.Raw(Json.Serialize(Model));
+
+            var memberDetails = new Array();
+            $("#tblDetails TBODY TR").each(function (index, el) {
+               
+                        var memberDetail = {};
+                memberDetail.userCounterID = $(el).find(".userCounterID").text();
+                memberDetail.departmentStoreName = $(el).find(".departmentStoreName").text();
+                memberDetail.departmentStoreID = $(el).find(".departmentStoreID").text();
+                memberDetail.brandName = $(el).find(".brandName").text();
+                memberDetail.brandID = $(el).find(".brandID").text();
+                memberDetail.channelName = $(el).find(".channelName").text();
+                memberDetail.channelID = $(el).find(".channelID").text();
+                        memberDetails.push(memberDetail);
+
+                    
+                }
+
+
+            });
+
+            var frmdata = {
+                userID: model.userID,
+                email: $('#email').val(),
+                displayName: $('#DisplayName').val(),
+                firstName: $('#FirstName').val(),
+                lastName: $('#LastName').val(),
+               
+                active: $("#flagactive").prop("checked"),
+                validateEmail: $("#flagValidateEmail").prop("checked"),
+                viewMaster: $("#flagViewMaster").prop("checked"),
+                editMaster: $("#flagEditMaster").prop("checked"),
+                editUser: $("#flagEditUser").prop("checked"),
+                viewData: $("#flagViewData").prop("checked"),
+                keyInData: $("#flagKeyInData").prop("checked"),
+                approveData: $("#flagApproveData").prop("checked"),
+                viewReport: $("#flagViewReport").prop("checked"),
+                actionBy: null,
+                userCounter: memberDetails
+               
+
+            };
+
+        console.log(frmdata)
+        //      public Guid ? userID { get; set; }
+        //public string email { get; set; }
+        //public string displayName { get; set; }
+        //public string firstName { get; set; }
+        //public string lastName { get; set; }
+        //public bool active { get; set; }
+        //public bool validateEmail { get; set; }
+        //public bool viewMaster { get; set; }
+        //public bool editMaster { get; set; }
+        //public bool editUser { get; set; }
+        //public bool viewData { get; set; }
+        //public bool keyInData { get; set; }
+        //public bool approveData { get; set; }
+        //public bool viewReport { get; set; }
+        //public Guid actionBy { get; set; }
+        //public List < UserCounterData > userCounter { get; set; }
+
+            @*$.ajax({
+                 type: "POST",
+                 url: '@Url.Action("SaveBrand", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                success: function (data) {
+                    $("#blocker").hide();
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "Brand");
+                        $('#successModal').modal('show');
+                    } else if (data.isDuplicated) {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text('Duplicate data!');
+                    } else {
+                        $('#failedModal').modal('show');
+                        $('#myModalFailedResult').text(data.responseError != ""
+                            && data.responseError != null ? data.responseError : 'Save data failed');
+                     }
+                    $('#confirmID').val('');
+                    $('#myModalFailedResult').val('');
+                },
+                error: function () {
+                    $("#blocker").hide();
+                }
+            });*@
+        });
+
+ });
+</script>
