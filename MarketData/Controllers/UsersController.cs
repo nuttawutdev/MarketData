@@ -54,9 +54,18 @@ namespace MarketData.Controllers
             }
         }
 
-        public IActionResult Users_Edit()
+        public IActionResult Users_Edit(Guid userID)
         {
-            return View();
+            var viewModel = GetUserDetail(userID);
+
+            if(viewModel != null)
+            {
+                return View(viewModel);
+            }
+            else
+            {
+                return View("Index");
+            }         
         }
 
         [HttpPost]
@@ -86,6 +95,79 @@ namespace MarketData.Controllers
             {
                 return Json(viewModel);
             }
+        }
+
+        public UserDetailViewModel GetUserDetail(Guid userID)
+        {
+            UserDetailViewModel data = new UserDetailViewModel();
+            var response = process.user.GetUserDetail(userID);
+
+            try
+            {
+                data.userID = response.userID;
+                data.email = response.email;
+                data.active = response.active;
+                data.displayName = response.displayName;
+                data.firstName = response.firstName;
+                data.lastName = response.lastName;
+                data.validateEmail = response.validateEmail;
+                data.viewMaster = response.viewMaster;
+                data.editMaster = response.editMaster;
+                data.editUser = response.editUser;
+                data.viewData = response.viewData;
+                data.keyInData = response.keyInData;
+                data.approveData = response.approveData;
+                data.viewReport = response.viewReport;
+               
+                if (response.departmentStore != null && response.departmentStore.Any())
+                {
+                    data.departmentStoreList = response.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                    {
+                        departmentStoreID = c.departmentStoreID,
+                        departmentStoreName = c.departmentStoreName,
+                        distributionChannelID = c.distributionChannelID,
+                        retailerGroupID = c.retailerGroupID
+                    }).ToList();
+                }
+
+                if (response.channel != null && response.channel.Any())
+                {
+                    data.channelList = response.channel.Select(c => new ChannelKeyInViewModel
+                    {
+                        distributionChannelID = c.distributionChannelID,
+                        distributionChannelName = c.distributionChannelName
+                    }).ToList();
+                }
+
+                if (response.brand != null && response.brand.Any())
+                {
+                    data.brandList = response.brand.Select(c => new BrandKeyInViewModel
+                    {
+                        brandID = c.brandID,
+                        brandName = c.brandName,
+                    }).ToList();
+                }
+
+                if (response.userCounter != null && response.userCounter.Any())
+                {
+                    data.userCounter = response.userCounter.Select(c => new UserCounterViewModel
+                    {
+                        userCounterID = c.userCounterID,
+                        departmentStoreID = c.departmentStoreID,
+                        departmentStoreName = c.departmentStoreName,
+                        channelID = c.channelID,
+                        channelName = c.channelName,
+                        brandID = c.brandID,
+                        brandName = c.brandName
+                    }).ToList();
+                }
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+
+            return data;
         }
     }
 }

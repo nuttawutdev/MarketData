@@ -751,6 +751,20 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMDistributionChannel> GetDistributionChannelListBy(Expression<Func<TMDistributionChannel, bool>> expression)
+        {
+            try
+            {
+                var searchData = _dbContext.TMDistributionChannel.Where(expression).AsNoTracking();
+                searchData = searchData.OrderByDescending(x => x.Distribution_Channel_Name);
+                return searchData.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> SaveDistributionChannel(SaveDistributionChannelRequest request)
         {
             try
