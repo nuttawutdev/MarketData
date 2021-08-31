@@ -145,8 +145,8 @@
                         <td class="col-2 text-center">
 
                             @*<a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-            <i class="ion-eye text-white"></i>
-        </a>*@
+                                    <i class="ion-eye text-white"></i>
+                                </a>*@
                             <a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
                                 <i class="ion-eye text-white"></i>
                             </a>
@@ -162,7 +162,7 @@
 
                         </td>
                     </tr>
-                  
+
                 </tbody>
             </table>
 
@@ -190,3 +190,228 @@
         </div>
     </div>
 </div>
+
+
+<div class="container-xl">
+
+
+    <table id="tableData" class="display" width="100%"></table>
+
+
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        //$('#importDataModalHref').attr("href", "Brand");
+        //$('#importDataModal').modal('show');
+
+        //function base64ToArrayBuffer(base64) {
+        //    var binaryString = window.atob(base64);
+        //    var binaryLen = binaryString.length;
+        //    var bytes = new Uint8Array(binaryLen);
+        //    for (var i = 0; i < binaryLen; i++) {
+        //        var ascii = binaryString.charCodeAt(i);
+        //        bytes[i] = ascii;
+        //    }
+        //    return bytes;
+        //}
+
+        //function saveByteArray(reportName, byte) {
+        //    var blob = new Blob([byte], { type: "text/plain" });
+        //    var link = document.createElement('a');
+        //    link.href = window.URL.createObjectURL(blob);
+        //    var fileName = reportName;
+        //    link.download = fileName;
+        //    link.click();
+        //};
+
+
+        @*$("#file-upload").change(function () {
+            $("#blocker").show();
+
+            var fd = new FormData();
+            var files = $('#file-upload')[0].files;
+
+            fd.append('userID', 'Test');
+
+            // Check file selected or not
+            if (files.length > 0) {
+                fd.append('excelFile', files[0]);
+            }
+
+            $.ajax(
+                {
+                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    type: "POST",
+                    success: function (data) {
+
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                           // dataTable.ajax.reload();
+
+                            $('#importSuccess').text("Import Success : " + data.countImportSuccess);
+                            $('#importFailed').text("Import Failed : " + data.countImportFailed);
+
+                            if (data.importResult.length > 0) {
+
+                                for (var i = 0; i < data.importResult.length; i++) {
+                                    $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result+"</p>");
+                                }
+
+                                var sampleArr = base64ToArrayBuffer(data.fileResult);
+                                saveByteArray(data.fileName, sampleArr);
+
+                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModal').modal('show');
+                            }
+                            else {
+                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModal').modal('show');
+                            }
+                        }
+                        else {
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Import data failed!');
+                                $('#failedModal').modal('show');
+                        }
+
+                        $("#file-upload").val("");
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                        $('#myModalFailedResult').text('Import data failed!');
+                        $('#failedModal').modal('show');
+                        $("#file-upload").val("");
+                    }
+                }
+            );
+        });*@
+
+
+        $("#tableData").one("preInit.dt", function () {
+
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
+        var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetBrandList", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.brandList;
+                }
+            },
+            "columns": [
+                { data: "userID", visible: false, searchable: false },
+                { data: "displayName", title: "Display Name"},
+                { data: "firstName", title: "First Name" },
+                { data: "lastName", title: "Last Name" },
+                { data: "validateEmail", title: "Validate Email" },
+                {
+                    data: "validateEmail",
+                    title: "Validate Email",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
+                    },
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                { data: "lastLogin", title: "Last Login" },
+                { data: "departmentStoreID ", , visible: false },
+                { data: "active", title: "active", visible: false },
+                {
+                    data: "active",
+                    title: "Active",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
+                    },
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                {
+                    orderable: false,
+                    title: "Action",
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        return '<a href="Brand_Edit_View?brandID=' + row.brandID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                            '<a href="Brand_Edit?brandID=' + row.brandID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                          /*  '<a href="#confirmModal" data-id="' + row.brandID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
+                }}
+            ]
+        });
+
+        @*$('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
+        });
+
+        $('.status-dropdown').on('change', function (e) {
+            var status = $(this).val();
+            $('.status-dropdown').val(status);
+            dataTable.column(10).search(status).draw();
+        });
+
+        $(document).on('click', '.delete-click', function () {
+            var id = $(this).attr('data-id');
+            $('#confirmID').val(id);
+        });
+
+        $('.btnReresh').on('click', function (e) {
+            dataTable.ajax.reload();
+        });
+
+        $(".btnConfirmModal").click(function () {
+                   var frmdata = {
+                       brandID: $('#confirmID').val(),
+                       userID: null
+            };
+
+            $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("DeleteBrand", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                 success: function (data) {
+                     if (data.isSuccess) {
+
+                         dataTable.ajax.reload();
+                         $('#confirmModal').modal('hide');
+                     } else {
+                        $('#myModalConfirmResult').text('Delete data failed');
+
+                 }
+
+                     $('#confirmID').val('');
+                     $('#myModalConfirmResult').val('');
+                },
+                error: function () {
+                }
+            });
+        });*@
+
+    });
+
+
+
+</script>
