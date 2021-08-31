@@ -1,11 +1,15 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
+using MarketData.Model.Entiry;
 using MarketData.Model.Request.User;
+using MarketData.Model.Response;
 using MarketData.Model.Response.User;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MarketData.Processes.Processes
 {
@@ -88,6 +92,7 @@ namespace MarketData.Processes.Processes
                     UserData userData = new UserData
                     {
                         userID = itemUser.ID,
+                        email = itemUser.Email,
                         displayName = itemUser.DisplayName,
                         firstName = itemUser.FirstName,
                         lastName = itemUser.LastName,
@@ -165,7 +170,7 @@ namespace MarketData.Processes.Processes
 
                 if (userCounterData != null && userCounterData.Any())
                 {
-                    response.userCounter = userCounterData.Select(c => new UserCounter
+                    response.userCounter = userCounterData.Select(c => new UserCounterData
                     {
                         userCounterID = c.ID,
                         departmentStoreID = c.DepartmentStore_ID,
@@ -184,5 +189,43 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public async Task<SaveDataResponse> SaveUserData(SaveUserDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                if(request.userID != null && request.userID != Guid.Empty)
+                {
+                    var createUserResponse = await repository.user.CreateNewUser(request);
+
+                    if(createUserResponse != null)
+                    {
+                        await repository.user.RemoveAllUserCounterByID(createUserResponse.ID);
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            return response;
+        }
+
+        //private async Task<bool> CreateUserCounterData(Guid userID,List<UserCounterData> userCounterData)
+        //{
+        //    var dateNow = Utility
+        //    List<TMUserCounter> userCounterList = userCounterData.Select(e => new TMUserCounter
+        //    {
+        //        ID = 
+        //    }).ToList();
+        //}
     }
 }

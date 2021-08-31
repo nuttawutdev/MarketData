@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MarketData.Model.Response.User
+namespace MarketData.Model.Request.User
 {
-    public class GetUserDetailResponse : BaseResponse
+    public class SaveUserDataRequest
     {
-        public Guid userID { get; set; }
+        public Guid? userID { get; set; }
         public string email { get; set; }
         public string displayName { get; set; }
         public string firstName { get; set; }
@@ -21,9 +21,7 @@ namespace MarketData.Model.Response.User
         public bool keyInData { get; set; }
         public bool approveData { get; set; }
         public bool viewReport { get; set; }
+        public Guid actionBy { get; set; }
         public List<UserCounterData> userCounter { get; set; }
-        public List<DepartmentStoreData> departmentStore { get; set; }
-        public List<BrandData> brand { get; set; }
-        public List<DistributionChannelData> channel { get; set; }
     }
 }

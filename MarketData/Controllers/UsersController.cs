@@ -78,6 +78,7 @@ namespace MarketData.Controllers
                 var userData = process.user.GetUserList();
                 viewModel.data = userData.data.Select(c => new UserListData
                 {
+                    email = c.email,
                     userID = c.userID,
                     departmentStoreID = c.departmentStoreID != null ? string.Join(",", c.departmentStoreID) : null,
                     firstName = c.firstName,
@@ -152,7 +153,7 @@ namespace MarketData.Controllers
                 {
                     data.userCounter = response.userCounter.Select(c => new UserCounterViewModel
                     {
-                        userCounterID = c.userCounterID,
+                        userCounterID = c.userCounterID.GetValueOrDefault(),
                         departmentStoreID = c.departmentStoreID,
                         departmentStoreName = c.departmentStoreName,
                         channelID = c.channelID,
