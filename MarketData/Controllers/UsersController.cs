@@ -136,20 +136,23 @@ namespace MarketData.Controllers
 
             try
             {
-                data.userID = response.userID;
-                data.email = response.email;
-                data.active = response.active;
-                data.displayName = response.displayName;
-                data.firstName = response.firstName;
-                data.lastName = response.lastName;
-                data.validateEmail = response.validateEmail;
-                data.viewMaster = response.viewMaster;
-                data.editMaster = response.editMaster;
-                data.editUser = response.editUser;
-                data.viewData = response.viewData;
-                data.keyInData = response.keyInData;
-                data.approveData = response.approveData;
-                data.viewReport = response.viewReport;
+                if(response.email != null)
+                {
+                    data.userID = response.userID;
+                    data.email = response.email;
+                    data.active = response.active;
+                    data.displayName = response.displayName;
+                    data.firstName = response.firstName;
+                    data.lastName = response.lastName;
+                    data.validateEmail = response.validateEmail;
+                    data.viewMaster = response.viewMaster;
+                    data.editMaster = response.editMaster;
+                    data.editUser = response.editUser;
+                    data.viewData = response.viewData;
+                    data.keyInData = response.keyInData;
+                    data.approveData = response.approveData;
+                    data.viewReport = response.viewReport;
+                }            
                
                 if (response.departmentStore != null && response.departmentStore.Any())
                 {

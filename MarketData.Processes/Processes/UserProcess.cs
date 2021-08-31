@@ -134,25 +134,45 @@ namespace MarketData.Processes.Processes
             try
             {
                 var userData = repository.user.FindUserBy(c => c.ID == userID);
-                var userCounterData = repository.user.GetUserCounterBy(e => e.User_ID == userID);
+              
                 var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
                 var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
                 var channelResponse = repository.masterData.GetDistributionChannelListBy(c => c.Active_Flag && c.Delete_Flag != true);
 
-                response.userID = userData.ID;
-                response.email = userData.Email;
-                response.active = userData.ActiveFlag;
-                response.displayName = userData.DisplayName;
-                response.firstName = userData.FirstName;
-                response.lastName = userData.LastName;
-                response.validateEmail = userData.ValidateEmailFlag;
-                response.viewMaster = userData.ViewMasterPermission;
-                response.editMaster = userData.EditMasterPermission;
-                response.editUser = userData.EditUserPermission;
-                response.viewData = userData.ViewDataPermission;
-                response.keyInData = userData.KeyInDataPermission;
-                response.approveData = userData.ApprovePermission;
-                response.viewReport = userData.ViewReportPermission;
+                if(userData != null)
+                {
+                    response.userID = userData.ID;
+                    response.email = userData.Email;
+                    response.active = userData.ActiveFlag;
+                    response.displayName = userData.DisplayName;
+                    response.firstName = userData.FirstName;
+                    response.lastName = userData.LastName;
+                    response.validateEmail = userData.ValidateEmailFlag;
+                    response.viewMaster = userData.ViewMasterPermission;
+                    response.editMaster = userData.EditMasterPermission;
+                    response.editUser = userData.EditUserPermission;
+                    response.viewData = userData.ViewDataPermission;
+                    response.keyInData = userData.KeyInDataPermission;
+                    response.approveData = userData.ApprovePermission;
+                    response.viewReport = userData.ViewReportPermission;
+
+                    var userCounterData = repository.user.GetUserCounterBy(e => e.User_ID == userID);
+
+                    if (userCounterData != null && userCounterData.Any())
+                    {
+                        response.userCounter = userCounterData.Select(c => new UserCounterData
+                        {
+                            userCounterID = c.ID,
+                            departmentStoreID = c.DepartmentStore_ID,
+                            departmentStoreName = getDepartmentStoreResponse.FirstOrDefault(e => e.Department_Store_ID == c.DepartmentStore_ID).Department_Store_Name,
+                            brandID = c.Brand_ID,
+                            brandName = getBrandResponse.FirstOrDefault(b => b.Brand_ID == c.Brand_ID).Brand_Name,
+                            channelID = c.DistributionChannel_ID,
+                            channelName = channelResponse.FirstOrDefault(r => r.Distribution_Channel_ID == c.DistributionChannel_ID).Distribution_Channel_Name
+                        }).ToList();
+                    }
+                }
+              
                 response.departmentStore = getDepartmentStoreResponse.Select(c => new DepartmentStoreData
                 {
                     departmentStoreID = c.Department_Store_ID,
@@ -171,19 +191,7 @@ namespace MarketData.Processes.Processes
                     distributionChannelName = c.Distribution_Channel_Name
                 }).OrderBy(r => r.distributionChannelName).ToList();
 
-                if (userCounterData != null && userCounterData.Any())
-                {
-                    response.userCounter = userCounterData.Select(c => new UserCounterData
-                    {
-                        userCounterID = c.ID,
-                        departmentStoreID = c.DepartmentStore_ID,
-                        departmentStoreName = getDepartmentStoreResponse.FirstOrDefault(e => e.Department_Store_ID == c.DepartmentStore_ID).Department_Store_Name,
-                        brandID = c.Brand_ID,
-                        brandName = getBrandResponse.FirstOrDefault(b => b.Brand_ID == c.Brand_ID).Brand_Name,
-                        channelID = c.DistributionChannel_ID,
-                        channelName = channelResponse.FirstOrDefault(r => r.Distribution_Channel_ID == c.DistributionChannel_ID).Distribution_Channel_Name
-                    }).ToList();
-                }
+              
             }
             catch (Exception ex)
             {
