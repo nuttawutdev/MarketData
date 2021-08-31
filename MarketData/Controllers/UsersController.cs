@@ -26,18 +26,18 @@ namespace MarketData.Controllers
 
             try
             {
-                //SaveUserDataRequest request = new SaveUserDataRequest
-                //{
-                //    email = "nuttawut.ppb@gmail.com",
-                //    firstName = "Nutt",
-                //    lastName = "Pool",
-                //    displayName = "PPB",
-                //    actionBy = Guid.NewGuid(),
-                //    active = false,
-                //    approveData = true
-                //};
+                SaveUserDataRequest request = new SaveUserDataRequest
+                {
+                    email = "nuttawut.ppb@gmail.com",
+                    firstName = "Nutt",
+                    lastName = "Pool",
+                    displayName = "PPB",
+                    actionBy = Guid.NewGuid(),
+                    active = false,
+                    approveData = true
+                };
 
-                //var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
+                var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
 
                 var userOption = process.user.GetUserOption();
 

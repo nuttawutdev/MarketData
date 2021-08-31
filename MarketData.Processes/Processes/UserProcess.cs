@@ -19,10 +19,17 @@ namespace MarketData.Processes.Processes
     {
         private readonly Repository repository;
         private static Random random = new Random();
-
+        private AppSettingHelper appsettingHelper;
+        private readonly string smtpHost, userName, password;
+        private readonly int port;
         public UserProcess(Repository repository)
         {
             this.repository = repository;
+            appsettingHelper = new AppSettingHelper();
+            smtpHost = appsettingHelper.GetConfiguration("EmailSetting:SmtpHost");
+            port = Int32.Parse(appsettingHelper.GetConfiguration("EmailSetting:Port"));
+            userName = appsettingHelper.GetConfiguration("EmailSetting:UserName");
+            password = appsettingHelper.GetConfiguration("EmailSetting:Password");
         }
 
         public LoginResponse Login(LoginRequest request)
@@ -134,12 +141,12 @@ namespace MarketData.Processes.Processes
             try
             {
                 var userData = repository.user.FindUserBy(c => c.ID == userID);
-              
+
                 var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
                 var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
                 var channelResponse = repository.masterData.GetDistributionChannelListBy(c => c.Active_Flag && c.Delete_Flag != true);
 
-                if(userData != null)
+                if (userData != null)
                 {
                     response.userID = userData.ID;
                     response.email = userData.Email;
@@ -172,7 +179,7 @@ namespace MarketData.Processes.Processes
                         }).ToList();
                     }
                 }
-              
+
                 response.departmentStore = getDepartmentStoreResponse.Select(c => new DepartmentStoreData
                 {
                     departmentStoreID = c.Department_Store_ID,
@@ -191,7 +198,7 @@ namespace MarketData.Processes.Processes
                     distributionChannelName = c.Distribution_Channel_Name
                 }).OrderBy(r => r.distributionChannelName).ToList();
 
-              
+
             }
             catch (Exception ex)
             {
@@ -201,7 +208,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<SaveDataResponse> SaveUserData(SaveUserDataRequest request,string hostUrl)
+        public async Task<SaveDataResponse> SaveUserData(SaveUserDataRequest request, string hostUrl)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -211,12 +218,12 @@ namespace MarketData.Processes.Processes
                 request.displayName = request.displayName.Trim();
 
                 var userByEmail = repository.user.FindUserBy(c =>
-                c.Email.ToLower() == request.email.ToLower());
+                        c.Email.ToLower() == request.email.ToLower());
 
                 var userByDisplatName = repository.user.FindUserBy(c =>
-               c.DisplayName.ToLower() == request.displayName.ToLower());
+                    c.DisplayName.ToLower() == request.displayName.ToLower());
 
-                if((userByEmail == null || (userByEmail != null && userByEmail.ID == request.userID))
+                if ((userByEmail == null || (userByEmail != null && userByEmail.ID == request.userID))
                    && (userByDisplatName == null || (userByDisplatName != null && userByDisplatName.ID == request.userID)))
                 {
                     if (request.userID == null || request.userID == Guid.Empty)
@@ -228,12 +235,12 @@ namespace MarketData.Processes.Processes
 
                         if (createUserResponse != null)
                         {
-                            if(request.userCounter != null && request.userCounter.Any())
+                            if (request.userCounter != null && request.userCounter.Any())
                             {
                                 await repository.user.RemoveAllUserCounterByID(createUserResponse.ID);
                                 await CreateUserCounterData(createUserResponse.ID, request.userCounter);
                             }
-                           
+
                             SendEmailActivateUser(request.email, hostUrl, createUserResponse.ID.ToString(), generatePassword);
                             response.isSuccess = true;
                         }
@@ -262,7 +269,7 @@ namespace MarketData.Processes.Processes
                 {
                     response.isSuccess = false;
                     response.isDuplicated = true;
-                }              
+                }
             }
             catch (Exception ex)
             {
@@ -289,15 +296,10 @@ namespace MarketData.Processes.Processes
             return await repository.user.CreateUserCounter(userCounterList);
         }
 
-        private bool SendEmailActivateUser(string emailTo, string hostUrl, string userID,string passwordUser)
+        private bool SendEmailActivateUser(string emailTo, string hostUrl, string userID, string passwordUser)
         {
             try
             {
-                string smtpHost = "smtp.gmail.com";
-                int port = Int32.Parse("587");
-                string userName = "developernuttawut@gmail.com";
-                string password = "@min1234";
-
                 // Send Email
                 string url = $"{hostUrl}/Users/ActivateUser?userID={userID}";
                 string htmlBody = string.Empty;
@@ -312,7 +314,7 @@ namespace MarketData.Processes.Processes
                 m.From = new MailAddress("developernuttawut@gmail", "Admin");
                 m.To.Add(emailTo);
                 m.Subject = "Activate User​";
-                m.Body =$"{url} {passwordUser}";
+                m.Body = $"{url} {passwordUser}";
                 //m.IsBodyHtml = true;
 
                 using (var smtp = new SmtpClient())
