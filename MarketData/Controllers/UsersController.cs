@@ -1,4 +1,5 @@
-﻿using MarketData.Models;
+﻿using MarketData.Model.Request.User;
+using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -24,6 +25,19 @@ namespace MarketData.Controllers
 
             try
             {
+                //SaveUserDataRequest request = new SaveUserDataRequest
+                //{
+                //    email = "nuttawut.ppb@gmail.com",
+                //    firstName = "Nutt",
+                //    lastName = "Pool",
+                //    displayName = "PPB",
+                //    actionBy = Guid.NewGuid(),
+                //    active = false,
+                //    approveData = true
+                //};
+
+                //var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
+
                 var userOption = process.user.GetUserOption();
 
                 if (userOption.departmentStore != null && userOption.departmentStore.Any())

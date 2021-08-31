@@ -54,7 +54,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<TMUser> CreateNewUser(SaveUserDataRequest request)
+        public async Task<TMUser> CreateNewUser(SaveUserDataRequest request,string passsword)
         {
             try
             {
@@ -62,6 +62,7 @@ namespace MarketData.Repositories.Repo
                 {
                     ID = Guid.NewGuid(),
                     Email = request.email,
+                    Password = passsword,
                     DisplayName = request.displayName,
                     FirstName = request.firstName,
                     LastName = request.lastName,

@@ -7,7 +7,9 @@ using MarketData.Model.Response.User;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,7 @@ namespace MarketData.Processes.Processes
     public class UserProcess
     {
         private readonly Repository repository;
+        private static Random random = new Random();
 
         public UserProcess(Repository repository)
         {
@@ -174,15 +177,15 @@ namespace MarketData.Processes.Processes
                     {
                         userCounterID = c.ID,
                         departmentStoreID = c.DepartmentStore_ID,
-                        departmentStoreName = getDepartmentStoreResponse.FirstOrDefault(e=>e.Department_Store_ID == c.DepartmentStore_ID).Department_Store_Name,
+                        departmentStoreName = getDepartmentStoreResponse.FirstOrDefault(e => e.Department_Store_ID == c.DepartmentStore_ID).Department_Store_Name,
                         brandID = c.Brand_ID,
-                        brandName = getBrandResponse.FirstOrDefault(b=>b.Brand_ID == c.Brand_ID).Brand_Name,
+                        brandName = getBrandResponse.FirstOrDefault(b => b.Brand_ID == c.Brand_ID).Brand_Name,
                         channelID = c.DistributionChannel_ID,
-                        channelName = channelResponse.FirstOrDefault(r=>r.Distribution_Channel_ID == c.DistributionChannel_ID).Distribution_Channel_Name
+                        channelName = channelResponse.FirstOrDefault(r => r.Distribution_Channel_ID == c.DistributionChannel_ID).Distribution_Channel_Name
                     }).ToList();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
@@ -190,42 +193,142 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<SaveDataResponse> SaveUserData(SaveUserDataRequest request)
+        public async Task<SaveDataResponse> SaveUserData(SaveUserDataRequest request,string hostUrl)
         {
             SaveDataResponse response = new SaveDataResponse();
 
             try
             {
-                if(request.userID != null && request.userID != Guid.Empty)
+                request.email = request.email.Trim();
+                request.displayName = request.displayName.Trim();
+
+                var userByEmail = repository.user.FindUserBy(c =>
+                c.Email.ToLower() == request.email.ToLower());
+
+                var userByDisplatName = repository.user.FindUserBy(c =>
+               c.DisplayName.ToLower() == request.displayName.ToLower());
+
+                if((userByEmail == null || (userByEmail != null && userByEmail.ID == request.userID))
+                   && (userByDisplatName == null || (userByDisplatName != null && userByDisplatName.ID == request.userID)))
                 {
-                    var createUserResponse = await repository.user.CreateNewUser(request);
-
-                    if(createUserResponse != null)
+                    if (request.userID == null || request.userID == Guid.Empty)
                     {
-                        await repository.user.RemoveAllUserCounterByID(createUserResponse.ID);
+                        var generatePassword = RandomPassword();
+                        var passwordEncrypt = Utility.Encrypt(generatePassword);
 
+                        var createUserResponse = await repository.user.CreateNewUser(request, passwordEncrypt);
+
+                        if (createUserResponse != null)
+                        {
+                            if(request.userCounter != null && request.userCounter.Any())
+                            {
+                                await repository.user.RemoveAllUserCounterByID(createUserResponse.ID);
+                                await CreateUserCounterData(createUserResponse.ID, request.userCounter);
+                            }
+                           
+                            SendEmailActivateUser(request.email, hostUrl, createUserResponse.ID.ToString(), generatePassword);
+                            response.isSuccess = true;
+                        }
+                        else
+                        {
+                            response.isSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        var updateUserResult = await repository.user.UpdateUserData(request);
+                        if (updateUserResult)
+                        {
+                            await repository.user.RemoveAllUserCounterByID(request.userID.GetValueOrDefault());
+                            await CreateUserCounterData(request.userID.GetValueOrDefault(), request.userCounter);
+
+                            response.isSuccess = true;
+                        }
+                        else
+                        {
+                            response.isSuccess = false;
+                        }
                     }
                 }
                 else
                 {
-
-                }
+                    response.isSuccess = false;
+                    response.isDuplicated = true;
+                }              
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
 
             return response;
         }
 
-        //private async Task<bool> CreateUserCounterData(Guid userID,List<UserCounterData> userCounterData)
-        //{
-        //    var dateNow = Utility
-        //    List<TMUserCounter> userCounterList = userCounterData.Select(e => new TMUserCounter
-        //    {
-        //        ID = 
-        //    }).ToList();
-        //}
+        private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)
+        {
+            var dateNow = Utility.GetDateNowThai();
+
+            List<TMUserCounter> userCounterList = userCounterData.Select(e => new TMUserCounter
+            {
+                ID = Guid.NewGuid(),
+                Brand_ID = e.brandID,
+                DepartmentStore_ID = e.departmentStoreID,
+                DistributionChannel_ID = e.channelID,
+                User_ID = userID
+            }).ToList();
+
+            return await repository.user.CreateUserCounter(userCounterList);
+        }
+
+        private bool SendEmailActivateUser(string emailTo, string hostUrl, string userID,string passwordUser)
+        {
+            try
+            {
+                string smtpHost = "smtp.gmail.com";
+                int port = Int32.Parse("587");
+                string userName = "developernuttawut@gmail.com";
+                string password = "@min1234";
+
+                // Send Email
+                string url = $"{hostUrl}/Users/ActivateUser?userID={userID}";
+                string htmlBody = string.Empty;
+                //string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
+                //using (StreamReader reader = File.OpenText(emailTemplatePath))
+                //{
+                //    htmlBody = reader.ReadToEnd();
+                //}
+
+                //htmlBody = htmlBody.Replace("linkRegister", url);
+                MailMessage m = new MailMessage();
+                m.From = new MailAddress("developernuttawut@gmail", "Admin");
+                m.To.Add(emailTo);
+                m.Subject = "Activate User​";
+                m.Body =$"{url} {passwordUser}";
+                //m.IsBodyHtml = true;
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Host = smtpHost;
+                    smtp.Port = 587;
+                    smtp.Credentials = new System.Net.NetworkCredential(userName, password);
+                    smtp.EnableSsl = true;
+                    smtp.Send(m);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private string RandomPassword()
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, 8)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace MarketData.Model.Entiry
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
         public bool ViewMasterPermission { get; set; }
         public bool EditMasterPermission { get; set; }
         public bool EditUserPermission { get; set; }
