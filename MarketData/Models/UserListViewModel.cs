@@ -19,7 +19,7 @@ namespace MarketData.Models
         public bool validateEmail { get; set; }
         public bool active { get; set; }
         public string lastLogin { get; set; }
-        public List<Guid> departmentStoreID { get; set; }
-        public List<Guid> brandID { get; set; }
+        public string departmentStoreID { get; set; }
+        public string brandID { get; set; }
     }
 }

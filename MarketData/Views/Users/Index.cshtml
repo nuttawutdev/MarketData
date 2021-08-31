@@ -1,4 +1,5 @@
-﻿@{
+﻿@model MarketData.Models.UserOptionViewModel;
+@{
     ViewData["Title"] = "Users";
 }
 
@@ -24,12 +25,7 @@
 
                 <div class="filter-group">
                     <label>Department Store</label>
-                    <select class="form-control" style="width:200px;">
-                        <option>All</option>
-                        <option>Central Bangna</option>
-                        <option>The Mall Bangkae</option>
-                        <option>Robinson Bangrak</option>
-                    </select>
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
                 </div>
                 <div class="filter-group">
                     <label>Brand</label>
@@ -56,7 +52,7 @@
         </div>
     </div>
 </div>
-<div class="container-xl">
+<!--<div class="container-xl">
     <div class="table-responsive">
         <div class="table-wrapper">
 
@@ -142,12 +138,11 @@
                         <td class="col-2 text-center">
                             2021-10-08 23:21:56
                         </td>
-                        <td class="col-2 text-center">
-
-                            @*<a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
-                                    <i class="ion-eye text-white"></i>
-                                </a>*@
-                            <a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+                        <td class="col-2 text-center">-->
+@*<a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
+        <i class="ion-eye text-white"></i>
+    </a>*@
+<!--<a href="Users_Edit" class="btn btn-primary col-sm-12 col-md-3 btn-sm">
                                 <i class="ion-eye text-white"></i>
                             </a>
                             <a href="Users_Edit" class="btn btn-warning col-sm-12 col-md-3 btn-sm">
@@ -168,8 +163,7 @@
 
         </div>
     </div>
-</div>
-
+</div>-->
 <!-- Delete Modal HTML -->
 <div id="deleteModal" class="modal fade">
     <div class="modal-dialog">
@@ -306,10 +300,10 @@
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
-                url: '@Url.Action("GetBrandList", "MasterData")',
+                url: '@Url.Action("GetUserList", "Users")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
-                    return result.brandList;
+                    return result.data;
                 }
             },
             "columns": [
@@ -331,8 +325,8 @@
                     orderable: false,
                 },
                 { data: "lastLogin", title: "Last Login" },
-                { data: "departmentStoreID ", , visible: false },
                 { data: "active", title: "active", visible: false },
+                { data: "departmentStoreID", title: "departmentStoreID", visible: false },
                 {
                     data: "active",
                     title: "Active",
@@ -353,8 +347,16 @@
                         return '<a href="Brand_Edit_View?brandID=' + row.brandID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
                             '<a href="Brand_Edit?brandID=' + row.brandID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                           /*  '<a href="#confirmModal" data-id="' + row.brandID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
-                }}
-            ]
+                    }
+                }
+            ]});
+
+        $('#departmentStoreList').on('change', function (e) {
+            var status = $(this).val();
+            $('#departmentStoreList').val(status);
+            console.log(status, 'status');
+            console.log(dataTable.column(7), 'dataTable.column(7)');
+            dataTable.column(8).search(status).draw();
         });
 
         @*$('.btnReresh').on('click', function (e) {

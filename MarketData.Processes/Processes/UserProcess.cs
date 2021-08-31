@@ -63,7 +63,7 @@ namespace MarketData.Processes.Processes
                     brandName = c.Brand_Name
                 }).OrderBy(r => r.brandName).ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
@@ -83,7 +83,7 @@ namespace MarketData.Processes.Processes
 
                 List<UserData> userDataList = new List<UserData>();
 
-                foreach(var itemUser in allUser)
+                foreach (var itemUser in allUser)
                 {
                     UserData userData = new UserData
                     {
@@ -100,9 +100,8 @@ namespace MarketData.Processes.Processes
 
                     if (userCounterData.Any())
                     {
-                        var departmetList = userCounterData.Select(c => c.DepartmentStore_ID);
+                        var departmetList = userCounterData.Select(c => c.DepartmentStore_ID).GroupBy(e => e).Select(g => g.Key);
                         var brandList = userCounterData.Select(e => e.Brand_ID);
-
                         userData.departmentStoreID = departmetList.ToList();
                         userData.brandID = brandList.ToList();
                     }
@@ -112,7 +111,7 @@ namespace MarketData.Processes.Processes
 
                 response.data = userDataList;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
             }

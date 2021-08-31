@@ -73,7 +73,7 @@ namespace MarketData.Controllers
 
                 var userData = process.user.Login(loginRequest);
 
-                if(userData != null)
+                if(userData != null && userData.userID != null)
                 {
                     HttpContext.Session.SetString("userID", userData.userID.ToString());
                     HttpContext.Session.SetString("role", userData.role);

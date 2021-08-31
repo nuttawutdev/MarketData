@@ -1,6 +1,7 @@
 ﻿using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace MarketData.Controllers
 
                 return View(viewModel);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return RedirectToAction("KeyIn", "Home");
             }
@@ -69,10 +70,10 @@ namespace MarketData.Controllers
                 viewModel.data = userData.data.Select(c => new UserListData
                 {
                     userID = c.userID,
-                    departmentStoreID = c.departmentStoreID,
+                    departmentStoreID = c.departmentStoreID != null ? string.Join(",", c.departmentStoreID) : null,
                     firstName = c.firstName,
                     active = c.active,
-                    brandID = c.brandID,
+                    brandID = c.brandID != null  ? string.Join(",", c.brandID) : null,
                     displayName = c.displayName,
                     lastLogin = c.lastLogin,
                     lastName = c.lastName,
@@ -81,7 +82,7 @@ namespace MarketData.Controllers
 
                 return Json(viewModel);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Json(viewModel);
             }
