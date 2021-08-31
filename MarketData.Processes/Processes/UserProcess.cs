@@ -310,7 +310,7 @@ namespace MarketData.Processes.Processes
                 using (var smtp = new SmtpClient())
                 {
                     smtp.Host = smtpHost;
-                    smtp.Port = 587;
+                    smtp.Port = port;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
                     smtp.Send(m);

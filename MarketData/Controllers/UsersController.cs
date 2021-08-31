@@ -1,4 +1,5 @@
 ﻿using MarketData.Model.Request.User;
+using MarketData.Model.Response;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Mvc;
@@ -109,6 +110,22 @@ namespace MarketData.Controllers
             catch (Exception ex)
             {
                 return Json(viewModel);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUserData([FromBody]SaveUserDataRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");           
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
             }
         }
 
