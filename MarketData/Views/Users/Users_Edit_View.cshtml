@@ -1,0 +1,221 @@
+﻿@model MarketData.Models.UserDetailViewModel;
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+
+<h3>@ViewData["Title"]</h3>
+<hr />
+
+<br />
+<form>
+<div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Email	</label>
+        <input type="email" class="form-control input-sm" id="Email" value="@Model.email">
+    </div>
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Display Name	</label>
+        <input type="text" class="form-control input-sm" id="DisplayName" value="@Model.displayName">
+    </div>
+
+</div>
+<div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">First Name</label>
+        <input type="text" class="form-control input-sm" id="FirstName" value="@Model.firstName">
+    </div>
+    <div class="form-group col-md-6 col-sm-6">
+        <label for="name">Last Name</label>
+        <input type="text" class="form-control input-sm" id="LastName" value="@Model.lastName">
+    </div>
+
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+        <label>
+            @if (Model.active)
+            {
+                <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+            }
+            Active
+        </label>
+    </div>
+    <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.validateEmail)
+            {
+                <input value="" id="flagValidateEmail" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagValidateEmail" type="checkbox" data-toggle="toggle">
+            }
+            Validated Email
+        </label>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+    <div class="col-md-12 col-sm-12">
+        <h6>Permission</h6>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+        <label>
+            @if (Model.viewMaster)
+            {
+                <input value="" id="flagViewMaster" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewMaster" type="checkbox" data-toggle="toggle">
+            }
+            View Master
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.editMaster)
+            {
+                <input value="" id="flagEditMaster" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagEditMaster" type="checkbox" data-toggle="toggle">
+            }
+            Edit Master
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.editUser)
+            {
+                <input value="" id="flagEditUser" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagEditUser" type="checkbox" data-toggle="toggle">
+            }
+            Edit Users
+        </label>
+    </div>
+</div>
+<div class="row col-md-12 col-sm-12">
+
+    <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.viewData)
+            {
+                <input value="" id="flagViewData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewData" type="checkbox" data-toggle="toggle">
+            }
+            View Data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+        <label>
+            @if (Model.keyInData)
+            {
+                <input value="" id="flagKeyInData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagKeyInData" type="checkbox" data-toggle="toggle">
+            }
+            Key-in Data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+        <label>
+            @if (Model.approveData)
+            {
+                <input value="" id="flagApproveData" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagApproveData" type="checkbox" data-toggle="toggle">
+            }
+            Approve data
+        </label>
+    </div>
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+
+
+        <label>
+            @if (Model.viewReport)
+            {
+                <input value="" id="flagViewReport" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagViewReport" type="checkbox" data-toggle="toggle">
+            }
+            View Report
+        </label>
+    </div>
+</div>
+
+
+<br />
+<div class="container-xl" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
+    <div class="table-responsive table-sm">
+        <div class="table-wrapper">
+            <div style=" overflow-x: auto;">
+                <table class="table  table-hover " id="tblDetails">
+                    <thead class="table-secondary">
+                        <tr class="row m-0">
+                            <th class="col-4">Department Store</th>
+                            <th class="col-4">Brand</th>
+                            <th class="col-2">Distribution Chanels</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model.userCounter)
+                            {
+                                <tr class="row m-0">
+                                    <td class="userCounterID" hidden>@item.userCounterID</td>
+                                    <td class="col-4 departmentStoreName">@item.departmentStoreName</td>
+                                    <td class="col-2 departmentStoreID" hidden>@item.departmentStoreID</td>
+                                    <td class="col-4 brandName">@item.brandName</td>
+                                    <td class="col-2 brandID" hidden>@item.brandID</td>
+                                    <td class="col-2 channelName">@item.channelName</td>
+                                    <td class="col-2 channelID" hidden>@item.channelID</td>
+                                </tr>
+                            }
+
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <a href="Index" class="btn btn-outline-danger">Cancel</a>
+
+</div>
+</form>
+
+<script type="text/javascript">
+    $("form :input").attr("disabled", "disabled");
+</script>
