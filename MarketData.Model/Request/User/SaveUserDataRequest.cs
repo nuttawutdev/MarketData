@@ -1,6 +1,7 @@
 ﻿using MarketData.Model.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MarketData.Model.Request.User
@@ -8,7 +9,9 @@ namespace MarketData.Model.Request.User
     public class SaveUserDataRequest
     {
         public Guid? userID { get; set; }
+        [Required]
         public string email { get; set; }
+        [Required]
         public string displayName { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }

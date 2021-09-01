@@ -403,6 +403,39 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public async Task<SaveDataResponse> ChangePasssword(ChangePasswordRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.ID == request.userID);
+                var urlData = repository.url.GetUrlDataBy(c => c.ID == request.urlID);
+
+                string passwordEncrypt = Encrypt(request.password);
+
+                var updateUserPasswordResult = await repository.user.ChangeUserPassword(request.userID, passwordEncrypt);
+                if (updateUserPasswordResult)
+                {
+                    urlData.Flag_Active = false;
+                    await repository.url.UpdateUrlData(urlData);
+
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
         public VerifyUrlResetPasswordResponse VerifyUrlResetPassword(Guid urlID)
         {
             VerifyUrlResetPasswordResponse response = new VerifyUrlResetPasswordResponse();

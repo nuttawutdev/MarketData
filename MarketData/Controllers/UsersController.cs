@@ -104,14 +104,25 @@ namespace MarketData.Controllers
         public async Task<IActionResult> SaveUserData([FromBody] SaveUserDataRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
-
-            try
+            if (ModelState.IsValid)
             {
-                response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
-                return Json(response);
+                try
+                {
+                    response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
+                    return Json(response);
+                }
+                catch (Exception ex)
+                {
+                    return Json(response);
+                }
             }
-            catch (Exception ex)
+            else
             {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false,
+                    responseError = "Please input required field."
+                };
                 return Json(response);
             }
         }
@@ -220,12 +231,35 @@ namespace MarketData.Controllers
                     urlID = verifyUrlResponse.urlID
                 };
 
-                return View("ChangePassword", viewModel);
+                return View("ResetPassword", viewModel);
             }
             else
             {
                 return View("UrlUnvaliable");
-            }          
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            if (ModelState.IsValid)
+            {
+                ChangePasswordRequest internalRequest = new ChangePasswordRequest
+                {
+                    urlID = request.urlID,
+                    userID = request.userID,
+                    password = request.password
+                };
+
+                response = await process.user.ChangePasssword(internalRequest);
+                return RedirectToAction("Login","Home");
+            }
+            else
+            {
+                return View("ResetPassword", request);
+            }       
         }
 
         public IActionResult Test()
