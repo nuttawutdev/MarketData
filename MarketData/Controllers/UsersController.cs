@@ -73,7 +73,20 @@ namespace MarketData.Controllers
                 return View("Index");
             }
         }
+        public IActionResult Users_Edit_View(Guid userID)
+        {
+            var viewModel = GetUserDetail(userID);
 
+            if (viewModel != null)
+            {
+                return View(viewModel);
+            }
+            else
+            {
+                return View("Index");
+            }
+        
+        }
         [HttpPost]
         public IActionResult GetUserList()
         {
