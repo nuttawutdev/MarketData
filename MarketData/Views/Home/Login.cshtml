@@ -26,16 +26,18 @@
             <h2 class="visually-hidden">Login Form</h2>
             <div class="illustration"><i class="icon ion-ios-locked-outline text-danger"></i></div>
             <div class="mb-3">
-                <input asp-for="userName" class="form-control text-danger" placeholder="User Name" />
+                <input asp-for="userName" class="form-control text-danger" placeholder="Email" />
+                <span asp-validation-for="userName" class="text-danger"></span>
                 @*<input class="form-control text-danger" type="email" name="email" placeholder="Email">*@
             </div>
             <div class="mb-3">
                 <input asp-for="password" class="form-control text-danger" type="password" placeholder="Password" />
+                <span asp-validation-for="password" class="text-danger"></span>
                 @*<input class="form-control text-danger" type="password" name="password" placeholder="Password">*@
             </div>
             <div class="mb-3"><button class="btn btn-danger d-block w-100" type="submit">Log In</button></div>
 
-            <a class="forgot " asp-area="" asp-controller="Home" asp-action="ForgotPassword">Forgot your email or password?</a>
+            <a class="forgot " asp-area="" asp-controller="Home" asp-action="ForgotPassword">Forgot password?</a>
         </form>
     </section>
     <script src="~/bootstrap/js/bootstrap.min.js"></script>
@@ -46,6 +48,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/widgets/widget-storage.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 </body>
 
 </html>

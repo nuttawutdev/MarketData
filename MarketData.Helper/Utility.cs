@@ -32,8 +32,8 @@ namespace MarketData.Helper
             Undefined, // Required here even though it's not a valid month
             [Description("ActivateUser")]
             ActivateUser,
-            [Description("ForgotPassword")]
-            ForgotPassword
+            [Description("ResetPassword")]
+            ResetPassword
         }
 
         public static DateTime GetDateNowThai()

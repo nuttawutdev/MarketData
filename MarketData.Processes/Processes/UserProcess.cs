@@ -248,7 +248,7 @@ namespace MarketData.Processes.Processes
 
                             if (urlActivateUserData != null)
                             {
-                                SendEmailActivateUser(request.email, hostUrl, urlActivateUserData.ID.ToString(), generatePassword);
+                                await SendEmailActivateUser(request.email, hostUrl, urlActivateUserData.ID.ToString(), generatePassword);
                             }
 
                             response.isSuccess = true;
@@ -307,11 +307,11 @@ namespace MarketData.Processes.Processes
                             urlData.Flag_Active = false;
                             await repository.url.UpdateUrlData(urlData);
 
-                            response.success = true;
+                            response.isSuccess = true;
                         }
                         else
                         {
-                            response.success = false;
+                            response.isSuccess = false;
                         }
                     }
                     else
@@ -322,18 +322,19 @@ namespace MarketData.Processes.Processes
                         }
                         else if (!urlData.Flag_Active)
                         {
-                            response.activated = true;
+                            response.unActive = true;
                         }
                     }
                 }
                 else
                 {
-                    response.success = false;
+                    response.urlNotFound = true;
+                    response.isSuccess = false;
                 }
             }
             catch (Exception ex)
             {
-                response.success = false;
+                response.isSuccess = false;
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
 
@@ -356,11 +357,95 @@ namespace MarketData.Processes.Processes
                 if (urlActivateUserData != null)
                 {
                     var passwordDecrypt = Utility.Decrypt(userData.Password);
-                    SendEmailActivateUser(userData.Email, hostUrl, urlActivateUserData.ID.ToString(), passwordDecrypt);
+                    response.isSuccess = await SendEmailActivateUser(userData.Email, hostUrl, urlActivateUserData.ID.ToString(), passwordDecrypt);
                 }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
 
-                response.isSuccess = true;
+            return response;
+        }
 
+        public async Task<SaveDataResponse> ResetPassword(string email,string hostUrl)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.Email.ToLower() == email.ToLower());
+
+                if(userData != null)
+                {
+                    await repository.url.UnActiveOldUrl(userData.ID.ToString(), TypeUrl.ResetPassword.ToString());
+
+                    var dateExpireLink = GetDateNowThai().AddHours(4);
+                    var urlResetPassword = await repository.url.CreateUrl(userData.ID.ToString(), dateExpireLink, TypeUrl.ResetPassword.ToString());
+
+                    if (urlResetPassword != null)
+                    {
+                        response.isSuccess = await SendEmailResetPassword(userData.Email, hostUrl, urlResetPassword.ID.ToString());
+                    }
+                }
+                else
+                {
+                    response.notExistEmail = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        public VerifyUrlResetPasswordResponse VerifyUrlResetPassword(Guid urlID)
+        {
+            VerifyUrlResetPasswordResponse response = new VerifyUrlResetPasswordResponse();
+
+            try
+            {
+                var urlData = repository.url.GetUrlDataBy(c => c.ID == urlID);
+                if (urlData != null)
+                {
+                    if (urlData.Flag_Active && urlData.Expire_Date > Utility.GetDateNowThai())
+                    {
+                        var ref1 = urlData.Ref1;
+                        Guid userID = new Guid(ref1);
+                        var userData =  repository.user.FindUserBy(c=> c.ID == userID);
+
+                        if (userData != null)
+                        {
+                            response.isSuccess = true;
+                            response.urlID = urlID;
+                            response.userID = userData.ID;
+                        }
+                        else
+                        {
+                            response.isSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        if (urlData.Expire_Date < Utility.GetDateNowThai())
+                        {
+                            response.urlExpire = true;
+                        }
+                        else if (!urlData.Flag_Active)
+                        {
+                            response.unActive = true;
+                        }
+                    }
+                }
+                else
+                {
+                    response.urlNotFound = true;
+                    response.isSuccess = false;
+                }
             }
             catch (Exception ex)
             {
@@ -387,7 +472,7 @@ namespace MarketData.Processes.Processes
             return await repository.user.CreateUserCounter(userCounterList);
         }
 
-        private bool SendEmailActivateUser(string emailTo, string hostUrl, string urlID, string passwordUser)
+        private async Task<bool> SendEmailActivateUser(string emailTo, string hostUrl, string urlID, string passwordUser)
         {
             try
             {
@@ -414,7 +499,45 @@ namespace MarketData.Processes.Processes
                     smtp.Port = port;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
-                    smtp.Send(m);
+                    await smtp.SendMailAsync(m);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private async Task<bool> SendEmailResetPassword(string emailTo, string hostUrl, string urlID)
+        {
+            try
+            {
+                // Send Email
+                string url = $"{hostUrl}/Users/VerifyUrlResetPassword?refID={urlID}";
+                string htmlBody = string.Empty;
+                //string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
+                //using (StreamReader reader = File.OpenText(emailTemplatePath))
+                //{
+                //    htmlBody = reader.ReadToEnd();
+                //}
+
+                //htmlBody = htmlBody.Replace("linkRegister", url);
+                MailMessage m = new MailMessage();
+                m.From = new MailAddress("developernuttawut@gmail", "Admin");
+                m.To.Add(emailTo);
+                m.Subject = "Reset Password​";
+                m.Body = $"{url}";
+                //m.IsBodyHtml = true;
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Host = smtpHost;
+                    smtp.Port = port;
+                    smtp.Credentials = new System.Net.NetworkCredential(userName, password);
+                    smtp.EnableSsl = true;
+                    await smtp.SendMailAsync(m);
                 }
 
                 return true;

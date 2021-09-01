@@ -60,14 +60,14 @@ namespace MarketData.Controllers
         {
             var viewModel = GetUserDetail(userID);
 
-            if(viewModel != null)
+            if (viewModel != null)
             {
                 return View(viewModel);
             }
             else
             {
                 return View("Index");
-            }         
+            }
         }
 
         [HttpPost]
@@ -85,7 +85,7 @@ namespace MarketData.Controllers
                     departmentStoreID = c.departmentStoreID != null ? string.Join(",", c.departmentStoreID) : null,
                     firstName = c.firstName,
                     active = c.active,
-                    brandID = c.brandID != null  ? string.Join(",", c.brandID) : null,
+                    brandID = c.brandID != null ? string.Join(",", c.brandID) : null,
                     displayName = c.displayName,
                     lastLogin = c.lastLogin,
                     lastName = c.lastName,
@@ -101,13 +101,13 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveUserData([FromBody]SaveUserDataRequest request)
+        public async Task<IActionResult> SaveUserData([FromBody] SaveUserDataRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
             try
             {
-                response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");           
+                response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
                 return Json(response);
             }
             catch (Exception ex)
@@ -123,7 +123,7 @@ namespace MarketData.Controllers
 
             try
             {
-                if(response.email != null)
+                if (response.email != null)
                 {
                     data.userID = response.userID;
                     data.email = response.email;
@@ -139,8 +139,8 @@ namespace MarketData.Controllers
                     data.keyInData = response.keyInData;
                     data.approveData = response.approveData;
                     data.viewReport = response.viewReport;
-                }            
-               
+                }
+
                 if (response.departmentStore != null && response.departmentStore.Any())
                 {
                     data.departmentStoreList = response.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
@@ -184,7 +184,7 @@ namespace MarketData.Controllers
                     }).ToList();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -197,18 +197,40 @@ namespace MarketData.Controllers
         {
             var activateUserResponse = await process.user.ActivateUser(new Guid(refID));
 
-            if (activateUserResponse.success)
+            if (activateUserResponse.isSuccess)
             {
                 return View("ActivateSuccess");
             }
             else
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("UrlUnvaliable");
             }
+        }
+
+        [HttpGet]
+        public IActionResult VerifyUrlResetPassword(string refID)
+        {
+            var verifyUrlResponse = process.user.VerifyUrlResetPassword(new Guid(refID));
+
+            if (verifyUrlResponse.isSuccess)
+            {
+                ChangePasswordViewModel viewModel = new ChangePasswordViewModel
+                {
+                    userID = verifyUrlResponse.userID,
+                    urlID = verifyUrlResponse.urlID
+                };
+
+                return View("ChangePassword", viewModel);
+            }
+            else
+            {
+                return View("UrlUnvaliable");
+            }          
         }
 
         public IActionResult Test()
         {
+            //var reset = process.user.ResetPassword("nuttawut.ppb@gmail.com", $"{Request.Scheme}://{Request.Host.Value}");
             //SaveUserDataRequest request = new SaveUserDataRequest
             //{
             //    email = "nuttawut.ppb@gmail.com",

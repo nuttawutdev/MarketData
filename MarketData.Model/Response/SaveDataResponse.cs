@@ -8,5 +8,6 @@ namespace MarketData.Model.Response
     {
         public bool isSuccess { get; set; }
         public bool? isDuplicated { get; set; }
+        public bool? notExistEmail { get; set; }
     }
 }

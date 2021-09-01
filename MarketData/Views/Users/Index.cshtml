@@ -19,11 +19,6 @@
             <div class="col-sm-10">
 
                 <div class="filter-group">
-                    <label>Filter</label>
-                    <input type="text" class="form-control">
-                </div>
-
-                <div class="filter-group">
                     <label>Department Store</label>
                     @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
                 </div>
