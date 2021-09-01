@@ -1,7 +1,7 @@
 ﻿@model MarketData.Models.UserDetailViewModel;
 
 @{
-    ViewData["Title"] = "Add Users";
+    ViewData["Title"] =  Model.email == null ? "Add Users" : "Edit Users";
     Html.RenderPartial("_WarningModal");
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
@@ -175,8 +175,9 @@
 </div>
 <div class="row col-md-12 col-sm-12 ">
     <div class=" col-md-12 col-sm-12">
-        <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Resend welcome email</a>
-        <a href="#" class="btn btn-danger col-sm-12 col-md-3 btn-sm">Reset password</a>
+        <button id="btnResend" class="btn btn-danger col-sm-12 col-md-3 btn-sm" type="button">Resend welcome email</button>
+        <button id="btnReset" class="btn btn-danger col-sm-12 col-md-3 btn-sm" type="button">Reset password</button>
+
     </div>
 </div>
 <br />
@@ -312,8 +313,71 @@
             }
 
 
-       
+
         });
+
+        $("#btnResend").click(function () {
+            $("#blocker").show();
+            var model = @Html.Raw(Json.Serialize(Model));
+           $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ResendWelcomeEmail", "Users")',
+                    contentType: "application/json; charset=utf-8",
+               data: {
+                   UserID: model.userID
+               },
+               success: function (data) {
+                   $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "");
+                            $('#successModal').modal('show');
+                            
+                            $('#txtResult').text("");
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Send email failed');
+                        }
+                        $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+                  
+                    },
+               error: function () {
+                   $("#blocker").hide();
+
+                    }
+                });
+        })
+
+        $("#btnReset").click(function () {
+            $("#blocker").show();
+             var model = @Html.Raw(Json.Serialize(Model));
+               $.ajax({
+                   type: "GET",
+                    url: '@Url.Action("ResetPassword", "Users")',
+                    contentType: "application/json; charset=utf-8",
+                   data: {
+                       email: model.email
+                   },
+               success: function (data) {
+                   $("#blocker").hide();
+                   if (data.isSuccess) {
+                       $('#successModalHref').attr("href", "");
+                       $('#successModal').modal('show');
+                       $('#txtResult').text("");
+                   } else {
+                       $('#failedModal').modal('show');
+                       $('#myModalFailedResult').text(data.responseError != ""
+                           && data.responseError != null ? data.responseError : 'Reset email failed');
+                   }
+                   $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+                    },
+                   error: function () {
+                       $("#blocker").hide();
+                    }
+                });
+        })
 
         function getDataFromTable() {
            var model = @Html.Raw(Json.Serialize(Model));
@@ -359,9 +423,8 @@
             return frmdata;
         };
 
-
         function validate_Email_Display() {
-           
+
             if ($("#Email").val() == "" || $("#DisplayName").val() == "") {
                 showWarningAlert('NullEmail_Display');
                 return 0;
@@ -373,7 +436,7 @@
             for (var i = 0; i < data.userCounter.length; i++) {
                 for (var j = 0; j < data.userCounter.length; j++) {
                     var first = data.userCounter[i].brandID + data.userCounter[i].channelID + data.userCounter[i].departmentStoreID;
-        
+
                     var secound = data.userCounter[j].brandID + data.userCounter[j].channelID + data.userCounter[j].departmentStoreID;
 
                     if (first == secound && i!=j) {
