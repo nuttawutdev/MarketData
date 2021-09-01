@@ -134,6 +134,32 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> ActivateUser(Guid userID)
+        {
+            try
+            {
+                var userData = _dbContext.TMUser.Find(userID);
+                userData.ActiveFlag = true;
+                userData.Update_By = userID;
+                userData.Update_Date = Utility.GetDateNowThai();
+
+                _dbContext.TMUser.Update(userData);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> RemoveAllUserCounterByID(Guid userID)
         {
             try

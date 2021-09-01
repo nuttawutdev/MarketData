@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using static MarketData.Helper.Utility;
 
 namespace MarketData.Processes.Processes
 {
@@ -241,7 +242,15 @@ namespace MarketData.Processes.Processes
                                 await CreateUserCounterData(createUserResponse.ID, request.userCounter);
                             }
 
-                            SendEmailActivateUser(request.email, hostUrl, createUserResponse.ID.ToString(), generatePassword);
+                            var dateExpireLink = Utility.GetDateNowThai().AddDays(30);
+
+                            var urlActivateUserData = await repository.url.CreateUrl(createUserResponse.ID.ToString(), dateExpireLink, TypeUrl.ActivateUser.ToString());
+
+                            if (urlActivateUserData != null)
+                            {
+                                SendEmailActivateUser(request.email, hostUrl, urlActivateUserData.ID.ToString(), generatePassword);
+                            }
+
                             response.isSuccess = true;
                         }
                         else
@@ -280,6 +289,88 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public async Task<ActivateUserResponse> ActivateUser(Guid urlID)
+        {
+            ActivateUserResponse response = new ActivateUserResponse();
+
+            try
+            {
+                var urlData = repository.url.GetUrlDataBy(c => c.ID == urlID);
+                if (urlData != null)
+                {
+                    if (urlData.Flag_Active && urlData.Expire_Date > Utility.GetDateNowThai())
+                    {
+                        var ref1 = urlData.Ref1;
+                        var activateUserResponse = await repository.user.ActivateUser(new Guid(ref1));
+                        if (activateUserResponse)
+                        {
+                            urlData.Flag_Active = false;
+                            await repository.url.UpdateUrlData(urlData);
+
+                            response.success = true;
+                        }
+                        else
+                        {
+                            response.success = false;
+                        }
+                    }
+                    else
+                    {
+                        if (urlData.Expire_Date < Utility.GetDateNowThai())
+                        {
+                            response.urlExpire = true;
+                        }
+                        else if (!urlData.Flag_Active)
+                        {
+                            response.activated = true;
+                        }
+                    }
+                }
+                else
+                {
+                    response.success = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.success = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveDataResponse> ResendWelcomeEmail(Guid userID, string hostUrl)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.ID == userID);
+                var dateExpireLink = Utility.GetDateNowThai().AddDays(30);
+
+                await repository.url.UnActiveOldUrl(userID.ToString(), TypeUrl.ActivateUser.ToString());
+
+                var urlActivateUserData = await repository.url.CreateUrl(userData.ID.ToString(), dateExpireLink, TypeUrl.ActivateUser.ToString());
+
+                if (urlActivateUserData != null)
+                {
+                    var passwordDecrypt = Utility.Decrypt(userData.Password);
+                    SendEmailActivateUser(userData.Email, hostUrl, urlActivateUserData.ID.ToString(), passwordDecrypt);
+                }
+
+                response.isSuccess = true;
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
         private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)
         {
             var dateNow = Utility.GetDateNowThai();
@@ -296,12 +387,12 @@ namespace MarketData.Processes.Processes
             return await repository.user.CreateUserCounter(userCounterList);
         }
 
-        private bool SendEmailActivateUser(string emailTo, string hostUrl, string userID, string passwordUser)
+        private bool SendEmailActivateUser(string emailTo, string hostUrl, string urlID, string passwordUser)
         {
             try
             {
                 // Send Email
-                string url = $"{hostUrl}/Users/ActivateUser?userID={userID}";
+                string url = $"{hostUrl}/Users/ActivateUser?refID={urlID}";
                 string htmlBody = string.Empty;
                 //string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
                 //using (StreamReader reader = File.OpenText(emailTemplatePath))

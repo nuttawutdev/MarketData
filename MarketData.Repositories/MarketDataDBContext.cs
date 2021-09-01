@@ -35,5 +35,6 @@ namespace MarketData.Repositories
         public DbSet<TTAdjustDataDetail> TTAdjustDataDetail { get; set; }
         public DbSet<TTAdjustDataBrandDetail> TTAdjustDataBrandDetail { get; set; }
         public DbSet<TMAdjustStatus> TMAdjustStatus { get; set; }
+        public DbSet<TMUrl> TMUrl { get; set; }
     }
 }

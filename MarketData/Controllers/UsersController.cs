@@ -26,19 +26,6 @@ namespace MarketData.Controllers
 
             try
             {
-                SaveUserDataRequest request = new SaveUserDataRequest
-                {
-                    email = "nuttawut.ppb@gmail.com",
-                    firstName = "Nutt",
-                    lastName = "Pool",
-                    displayName = "PPB",
-                    actionBy = Guid.NewGuid(),
-                    active = false,
-                    approveData = true
-                };
-
-                var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
-
                 var userOption = process.user.GetUserOption();
 
                 if (userOption.departmentStore != null && userOption.departmentStore.Any())
@@ -203,6 +190,41 @@ namespace MarketData.Controllers
             }
 
             return data;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ActivateUser(string refID)
+        {
+            var activateUserResponse = await process.user.ActivateUser(new Guid(refID));
+
+            if (activateUserResponse.success)
+            {
+                return View("ActivateSuccess");
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
+        }
+
+        public IActionResult Test()
+        {
+            //SaveUserDataRequest request = new SaveUserDataRequest
+            //{
+            //    email = "nuttawut.ppb@gmail.com",
+            //    firstName = "Nutt",
+            //    lastName = "Pool",
+            //    displayName = "PPB",
+            //    actionBy = Guid.NewGuid(),
+            //    active = false,
+            //    approveData = true
+            //};
+
+            //var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
+
+            //var resendWelcome = process.user.ResendWelcomeEmail(new Guid("3B1E4B7D-F75D-4A27-A707-8676F112814D"), $"{Request.Scheme}://{Request.Host.Value}");
+
+            return View();
         }
     }
 }
