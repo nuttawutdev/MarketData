@@ -139,7 +139,7 @@ namespace MarketData.Repositories.Repo
             try
             {
                 var userData = _dbContext.TMUser.Find(userID);
-                userData.ActiveFlag = true;
+                userData.ValidateEmailFlag = true;
                 userData.Update_By = userID;
                 userData.Update_Date = Utility.GetDateNowThai();
 

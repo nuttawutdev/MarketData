@@ -5,7 +5,7 @@
     Html.RenderPartial("_FailedModal");
     Html.RenderPartial("_ImportDataResultModal");
 }
-}
+
 
 
 <h3>
@@ -118,11 +118,11 @@
                                 var sampleArr = base64ToArrayBuffer(data.fileResult);
                                 saveByteArray(data.fileName, sampleArr);
 
-                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModalHref').attr("href", "Index");
                                 $('#importDataModal').modal('show');
                             }
                             else {
-                                $('#importDataModalHref').attr("href", "Brand");
+                                $('#importDataModalHref').attr("href", "Index");
                                 $('#importDataModal').modal('show');
                             }
                         }
@@ -207,9 +207,16 @@
                         var edit = '<a href="Users_Edit?userID=' + row.userID + '" class="btn btn-warning col-sm-12 col-md-3 btn-sm"><i class="ion-edit text-white"></i></a>';
                         var reset = '<a style="margin-top:5px;font-size:10px" href="#" class="btn btn-outline-danger col-sm-12 col-md-10 btn-sm">Reset Password</a>';
                         var resend = '<a style="margin-top:5px;font-size:10px" href="#" class="btn btn-outline-primary col-sm-12 col-md-10 btn-sm">Resend Welcome Email</a>';
+                        var actionButton = view + edit;
 
-                        return view + edit + reset + resend;
-                         }
+                        if (row.validateEmail == true) {
+                            actionButton += reset
+                        }
+                        else {
+                            actionButton += resend
+                        }
+                        return actionButton;
+                   }
                 }
             ]});
 

@@ -596,8 +596,8 @@ namespace MarketData.Processes.Processes
                                     && !string.IsNullOrWhiteSpace(channel))
                                 {
                                     var departMentStoreData = getDepartmentStoreResponse.FirstOrDefault(d => d.Department_Store_Name.ToLower() == departmentStore.ToLower());
-                                    var brandData = getBrandResponse.FirstOrDefault(d => d.Brand_Name.ToLower() == departmentStore.ToLower());
-                                    var channelData = channelResponse.FirstOrDefault(d => d.Distribution_Channel_Name.ToLower() == departmentStore.ToLower());
+                                    var brandData = getBrandResponse.FirstOrDefault(d => d.Brand_Name.ToLower() == brand.ToLower());
+                                    var channelData = channelResponse.FirstOrDefault(d => d.Distribution_Channel_Name.ToLower() == channel.ToLower());
 
                                     if (departMentStoreData != null && brandData != null && channelData != null)
                                     {
