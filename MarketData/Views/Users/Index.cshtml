@@ -4,6 +4,7 @@
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
     Html.RenderPartial("_ImportDataResultModal");
+    Html.RenderPartial("_SuccessModal");
 }
 
 
@@ -59,9 +60,6 @@
 
 
     $(document).ready(function () {
-        //$('#importDataModalHref').attr("href", "Brand");
-        //$('#importDataModal').modal('show');
-
         function base64ToArrayBuffer(base64) {
             var binaryString = window.atob(base64);
             var binaryLen = binaryString.length;
@@ -205,9 +203,11 @@
                     render: function (data, type, row) {
                         var view = '<a href="Users_Edit_View?userID=' + row.userID + '" class="btn btn-primary col-sm-12 col-md-3 btn-sm"><i class="ion-eye text-white"></i></a>';
                         var edit = '<a href="Users_Edit?userID=' + row.userID + '" class="btn btn-warning col-sm-12 col-md-3 btn-sm"><i class="ion-edit text-white"></i></a>';
-                        var reset = '<a style="margin-top:5px;font-size:10px" href="#" class="btn btn-outline-danger col-sm-12 col-md-10 btn-sm">Reset Password</a>';
-                        var resend = '<a style="margin-top:5px;font-size:10px" href="#" class="btn btn-outline-primary col-sm-12 col-md-10 btn-sm">Resend Welcome Email</a>';
+                        var reset = '<a data-email="' + row.email + '" style="margin-top:5px;font-size:10px" href="#" class="btnReset btn btn-outline-danger col-sm-12 col-md-10 btn-sm">Reset Password</a>';
+                        var resend = '<a data-id="' + row.userID +'" style="margin-top:5px;font-size:10px" href="#" class="btnResend btn btn-outline-primary col-sm-12 col-md-10 btn-sm">Resend Welcome Email</a>';
                         var actionButton = view + edit;
+
+
 
                         if (row.validateEmail == true) {
                             actionButton += reset
@@ -239,6 +239,77 @@
                 $("#blocker").hide();
             }, 500);
         });
+
+        $(document).on('click', '.btnResend', function () {
+
+            var userID  = $(this).data('id');
+
+                    $("#blocker").show();
+            var model = @Html.Raw(Json.Serialize(Model));
+           $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ResendWelcomeEmail", "Users")',
+                    contentType: "application/json; charset=utf-8",
+               data: {
+                   UserID: userID
+               },
+               success: function (data) {
+                   $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "");
+                            $('#successModal').modal('show');
+
+                            $('#txtResult').text("");
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Send email failed');
+                        }
+                        $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+
+                    },
+               error: function () {
+                   $("#blocker").hide();
+
+                    }
+                });
+        })
+
+        $(document).on('click', '.btnReset', function () {
+
+            var email = $(this).data('email');
+                  $("#blocker").show();
+             var model = @Html.Raw(Json.Serialize(Model));
+               $.ajax({
+                   type: "GET",
+                    url: '@Url.Action("ResetPassword", "Users")',
+                    contentType: "application/json; charset=utf-8",
+                   data: {
+                       email: email
+                   },
+               success: function (data) {
+                   $("#blocker").hide();
+                   if (data.isSuccess) {
+                       $('#successModalHref').attr("href", "");
+                       $('#successModal').modal('show');
+                       $('#txtResult').text("");
+                   } else {
+                       $('#failedModal').modal('show');
+                       $('#myModalFailedResult').text(data.responseError != ""
+                           && data.responseError != null ? data.responseError : 'Reset email failed');
+                   }
+                   $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+                    },
+                   error: function () {
+                       $("#blocker").hide();
+                    }
+                });
+        })
+
+
+
 
 
     });
