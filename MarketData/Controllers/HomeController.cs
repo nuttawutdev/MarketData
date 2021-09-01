@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MarketData.Controllers
@@ -74,10 +75,15 @@ namespace MarketData.Controllers
 
                 var userData = process.user.Login(loginRequest);
 
-                if(userData != null && userData.userID != null)
+                if(userData != null && userData.userDetail != null)
                 {
-                    HttpContext.Session.SetString("userID", userData.userID.ToString());
-                    HttpContext.Session.SetString("role", userData.role);
+                    HttpContext.Session.SetString("userDetail", JsonSerializer.Serialize(userData.userDetail));
+                    CookieOptions option = new CookieOptions();
+                    option.Expires = DateTime.Now.AddDays(1);
+                    option.SameSite = SameSiteMode.Strict;
+                    option.IsEssential = true;
+                    Response.Cookies.Append("userDetail", JsonSerializer.Serialize(userData.userDetail), option);
+                   
                     return View("Index");
                 }
                 else

@@ -66,7 +66,7 @@ namespace MarketData.Repositories.Repo
                     DisplayName = request.displayName,
                     FirstName = request.firstName,
                     LastName = request.lastName,
-                    ActiveFlag = request.active,
+                    ActiveFlag = true,
                     ValidateEmailFlag = request.validateEmail,
                     ViewMasterPermission = request.viewMaster,
                     EditMasterPermission = request.editMaster,

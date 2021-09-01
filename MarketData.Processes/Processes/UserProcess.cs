@@ -54,6 +54,10 @@ namespace MarketData.Processes.Processes
                     {
                         response.userLocked = true;
                     }
+                    else if (!userData.ValidateEmailFlag)
+                    {
+                        response.userNotValidate = true;
+                    }
                     else
                     {
                         if (userData.Password == encryptPassword)
@@ -62,6 +66,7 @@ namespace MarketData.Processes.Processes
                         }
                         else
                         {
+                            // Count wrong password
                             response.wrongPassword = true;
                         }
                     }                              

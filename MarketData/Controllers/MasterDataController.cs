@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Middleware;
+using MarketData.Model.Data;
 using MarketData.Model.Request;
 using MarketData.Model.Request.MasterData;
 using MarketData.Model.Response;
@@ -31,6 +32,7 @@ namespace MarketData.Controllers
             return View();
         }
 
+        //[ServiceFilter(typeof(AuthorizeFilter))]
         public ActionResult Brand()
         {
             return View();
