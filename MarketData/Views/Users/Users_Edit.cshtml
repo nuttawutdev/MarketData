@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Add Users";
+    Html.RenderPartial("_WarningModal");
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 
 
@@ -13,7 +16,7 @@
 <div class="row col-md-12 col-sm-12">
     <div class="form-group col-md-6 col-sm-6">
         <label for="name">Email	</label>
-        <input type="text" class="form-control input-sm" id="Email" value="@Model.email">
+        <input type="email" class="form-control input-sm" id="Email" value="@Model.email">
     </div>
     <div class="form-group col-md-6 col-sm-6">
         <label for="name">Display Name	</label>
@@ -77,7 +80,7 @@
             }
             else
             {
-                <input value="" id="flagViewMasterv" type="checkbox" data-toggle="toggle">
+                <input value="" id="flagViewMaster" type="checkbox" data-toggle="toggle">
             }
             View Master
         </label>
@@ -255,7 +258,7 @@
             $(this).closest('tr').remove();
         })
 
-         $("#Add").click(function () {
+        $("#Add").click(function () {
             if ($('#departmentStoreList').val() != "" && $('#brandList').val() != "" && $('#channelList').val() != "") {
                  //check duplicate user
                 var newRow = '<tr class="row m-0">'
@@ -267,7 +270,7 @@
                     + '<td class="channelID" hidden >' + $('#channelList').val() + '</td>'
                     + '<td class="col-2"><a class="delete-user buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a></td>'
                     + ' </tr>';
-                $('#tblDetails tr:last').after(newRow);
+                $('#tblDetails tbody').append(newRow);
 
             } else {
 
@@ -275,15 +278,50 @@
         })
 
         $("#save").click(function () {
+      $("#blocker").show();
+            var frmdata = getDataFromTable();
 
-            
-            $("#blocker").show();
-            var model = @Html.Raw(Json.Serialize(Model));
+            if (validate_Email_Display() && validate_Duplicate_Store(frmdata)) {
+
+                 $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveBrand", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "Index");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                        }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+
+
+       
+        });
+
+        function getDataFromTable() {
+           var model = @Html.Raw(Json.Serialize(Model));
 
             var memberDetails = new Array();
-            $("#tblDetails TBODY TR").each(function (index, el) {
-               
-                        var memberDetail = {};
+            $("#tblDetails tbody tr").each(function (index, el) {
+
+                var memberDetail = {};
                 memberDetail.userCounterID = $(el).find(".userCounterID").text();
                 memberDetail.departmentStoreName = $(el).find(".departmentStoreName").text();
                 memberDetail.departmentStoreID = $(el).find(".departmentStoreID").text();
@@ -291,21 +329,18 @@
                 memberDetail.brandID = $(el).find(".brandID").text();
                 memberDetail.channelName = $(el).find(".channelName").text();
                 memberDetail.channelID = $(el).find(".channelID").text();
-                        memberDetails.push(memberDetail);
-
-                    
-                }
+                memberDetails.push(memberDetail);
 
 
-            });
+                })
+
 
             var frmdata = {
                 userID: model.userID,
-                email: $('#email').val(),
+                email: $('#Email').val(),
                 displayName: $('#DisplayName').val(),
                 firstName: $('#FirstName').val(),
                 lastName: $('#LastName').val(),
-               
                 active: $("#flagactive").prop("checked"),
                 validateEmail: $("#flagValidateEmail").prop("checked"),
                 viewMaster: $("#flagViewMaster").prop("checked"),
@@ -317,55 +352,61 @@
                 viewReport: $("#flagViewReport").prop("checked"),
                 actionBy: null,
                 userCounter: memberDetails
-               
 
             };
 
         console.log(frmdata)
-        //      public Guid ? userID { get; set; }
-        //public string email { get; set; }
-        //public string displayName { get; set; }
-        //public string firstName { get; set; }
-        //public string lastName { get; set; }
-        //public bool active { get; set; }
-        //public bool validateEmail { get; set; }
-        //public bool viewMaster { get; set; }
-        //public bool editMaster { get; set; }
-        //public bool editUser { get; set; }
-        //public bool viewData { get; set; }
-        //public bool keyInData { get; set; }
-        //public bool approveData { get; set; }
-        //public bool viewReport { get; set; }
-        //public Guid actionBy { get; set; }
-        //public List < UserCounterData > userCounter { get; set; }
 
-            @*$.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBrand", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "Brand");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
+            return frmdata;
+        };
+
+
+        function validate_Email_Display() {
+           
+            if ($("#Email").val() == "" || $("#DisplayName").val() == "") {
+                showWarningAlert('NullEmail_Display');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_Duplicate_Store(data) {
+            var isDuplicate = 0;
+            for (var i = 0; i < data.userCounter.length; i++) {
+                for (var j = 0; j < data.userCounter.length; j++) {
+                    var first = data.userCounter[i].brandID + data.userCounter[i].channelID + data.userCounter[i].departmentStoreID;
+        
+                    var secound = data.userCounter[j].brandID + data.userCounter[j].channelID + data.userCounter[j].departmentStoreID;
+
+                    if (first == secound && i!=j) {
+                        isDuplicate = 1;
+                    }
                 }
-            });*@
-        });
+            }
+
+            if (isDuplicate) {
+                showWarningAlert('DuplicateStore');
+                return 0;
+            } else return 1;
+        }
+
+        function showWarningAlert(typeWarning) {
+            var msg = '';
+            switch (typeWarning) {
+                case 'NullEmail_Display':
+                    msg = 'กรุณากรอกข้อมูล Email และ Display Name';
+                    break;
+                case 'DuplicateStore':
+                    msg = 'กรุณาตรวจสอบข้อมูล Department Store, Brand, Distribution Chanels ';
+                    break;
+                default:
+            }
+
+
+            $('#warningModal').modal('show');
+
+            $('#myModalWarningResult').text(msg);
+
+        }
 
  });
 </script>
