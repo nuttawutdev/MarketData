@@ -464,7 +464,7 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        if (urlData.Expire_Date < Utility.GetDateNowThai())
+                        if (DateTime.Compare(urlData.Expire_Date,Utility.GetDateNowThai()) < 0)
                         {
                             response.urlExpire = true;
                         }

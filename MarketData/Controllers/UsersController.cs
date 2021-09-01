@@ -262,8 +262,17 @@ namespace MarketData.Controllers
             }       
         }
 
-        public IActionResult Test()
+        public async Task<IActionResult> Test()
         {
+            //ChangePasswordRequest internalRequest = new ChangePasswordRequest
+            //{
+            //    urlID = new Guid("c3f34114-3777-442d-9f0e-4fc4194074c2"),
+            //    userID = new Guid("3B1E4B7D-F75D-4A27-A707-8676F112814D"),
+            //    password = "1234"
+            //};
+
+            //var response = await process.user.ChangePasssword(internalRequest);
+
             //var reset = process.user.ResetPassword("nuttawut.ppb@gmail.com", $"{Request.Scheme}://{Request.Host.Value}");
             //SaveUserDataRequest request = new SaveUserDataRequest
             //{
