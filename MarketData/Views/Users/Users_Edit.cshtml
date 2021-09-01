@@ -219,13 +219,13 @@
                             foreach (var item in Model.userCounter)
                             {
                                 <tr class="row m-0">
-                                    <td class="" hidden>@item.userCounterID</td>
-                                    <td class="col-4">@item.departmentStoreName</td>
-                                    <td class="col-2" hidden>@item.departmentStoreID</td>
-                                    <td class="col-4">@item.brandName</td>
-                                    <td class="col-2" hidden>@item.brandID</td>
-                                    <td class="col-2">@item.channelName</td>
-                                    <td class="col-2" hidden>@item.channelID</td>
+                                    <td class="userCounterID" hidden>@item.userCounterID</td>
+                                    <td class="col-4 departmentStoreName">@item.departmentStoreName</td>
+                                    <td class="col-2 departmentStoreID" hidden>@item.departmentStoreID</td>
+                                    <td class="col-4 brandName">@item.brandName</td>
+                                    <td class="col-2 brandID" hidden>@item.brandID</td>
+                                    <td class="col-2 channelName">@item.channelName</td>
+                                    <td class="col-2 channelID" hidden>@item.channelID</td>
                                     <td class="col-2">
                                         <a data-id="@item.userCounterID" class="delete-user buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>
                                     </td>
@@ -285,7 +285,7 @@
 
                  $.ajax({
                     type: "POST",
-                    url: '@Url.Action("SaveBrand", "MasterData")',
+                    url: '@Url.Action("SaveUserData", "Users")',
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
@@ -322,7 +322,7 @@
             $("#tblDetails tbody tr").each(function (index, el) {
 
                 var memberDetail = {};
-                memberDetail.userCounterID = $(el).find(".userCounterID").text();
+                memberDetail.userCounterID = $(el).find(".userCounterID").text() ? $(el).find(".userCounterID").text() : null;
                 memberDetail.departmentStoreName = $(el).find(".departmentStoreName").text();
                 memberDetail.departmentStoreID = $(el).find(".departmentStoreID").text();
                 memberDetail.brandName = $(el).find(".brandName").text();
@@ -333,7 +333,6 @@
 
 
                 })
-
 
             var frmdata = {
                 userID: model.userID,
