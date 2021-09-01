@@ -1,11 +1,15 @@
-﻿using MarketData.Model.Request.User;
+﻿using MarketData.Model.Request.MasterData;
+using MarketData.Model.Request.User;
 using MarketData.Model.Response;
+using MarketData.Model.Response.MasterData;
 using MarketData.Models;
 using MarketData.Processes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -108,6 +112,8 @@ namespace MarketData.Controllers
             {
                 try
                 {
+                    // Get by Session
+                    request.actionBy = Guid.NewGuid();
                     response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
                     return Json(response);
                 }
@@ -260,6 +266,30 @@ namespace MarketData.Controllers
             {
                 return View("ResetPassword", request);
             }       
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportUser(IFormFile excelFile)
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            ImportDataResponse response = new ImportDataResponse();
+
+            using (var stream = new MemoryStream())
+            {
+                excelFile.CopyTo(stream);
+                stream.Position = 0;
+
+                ImportDataRequest request = new ImportDataRequest
+                {
+                    fileStream = stream,
+                    filePath = excelFile.FileName,
+                    userID = Guid.NewGuid().ToString(), // Get User ID from session
+                };
+
+                response = await process.user.ImportUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
+            }
+
+            return Json(response);
         }
 
         public async Task<IActionResult> Test()

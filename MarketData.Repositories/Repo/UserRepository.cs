@@ -75,7 +75,7 @@ namespace MarketData.Repositories.Repo
                     KeyInDataPermission = request.keyInData,
                     ApprovePermission = request.approveData,
                     ViewReportPermission = request.viewReport,
-                    Create_By = request.actionBy,
+                    Create_By = request.actionBy.GetValueOrDefault(),
                     Create_Date = Utility.GetDateNowThai()
                 };
 

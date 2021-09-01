@@ -1,12 +1,16 @@
-﻿using MarketData.Helper;
+﻿using ExcelDataReader;
+using MarketData.Helper;
 using MarketData.Model.Data;
 using MarketData.Model.Entiry;
+using MarketData.Model.Request.MasterData;
 using MarketData.Model.Request.User;
 using MarketData.Model.Response;
+using MarketData.Model.Response.MasterData;
 using MarketData.Model.Response.User;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -369,7 +373,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<SaveDataResponse> ResetPassword(string email,string hostUrl)
+        public async Task<SaveDataResponse> ResetPassword(string email, string hostUrl)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -377,7 +381,7 @@ namespace MarketData.Processes.Processes
             {
                 var userData = repository.user.FindUserBy(c => c.Email.ToLower() == email.ToLower());
 
-                if(userData != null)
+                if (userData != null)
                 {
                     await repository.url.UnActiveOldUrl(userData.ID.ToString(), TypeUrl.ResetPassword.ToString());
 
@@ -449,7 +453,7 @@ namespace MarketData.Processes.Processes
                     {
                         var ref1 = urlData.Ref1;
                         Guid userID = new Guid(ref1);
-                        var userData =  repository.user.FindUserBy(c=> c.ID == userID);
+                        var userData = repository.user.FindUserBy(c => c.ID == userID);
 
                         if (userData != null)
                         {
@@ -464,7 +468,7 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        if (DateTime.Compare(urlData.Expire_Date,Utility.GetDateNowThai()) < 0)
+                        if (DateTime.Compare(urlData.Expire_Date, Utility.GetDateNowThai()) < 0)
                         {
                             response.urlExpire = true;
                         }
@@ -489,6 +493,256 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public async Task<ImportDataResponse> ImportUserData(ImportDataRequest request,string hostUrl)
+        {
+            ImportDataResponse response = new ImportDataResponse();
+
+            try
+            {
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                List<SaveUserDataRequest> saveUserList = new List<SaveUserDataRequest>();
+                List<ImportResultByRowResponse> importResult = new List<ImportResultByRowResponse>();
+
+                var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
+                var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
+                var channelResponse = repository.masterData.GetDistributionChannelListBy(c => c.Active_Flag && c.Delete_Flag != true);
+
+                using (var reader = ExcelReaderFactory.CreateReader(request.fileStream))
+                {
+                    while (reader.Read()) //Each row of the file
+                    {
+                        // Validate Column File
+                        if (reader.Depth == 0)
+                        {
+                            string column1 = reader.GetValue(0)?.ToString();
+                            string column2 = reader.GetValue(1)?.ToString();
+                            string column3 = reader.GetValue(2)?.ToString();
+                            string column4 = reader.GetValue(3)?.ToString();
+                            string column5 = reader.GetValue(4)?.ToString();
+                            string column6 = reader.GetValue(5)?.ToString();
+                            string column7 = reader.GetValue(6)?.ToString();
+                            string column8 = reader.GetValue(7)?.ToString();
+                            string column9 = reader.GetValue(8)?.ToString();
+                            string column10 = reader.GetValue(9)?.ToString();
+                            string column11 = reader.GetValue(10)?.ToString();
+                            string column12 = reader.GetValue(11)?.ToString();
+                            string column13 = reader.GetValue(12)?.ToString();
+                            string column14 = reader.GetValue(13)?.ToString();
+
+                            if ((column1 != null && column1.ToLower() != "first name") ||
+                                (column2 != null && column2.ToLower() != "last name") ||
+                                (column3 != null && column3.ToLower() != "email") ||
+                                (column4 != null && column4.ToLower() != "display name") ||
+                                (column5 != null && column5.ToLower() != "department store") ||
+                                (column6 != null && column6.ToLower() != "brand") ||
+                                (column7 != null && column7.ToLower() != "distribution channel") ||
+                                (column8 != null && column8.ToLower() != "view master permission") ||
+                                (column9 != null && column9.ToLower() != "edit master permission") ||
+                                (column10 != null && column10.ToLower() != "edit users permission") ||
+                                (column11 != null && column11.ToLower() != "view data permission") ||
+                                (column12 != null && column12.ToLower() != "key-in data permission") ||
+                                (column13 != null && column13.ToLower() != "approve data permission") ||
+                                (column14 != null && column14.ToLower() != "view report permission"))
+                            {
+                                response.isSuccess = false;
+                                response.wrongFormatFile = true;
+                                return response;
+                            }
+                        }
+
+                        if (reader.Depth != 0)
+                        {
+                            string firstName = reader.GetValue(0)?.ToString();
+                            string lastName = reader.GetValue(1)?.ToString();
+                            string email = reader.GetValue(2)?.ToString();
+                            string displayName = reader.GetValue(3)?.ToString();
+                            string departmentStore = reader.GetValue(4)?.ToString();
+                            string brand = reader.GetValue(5)?.ToString();
+                            string channel = reader.GetValue(6)?.ToString();
+                            string viewMaster = reader.GetValue(7)?.ToString();
+                            string editMaster = reader.GetValue(8)?.ToString();
+                            string editUser = reader.GetValue(9)?.ToString();
+                            string viewData = reader.GetValue(10)?.ToString();
+                            string keyIn = reader.GetValue(11)?.ToString();
+                            string approve = reader.GetValue(12)?.ToString();
+                            string viewReport = reader.GetValue(13)?.ToString();
+
+                            if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(displayName)
+                                    && !string.IsNullOrWhiteSpace(viewMaster) && !string.IsNullOrWhiteSpace(editMaster)
+                                    && !string.IsNullOrWhiteSpace(editUser) && !string.IsNullOrWhiteSpace(viewData)
+                                    && !string.IsNullOrWhiteSpace(keyIn) && !string.IsNullOrWhiteSpace(approve)
+                                    && !string.IsNullOrWhiteSpace(viewReport))
+                            {
+                                SaveUserDataRequest saveUserRequest = new SaveUserDataRequest
+                                {
+                                    firstName = firstName,
+                                    lastName = lastName,
+                                    actionBy = new Guid(request.userID),
+                                    displayName = displayName,
+                                    email = email,
+                                    active = false,
+                                    viewMaster = viewMaster == "1",
+                                    viewData = viewData == "1",
+                                    editUser = editUser == "1",
+                                    keyInData = keyIn == "1",
+                                    editMaster = editMaster == "1",
+                                    approveData = approve == "1",
+                                    viewReport = viewReport == "1",
+                                    validateEmail = false,
+                                    row = reader.Depth + 1
+                                };
+
+                                if (!string.IsNullOrWhiteSpace(brand) && !string.IsNullOrWhiteSpace(departmentStore)
+                                    && !string.IsNullOrWhiteSpace(channel))
+                                {
+                                    var departMentStoreData = getDepartmentStoreResponse.FirstOrDefault(d => d.Department_Store_Name.ToLower() == departmentStore.ToLower());
+                                    var brandData = getBrandResponse.FirstOrDefault(d => d.Brand_Name.ToLower() == departmentStore.ToLower());
+                                    var channelData = channelResponse.FirstOrDefault(d => d.Distribution_Channel_Name.ToLower() == departmentStore.ToLower());
+
+                                    if (departMentStoreData != null && brandData != null && channelData != null)
+                                    {
+                                        saveUserRequest.userCounter = new List<UserCounterData>()
+                                        {
+                                            new UserCounterData
+                                            {
+                                                brandID = brandData.Brand_ID,
+                                                channelID = channelData.Distribution_Channel_ID,
+                                                departmentStoreID = departMentStoreData.Department_Store_ID
+                                            }
+                                        };
+                                    }
+                                }
+
+                                saveUserList.Add(saveUserRequest);
+                            }
+                            else
+                            {
+                                int row = reader.Depth + 1;
+                                ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                                {
+                                    row = row,
+                                    result = $"Row {row} Required value in column "
+                                };
+
+                                if (string.IsNullOrWhiteSpace(email))
+                                {
+                                    resultImport.result += "Email, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(displayName))
+                                {
+                                    resultImport.result += "Display name, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(viewMaster))
+                                {
+                                    resultImport.result += "View Master permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(editMaster))
+                                {
+                                    resultImport.result += "Edit Master permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(editUser))
+                                {
+                                    resultImport.result += "Edit users permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(viewData))
+                                {
+                                    resultImport.result += "View data permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(keyIn))
+                                {
+                                    resultImport.result += "Key-in data permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(approve))
+                                {
+                                    resultImport.result += "Approve data permission, ";
+                                }
+
+                                if (string.IsNullOrWhiteSpace(viewReport))
+                                {
+                                    resultImport.result += "View report permission, ";
+                                }
+
+                                importResult.Add(resultImport);
+                                response.countImportFailed = response.countImportFailed + 1;
+                            }
+                        }
+                    }
+                }
+
+                if (saveUserList.Any())
+                {
+                    foreach (var saveUserRequest in saveUserList)
+                    {
+                        var result = await SaveUserData(saveUserRequest, hostUrl);
+
+                        if (result.isSuccess)
+                        {
+                            response.countImportSuccess = response.countImportSuccess + 1;
+                        }
+                        else
+                        {
+                            ImportResultByRowResponse resultImport = new ImportResultByRowResponse
+                            {
+                                row = saveUserRequest.row
+                            };
+
+                            if (result.isDuplicated == true)
+                            {
+                                resultImport.result = $"Row {saveUserRequest.row} Data is duplicate.";
+                            }
+                            else
+                            {
+                                resultImport.result = $"Row {saveUserRequest.row} Save data failed.";
+                            }
+
+                            importResult.Add(resultImport);
+                            response.countImportFailed = response.countImportFailed + 1;
+                        }
+
+                    }
+
+                    response.importResult = importResult.OrderBy(c => c.row).ToList();
+
+                    byte[] bytes = null;
+                    using (var ms = new MemoryStream())
+                    {
+                        TextWriter tw = new StreamWriter(ms);
+
+                        foreach (var itemResult in response.importResult)
+                        {
+                            tw.WriteLine(itemResult.result);
+                        }
+
+                        tw.Flush();
+                        ms.Position = 0;
+                        bytes = ms.ToArray();
+                        tw.Close();
+                    }
+
+                    response.fileName = "ImportUserDataResult_" + Utility.GetDateNowThai().ToString("dd-MM-yyyy-HH-mm");
+                    response.fileResult = Convert.ToBase64String(bytes);
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = false;
+                    response.wrongFormatFile = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+            }
+
+            return response;
+        }
         private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)
         {
             var dateNow = Utility.GetDateNowThai();

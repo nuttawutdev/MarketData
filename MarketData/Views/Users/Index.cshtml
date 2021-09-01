@@ -1,6 +1,10 @@
 ﻿@model MarketData.Models.UserOptionViewModel;
 @{
     ViewData["Title"] = "Users";
+    Html.RenderPartial("_ConfirmModal");
+    Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_ImportDataResultModal");
+}
 }
 
 
@@ -37,7 +41,8 @@
                     <label for="file-upload" class="custom-file-upload1">
                         <i class="ion-android-document"></i> Import by Excel
                     </label>
-                    <input id="file-upload" type="file" />
+                    <input id="file-upload" type="file" name="excelFile" />
+                    <input type="submit" id="btnSubmit" value="Import" hidden />
                 </div>
             </div>
         </div>
@@ -57,34 +62,31 @@
         //$('#importDataModalHref').attr("href", "Brand");
         //$('#importDataModal').modal('show');
 
-        //function base64ToArrayBuffer(base64) {
-        //    var binaryString = window.atob(base64);
-        //    var binaryLen = binaryString.length;
-        //    var bytes = new Uint8Array(binaryLen);
-        //    for (var i = 0; i < binaryLen; i++) {
-        //        var ascii = binaryString.charCodeAt(i);
-        //        bytes[i] = ascii;
-        //    }
-        //    return bytes;
-        //}
+        function base64ToArrayBuffer(base64) {
+            var binaryString = window.atob(base64);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+            for (var i = 0; i < binaryLen; i++) {
+                var ascii = binaryString.charCodeAt(i);
+                bytes[i] = ascii;
+            }
+            return bytes;
+        }
 
-        //function saveByteArray(reportName, byte) {
-        //    var blob = new Blob([byte], { type: "text/plain" });
-        //    var link = document.createElement('a');
-        //    link.href = window.URL.createObjectURL(blob);
-        //    var fileName = reportName;
-        //    link.download = fileName;
-        //    link.click();
-        //};
+        function saveByteArray(reportName, byte) {
+            var blob = new Blob([byte], { type: "text/plain" });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            var fileName = reportName;
+            link.download = fileName;
+            link.click();
+        };
 
-
-        @*$("#file-upload").change(function () {
+        $("#file-upload").change(function () {
             $("#blocker").show();
 
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
-
-            fd.append('userID', 'Test');
 
             // Check file selected or not
             if (files.length > 0) {
@@ -93,7 +95,7 @@
 
             $.ajax(
                 {
-                    url: '@Url.Action("ImportBrand", "MasterData")',
+                    url: '@Url.Action("ImportUser", "Users")',
                     data: fd,
                     processData: false,
                     contentType: false,
@@ -140,7 +142,7 @@
                     }
                 }
             );
-        });*@
+        });
 
 
         $("#tableData").one("preInit.dt", function () {

@@ -24,7 +24,8 @@ namespace MarketData.Model.Request.User
         public bool keyInData { get; set; }
         public bool approveData { get; set; }
         public bool viewReport { get; set; }
-        public Guid actionBy { get; set; }
+        public Guid? actionBy { get; set; }
         public List<UserCounterData> userCounter { get; set; }
+        public int row { get; set; }
     }
 }
