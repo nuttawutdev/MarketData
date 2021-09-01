@@ -23,6 +23,7 @@ namespace MarketData.Model.Entiry
         public bool ViewReportPermission { get; set; }
         public bool ActiveFlag { get; set; }
         public bool ValidateEmailFlag { get; set; }
+        public int? WrongPasswordCount { get; set; }
         public DateTime? Last_Login { get; set; }
         public Guid Create_By { get; set; }
         public DateTime Create_Date { get; set; }

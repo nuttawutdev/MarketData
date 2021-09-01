@@ -292,6 +292,39 @@ namespace MarketData.Controllers
             return Json(response);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> ResendWelcomeEmail(Guid userID)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response = await process.user.ResendWelcomeEmail(userID, $"{Request.Scheme}://{Request.Host.Value}");
+                return Json(response);
+            }
+            catch(Exception ex)
+            {
+                return Json(response);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string email)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                response = await process.user.ResetPassword(email, $"{Request.Scheme}://{Request.Host.Value}");
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
+            }
+        }
+
         public async Task<IActionResult> Test()
         {
             //ChangePasswordRequest internalRequest = new ChangePasswordRequest

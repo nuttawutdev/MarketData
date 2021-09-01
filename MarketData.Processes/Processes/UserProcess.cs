@@ -43,14 +43,33 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var userData = repository.user.FindUserBy(c => c.Email.ToLower() == request.userName.ToLower());
+                var encryptPassword = Encrypt(request.password);
+
+                var userData = repository.user.FindUserBy(
+                    c => c.Email.ToLower() == request.userName.ToLower());
 
                 if (userData != null)
                 {
-                    response.userID = userData.ID;
-                    response.role = request.userName.ToLower().Contains("admin") ? "Admin" : "BA";
+                    if (!userData.ActiveFlag)
+                    {
+                        response.userLocked = true;
+                    }
+                    else
+                    {
+                        if (userData.Password == encryptPassword)
+                        {
+                            response.userDetail = GetUserDetailData(userData.ID);
+                        }
+                        else
+                        {
+                            response.wrongPassword = true;
+                        }
+                    }                              
                 }
-
+                else
+                {
+                    response.emailNotExist = true;
+                }
             }
             catch (Exception ex)
             {
@@ -204,6 +223,40 @@ namespace MarketData.Processes.Processes
                 }).OrderBy(r => r.distributionChannelName).ToList();
 
 
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
+        }
+
+        public GetUserDetailResponse GetUserDetailData(Guid userID)
+        {
+            GetUserDetailResponse response = new GetUserDetailResponse();
+
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.ID == userID);
+
+                if (userData != null)
+                {
+                    response.userID = userData.ID;
+                    response.email = userData.Email;
+                    response.active = userData.ActiveFlag;
+                    response.displayName = userData.DisplayName;
+                    response.firstName = userData.FirstName;
+                    response.lastName = userData.LastName;
+                    response.validateEmail = userData.ValidateEmailFlag;
+                    response.viewMaster = userData.ViewMasterPermission;
+                    response.editMaster = userData.EditMasterPermission;
+                    response.editUser = userData.EditUserPermission;
+                    response.viewData = userData.ViewDataPermission;
+                    response.keyInData = userData.KeyInDataPermission;
+                    response.approveData = userData.ApprovePermission;
+                    response.viewReport = userData.ViewReportPermission;
+                }
             }
             catch (Exception ex)
             {
@@ -743,6 +796,7 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+       
         private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)
         {
             var dateNow = Utility.GetDateNowThai();

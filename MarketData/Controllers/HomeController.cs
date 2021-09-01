@@ -68,7 +68,8 @@ namespace MarketData.Controllers
             {
                 LoginRequest loginRequest = new LoginRequest
                 {
-                    userName = request.userName
+                    userName = request.userName,
+                    password = request.password
                 };
 
                 var userData = process.user.Login(loginRequest);
