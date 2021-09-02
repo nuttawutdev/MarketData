@@ -308,16 +308,9 @@
                         success: function (data) {
                             $("#blocker").hide();
 
-                            if (data.isSuccess) {
-                                if (type != 'save') {
-                                    $('#successModalHref').attr("href", "Index");
-                                    $('#successModal').modal('show');
-                                }
-                                else {
-                                    $('#successModalHref').attr("data-dismiss", "modal");
-                                    $('#successModal').modal('show');
-                                }
-
+                            if (data.isSuccess) {                            
+                               $('#successModalHref').attr("data-dismiss", "modal");
+                               $('#successModal').modal('show');
                             } else if (data.isDuplicated) {
                                 $('#failedModal').modal('show');
                                 $('#myModalFailedResult').text('Duplicate data!');

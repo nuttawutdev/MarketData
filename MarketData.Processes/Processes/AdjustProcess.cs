@@ -100,17 +100,32 @@ namespace MarketData.Processes.Processes
 
                     foreach (var itemBrandLoreal in onlyBrandLorel)
                     {
-                        var statusBrand = approveKeyInDataFilter.Where(
-                            e => e.brandID == itemBrandLoreal.brandID
-                            && e.departmentStoreID == itemDepartment.departmentStoreID
-                            && e.distributionChannelID == itemDepartment.distributionChannelID
-                            && e.retailerGroupID == itemDepartment.retailerGroupID)
-                            .OrderByDescending(c => c.dateApprove).FirstOrDefault();
-
                         var brandShortName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
-                        var approveStatus = statusBrand?.statusName;
 
-                        adjustData.brandStatus.Add(brandShortName, approveStatus);
+                        string statusBrand = string.Empty;
+
+                        var existCounter = counterByDepartmentStoreList.FirstOrDefault(
+                           c => c.Distribution_Channel_ID == itemDepartment.distributionChannelID
+                           && c.Department_Store_ID == itemDepartment.departmentStoreID
+                           && c.Brand_ID == itemBrandLoreal.brandID);
+
+                        if (existCounter != null)
+                        {
+                            var approveStatus = approveKeyInDataFilter.Where(
+                          e => e.brandID == itemBrandLoreal.brandID
+                          && e.departmentStoreID == itemDepartment.departmentStoreID
+                          && e.distributionChannelID == itemDepartment.distributionChannelID
+                          && e.retailerGroupID == itemDepartment.retailerGroupID)
+                          .OrderByDescending(c => c.dateApprove).FirstOrDefault();
+
+                            statusBrand = approveStatus?.statusName;
+                        }
+                        else
+                        {
+                            statusBrand = "none";
+                        }
+                                  
+                        adjustData.brandStatus.Add(brandShortName, statusBrand);
                     }
 
                     adjustDataList.Add(adjustData);

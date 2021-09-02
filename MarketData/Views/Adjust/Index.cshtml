@@ -225,7 +225,13 @@
                                 var jsonData = data.data[i].brandStatus;
                                 Object.keys(jsonData).forEach(function (key) {
                                     var value = jsonData[key] == null ? "" : jsonData[key];
-                                    rowTable += '<td data-id=' + key + '>' + value + '</td>';
+                                    if (value != "none") {
+                                        rowTable += '<td data-id=' + key + '>' + value + '</td>';
+                                    }
+                                    else {
+                                        rowTable += '<td style="background-color: black;border:solid;border-color: white;" data-id=' + key + '></td>';
+                                    }
+                                   
 
                                 });
                                 rowTable +=   '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
