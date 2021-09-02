@@ -289,7 +289,7 @@
 
             if (validate_Email_Display() && validate_Duplicate_Store(frmdata)) {
 
-                 $.ajax({
+                $.ajax({
                     type: "POST",
                     url: '@Url.Action("SaveUserData", "Users")',
                     contentType: "application/json; charset=utf-8",
@@ -315,6 +315,8 @@
                         $("#blocker").hide();
                     }
                 });
+            } else {
+                $("#blocker").hide();
             }
 
 
