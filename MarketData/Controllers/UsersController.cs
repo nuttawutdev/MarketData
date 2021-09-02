@@ -229,17 +229,20 @@ namespace MarketData.Controllers
         {
             var activateUserResponse = await process.user.ActivateUser(new Guid(refID));
 
-            if (activateUserResponse.isSuccess)
-            {
+            //if (activateUserResponse.isSuccess)
+            //{
                 return View("ActivateSuccess");
-            }
-            else
-            {
-                return RedirectToAction("UrlUnvaliable");
-            }
+            //}
+            //else
+            //{
+            //    return RedirectToAction("UrlUnvaliable");
+            //}
         }
-
-        [HttpGet]
+        public IActionResult UrlUnvaliable(string refID)
+        {
+            return View();
+        }
+            [HttpGet]
         public IActionResult VerifyUrlResetPassword(string refID)
         {
             var verifyUrlResponse = process.user.VerifyUrlResetPassword(new Guid(refID));

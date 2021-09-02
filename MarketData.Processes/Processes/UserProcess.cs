@@ -938,19 +938,19 @@ namespace MarketData.Processes.Processes
                 // Send Email
                 string url = $"{hostUrl}/Users/ActivateUser?refID={urlID}";
                 string htmlBody = string.Empty;
-                //string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
-                //using (StreamReader reader = File.OpenText(emailTemplatePath))
-                //{
-                //    htmlBody = reader.ReadToEnd();
-                //}
+                string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
+                using (StreamReader reader = File.OpenText(emailTemplatePath))
+                {
+                    htmlBody = reader.ReadToEnd();
+                }
 
-                //htmlBody = htmlBody.Replace("linkRegister", url);
+                htmlBody = htmlBody.Replace("linkRegister", url);
                 MailMessage m = new MailMessage();
                 m.From = new MailAddress("developernuttawut@gmail", "Admin");
                 m.To.Add(emailTo);
                 m.Subject = "Activate User​";
-                m.Body = $"{url} {passwordUser}";
-                //m.IsBodyHtml = true;
+                m.Body = htmlBody;// $"{url} {passwordUser}";
+                m.IsBodyHtml = true;
 
                 using (var smtp = new SmtpClient())
                 {
