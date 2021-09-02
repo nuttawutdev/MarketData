@@ -31,7 +31,7 @@
         }
 
             #blocker div {
-                position: absolute ;
+                position: absolute;
                 border: 16px solid #f3f3f3;
                 border-radius: 50%;
                 top: 50%;
@@ -103,9 +103,12 @@
                         </li>
                     </ul> <ul class="navbar-nav">
                         <li>
-                            <a asp-controller="Home" asp-action="Login" class="btn btn-light text-danger">
-                                Logout   <span class="ion-android-exit"></span>
-                            </a>
+                            @using (Html.BeginForm("Logout", "Home", FormMethod.Post, new { @class = "ui large form" }))
+                            {
+                                <a asp-controller="Home" asp-action="Logout" class="btn btn-light text-danger">
+                                    Logout   <span class="ion-android-exit"></span>
+                                </a>
+                            }
                         </li>
                     </ul>
                 </div>

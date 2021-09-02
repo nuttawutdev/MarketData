@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Request.User;
+﻿using MarketData.Middleware;
+using MarketData.Model.Request.User;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
@@ -54,15 +55,17 @@ namespace MarketData.Controllers
             {
                 return RedirectToAction("KeyinByBrand", "KeyIn");
             }
-            
+
         }
+
+        [AliveInSystemFilter]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Login(LoginViewModel request)
+        public async Task<IActionResult> Login(LoginViewModel request)
         {
 
             if (ModelState.IsValid)
@@ -73,27 +76,58 @@ namespace MarketData.Controllers
                     password = request.password
                 };
 
-                var userData = process.user.Login(loginRequest);
+                var userData = await process.user.Login(loginRequest);
 
-                if(userData != null && userData.userDetail != null)
+                if (userData != null && userData.userDetail != null)
                 {
                     HttpContext.Session.SetString("userDetail", JsonSerializer.Serialize(userData.userDetail));
+                    HttpContext.Session.SetString("tokenID", userData.tokenID);
+
                     CookieOptions option = new CookieOptions();
                     option.Expires = DateTime.Now.AddDays(1);
                     option.SameSite = SameSiteMode.Strict;
                     option.IsEssential = true;
                     Response.Cookies.Append("userDetail", JsonSerializer.Serialize(userData.userDetail), option);
-                   
+                    Response.Cookies.Append("tokenID", userData.tokenID, option);
+
                     return View("Index");
                 }
                 else
                 {
                     return View("Login");
-                }               
+                }
             }
             else
             {
                 return View("Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            if (!string.IsNullOrWhiteSpace(HttpContext.Session.GetString("userDetail"))
+                || !string.IsNullOrWhiteSpace(HttpContext.Request.Cookies["userDetail"]))
+            {
+                //var userData = JsonSerializer.Deserialize<UserDataModel>(HttpContext.Session.GetString("userData"));
+                //var logoutResponse = await process.account.Logout(userData.ID, userData.tokenID);
+
+                //if (logoutResponse)
+                //{
+
+                Response.Cookies.Delete("userDetail");
+                Response.Cookies.Delete("tokenID");
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
+                //}
+                //else
+                //{
+                //    return View("Index");
+                //}
+            }
+            else
+            {
+                return RedirectToAction("Login");
             }
         }
     }

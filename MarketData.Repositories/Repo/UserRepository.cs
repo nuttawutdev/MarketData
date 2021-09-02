@@ -54,7 +54,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<TMUser> CreateNewUser(SaveUserDataRequest request,string passsword)
+        public async Task<TMUser> CreateNewUser(SaveUserDataRequest request, string passsword)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<bool> ChangeUserPassword(Guid userID,string password)
+        public async Task<bool> ChangeUserPassword(Guid userID, string password)
         {
             try
             {
@@ -214,6 +214,61 @@ namespace MarketData.Repositories.Repo
             {
                 _dbContext.TMUserCounter.AddRange(listUserCounter);
                 return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<TMUserToken> CreateUserToken(Guid userID)
+        {
+            try
+            {
+                TMUserToken newUserToken = new TMUserToken
+                {
+                    ID = Guid.NewGuid(),
+                    Token_ID = Guid.NewGuid().ToString(),
+                    Token_ExpireTime = Utility.GetDateNowThai().AddHours(1),
+                    FlagActive = true,
+                    User_ID = userID
+                };
+
+                _dbContext.TMUserToken.Add(newUserToken);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return newUserToken;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateUser(TMUser userData)
+        {
+            try
+            {              
+                _dbContext.TMUser.Update(userData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMUserToken GetUserTokenBy(Expression<Func<TMUserToken, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMUserToken.Where(expression).FirstOrDefault();
             }
             catch (Exception ex)
             {

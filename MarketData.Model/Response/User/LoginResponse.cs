@@ -11,6 +11,8 @@ namespace MarketData.Model.Response.User
         public bool emailNotExist { get; set; }
         public bool userLocked { get; set; }
         public bool userNotValidate { get; set; }
+        public bool userOnline { get; set; }
+        public string tokenID { get; set; }
         public GetUserDetailResponse userDetail { get; set; }
     }
 }

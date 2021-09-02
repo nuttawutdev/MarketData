@@ -37,7 +37,7 @@ namespace MarketData.Processes.Processes
             password = appsettingHelper.GetConfiguration("EmailSetting:Password");
         }
 
-        public LoginResponse Login(LoginRequest request)
+        public async Task<LoginResponse> Login(LoginRequest request)
         {
             LoginResponse response = new LoginResponse();
 
@@ -58,18 +58,45 @@ namespace MarketData.Processes.Processes
                     {
                         response.userNotValidate = true;
                     }
+                    else if (userData.OnlineFlag)
+                    {
+                        response.userOnline = true;
+                    }
                     else
                     {
                         if (userData.Password == encryptPassword)
                         {
-                            response.userDetail = GetUserDetailData(userData.ID);
+                            var userToken = await repository.user.CreateUserToken(userData.ID);
+
+                            if (userToken != null)
+                            {
+                                userData.OnlineFlag = true;
+                                userData.Last_Login = Utility.GetDateNowThai();
+                                await repository.user.UpdateUser(userData);
+
+                                response.userDetail = GetUserDetailData(userData.ID);
+                                response.tokenID = userToken.Token_ID;
+                                response.isSuccess = true;
+                            }
                         }
                         else
                         {
-                            // Count wrong password
+                            if (userData.WrongPasswordCount == 3)
+                            {
+                                // ผิดเกิน 3 ครั้ง
+                                // Lock User
+                                userData.WrongPasswordCount = 0;
+                                userData.ActiveFlag = false;
+                            }
+                            else
+                            {
+                                userData.WrongPasswordCount = userData.WrongPasswordCount + 1;
+                            }
+
+                            await repository.user.UpdateUser(userData);
                             response.wrongPassword = true;
                         }
-                    }                              
+                    }
                 }
                 else
                 {
@@ -551,7 +578,7 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<ImportDataResponse> ImportUserData(ImportDataRequest request,string hostUrl)
+        public async Task<ImportDataResponse> ImportUserData(ImportDataRequest request, string hostUrl)
         {
             ImportDataResponse response = new ImportDataResponse();
 
@@ -801,7 +828,55 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
-       
+
+        public bool ValidateToken(string tokenID)
+        {
+            try
+            {
+                var userTokenData = repository.user.GetUserTokenBy(c => c.Token_ID == tokenID);
+                if (userTokenData != null)
+                {
+                    if (!userTokenData.FlagActive
+                        || DateTime.Compare(userTokenData.Token_ExpireTime, Utility.GetDateNowThai()) < 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<string> RefreshToken(Guid userID)
+        {
+            try
+            {
+                var userTokenData = await repository.user.CreateUserToken(userID);
+                if (userTokenData != null)
+                {
+                    return userTokenData.Token_ID;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)
         {
             var dateNow = Utility.GetDateNowThai();

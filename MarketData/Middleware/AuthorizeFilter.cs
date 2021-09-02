@@ -20,50 +20,65 @@ namespace MarketData.Middleware
             _process = process;
         }
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public async override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var sessionData = filterContext.HttpContext.Session.GetString("userDetail");
+            var tokenIDSession = filterContext.HttpContext.Session.GetString("tokenID");
+            var userDetailSession = filterContext.HttpContext.Session.GetString("userDetail");
 
-            if (sessionData != null)
+            if (tokenIDSession != null && userDetailSession != null)
             {
-                var userData = JsonSerializer.Deserialize<GetUserDetailResponse>(sessionData);
-                //bool validToken = _process.account.ValidateToken(userData.tokenID);
-                //if (!validToken)
-                //{
-                //    var values = new RouteValueDictionary(new
-                //    {
-                //        action = "Login",
-                //        controller = "Account",
-                //    });
+                var userData = JsonSerializer.Deserialize<GetUserDetailResponse>(userDetailSession);
+                var tokenIsValid = _process.user.ValidateToken(tokenIDSession);
 
-                //    filterContext.HttpContext.Session.Clear();
-                //    filterContext.Result = new RedirectToRouteResult(values);
-                //}
+                if (!tokenIsValid)
+                {
+                    var newToken = await _process.user.RefreshToken(userData.userID);
+                    filterContext.HttpContext.Session.SetString("tokenID", newToken);
+
+                    CookieOptions option = new CookieOptions();
+                    option.Expires = DateTime.Now.AddDays(1);
+                    option.SameSite = SameSiteMode.Strict;
+                    option.IsEssential = true;
+
+                    filterContext.HttpContext.Response.Cookies.Delete("tokenID");
+                    filterContext.HttpContext.Response.Cookies.Append("tokenID", newToken, option);
+                }
             }
             else
             {
+                string tokenIDCookie = filterContext.HttpContext.Request.Cookies["tokenID"];
                 string cookieUserData = filterContext.HttpContext.Request.Cookies["userDetail"];
 
-                if (cookieUserData != null)
+                if (tokenIDCookie != null)
                 {
-                    filterContext.HttpContext.Session.SetString("userDetail", cookieUserData);
+                    var tokenIsValid = _process.user.ValidateToken(tokenIDCookie);
 
-                    var userData = JsonSerializer.Deserialize<GetUserDetailResponse>(filterContext.HttpContext.Session.GetString("userDetail"));
-                    //bool validToken = _process.account.ValidateToken(userData.tokenID);
-                    //if (!validToken)
-                    //{
-                    //    var values = new RouteValueDictionary(new
-                    //    {
-                    //        action = "Login",
-                    //        controller = "Account",
-                    //    });
+                    if (!tokenIsValid)
+                    {
+                        filterContext.HttpContext.Session.Clear();
+                        filterContext.HttpContext.Response.Cookies.Delete("tokenID");
+                        filterContext.HttpContext.Response.Cookies.Delete("userDetail");
 
-                    //    filterContext.HttpContext.Session.Clear();
-                    //    filterContext.Result = new RedirectToRouteResult(values);
-                    //}
+                        var values = new RouteValueDictionary(new
+                        {
+                            action = "Login",
+                            controller = "Home",
+                        });
+
+                        filterContext.Result = new RedirectToRouteResult(values);
+                    }
+                    else
+                    {
+                        filterContext.HttpContext.Session.SetString("userDetail", cookieUserData);
+                        filterContext.HttpContext.Session.SetString("tokenID", tokenIDCookie);
+                    }
                 }
                 else
                 {
+                    filterContext.HttpContext.Session.Clear();
+                    filterContext.HttpContext.Response.Cookies.Delete("tokenID");
+                    filterContext.HttpContext.Response.Cookies.Delete("userDetail");
+
                     var values = new RouteValueDictionary(new
                     {
                         action = "Login",
