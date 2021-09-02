@@ -50,6 +50,10 @@ namespace MarketData.Processes.Processes
 
                 if (userData != null)
                 {
+                    var currentUserTokenActive = repository.user.GetUserTokenBy(
+                        c => c.User_ID == userData.ID && c.FlagActive);
+
+                   
                     if (!userData.ActiveFlag)
                     {
                         response.userLocked = true;
@@ -58,8 +62,8 @@ namespace MarketData.Processes.Processes
                     {
                         response.userNotValidate = true;
                     }
-                    else if (userData.OnlineFlag)
-                    {
+                    else if (userData.OnlineFlag && currentUserTokenActive != null && DateTime.Compare(currentUserTokenActive.Token_ExpireTime, Utility.GetDateNowThai()) > 0)
+                    {                      
                         response.userOnline = true;
                     }
                     else
@@ -844,6 +848,40 @@ namespace MarketData.Processes.Processes
                     else
                     {
                         return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> Logout(Guid userID,string tokenID)
+        {
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.ID == userID);
+                var userToken = repository.user.GetUserTokenBy(e => e.Token_ID == tokenID);
+
+                if (userData != null)
+                {
+                    userData.OnlineFlag = false;
+
+                    var updateUserToken = await repository.user.DeleteUserToken(userToken);
+                    var updateUserResult = await repository.user.UpdateUser(userData);
+                    
+                    if (updateUserResult)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
                 else

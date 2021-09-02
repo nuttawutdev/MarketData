@@ -1,5 +1,6 @@
 ﻿using MarketData.Middleware;
 using MarketData.Model.Request.User;
+using MarketData.Model.Response.User;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace MarketData.Controllers
             this.process = process;
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
         public IActionResult Index()
         {
             return View();
@@ -43,19 +45,25 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
         public IActionResult KeyIn()
         {
-            var role = HttpContext.Session.GetString("role");
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
 
-            if (role == "BA")
+            if (userPermission.keyInData && !userPermission.approveData)
             {
                 return RedirectToAction("KeyinByStore", "KeyIn");
             }
-            else
+            else if(userPermission.approveData)
             {
                 return RedirectToAction("KeyinByBrand", "KeyIn");
             }
-
+            else
+            {
+                return View("Index");
+            }
         }
 
         [AliveInSystemFilter]
@@ -109,21 +117,38 @@ namespace MarketData.Controllers
             if (!string.IsNullOrWhiteSpace(HttpContext.Session.GetString("userDetail"))
                 || !string.IsNullOrWhiteSpace(HttpContext.Request.Cookies["userDetail"]))
             {
-                //var userData = JsonSerializer.Deserialize<UserDataModel>(HttpContext.Session.GetString("userData"));
-                //var logoutResponse = await process.account.Logout(userData.ID, userData.tokenID);
+                GetUserDetailResponse userData;
+                string tokenID = string.Empty;
 
-                //if (logoutResponse)
-                //{
+                var sessionData = HttpContext.Session.GetString("userDetail");
+                var tokenSession = HttpContext.Session.GetString("tokenID");
+                var sessionCookie = HttpContext.Request.Cookies["userDetail"];
+                var tokenCookie = HttpContext.Request.Cookies["tokenID"];
 
-                Response.Cookies.Delete("userDetail");
-                Response.Cookies.Delete("tokenID");
-                HttpContext.Session.Clear();
-                return RedirectToAction("Login");
-                //}
-                //else
-                //{
-                //    return View("Index");
-                //}
+                if (sessionData != null)
+                {
+                    userData = JsonSerializer.Deserialize<GetUserDetailResponse>(sessionData);
+                    tokenID = tokenSession;
+                }
+                else
+                {
+                    userData = JsonSerializer.Deserialize<GetUserDetailResponse>(sessionCookie);
+                    tokenID = tokenCookie;
+                }
+
+                var logoutResponse = await process.user.Logout(userData.userID, tokenID);
+
+                if (logoutResponse)
+                {
+                    Response.Cookies.Delete("userDetail");
+                    Response.Cookies.Delete("tokenID");
+                    HttpContext.Session.Clear();
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    return View("Index");
+                }                          
             }
             else
             {

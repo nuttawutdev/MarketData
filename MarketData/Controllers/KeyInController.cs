@@ -9,6 +9,8 @@ using MarketData.Models;
 using Microsoft.AspNetCore.Http;
 using MarketData.Model.Request.KeyIn;
 using MarketData.Model.Response;
+using System.Text.Json;
+using MarketData.Middleware;
 
 namespace MarketData.Controllers
 {
@@ -26,11 +28,14 @@ namespace MarketData.Controllers
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult KeyinByBrand()
         {
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
 
-            var role = HttpContext.Session.GetString("role");
-            if (role == "Admin")
+            if (userPermission.approveData)
             {
                 AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
 
@@ -96,81 +101,75 @@ namespace MarketData.Controllers
             }
             else
             {
-                return RedirectToAction("KeyinByStore");
+                return RedirectToAction("Index", "Home");
             }
-
         }
 
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult KeyinByStore()
         {
             BAKeyInListViewModel dataModel = new BAKeyInListViewModel();
 
-            var role = HttpContext.Session.GetString("role");
-            if (role == "BA")
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            if (userPermission != null && userPermission.keyInData)
             {
                 try
                 {
-                    var userID = HttpContext.Session.GetString("userID");
+                    var baKeyInOption = process.keyIn.GetBAKeyInOption(userPermission.userID);
+                    var keyInStatus = process.masterData.GetKeyInStatus();
 
-                    if (userID != null)
+                    if (baKeyInOption != null && baKeyInOption.channel != null && baKeyInOption.channel.Any())
                     {
-                        var baKeyInOption = process.keyIn.GetBAKeyInOption(new Guid(userID));
-                        var keyInStatus = process.masterData.GetKeyInStatus();
-
-                        if (baKeyInOption != null && baKeyInOption.channel != null && baKeyInOption.channel.Any())
+                        dataModel.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
                         {
-                            dataModel.channelList = baKeyInOption.channel.Select(c => new ChannelKeyInViewModel
-                            {
-                                distributionChannelID = c.distributionChannelID,
-                                distributionChannelName = c.distributionChannelName
-                            }).ToList();
-                        }
-
-                        if (baKeyInOption != null && baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
-                        {
-                            dataModel.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
-                            {
-                                departmentStoreID = c.departmentStoreID,
-                                departmentStoreName = c.departmentStoreName
-                            }).ToList();
-                        }
-
-                        if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                        {
-                            dataModel.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
-                            {
-                                brandID = c.brandID,
-                                brandName = c.brandName
-                            }).ToList();
-                        }
-
-                        if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
-                        {
-                            dataModel.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
-                            {
-                                retailerGroupID = c.retailerGroupID,
-                                retailerGroupName = c.retailerGroupName
-                            }).ToList();
-                        }
-
-                        if (keyInStatus != null && keyInStatus.data != null && keyInStatus.data.Any())
-                        {
-                            dataModel.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
-                            {
-                                statusID = c.statusID,
-                                statusName = c.statusName
-                            }).ToList();
-                        }
-
-                        dataModel.yearList = baKeyInOption.year;
-
-                        dataModel.userID = new Guid(userID);
-                        return View(dataModel);
+                            distributionChannelID = c.distributionChannelID,
+                            distributionChannelName = c.distributionChannelName
+                        }).ToList();
                     }
-                    else
+
+                    if (baKeyInOption != null && baKeyInOption.departmentStore != null && baKeyInOption.departmentStore.Any())
                     {
-                        return RedirectToAction("KeyIn", "Home");
+                        dataModel.departmentStoreList = baKeyInOption.departmentStore.Select(c => new DepartmentStoreKeyInViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName
+                        }).ToList();
                     }
+
+                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                    {
+                        dataModel.brandList = baKeyInOption.brand.Select(c => new BrandKeyInViewModel
+                        {
+                            brandID = c.brandID,
+                            brandName = c.brandName
+                        }).ToList();
+                    }
+
+                    if (baKeyInOption != null && baKeyInOption.brand != null && baKeyInOption.brand.Any())
+                    {
+                        dataModel.retailerGroupList = baKeyInOption.retailerGroup.Select(c => new RetailerGroupKeyInViewModel
+                        {
+                            retailerGroupID = c.retailerGroupID,
+                            retailerGroupName = c.retailerGroupName
+                        }).ToList();
+                    }
+
+                    if (keyInStatus != null && keyInStatus.data != null && keyInStatus.data.Any())
+                    {
+                        dataModel.statusList = keyInStatus.data.Select(c => new StatusKeyInViewModel
+                        {
+                            statusID = c.statusID,
+                            statusName = c.statusName
+                        }).ToList();
+                    }
+
+                    dataModel.yearList = baKeyInOption.year;
+
+                    dataModel.userID = userPermission.userID;
+                    return View(dataModel);
+
                 }
                 catch (Exception ex)
                 {
@@ -179,8 +178,8 @@ namespace MarketData.Controllers
             }
             else
             {
-                return RedirectToAction("KeyinByBrand");
-            }        
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public async Task<IActionResult> KeyinByStore_Edit(Guid baKeyInID)

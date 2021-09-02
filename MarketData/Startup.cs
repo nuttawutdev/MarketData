@@ -33,6 +33,7 @@ namespace MarketData
             services.AddScoped<Process>();
             services.AddScoped<Repository>();
             services.AddScoped<AuthorizeFilter>();
+            services.AddScoped<PermissionFilter>();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(60);//You can set Time   

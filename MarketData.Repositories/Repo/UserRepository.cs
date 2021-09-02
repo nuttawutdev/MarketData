@@ -264,6 +264,19 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> DeleteUserToken(TMUserToken userTokenData)
+        {
+            try
+            {
+                _dbContext.TMUserToken.Remove(userTokenData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMUserToken GetUserTokenBy(Expression<Func<TMUserToken, bool>> expression)
         {
             try
