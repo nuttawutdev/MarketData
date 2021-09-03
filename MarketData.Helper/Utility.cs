@@ -56,7 +56,15 @@ namespace MarketData.Helper
             KeyinByStore_Edit,
             KeyinByStore_Edit_View,
             MasterData,
-            Reports
+            Reports,
+            Brand_Edit,
+            BrandGroup_Edit,
+            BrandType_Edit,
+            BrandSegment_Edit,
+            RetailerGroup_Edit,
+            DistributionChannels_Edit,
+            DepartmentStore_Edit,
+            Counter_Edit
         }
 
         public static DateTime GetDateNowThai()
