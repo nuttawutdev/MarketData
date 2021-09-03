@@ -7,11 +7,11 @@ using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MarketData.Controllers
@@ -134,8 +134,10 @@ namespace MarketData.Controllers
             {
                 try
                 {
-                    // Get by Session
-                    request.actionBy = Guid.NewGuid();
+                    var userDetailSession = HttpContext.Session.GetString("userDetail");
+                    var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                    request.actionBy = userDetail.userID;
                     response = await process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
                     return Json(response);
                 }
@@ -301,6 +303,9 @@ namespace MarketData.Controllers
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             ImportDataResponse response = new ImportDataResponse();
 
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
             using (var stream = new MemoryStream())
             {
                 excelFile.CopyTo(stream);
@@ -310,7 +315,7 @@ namespace MarketData.Controllers
                 {
                     fileStream = stream,
                     filePath = excelFile.FileName,
-                    userID = Guid.NewGuid().ToString(), // Get User ID from session
+                    userID = userDetail.userID.ToString(), // Get User ID from session
                 };
 
                 response = await process.user.ImportUserData(request, $"{Request.Scheme}://{Request.Host.Value}");

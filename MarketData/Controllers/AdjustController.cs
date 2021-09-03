@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MarketData.Middleware;
 using MarketData.Model.Request.Adjust;
@@ -183,8 +184,10 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
-            var userID = HttpContext.Session.GetString("userID");
-            request.userID = new Guid(userID);
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            request.userID = userDetail.userID;
             SaveDataResponse response = new SaveDataResponse();
 
             try
@@ -201,8 +204,10 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
-            var userID = HttpContext.Session.GetString("userID");
-            request.userID = new Guid(userID);
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            request.userID = userDetail.userID;
 
             SaveDataResponse response = new SaveDataResponse();
 

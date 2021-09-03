@@ -203,8 +203,10 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBAKeyInDetail([FromBody] CreateBAKeyInRequest request)
         {
-            var userID = HttpContext.Session.GetString("userID");
-            request.userID = new Guid(userID);
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            request.userID = userDetail.userID;
 
             var viewData = await process.keyIn.CreateBAKeyInDetail(request);
             return Json(viewData);
@@ -278,11 +280,12 @@ namespace MarketData.Controllers
 
             try
             {
-                var userID = HttpContext.Session.GetString("userID");
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
 
-                if (userID != null)
+                if (userDetail != null)
                 {
-                    var baKeyInData = process.keyIn.GetBAKeyInList(new Guid(userID));
+                    var baKeyInData = process.keyIn.GetBAKeyInList(userDetail.userID);
 
                     if (baKeyInData != null && baKeyInData.data != null && baKeyInData.data.Any())
                     {
@@ -307,8 +310,6 @@ namespace MarketData.Controllers
                             year = c.year
                         }).ToList();
                     }
-
-                    dataModel.userID = new Guid(userID);
                 }
             }
             catch (Exception ex)
@@ -326,8 +327,10 @@ namespace MarketData.Controllers
 
             if (ModelState.IsValid)
             {
-                var userID = HttpContext.Session.GetString("userID");
-                request.userID = new Guid(userID);
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                request.userID = userDetail.userID;
 
                 response = await process.keyIn.SaveBAKeyInDetail(request);
                 return Json(response);
@@ -350,8 +353,10 @@ namespace MarketData.Controllers
 
             if (ModelState.IsValid)
             {
-                var userID = HttpContext.Session.GetString("userID");
-                request.userID = new Guid(userID);
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                request.userID = userDetail.userID;
 
                 response = await process.keyIn.SubmitBAKeyInDetail(request);
                 return Json(response);
@@ -425,8 +430,10 @@ namespace MarketData.Controllers
 
             if (ModelState.IsValid)
             {
-                var userID = HttpContext.Session.GetString("userID");
-                request.userID = new Guid(userID);
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                request.userID = userDetail.userID;
 
                 response = await process.keyIn.SaveAdminKeyIn(request);
                 return Json(response);

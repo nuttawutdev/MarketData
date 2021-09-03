@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.BrandViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = Model.brandName == null ? "Add Brand" : "Edit Brand";
@@ -18,6 +21,12 @@
 <br />
 
 <form>
+
+    @{
+        var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+        <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    }
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Name</label><label style="font-size:14px;color:red">*</label>
@@ -31,16 +40,16 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Group</label><label style="font-size:14px;color:red">*</label>
-     
-            @Html.DropDownListFor(n => n.brandGroupID, new SelectList(Model.brandGroupList, "brandGroupID", "brandGroupName", 1), "Please select",new { id = "idbrandGroupList", @class= "form-control " })
+
+            @Html.DropDownListFor(n => n.brandGroupID, new SelectList(Model.brandGroupList, "brandGroupID", "brandGroupName", 1), "Please select", new { id = "idbrandGroupList", @class = "form-control " })
         </div>
 
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Segment</label><label style="font-size:14px;color:red">*</label>
-         
+
             @Html.DropDownListFor(n => n.brandSegmentID, new SelectList(Model.brandSegmentList, "brandSegmentID", "brandSegmentName", 1), "Please select", new { id = "idbrandSegmentList", @class = "form-control " })
 
-</div>
+        </div>
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
@@ -58,34 +67,34 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Loreal Brand Rank</label>
-            <input type="number" class="form-control input-sm" value="@Model.lorealBrandRank"id="idlorealBrandRank" />
+            <input type="number" class="form-control input-sm" value="@Model.lorealBrandRank" id="idlorealBrandRank" />
         </div>
 
         <div class="form-group col-md-6 col-sm-6 " style=" align-self: flex-end;">
             <label for="name">Universe</label>
-                @{
-                    List<SelectListItem> listUniverse = new List<SelectListItem>();
-                    listUniverse.Add(new SelectListItem
-                    {
-                        Text = "CPD",
-                        Value = "CPD"
-                    });
-                    listUniverse.Add(new SelectListItem
-                    {
-                        Text = "LPD",
-                        Value = "LPD",
+            @{
+                List<SelectListItem> listUniverse = new List<SelectListItem>();
+                listUniverse.Add(new SelectListItem
+                {
+                    Text = "CPD",
+                    Value = "CPD"
+                });
+                listUniverse.Add(new SelectListItem
+                {
+                    Text = "LPD",
+                    Value = "LPD",
 
-                    });
+                });
 
-                    @Html.DropDownListFor(n => n.universe, new SelectList(listUniverse, "Value", "Text", 1), "Please select", new { id = "iduniverseList", @class = "form-control " })
+                @Html.DropDownListFor(n => n.universe, new SelectList(listUniverse, "Value", "Text", 1), "Please select", new { id = "iduniverseList", @class = "form-control " })
 
-                }
+            }
 
         </div>
     </div>
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
-            <label >
+            <label>
                 @if (Model.active)
                 {
                     <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">

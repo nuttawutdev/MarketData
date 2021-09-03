@@ -1,6 +1,7 @@
-﻿
-
-@model MarketData.Models.DepartmentStoreViewModel
+﻿@model MarketData.Models.DepartmentStoreViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = Model.departmentStoreName == null ? "Add Department Store" : "Edit Department Store";
@@ -15,6 +16,11 @@
 <br />
 
 <form>
+    @{
+        var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+        <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    }
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Department Store Name</label><label style="font-size:14px;color:red">*</label>

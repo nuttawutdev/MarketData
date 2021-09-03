@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MarketData.Controllers
@@ -205,8 +206,10 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> ApproveKeyInData([FromBody] ApproveKeyInDataRequest request)
         {
-            var userID = HttpContext.Session.GetString("userID");
-            request.userID = new Guid(userID);
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            request.userID = userDetail.userID;
 
             var viewData = await process.approve.ApproveKeyInData(request);
             return Json(viewData);
@@ -215,8 +218,10 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> RejectKeyInData([FromBody] RejectKeyInDataRequest request)
         {
-            var userID = HttpContext.Session.GetString("userID");
-            request.userID = new Guid(userID);
+            var userDetailSession = HttpContext.Session.GetString("userDetail");
+            var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+            request.userID = userDetail.userID;
 
             var viewData = await process.approve.RejectKeyInData(request);
             return Json(viewData);

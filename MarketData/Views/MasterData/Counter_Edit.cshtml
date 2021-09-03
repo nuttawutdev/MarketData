@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.CounterViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = Model.departmentStoreID == Guid.Empty ? "Add Counter" : "Edit Counter";
@@ -13,6 +16,11 @@
 <br />
 
 <form>
+    @{
+        var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+        <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    }
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>Distribution Channels</label><label style="font-size:14px;color:red">*</label>
@@ -68,7 +76,7 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {          
+    $(document).ready(function () {
 
         $("#save").click(function () {
             $("#blocker").show();

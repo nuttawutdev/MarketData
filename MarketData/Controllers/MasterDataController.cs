@@ -910,10 +910,6 @@ namespace MarketData.Controllers
             if (ModelState.IsValid)
             {
                 var response = process.masterData.GetCounterList();
-                //var departmentStoreList = process.masterData.GetDepartmentStoreList();
-                //var brandList = process.masterData.GetBrandList();
-                //var channelList = process.masterData.GetDistributionChannelList();
-                //var retailerGroupList = process.masterData.GetRetailerGroupList();
 
                 if (response != null && response.data != null && response.data.Any())
                 {
@@ -930,26 +926,6 @@ namespace MarketData.Controllers
                         brandName = c.brandName,
                         active = c.active
                     }).ToList();
-                    //listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
-                    //{
-                    //    departmentStoreID = e.departmentStoreID,
-                    //    departmentStoreName = e.departmentStoreName
-                    //}).ToList() : new List<DepartmentStoreViewModel>();
-                    //listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
-                    //{
-                    //    distributionChannelID = e.distributionChannelID,
-                    //    distributionChannelName = e.distributionChannelName
-                    //}).ToList() : new List<DistributionChannelViewModel>();
-                    //listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
-                    //{
-                    //    brandID = e.brandID,
-                    //    brandName = e.brandName
-                    //}).ToList() : new List<BrandViewModel>();
-                    //listView.retailerGroupList = retailerGroupList != null && retailerGroupList.data != null ? retailerGroupList.data.Select(e => new RetailerGroupViewModel
-                    //{
-                    //    retailerGroupID = e.retailerGroupID,
-                    //    retailerGroupName = e.retailerGroupName
-                    //}).ToList() : new List<RetailerGroupViewModel>();
                 }
                 else
                 {

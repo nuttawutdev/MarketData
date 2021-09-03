@@ -29,7 +29,7 @@ namespace MarketData.Middleware
 
             var userDetailSession = filterContext.HttpContext.Session.GetString("userDetail");
 
-            if(userDetailSession != null)
+            if (userDetailSession != null)
             {
                 var userData = JsonSerializer.Deserialize<GetUserDetailResponse>(userDetailSession);
 
@@ -40,16 +40,29 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
+                else if (userData.approveData && userData.keyInData)
+                {
+                    if (actionName == ViewPermission.KeyinByStore.ToString() && userData.approveData)
+                    {
+                        var values = new RouteValueDictionary(new
+                        {
+                            action = "KeyinByBrand",
+                            controller = "KeyIn",
+                        });
+
+                        filterContext.Result = new RedirectToRouteResult(values);
+                    }
+                }
                 // ไม่มิสิทธิ์ Key-in by brand
                 else if (actionName == ViewPermission.KeyinByBrand.ToString() && !userData.approveData)
                 {
                     GoToHome(filterContext);
                 }
-                else if(controller == ControllerPermission.Users.ToString() && !userData.editUser)
+                else if (controller == ControllerPermission.Users.ToString() && !userData.editUser)
                 {
                     GoToHome(filterContext);
                 }
-                else if (controller == ControllerPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster)) 
+                else if (controller == ControllerPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster))
                 {
                     GoToHome(filterContext);
                 }

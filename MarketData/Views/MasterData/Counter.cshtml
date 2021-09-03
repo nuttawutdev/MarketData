@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.CounterListViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "Counter";
@@ -26,34 +29,34 @@
 
             <label class="form-label">Department Store :&nbsp;</label>
             @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
-          
+
             <label class="form-label">Brand :&nbsp;</label>
             @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
             @*<label class="form-label">Active:&nbsp;</label>
-        <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
-            <option value="">All</option>
-            <option value=true>Y</option>
-            <option value="false">N</option>
-        </select>
-        <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-              enctype="multipart/form-data">
-            <div class="filter-group ">
-                <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+                <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
+                    <option value="">All</option>
+                    <option value=true>Y</option>
+                    <option value="false">N</option>
+                </select>
+                <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                      enctype="multipart/form-data">
+                    <div class="filter-group ">
+                        <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
-                    <label for="file-upload" class="custom-file-upload1">
-                        <i class="ion-android-document"></i> Import by Excel
-                    </label>
-                    <input type="text" id="userID" name="userID" value="DDD" hidden />
-                    <input id="file-upload" type="file" name="excelFile" />
-                    <input type="submit" id="btnSubmit" value="Import" hidden />
-                </div>
-            </div>
-        </form>*@
+                            <label for="file-upload" class="custom-file-upload1">
+                                <i class="ion-android-document"></i> Import by Excel
+                            </label>
+                            <input type="text" id="userID" name="userID" value="DDD" hidden />
+                            <input id="file-upload" type="file" name="excelFile" />
+                            <input type="submit" id="btnSubmit" value="Import" hidden />
+                        </div>
+                    </div>
+                </form>*@
         </div>
     </div>
 
     <div class="row">
-       
+
         <div class="col text-end d-flex justify-content-end align-items-center">
             <label class="form-label">Active :&nbsp;</label>
             <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
@@ -63,6 +66,10 @@
             </select>
             <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
                   enctype="multipart/form-data">
+                @{
+                    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+                    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+                }
                 <div class="filter-group ">
                     <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
@@ -114,7 +121,7 @@
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
 
-            fd.append('userID', 'Test');
+            fd.append('userID', $('#iduserID').val());
 
             // Check file selected or not
             if (files.length > 0) {
@@ -289,7 +296,7 @@
         $('#departmentStoreList').on('change', function (e) {
             var status = $(this).val();
             $('#departmentStoreList').val(status);
-            dataTable.column(3).search(status).draw();            
+            dataTable.column(3).search(status).draw();
         });
 
         $('#brandList').on('change', function (e) {

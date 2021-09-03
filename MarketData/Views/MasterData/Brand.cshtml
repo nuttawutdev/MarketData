@@ -1,4 +1,8 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Brand";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
@@ -29,6 +33,10 @@
             </select>
             <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
                   enctype="multipart/form-data">
+                @{
+                    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+                    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+                }
                 <div class="filter-group ">
                     <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
@@ -89,7 +97,7 @@
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
 
-            fd.append('userID', 'Test');
+            fd.append('userID', $('#iduserID').val());
 
             // Check file selected or not
             if (files.length > 0) {
@@ -104,7 +112,7 @@
                     contentType: false,
                     type: "POST",
                     success: function (data) {
-                      
+
                         $("#blocker").hide();
                         if (data.isSuccess) {
                            // dataTable.ajax.reload();
