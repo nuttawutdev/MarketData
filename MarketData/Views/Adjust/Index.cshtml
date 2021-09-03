@@ -1,4 +1,8 @@
 ﻿@model MarketData.Models.AdjustDataViewModel;
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
 @{
     ViewData["Title"] = "Adjust";
     Html.RenderPartial("_WarningModal");
@@ -131,7 +135,7 @@
             <div class="row col-sm-12" style="padding-top: 15px;padding-bottom:15px;">
                 <div class="col-sm-3" style="align-self: flex-end;">
                     <div class="filter-group">
-                            <button id="btnShow" type="button" class="btn btn-danger"><i class="ion-search"></i> Show</button>
+                        <button id="btnShow" type="button" class="btn btn-danger"><i class="ion-search"></i> Show</button>
                     </div>
                 </div>
             </div>
@@ -150,8 +154,21 @@
 
 </div>
 
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var viewDataPermission = userPermission.viewData;
+    var approveDataPermission = userPermission.approveData;
+
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@viewDataPermission.ToString()" class="form-control input-sm" id="viewDataPermission" placeholder="">
+    <input hidden type="text" value="@approveDataPermission.ToString()" class="form-control input-sm" id="approveDataPermission" placeholder="">
+}
+
 <script type="text/javascript">
     $(document).ready(function () {
+        var viewDataPermission = $('#viewDataPermission').val();
+        var approveDataPermission = $('#approveDataPermission').val();
+
         $("#container").removeClass("container");
 
         $('#btnShow').on('click', function (e) {
@@ -231,7 +248,7 @@
                                     else {
                                         rowTable += '<td style="background-color: black;border:solid;border-color: white;" data-id=' + key + '></td>';
                                     }
-                                   
+
 
                                 });
                                 rowTable +=   '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';

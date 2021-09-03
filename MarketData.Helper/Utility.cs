@@ -64,7 +64,9 @@ namespace MarketData.Helper
             RetailerGroup_Edit,
             DistributionChannels_Edit,
             DepartmentStore_Edit,
-            Counter_Edit
+            Counter_Edit,
+            Approve_Edit,
+            Adjust_Edit
         }
 
         public static DateTime GetDateNowThai()
