@@ -33,20 +33,28 @@ namespace MarketData.Controllers
         {
             return View();
         }
+
         public IActionResult ResetPassword()
         {
             return View();
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult MasterData()
         {
             return View();
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Reports()
         {
             return View();
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult KeyIn()
         {
             var userDetailSession = HttpContext.Session.GetString("userDetail");

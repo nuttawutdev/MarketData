@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Request.MasterData;
+﻿using MarketData.Middleware;
+using MarketData.Model.Request.MasterData;
 using MarketData.Model.Request.User;
 using MarketData.Model.Response;
 using MarketData.Model.Response.MasterData;
@@ -24,6 +25,8 @@ namespace MarketData.Controllers
             this.process = process;
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Index()
         {
             UserOptionViewModel viewModel = new UserOptionViewModel();
@@ -60,6 +63,8 @@ namespace MarketData.Controllers
             }
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Users_Edit(Guid userID)
         {
             var viewModel = GetUserDetail(userID);
@@ -74,6 +79,8 @@ namespace MarketData.Controllers
             }
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Users_Edit_View(Guid userID)
         {
             var viewModel = GetUserDetail(userID);
@@ -86,7 +93,7 @@ namespace MarketData.Controllers
             {
                 return View("Index");
             }
-        
+
         }
 
         [HttpPost]
@@ -229,20 +236,22 @@ namespace MarketData.Controllers
         {
             var activateUserResponse = await process.user.ActivateUser(new Guid(refID));
 
-            //if (activateUserResponse.isSuccess)
-            //{
+            if (activateUserResponse.isSuccess)
+            {
                 return View("ActivateSuccess");
-            //}
-            //else
-            //{
-            //    return RedirectToAction("UrlUnvaliable");
-            //}
+            }
+            else
+            {
+                return RedirectToAction("UrlUnvaliable");
+            }
         }
+
         public IActionResult UrlUnvaliable(string refID)
         {
             return View();
         }
-            [HttpGet]
+
+        [HttpGet]
         public IActionResult VerifyUrlResetPassword(string refID)
         {
             var verifyUrlResponse = process.user.VerifyUrlResetPassword(new Guid(refID));
@@ -278,12 +287,12 @@ namespace MarketData.Controllers
                 };
 
                 response = await process.user.ChangePasssword(internalRequest);
-                return RedirectToAction("Login","Home");
+                return RedirectToAction("Login", "Home");
             }
             else
             {
                 return View("ResetPassword", request);
-            }       
+            }
         }
 
         [HttpPost]
@@ -321,7 +330,7 @@ namespace MarketData.Controllers
                 response = await process.user.ResendWelcomeEmail(userID, $"{Request.Scheme}://{Request.Host.Value}");
                 return Json(response);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Json(response);
             }

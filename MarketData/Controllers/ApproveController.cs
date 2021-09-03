@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Request.Approve;
+﻿using MarketData.Middleware;
+using MarketData.Model.Request.Approve;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,8 @@ namespace MarketData.Controllers
             this.process = process;
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Index()
         {
             ApproveKeyInViewModel dataModel = new ApproveKeyInViewModel();
@@ -95,16 +98,22 @@ namespace MarketData.Controllers
             return View(dataModel);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Approve_Edit(Guid approveKeyInID)
         {
             var viewData = GetApproveKeyInDetail(approveKeyInID);
             return View(viewData);
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Approve_Edit_View(Guid approveKeyInID)
         {
             var viewData = GetApproveKeyInDetail(approveKeyInID);
             return View(viewData);
         }
+        
         [HttpPost]
         public IActionResult GetApproveKeyInList()
         {

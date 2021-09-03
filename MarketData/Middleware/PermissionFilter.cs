@@ -1,10 +1,15 @@
-﻿using MarketData.Processes;
+﻿using MarketData.Model.Response.User;
+using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static MarketData.Helper.Utility;
 
 namespace MarketData.Middleware
 {
@@ -20,16 +25,70 @@ namespace MarketData.Middleware
         {
             string controller = (string)filterContext.RouteData.Values["controller"];
             string actionName = (string)filterContext.RouteData.Values["action"];
-            string pageName = filterContext.ActionDescriptor.AttributeRouteInfo?.Template;
 
-            string pathAction = $"{controller}/{actionName}";
 
             var userDetailSession = filterContext.HttpContext.Session.GetString("userDetail");
 
             if(userDetailSession != null)
             {
+                var userData = JsonSerializer.Deserialize<GetUserDetailResponse>(userDetailSession);
 
+                // ไม่มิสิทธิ์ Key-in 
+                if ((actionName == ViewPermission.KeyinByStore.ToString()
+                    || actionName == ViewPermission.KeyinByStore_Edit.ToString()
+                    || actionName == ViewPermission.KeyinByStore_Edit_View.ToString()) && !userData.keyInData)
+                {
+                    GoToHome(filterContext);
+                }
+                // ไม่มิสิทธิ์ Key-in by brand
+                else if (actionName == ViewPermission.KeyinByBrand.ToString() && !userData.approveData)
+                {
+                    GoToHome(filterContext);
+                }
+                else if(controller == ControllerPermission.Users.ToString() && !userData.editUser)
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ControllerPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster)) 
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ControllerPermission.Adjust.ToString() && (!userData.approveData && !userData.viewData))
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ControllerPermission.Approve.ToString() && (!userData.approveData && !userData.viewData))
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ControllerPermission.Reports.ToString() && !userData.viewReport)
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ViewPermission.KeyIn.ToString() && (!userData.keyInData && !userData.approveData))
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ViewPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster))
+                {
+                    GoToHome(filterContext);
+                }
+                else if (controller == ViewPermission.Reports.ToString() && !userData.viewReport)
+                {
+                    GoToHome(filterContext);
+                }
             }
+        }
+
+        private void GoToHome(ActionExecutingContext filterContext)
+        {
+            var values = new RouteValueDictionary(new
+            {
+                action = "Index",
+                controller = "Home",
+            });
+
+            filterContext.Result = new RedirectToRouteResult(values);
         }
     }
 }

@@ -105,6 +105,7 @@ namespace MarketData.Controllers
             }
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult KeyinByStore()
         {
@@ -182,12 +183,16 @@ namespace MarketData.Controllers
             }
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> KeyinByStore_Edit(Guid baKeyInID)
         {
             var viewData = await GetBAKeyInDetail(baKeyInID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> KeyinByStore_Edit_View(Guid baKeyInID)
         {
             var viewData = await GetBAKeyInDetail(baKeyInID, true);
@@ -412,6 +417,7 @@ namespace MarketData.Controllers
                 return Json(dataModel);
             }
         }
+       
         [HttpPost]
         public async Task<IActionResult> SaveAdminKeyIn([FromBody] SaveAdminKeyInDetailRequest request)
         {

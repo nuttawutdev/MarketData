@@ -36,6 +36,29 @@ namespace MarketData.Helper
             ResetPassword
         }
 
+        public enum ControllerPermission
+        {
+            Undefined, // Required here even though it's not a valid month
+            Keyin,
+            Users,
+            Reports,
+            Approve,
+            MasterData,
+            Adjust
+        }
+
+        public enum ViewPermission
+        {
+            Undefined, // Required here even though it's not a valid month
+            KeyIn,
+            KeyinByBrand,
+            KeyinByStore,
+            KeyinByStore_Edit,
+            KeyinByStore_Edit_View,
+            MasterData,
+            Reports
+        }
+
         public static DateTime GetDateNowThai()
         {
             var dateUtc = DateTime.UtcNow;

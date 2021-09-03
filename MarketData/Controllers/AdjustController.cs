@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketData.Middleware;
 using MarketData.Model.Request.Adjust;
 using MarketData.Model.Response;
 using MarketData.Model.Response.AdjustData;
@@ -20,6 +21,8 @@ namespace MarketData.Controllers
             this.process = process;
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Index()
         {
             var role = HttpContext.Session.GetString("role");
@@ -89,6 +92,8 @@ namespace MarketData.Controllers
 
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult Adjust_Edit(Guid adjustDataID)
         {
             var role = HttpContext.Session.GetString("role");
