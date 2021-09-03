@@ -203,7 +203,7 @@ namespace MarketData.Processes.Processes
                 var userData = repository.user.FindUserBy(c => c.ID == userID);
 
                 var getDepartmentStoreResponse = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
-                var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
+                var getBrandResponse = repository.masterData.GetBrandListLoreal(c => c.Active_Flag);
                 var channelResponse = repository.masterData.GetDistributionChannelListBy(c => c.Active_Flag && c.Delete_Flag != true);
 
                 if (userData != null)
@@ -233,7 +233,7 @@ namespace MarketData.Processes.Processes
                             departmentStoreID = c.DepartmentStore_ID,
                             departmentStoreName = getDepartmentStoreResponse.FirstOrDefault(e => e.Department_Store_ID == c.DepartmentStore_ID).Department_Store_Name,
                             brandID = c.Brand_ID,
-                            brandName = getBrandResponse.FirstOrDefault(b => b.Brand_ID == c.Brand_ID).Brand_Name,
+                            brandName = getBrandResponse.FirstOrDefault(b => b.brandID == c.Brand_ID).brandName,
                             channelID = c.DistributionChannel_ID,
                             channelName = channelResponse.FirstOrDefault(r => r.Distribution_Channel_ID == c.DistributionChannel_ID).Distribution_Channel_Name
                         }).ToList();
@@ -249,8 +249,8 @@ namespace MarketData.Processes.Processes
                 }).OrderBy(r => r.departmentStoreName).ToList();
                 response.brand = getBrandResponse.Select(c => new BrandData
                 {
-                    brandID = c.Brand_ID,
-                    brandName = c.Brand_Name
+                    brandID = c.brandID,
+                    brandName = c.brandName
                 }).OrderBy(r => r.brandName).ToList();
                 response.channel = channelResponse.Select(c => new DistributionChannelData
                 {
@@ -944,11 +944,12 @@ namespace MarketData.Processes.Processes
                     htmlBody = reader.ReadToEnd();
                 }
 
+                htmlBody = htmlBody.Replace("TXTPASSWORD", passwordUser);
                 htmlBody = htmlBody.Replace("linkRegister", url);
                 MailMessage m = new MailMessage();
-                m.From = new MailAddress("developernuttawut@gmail", "Admin");
+                m.From = new MailAddress("developernuttawut@gmail", "Admin Market Data");
                 m.To.Add(emailTo);
-                m.Subject = "Activate User​";
+                m.Subject = "Market Data Confirm email​";
                 m.Body = htmlBody;// $"{url} {passwordUser}";
                 m.IsBodyHtml = true;
 
