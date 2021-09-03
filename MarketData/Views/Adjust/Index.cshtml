@@ -251,7 +251,14 @@
 
 
                                 });
-                                rowTable +=   '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
+
+                                if (approveDataPermission == 'True') {
+                                    rowTable += '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
+                                }
+                                else if (viewDataPermission == 'True') {
+                                    rowTable += '<td > <button type="button" class="buttonIcon btn btn-primary btn-sm btnAdjustEdit"><i class="ion-eye text-white"></i></button></td >';
+                                }
+                                                           
                                 rowTable += '</tr>';
                             }
 
@@ -311,13 +318,13 @@
                     data: JSON.stringify(frmdata),
                     datatype: "json",
                      success: function (data) {
-                            if (data.isSuccess) {
-                        if (!data.isSubmited) {
+                     if (data.isSuccess) {
+                         if (approveDataPermission == 'True') {
                             var url = '@Url.Action("Adjust_Edit", "Adjust", new { adjustDataID = "_id_" })';
                             window.location.href = url.replace('_id_', data.adjustDataID);
                         }
-                        else {
-                            var url = '@Url.Action("Adjust_Edit", "Adjust", new { adjustDataID = "_id_" })';
+                         else if (viewDataPermission == 'True') {
+                            var url = '@Url.Action("Adjust_Edit_View", "Adjust", new { adjustDataID = "_id_" })';
                             window.location.href = url.replace('_id_', data.adjustDataID);
                         }
                     }
