@@ -977,19 +977,19 @@ namespace MarketData.Processes.Processes
                 // Send Email
                 string url = $"{hostUrl}/Users/VerifyUrlResetPassword?refID={urlID}";
                 string htmlBody = string.Empty;
-                //string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
-                //using (StreamReader reader = File.OpenText(emailTemplatePath))
-                //{
-                //    htmlBody = reader.ReadToEnd();
-                //}
+                string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateResetPassword.html"));
+                using (StreamReader reader = File.OpenText(emailTemplatePath))
+                {
+                    htmlBody = reader.ReadToEnd();
+                }
 
-                //htmlBody = htmlBody.Replace("linkRegister", url);
+                htmlBody = htmlBody.Replace("linkChangePassword", url);
                 MailMessage m = new MailMessage();
                 m.From = new MailAddress("developernuttawut@gmail", "Admin");
                 m.To.Add(emailTo);
-                m.Subject = "Reset Password​";
-                m.Body = $"{url}";
-                //m.IsBodyHtml = true;
+                m.Subject = "Market Data Reset Password​";
+                m.Body = htmlBody;
+                m.IsBodyHtml = true;
 
                 using (var smtp = new SmtpClient())
                 {

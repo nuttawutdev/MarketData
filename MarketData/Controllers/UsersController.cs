@@ -266,7 +266,7 @@ namespace MarketData.Controllers
                     urlID = verifyUrlResponse.urlID
                 };
 
-                return View("ResetPassword", viewModel);
+                return View("../Home/ResetPassword", viewModel);
             }
             else
             {
@@ -293,7 +293,7 @@ namespace MarketData.Controllers
             }
             else
             {
-                return View("ResetPassword", request);
+                return View("../Home/ResetPassword", request);
             }
         }
 
