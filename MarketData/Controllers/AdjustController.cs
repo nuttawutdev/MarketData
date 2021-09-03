@@ -130,7 +130,50 @@ namespace MarketData.Controllers
 
             return View(dataModel);
         }
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
+        public IActionResult Adjust_Edit_View(Guid adjustDataID)
+        {
+            var adjustDetailData = process.adjust.GetAdjustDataDetail(adjustDataID);
+            AdjustDetailViewModel dataModel = new AdjustDetailViewModel
+            {
+                adjustDataID = adjustDetailData.adjustDataID,
+                brandDataColumn = adjustDetailData.brandDataColumn,
+                channel = adjustDetailData.channel,
+                departmentStore = adjustDetailData.departmentStore,
+                month = adjustDetailData.month,
+                status = adjustDetailData.status,
+                retailerGroup = adjustDetailData.retailerGroup,
+                universe = adjustDetailData.universe,
+                week = adjustDetailData.week,
+                year = adjustDetailData.year,
+                brandTotalAmount = adjustDetailData.brandTotalAmount,
+                data = adjustDetailData.data.Select(c => new AdjustDetailViewData
+                {
+                    brandID = c.brandID,
+                    brandColor = c.brandColor,
+                    month = c.month,
+                    week = c.week,
+                    year = c.year,
+                    adjustAmountSale = c.adjustAmountSale,
+                    adjustWholeSale = c.adjustWholeSale,
+                    adminAmountSale = c.adminAmountSale,
+                    amountPreviousYear = c.amountPreviousYear,
+                    brandKeyInAmount = c.brandKeyInAmount,
+                    brandKeyInRank = c.brandKeyInRank,
+                    fg = c.fg,
+                    mu = c.mu,
+                    ot = c.ot,
+                    sk = c.sk,
+                    brandName = c.brandName,
+                    remark = c.remark,
+                    rank = c.rank,
+                    percentGrowth = c.percentGrowth
+                }).ToList()
+            };
 
+            return View(dataModel);
+        }
         [HttpPost]
         public IActionResult GetAdjustList([FromBody] GetAdjustListRequest request)
         {
