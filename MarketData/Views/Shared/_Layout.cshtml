@@ -123,7 +123,7 @@
                                     </li>
                                 }
 
-                                if (userPermission.approveData)
+                                if (userPermission.approveData || userPermission.viewData)
                                 {
                                     <li class="nav-item">
                                         <a class="nav-link text-white" asp-area="" asp-controller="Approve" asp-action="Index">Approve</a>
