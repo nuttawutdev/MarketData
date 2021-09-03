@@ -1,4 +1,8 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Retailer Group";
     Html.RenderPartial("_ConfirmModal");
 }
@@ -6,12 +10,20 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
 
-<h3>
-    @ViewData["Title"]
-    <a href="RetailerGroup_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var editMaster = userPermission.editMaster;
 
-</h3>
-
+    <input hidden type="text" value="@userPermission.viewMaster.ToString()" class="form-control input-sm" id="viewMaster" placeholder="">
+    <input hidden type="text" value="@userPermission.editMaster.ToString()" class="form-control input-sm" id="editMaster" placeholder="">
+    <h3>
+        @ViewData["Title"]
+        @if (editMaster)
+        {
+            <a href="RetailerGroup_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        }
+    </h3>
+}
 <hr />
 <div style="padding-bottom:10px;">
     <div class="row">
@@ -36,6 +48,9 @@
 
 
     $(document).ready(function () {
+        var viewMasterPermission = $('#viewMaster').val();
+        var editMasterPermission = $('#editMaster').val();
+
         $("#tableData").one("preInit.dt", function () {
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
             $("#tableData_filter label").append($button);
@@ -74,9 +89,17 @@
                     width: "20%",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="RetailerGroup_View?retailerGroupID=' + row.retailerGroupID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="RetailerGroup_Edit?retailerGroupID=' + row.retailerGroupID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        if (editMasterPermission == 'True') {
 
+                            return '<a href="RetailerGroup_View?retailerGroupID=' + row.retailerGroupID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                                '<a href="RetailerGroup_Edit?retailerGroupID=' + row.retailerGroupID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        }
+                        else if (viewMasterPermission == 'True' && editMasterPermission != 'True') {
+                            return '<a href="RetailerGroup_View?retailerGroupID=' + row.retailerGroupID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>';
+                        }
+                        else {
+                            return '';
+                        }
                     }
                 }
             ]

@@ -78,15 +78,25 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
-                else if (controller == ViewPermission.KeyIn.ToString() && (!userData.keyInData && !userData.approveData))
+                else if (actionName == ViewPermission.KeyIn.ToString() && (!userData.keyInData && !userData.approveData))
                 {
                     GoToHome(filterContext);
                 }
-                else if (controller == ViewPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster))
+                else if (actionName == ViewPermission.MasterData.ToString() && (!userData.editMaster && !userData.viewMaster))
                 {
                     GoToHome(filterContext);
                 }
-                else if (controller == ViewPermission.Reports.ToString() && !userData.viewReport)
+                else if (actionName == ViewPermission.Reports.ToString() && !userData.viewReport)
+                {
+                    GoToHome(filterContext);
+                }
+                else if ((actionName == ViewPermission.BrandGroup_Edit.ToString() ||
+                    actionName == ViewPermission.BrandSegment_Edit.ToString() ||
+                    actionName == ViewPermission.BrandType_Edit.ToString() ||
+                    actionName == ViewPermission.Brand_Edit.ToString() ||
+                    actionName == ViewPermission.Counter_Edit.ToString() ||
+                    actionName == ViewPermission.DepartmentStore_Edit.ToString() ||
+                    actionName == ViewPermission.DistributionChannels_Edit.ToString()) && !userData.editMaster)
                 {
                     GoToHome(filterContext);
                 }

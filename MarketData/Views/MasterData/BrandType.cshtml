@@ -1,16 +1,28 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Brand Type";
     Html.RenderPartial("_ConfirmModal");
 }
 
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var editMaster = userPermission.editMaster;
 
-<h3>
+    <input hidden type="text" value="@userPermission.viewMaster.ToString()" class="form-control input-sm" id="viewMaster" placeholder="">
+    <input hidden type="text" value="@userPermission.editMaster.ToString()" class="form-control input-sm" id="editMaster" placeholder="">
+    <h3>
+        @ViewData["Title"]
 
-    @ViewData["Title"]
-    <a href="BrandType_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        @if (editMaster)
+        {
+            <a href="BrandType_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        }
 
-</h3>
-
+    </h3>
+}
 
 <hr />
 <div style="padding-bottom:10px;">
@@ -39,6 +51,9 @@
 
 
     $(document).ready(function () {
+        var viewMasterPermission = $('#viewMaster').val();
+        var editMasterPermission = $('#editMaster').val();
+
         $("#tableData").one("preInit.dt", function () {
 
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
@@ -78,8 +93,16 @@
                     width: "20%",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        if (editMasterPermission == 'True') {
+                            return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                                '<a href="BrandType_Edit?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        }
+                        else if (viewMasterPermission == 'True' && editMasterPermission != 'True') {
+                            return '<a href="BrandType_Edit_View?brandTypeID=' + row.brandTypeID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>';
+                        }
+                        else {
+                            return '';
+                        }
                 }}
             ]
         });
