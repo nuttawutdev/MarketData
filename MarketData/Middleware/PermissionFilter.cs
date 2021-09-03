@@ -100,6 +100,11 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
+                else if ((actionName == ViewPermission.Approve_Edit.ToString() ||
+                    actionName == ViewPermission.Adjust_Edit.ToString()) && !userData.approveData)
+                {
+                    GoToHome(filterContext);
+                }
             }
         }
 

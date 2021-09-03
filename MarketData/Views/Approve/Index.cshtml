@@ -1,4 +1,8 @@
 ﻿@model MarketData.Models.ApproveKeyInViewModel;
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
 @{
     ViewData["Title"] = "Approve";
 }
@@ -103,13 +107,13 @@
             <div class="col-sm-3">
                 <label>Year</label>
                 @Html.DropDownList(
-                    "yearList",
-                    new SelectList(
-                        Model.yearList.Select(x => new { Value = x, Text = x }),
-                        "Value",
-                        "Text"
-                    ), "All", new { id = "yearList", @class = "form-control col-sm-12" }
-                )
+         "yearList",
+         new SelectList(
+             Model.yearList.Select(x => new { Value = x, Text = x }),
+             "Value",
+             "Text"
+         ), "All", new { id = "yearList", @class = "form-control col-sm-12" }
+     )
             </div>
             <div class="col-sm-3">
                 <label>Universe</label>
@@ -156,10 +160,22 @@
     <table id="tableData" class="display" width="100%"></table>
 </div>
 
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var viewDataPermission = userPermission.viewData;
+    var approveDataPermission = userPermission.approveData;
+
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@viewDataPermission.ToString()" class="form-control input-sm" id="viewDataPermission" placeholder="">
+    <input hidden type="text" value="@approveDataPermission.ToString()" class="form-control input-sm" id="approveDataPermission" placeholder="">
+}
 <script type="text/javascript">
 
 
     $(document).ready(function () {
+        var viewDataPermission = $('#viewDataPermission').val();
+        var approveDataPermission = $('#approveDataPermission').val();
+
         $("#tableData").one("preInit.dt", function () {
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
             $("#tableData_filter label").append($button);
@@ -199,11 +215,21 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        if (row.statusID.toUpperCase() == 'ADE8DDCA-743B-4A42-85AD-A6065D9C9F66') {
-                            return '<a href="Approve_Edit?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                        }else{
+
+                        if (approveDataPermission == 'True') {
+                            if (row.statusID.toUpperCase() == 'ADE8DDCA-743B-4A42-85AD-A6065D9C9F66') {
+                                return '<a href="Approve_Edit?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                            } else {
+                                return '<a href="Approve_Edit_View?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                            }
+                        }
+                        else if (viewDataPermission == 'True') {
                             return '<a href="Approve_Edit_View?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
                         }
+                        else {
+                            return ''
+                        }
+
                       }
                 }
 
