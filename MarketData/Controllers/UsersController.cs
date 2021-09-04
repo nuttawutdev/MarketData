@@ -275,7 +275,7 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel request)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel request)
         {
             SaveDataResponse response = new SaveDataResponse();
 
@@ -289,11 +289,21 @@ namespace MarketData.Controllers
                 };
 
                 response = await process.user.ChangePasssword(internalRequest);
-                return RedirectToAction("Login", "Home");
+                return Json(response);
             }
             else
             {
-                return View("../Home/ResetPassword", request);
+                var modelErrors = new List<string>();
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var modelError in modelState.Errors)
+                    {
+                        modelErrors.Add(modelError.ErrorMessage);
+                    }
+                }
+
+                response.responseError = modelErrors.FirstOrDefault();
+                return Json(response);
             }
         }
 

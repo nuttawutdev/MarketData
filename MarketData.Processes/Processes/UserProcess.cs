@@ -472,18 +472,28 @@ namespace MarketData.Processes.Processes
 
                 if (userData != null)
                 {
-                    await repository.url.UnActiveOldUrl(userData.ID.ToString(), TypeUrl.ResetPassword.ToString());
-
-                    var dateExpireLink = GetDateNowThai().AddHours(4);
-                    var urlResetPassword = await repository.url.CreateUrl(userData.ID.ToString(), dateExpireLink, TypeUrl.ResetPassword.ToString());
-
-                    if (urlResetPassword != null)
+                    if (userData.ValidateEmailFlag)
                     {
-                        response.isSuccess = await SendEmailResetPassword(userData.Email, hostUrl, urlResetPassword.ID.ToString());
+
+                        await repository.url.UnActiveOldUrl(userData.ID.ToString(), TypeUrl.ResetPassword.ToString());
+
+                        var dateExpireLink = GetDateNowThai().AddHours(4);
+                        var urlResetPassword = await repository.url.CreateUrl(userData.ID.ToString(), dateExpireLink, TypeUrl.ResetPassword.ToString());
+
+                        if (urlResetPassword != null)
+                        {
+                            response.isSuccess = await SendEmailResetPassword(userData.Email, hostUrl, urlResetPassword.ID.ToString());
+                        }
                     }
+                    else
+                    {
+                        response.responseError = "Email นี้ยังไม่ได้ทำการยืนยัน กรุณายืนยันอีเมล์เพื่อใช้งาน";
+                    }
+                 
                 }
                 else
                 {
+                    response.responseError = "ไม่พบ Email นี้ในระบบ";
                     response.notExistEmail = true;
                 }
             }
