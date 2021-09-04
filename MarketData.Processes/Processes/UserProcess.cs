@@ -52,18 +52,20 @@ namespace MarketData.Processes.Processes
                 {
                     var currentUserTokenActive = repository.user.GetUserTokenBy(
                         c => c.User_ID == userData.ID && c.FlagActive);
-
-                   
+              
                     if (!userData.ActiveFlag)
                     {
+                        response.responseError = "User Locked เนื่องจากกรอกรหัสผ่านผิดเกิน 3 ครั้ง กรุณาติดต่อผู้ดูแลระบบ";
                         response.userLocked = true;
                     }
                     else if (!userData.ValidateEmailFlag)
                     {
+                        response.responseError = "Email นี้ยังไม่ได้ทำการยืนยัน กรุณายืนยัน Email เพื่อใช้งานระบบ";
                         response.userNotValidate = true;
                     }
                     else if (userData.OnlineFlag && currentUserTokenActive != null && DateTime.Compare(currentUserTokenActive.Token_ExpireTime, Utility.GetDateNowThai()) > 0)
-                    {                      
+                    {
+                        response.responseError = "User นี้ออนไลน์อยู่ในระบบ";
                         response.userOnline = true;
                     }
                     else
@@ -75,6 +77,7 @@ namespace MarketData.Processes.Processes
                             if (userToken != null)
                             {
                                 userData.OnlineFlag = true;
+                                userData.WrongPasswordCount = 0;
                                 userData.Last_Login = Utility.GetDateNowThai();
                                 await repository.user.UpdateUser(userData);
 
@@ -98,18 +101,21 @@ namespace MarketData.Processes.Processes
                             }
 
                             await repository.user.UpdateUser(userData);
+
+                            response.responseError = "รหัสผ่านไม่ถูกต้อง";
                             response.wrongPassword = true;
                         }
                     }
                 }
                 else
                 {
+                    response.responseError = "ไม่พบ Email นี้ในระบบ";
                     response.emailNotExist = true;
                 }
             }
             catch (Exception ex)
             {
-
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
             }
 
             return response;
@@ -995,7 +1001,7 @@ namespace MarketData.Processes.Processes
 
                 htmlBody = htmlBody.Replace("linkChangePassword", url);
                 MailMessage m = new MailMessage();
-                m.From = new MailAddress("developernuttawut@gmail", "Admin");
+                m.From = new MailAddress("developernuttawut@gmail", "Admin Market Data");
                 m.To.Add(emailTo);
                 m.Subject = "Market Data Reset Password​";
                 m.Body = htmlBody;

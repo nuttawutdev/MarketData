@@ -81,20 +81,22 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel request)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel request)
         {
+            LoginResponse response = new LoginResponse();
+
 
             if (ModelState.IsValid)
             {
                 LoginRequest loginRequest = new LoginRequest
                 {
-                    userName = request.userName,
+                    userName = request.email,
                     password = request.password
                 };
 
                 var userData = await process.user.Login(loginRequest);
 
-                if (userData != null && userData.userDetail != null)
+                if (userData.isSuccess)
                 {
                     HttpContext.Session.SetString("userDetail", JsonSerializer.Serialize(userData.userDetail));
                     HttpContext.Session.SetString("tokenID", userData.tokenID);
@@ -105,17 +107,23 @@ namespace MarketData.Controllers
                     option.IsEssential = true;
                     Response.Cookies.Append("userDetail", JsonSerializer.Serialize(userData.userDetail), option);
                     Response.Cookies.Append("tokenID", userData.tokenID, option);
+                }
 
-                    return View("Index");
-                }
-                else
-                {
-                    return View("Login");
-                }
+                return Json(userData);
             }
             else
             {
-                return View("Login");
+                var modelErrors = new List<string>();
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var modelError in modelState.Errors)
+                    {
+                        modelErrors.Add(modelError.ErrorMessage);
+                    }
+                }
+
+                response.responseError = modelErrors.FirstOrDefault();
+                return Json(response);
             }
         }
 

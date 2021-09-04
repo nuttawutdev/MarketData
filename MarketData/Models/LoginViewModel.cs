@@ -10,11 +10,11 @@ namespace MarketData.Models
     {
         [Required(ErrorMessage = "Please input email.")]
         [EmailAddress]
-        public string userName { get; set; }
+        public string email { get; set; }
 
         [Required(ErrorMessage = "Please input password.")]
         [DataType(DataType.Password)]
-        [StringLength(20, ErrorMessage = "Must be between 8 and 20 characters", MinimumLength = 8)]
+        [StringLength(20, ErrorMessage = "Password must be between 8 and 20 characters", MinimumLength = 8)]
         public string password { get; set; }
     }
 }

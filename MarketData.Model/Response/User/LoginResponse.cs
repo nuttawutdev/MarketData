@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MarketData.Model.Response.User
 {
-    public class LoginResponse
+    public class LoginResponse : BaseResponse
     {
         public bool isSuccess { get; set; }
         public bool wrongPassword { get; set; }
