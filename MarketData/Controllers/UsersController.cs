@@ -347,6 +347,7 @@ namespace MarketData.Controllers
             }
             catch (Exception ex)
             {
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
                 return Json(response);
             }
         }

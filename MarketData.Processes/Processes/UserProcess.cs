@@ -52,7 +52,7 @@ namespace MarketData.Processes.Processes
                 {
                     var currentUserTokenActive = repository.user.GetUserTokenBy(
                         c => c.User_ID == userData.ID && c.FlagActive);
-              
+
                     if (!userData.ActiveFlag)
                     {
                         response.responseError = "User Locked เนื่องจากกรอกรหัสผ่านผิดเกิน 3 ครั้ง กรุณาติดต่อผู้ดูแลระบบ";
@@ -495,7 +495,7 @@ namespace MarketData.Processes.Processes
                     {
                         response.responseError = "Email นี้ยังไม่ได้ทำการยืนยัน กรุณายืนยันอีเมล์เพื่อใช้งาน";
                     }
-                 
+
                 }
                 else
                 {
@@ -877,7 +877,7 @@ namespace MarketData.Processes.Processes
             }
         }
 
-        public async Task<bool> Logout(Guid userID,string tokenID)
+        public async Task<bool> Logout(Guid userID, string tokenID)
         {
             try
             {
@@ -890,7 +890,7 @@ namespace MarketData.Processes.Processes
 
                     var updateUserToken = await repository.user.DeleteUserToken(userToken);
                     var updateUserResult = await repository.user.UpdateUser(userData);
-                    
+
                     if (updateUserResult)
                     {
                         return true;
@@ -954,7 +954,7 @@ namespace MarketData.Processes.Processes
                 // Send Email
                 string url = $"{hostUrl}/Users/ActivateUser?refID={urlID}";
                 string htmlBody = string.Empty;
-                string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateConfirmRegister.html"));
+                string emailTemplatePath = Path.GetFullPath(Path.Combine("EmailTemplateConfirmRegister.html"));
                 using (StreamReader reader = File.OpenText(emailTemplatePath))
                 {
                     htmlBody = reader.ReadToEnd();
@@ -971,8 +971,9 @@ namespace MarketData.Processes.Processes
 
                 using (var smtp = new SmtpClient())
                 {
+                    smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = port;
+                    smtp.Port = 587;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);
@@ -982,7 +983,7 @@ namespace MarketData.Processes.Processes
             }
             catch (Exception ex)
             {
-                return false;
+                throw ex;
             }
         }
 
@@ -993,7 +994,7 @@ namespace MarketData.Processes.Processes
                 // Send Email
                 string url = $"{hostUrl}/Users/VerifyUrlResetPassword?refID={urlID}";
                 string htmlBody = string.Empty;
-                string emailTemplatePath = Path.GetFullPath(Path.Combine("Views\\Email\\EmailTemplateResetPassword.html"));
+                string emailTemplatePath = Path.GetFullPath(Path.Combine("EmailTemplateResetPassword.html"));
                 using (StreamReader reader = File.OpenText(emailTemplatePath))
                 {
                     htmlBody = reader.ReadToEnd();
@@ -1009,8 +1010,9 @@ namespace MarketData.Processes.Processes
 
                 using (var smtp = new SmtpClient())
                 {
+                    smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = port;
+                    smtp.Port = 587;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);
