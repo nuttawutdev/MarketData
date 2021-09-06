@@ -105,6 +105,11 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
+
+                else if ((actionName == ViewPermission.ManualChangePassword.ToString() && !userData.editUser))
+                {
+                    GoToHome(filterContext);
+                }
             }
         }
 

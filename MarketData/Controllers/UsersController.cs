@@ -96,6 +96,29 @@ namespace MarketData.Controllers
 
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
+        public IActionResult ManualChangePassword()
+        {
+            try
+            {
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                ChangePasswordViewModel viewModel = new ChangePasswordViewModel
+                {
+                    userID = userDetail.userID,
+                    urlID = Guid.Empty
+                };
+
+                return View("../Home/ResetPassword", viewModel);
+            }
+            catch(Exception ex)
+            {
+                return View("../Home/Index");
+            }          
+        }
+
         [HttpPost]
         public IActionResult GetUserList()
         {

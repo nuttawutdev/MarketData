@@ -166,6 +166,7 @@ namespace MarketData.Repositories.Repo
             {
                 var userData = _dbContext.TMUser.Find(userID);
                 userData.Password = password;
+                userData.WrongPasswordCount = 0;
                 userData.Update_By = userID;
                 userData.Update_Date = Utility.GetDateNowThai();
 

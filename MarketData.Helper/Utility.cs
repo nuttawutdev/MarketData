@@ -66,7 +66,8 @@ namespace MarketData.Helper
             DepartmentStore_Edit,
             Counter_Edit,
             Approve_Edit,
-            Adjust_Edit
+            Adjust_Edit,
+            ManualChangePassword
         }
 
         public static DateTime GetDateNowThai()

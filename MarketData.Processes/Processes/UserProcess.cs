@@ -526,9 +526,12 @@ namespace MarketData.Processes.Processes
                 var updateUserPasswordResult = await repository.user.ChangeUserPassword(request.userID, passwordEncrypt);
                 if (updateUserPasswordResult)
                 {
-                    urlData.Flag_Active = false;
-                    await repository.url.UpdateUrlData(urlData);
-
+                    if(urlData != null)
+                    {
+                        urlData.Flag_Active = false;
+                        await repository.url.UpdateUrlData(urlData);
+                    }
+                  
                     response.isSuccess = true;
                 }
                 else
