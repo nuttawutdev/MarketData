@@ -241,12 +241,16 @@ namespace MarketData.Processes.Processes
                     foreach (var itemCounter in counterList)
                     {
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
-                        var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
-
-                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                       
+                        if(brandData != null)
                         {
-                            listCounterFilterFragrances.Add(itemCounter);
-                        }
+                            var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
+
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                            {
+                                listCounterFilterFragrances.Add(itemCounter);
+                            }
+                        }                      
                     }
 
                     counterList = listCounterFilterFragrances;

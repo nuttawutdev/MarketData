@@ -63,11 +63,11 @@ namespace MarketData.Processes.Processes
                         response.responseError = "Email นี้ยังไม่ได้ทำการยืนยัน กรุณายืนยัน Email เพื่อใช้งานระบบ";
                         response.userNotValidate = true;
                     }
-                    else if (userData.OnlineFlag && currentUserTokenActive != null && DateTime.Compare(currentUserTokenActive.Token_ExpireTime, Utility.GetDateNowThai()) > 0)
-                    {
-                        response.responseError = "User นี้ออนไลน์อยู่ในระบบ";
-                        response.userOnline = true;
-                    }
+                    //else if (userData.OnlineFlag && currentUserTokenActive != null && DateTime.Compare(currentUserTokenActive.Token_ExpireTime, Utility.GetDateNowThai()) > 0)
+                    //{
+                    //    response.responseError = "User นี้ออนไลน์อยู่ในระบบ";
+                    //    response.userOnline = true;
+                    //}
                     else
                     {
                         if (userData.Password == encryptPassword)
@@ -816,6 +816,15 @@ namespace MarketData.Processes.Processes
 
                     }
 
+                    response.isSuccess = true;
+                }
+                else
+                {
+                    response.isSuccess = true;
+                }
+
+                if (importResult.Any())
+                {
                     response.importResult = importResult.OrderBy(c => c.row).ToList();
 
                     byte[] bytes = null;
@@ -836,12 +845,6 @@ namespace MarketData.Processes.Processes
 
                     response.fileName = "ImportUserDataResult_" + Utility.GetDateNowThai().ToString("dd-MM-yyyy-HH-mm");
                     response.fileResult = Convert.ToBase64String(bytes);
-                    response.isSuccess = true;
-                }
-                else
-                {
-                    response.isSuccess = false;
-                    response.wrongFormatFile = true;
                 }
             }
             catch (Exception ex)
