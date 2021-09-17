@@ -159,6 +159,7 @@ namespace MarketData.Processes.Processes
                 var getBrandResponse = repository.masterData.GetBrandListBy(c => c.Active_Flag);
                 var getChannelResponse = repository.masterData.GetDistributionChannelList().Where(c => c.Active_Flag);
                 var keyInStatusApprove = repository.masterData.GetKeyInStatusBy(c => c.Status_Name == "Approve");
+                var allAdjustData = repository.adjust.GetAdjustDataBy(c => c.ID != Guid.Empty);
 
                 response.channel = getChannelResponse.Select(c => new DistributionChannelData
                 {
@@ -190,8 +191,11 @@ namespace MarketData.Processes.Processes
 
                 var keyInApproveData = repository.baKeyIn.GetBAKeyInBy(c => c.KeyIn_Status_ID == keyInStatusApprove.ID);
 
-                var olldYearList = keyInApproveData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+                var olldYearListApprove = keyInApproveData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).ToList();
+                var oldYearListAdjust = allAdjustData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).ToList();
+                olldYearListApprove.AddRange(oldYearListAdjust);
 
+                var olldYearList = olldYearListApprove.GroupBy(c => c).SelectMany(e => e);
                 if (olldYearList.Any())
                 {
                     yearList.AddRange(olldYearList);
@@ -569,6 +573,11 @@ namespace MarketData.Processes.Processes
 
             try
             {
+                if (request.month.Contains("0"))
+                {
+                    request.month = request.month.Replace("0", "");
+                }
+
                 var adjustData = repository.adjust.FindAdjustDataBy(
                     c => c.DistributionChannel_ID == request.distributionChannelID
                     && c.DepartmentStore_ID == request.departmentStoreID

@@ -888,15 +888,15 @@ namespace MarketData.Processes.Processes
             try
             {
                 var userData = repository.user.FindUserBy(c => c.ID == userID);
+
                 var userToken = repository.user.GetUserTokenBy(e => e.Token_ID == tokenID);
 
                 if (userData != null)
                 {
                     userData.OnlineFlag = false;
-
-                    var updateUserToken = await repository.user.DeleteUserToken(userToken);
                     var updateUserResult = await repository.user.UpdateUser(userData);
-
+                    var updateUserToken = await repository.user.DeleteUserToken(userToken);
+                    
                     if (updateUserResult)
                     {
                         return true;

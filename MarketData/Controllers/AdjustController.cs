@@ -215,6 +215,10 @@ namespace MarketData.Controllers
 
             try
             {
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+                request.userID = userDetail.userID;
+
                 response = await process.adjust.CreateAdjustData(request);
                 return Json(response);
             }
