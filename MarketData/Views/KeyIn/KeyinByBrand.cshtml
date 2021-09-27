@@ -365,52 +365,59 @@
             // and puts cursor back in right position.
 
             // get input value
-            var input_val = text;
 
-            // don't validate empty input
-            if (input_val === "") { return; }
+            if (text) {
+                var input_val = text;
 
-            // original length
-            var original_len = input_val.length;
+                // don't validate empty input
+                if (input_val === "") { return; }
 
-            // initial caret position
-            //var caret_pos = input.prop("selectionStart");
+                // original length
+                var original_len = input_val.length;
 
-            // check for decimal
-            if (input_val.indexOf(".") >= 0) {
+                // initial caret position
+                //var caret_pos = input.prop("selectionStart");
 
-                // get position of first decimal
-                // this prevents multiple decimals from
-                // being entered
-                var decimal_pos = input_val.indexOf(".");
+                // check for decimal
+                if (input_val.indexOf(".") >= 0) {
 
-                // split number by decimal point
-                var left_side = input_val.substring(0, decimal_pos);
-                var right_side = input_val.substring(decimal_pos);
+                    // get position of first decimal
+                    // this prevents multiple decimals from
+                    // being entered
+                    var decimal_pos = input_val.indexOf(".");
 
-                // add commas to left side of number
-                left_side = formatNumber(left_side);
+                    // split number by decimal point
+                    var left_side = input_val.substring(0, decimal_pos);
+                    var right_side = input_val.substring(decimal_pos);
 
-                // validate right side
-                right_side = formatNumber(right_side);
+                    // add commas to left side of number
+                    left_side = formatNumber(left_side);
+
+                    // validate right side
+                    right_side = formatNumber(right_side);
 
 
-                right_side += "00";
+                    right_side += "00";
 
 
-                // Limit decimal to only 2 digits
-                right_side = right_side.substring(0, 2);
+                    // Limit decimal to only 2 digits
+                    right_side = right_side.substring(0, 2);
 
-                // join number by .
-                input_val = left_side + "." + right_side;
+                    // join number by .
+                    input_val = left_side + "." + right_side;
 
-            } else {
-                input_val = formatNumber(input_val);
-                input_val = input_val;
-                input_val += ".00";
+                } else {
+                    input_val = formatNumber(input_val);
+                    input_val = input_val;
+                    input_val += ".00";
+                }
+
+                return input_val;
             }
-
-            return input_val;
+            else {
+                return '';
+            }
+            
         }
         $('#btnSubmit').on('click', function (e) {
             var frmdata = getDataFromTable();

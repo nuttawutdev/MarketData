@@ -46,11 +46,12 @@ namespace MarketData.Processes.Processes
                 var encryptPassword = Encrypt(request.password);
 
                 var userData = repository.user.FindUserBy(
-                    c => c.Email.ToLower() == request.userName.ToLower());
+                    c => c.Email.ToLower() == request.userName.ToLower()
+                    && c.Delete_Flag != true);
 
                 if (userData != null)
                 {
-                    var currentUserTokenActive = repository.user.GetUserTokenBy(
+                    var currentUserTokenActive = repository.user.GetAllUserTokenBy(
                         c => c.User_ID == userData.ID && c.FlagActive);
 
                     if (!userData.ActiveFlag)
@@ -63,16 +64,11 @@ namespace MarketData.Processes.Processes
                         response.responseError = "Email นี้ยังไม่ได้ทำการยืนยัน กรุณายืนยัน Email เพื่อใช้งานระบบ";
                         response.userNotValidate = true;
                     }
-                    //else if (userData.OnlineFlag && currentUserTokenActive != null && DateTime.Compare(currentUserTokenActive.Token_ExpireTime, Utility.GetDateNowThai()) > 0)
-                    //{
-                    //    response.responseError = "User นี้ออนไลน์อยู่ในระบบ";
-                    //    response.userOnline = true;
-                    //}
                     else
                     {
                         if (userData.Password == encryptPassword)
                         {
-                            var userToken = await repository.user.CreateUserToken(userData.ID);
+                            var userToken = repository.user.CreateUserToken(userData.ID);
 
                             if (userToken != null)
                             {
@@ -81,6 +77,13 @@ namespace MarketData.Processes.Processes
                                 userData.Last_Login = Utility.GetDateNowThai();
                                 await repository.user.UpdateUser(userData);
 
+                                if (currentUserTokenActive.Any())
+                                {
+                                    foreach (var userTokenActive in currentUserTokenActive)
+                                    {
+                                        await repository.user.DeleteUserToken(userTokenActive);
+                                    }
+                                }
                                 response.userDetail = GetUserDetailData(userData.ID);
                                 response.tokenID = userToken.Token_ID;
                                 response.isSuccess = true;
@@ -157,7 +160,7 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var allUser = repository.user.GetUserBy(c => c.ID != Guid.Empty);
+                var allUser = repository.user.GetUserBy(c => c.Delete_Flag != true);
                 var userIDList = allUser.Select(e => e.ID);
                 var allUserCounter = repository.user.GetUserCounterBy(c => userIDList.Contains(c.User_ID));
 
@@ -318,13 +321,15 @@ namespace MarketData.Processes.Processes
                 request.displayName = request.displayName.Trim();
 
                 var userByEmail = repository.user.FindUserBy(c =>
-                        c.Email.ToLower() == request.email.ToLower());
+                        c.Email.ToLower() == request.email.ToLower()
+                        && c.Delete_Flag != true);
 
-                var userByDisplatName = repository.user.FindUserBy(c =>
-                    c.DisplayName.ToLower() == request.displayName.ToLower());
+                var userByDisplayName = repository.user.FindUserBy(c =>
+                    c.DisplayName.ToLower() == request.displayName.ToLower()
+                    && c.Delete_Flag != true);
 
                 if ((userByEmail == null || (userByEmail != null && userByEmail.ID == request.userID))
-                   && (userByDisplatName == null || (userByDisplatName != null && userByDisplatName.ID == request.userID)))
+                   && (userByDisplayName == null || (userByDisplayName != null && userByDisplayName.ID == request.userID)))
                 {
                     if (request.userID == null || request.userID == Guid.Empty)
                     {
@@ -526,12 +531,12 @@ namespace MarketData.Processes.Processes
                 var updateUserPasswordResult = await repository.user.ChangeUserPassword(request.userID, passwordEncrypt);
                 if (updateUserPasswordResult)
                 {
-                    if(urlData != null)
+                    if (urlData != null)
                     {
                         urlData.Flag_Active = false;
                         await repository.url.UpdateUrlData(urlData);
                     }
-                  
+
                     response.isSuccess = true;
                 }
                 else
@@ -855,8 +860,10 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public bool ValidateToken(string tokenID)
+        public ValidateTokenResponse ValidateToken(string tokenID)
         {
+            ValidateTokenResponse response = new ValidateTokenResponse();
+
             try
             {
                 var userTokenData = repository.user.GetUserTokenBy(c => c.Token_ID == tokenID);
@@ -865,22 +872,24 @@ namespace MarketData.Processes.Processes
                     if (!userTokenData.FlagActive
                         || DateTime.Compare(userTokenData.Token_ExpireTime, Utility.GetDateNowThai()) < 0)
                     {
-                        return false;
+                        response.tokenExpire = true;
                     }
                     else
                     {
-                        return true;
+                        response.isValid = true;
                     }
                 }
                 else
                 {
-                    return false;
+                    response.notExistToken = true;
                 }
             }
             catch (Exception ex)
             {
-                return false;
+                return response;
             }
+
+            return response;
         }
 
         public async Task<bool> Logout(Guid userID, string tokenID)
@@ -896,7 +905,7 @@ namespace MarketData.Processes.Processes
                     userData.OnlineFlag = false;
                     var updateUserResult = await repository.user.UpdateUser(userData);
                     var updateUserToken = await repository.user.DeleteUserToken(userToken);
-                    
+
                     if (updateUserResult)
                     {
                         return true;
@@ -917,11 +926,11 @@ namespace MarketData.Processes.Processes
             }
         }
 
-        public async Task<string> RefreshToken(Guid userID)
+        public string RefreshToken(Guid userID)
         {
             try
             {
-                var userTokenData = await repository.user.CreateUserToken(userID);
+                var userTokenData = repository.user.CreateUserToken(userID);
                 if (userTokenData != null)
                 {
                     return userTokenData.Token_ID;
@@ -935,6 +944,29 @@ namespace MarketData.Processes.Processes
             {
                 return null;
             }
+        }
+
+        public async Task<SaveDataResponse> DeleteUser(DeleteUserRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var userData = repository.user.FindUserBy(c => c.ID == request.userID);
+                userData.Delete_Flag = true;
+                userData.Update_By = request.actionBy;
+                userData.Update_Date = GetDateNowThai();
+
+                var updateUserResult = await repository.user.UpdateUser(userData);
+                response.isSuccess = updateUserResult;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.InnerException?.Message ?? ex.Message;
+            }
+
+            return response;
         }
 
         private async Task<bool> CreateUserCounterData(Guid userID, List<UserCounterData> userCounterData)

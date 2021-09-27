@@ -375,6 +375,8 @@ namespace MarketData.Controllers
             }
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         [HttpGet]
         public async Task<IActionResult> ResetPassword(string email)
         {
@@ -383,6 +385,28 @@ namespace MarketData.Controllers
             try
             {
                 response = await process.user.ResetPassword(email, $"{Request.Scheme}://{Request.Host.Value}");
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(response);
+            }
+        }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser([FromBody]DeleteUserRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var userDetailSession = HttpContext.Session.GetString("userDetail");
+                var userDetail = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
+
+                request.actionBy = userDetail.userID;
+                response = await process.user.DeleteUser(request);
                 return Json(response);
             }
             catch (Exception ex)

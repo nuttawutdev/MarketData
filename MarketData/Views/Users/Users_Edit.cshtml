@@ -5,6 +5,7 @@
     Html.RenderPartial("_WarningModal");
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_ConfirmModalWithText");
 }
 
 
@@ -179,6 +180,7 @@
         <div class=" col-md-12 col-sm-12">
             <button id="btnResend" class="btn btn-danger col-sm-12 col-md-3 btn-sm" type="button">Resend welcome email</button>
             <button id="btnReset" class="btn btn-danger col-sm-12 col-md-3 btn-sm" type="button">Reset password</button>
+            <button id="btnDelete" class="btn btn-danger col-sm-12 col-md-3 btn-sm" type="button">Delete user</button>
 
         </div>
     </div>
@@ -284,7 +286,7 @@
         })
 
         $("#save").click(function () {
-      $("#blocker").show();
+            $("#blocker").show();
             var frmdata = getDataFromTable();
 
             if (validate_Email_Display() && validate_Duplicate_Store(frmdata)) {
@@ -385,6 +387,54 @@
                     }
                 });
         })
+
+
+        $("#btnDelete").click(function () {
+            $('#confirmWithTextID').val('DeleteUser');
+                $('#myModalConfirmWithText').text('คุณต้องการลบ User นี้ใช่หรือไหม?');
+                $('#ConfirmModalWithText').modal('show');
+
+        })
+
+    $(".btnConfirmModalWithText").click(function () {
+
+        $('#ConfirmModalWithText').modal('hide');
+        $("#blocker").show();
+        var model = @Html.Raw(Json.Serialize(Model));
+
+            var frmdata = {
+                userID: model.userID
+             };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DeleteUser", "Users")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                success: function (data) {
+                    $("#blocker").hide();
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "Index");
+                        $('#successModal').modal('show');
+                    }
+                     else {
+                         $('#failedModal').modal('show');
+                         $('#myModalFailedResult').text(data.responseError != ""
+                             && data.responseError != null ? data.responseError : 'Delete user failed');
+                     }
+
+                     $('#myModalFailedResult').val('');
+                    $('#confirmWithTextID').val('');
+                     $('#ConfirmModalWithText').val('');
+                     $('#myModalConfirmWithTextResult').val('');
+                     $('#myModalWarningResult').text('');
+                },
+                error: function () {
+                    $("#blocker").hide();
+                }
+            });
+          });
 
         function getDataFromTable() {
            var model = @Html.Raw(Json.Serialize(Model));

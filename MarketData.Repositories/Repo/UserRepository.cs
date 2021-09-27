@@ -222,7 +222,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<TMUserToken> CreateUserToken(Guid userID)
+        public TMUserToken CreateUserToken(Guid userID)
         {
             try
             {
@@ -237,7 +237,7 @@ namespace MarketData.Repositories.Repo
 
                 _dbContext.TMUserToken.Add(newUserToken);
 
-                if (await _dbContext.SaveChangesAsync() > 0)
+                if (_dbContext.SaveChanges() > 0)
                 {
                     return newUserToken;
                 }
@@ -283,6 +283,18 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TMUserToken.Where(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMUserToken> GetAllUserTokenBy(Expression<Func<TMUserToken, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMUserToken.Where(expression).ToList();
             }
             catch (Exception ex)
             {

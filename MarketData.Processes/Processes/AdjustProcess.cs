@@ -195,7 +195,7 @@ namespace MarketData.Processes.Processes
                 var oldYearListAdjust = allAdjustData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).ToList();
                 olldYearListApprove.AddRange(oldYearListAdjust);
 
-                var olldYearList = olldYearListApprove.GroupBy(c => c).SelectMany(e => e);
+                var olldYearList = olldYearListApprove.GroupBy(c => c).SelectMany(e => e).OrderByDescending(t=>t);
                 if (olldYearList.Any())
                 {
                     yearList.AddRange(olldYearList);
@@ -511,7 +511,7 @@ namespace MarketData.Processes.Processes
                 foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale))
                 {
                     itemAdjustData.rank = rankAdjust;
-                    if (itemAdjustData.amountPreviousYear.HasValue)
+                    if (itemAdjustData.amountPreviousYear.HasValue && itemAdjustData.adjustAmountSale.HasValue)
                     {
                         // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
                         itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYear.GetValueOrDefault()) / itemAdjustData.amountPreviousYear.GetValueOrDefault()) * 100;
@@ -573,11 +573,6 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                if (request.month.Contains("0"))
-                {
-                    request.month = request.month.Replace("0", "");
-                }
-
                 var adjustData = repository.adjust.FindAdjustDataBy(
                     c => c.DistributionChannel_ID == request.distributionChannelID
                     && c.DepartmentStore_ID == request.departmentStoreID
