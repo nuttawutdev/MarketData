@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using MarketData.Helper;
 using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request;
@@ -709,6 +710,7 @@ namespace MarketData.Processes.Processes
                         saveBrandRequest.brandTypeID = brandTypeData.FirstOrDefault(c => c.Key == saveBrandRequest.brandTypeName).Value;
                         saveBrandRequest.active = true;
                         saveBrandRequest.userID = request.userID;
+                        saveBrandRequest.universe = "LPD";
 
                         if (!string.IsNullOrWhiteSpace(saveBrandRequest.brandName)
                             && saveBrandRequest.brandGroupID != Guid.Empty
@@ -793,7 +795,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -1434,7 +1436,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -1782,7 +1784,7 @@ namespace MarketData.Processes.Processes
                         tw.Close();
                     }
 
-                    string today = DateTime.Now.ToString();
+                    string today = Utility.GetDateNowThai().ToString();
                     DateTime dateNow;
                     IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
                     DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -1880,6 +1882,64 @@ namespace MarketData.Processes.Processes
                         ID = c.ID,
                         remark = c.Remark
                     }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public List<ApproveStatusData> GetApproveStatus()
+        {
+            List<ApproveStatusData> response = new List<ApproveStatusData>();
+
+            try
+            {
+                var searchData = repository.masterData.GetApproveStatusList();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response = searchData.Select(c => new ApproveStatusData
+                    {
+                        statusID = c.ID,
+                        statusName = c.Status_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response = new List<ApproveStatusData>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return response;
+        }
+
+        public List<AdjustStatusData> GetAdjustStatus()
+        {
+            List<AdjustStatusData> response = new List<AdjustStatusData>();
+
+            try
+            {
+                var searchData = repository.masterData.GetAdjustStatusList();
+
+                if (searchData != null && searchData.Any())
+                {
+                    response = searchData.Select(c => new AdjustStatusData
+                    {
+                        statusID = c.ID,
+                        statusName = c.Status_Name
+                    }).ToList();
+                }
+                else
+                {
+                    response = new List<AdjustStatusData>();
                 }
             }
             catch (Exception ex)

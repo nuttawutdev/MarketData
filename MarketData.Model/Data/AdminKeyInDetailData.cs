@@ -16,6 +16,7 @@ namespace MarketData.Model.Data
         public string departmentStoreName { get; set; }
         public Guid brandID { get; set; }
         public string brandName { get; set; }
+        public string brandColor { get; set; }
         public Guid distributionChannelID { get; set; }
         public string universe { get; set; }
         public int? rank { get; set; }

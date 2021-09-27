@@ -8,6 +8,6 @@ namespace MarketData.Model.Request.KeyIn
     public class SaveAdminKeyInDetailRequest
     {
         public List<AdminKeyInDetailData> data { get; set; }
-        public Guid userID { get; set; }
+        public Guid? userID { get; set; }
     }
 }

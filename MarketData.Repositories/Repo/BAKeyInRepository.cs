@@ -1,10 +1,12 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.KeyIn;
 using MarketData.Model.Response.KeyIn;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -15,7 +17,7 @@ namespace MarketData.Repositories.Repo
     public class BAKeyInRepository
     {
         private readonly MarketDataDBContext _dbContext;
-      
+
         public BAKeyInRepository(MarketDataDBContext dbContext)
         {
             _dbContext = dbContext;
@@ -87,8 +89,8 @@ namespace MarketData.Repositories.Repo
                       distributionChannelName = channel.Distribution_Channel_Name,
                       statusID = e.KeyIn_Status_ID,
                       statusName = status.Status_Name,
-                      lastEdit = updateBy != null ? updateBy.UserName : createBy != null ? createBy.UserName : string.Empty,
-                      approver = approver != null ? approver.UserName : string.Empty,
+                      lastEdit = updateBy != null ? updateBy.DisplayName : createBy != null ? createBy.DisplayName : string.Empty,
+                      approver = approver != null ? approver.DisplayName : string.Empty,
                       approveDate = e.Approved_Date.HasValue ? e.Approved_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                       submitDate = e.Submited_Date.HasValue ? e.Submited_Date.GetValueOrDefault().ToString("yyyy-MM-dd") : "",
                       remark = e.Remark
@@ -144,7 +146,7 @@ namespace MarketData.Repositories.Repo
                     Week = request.week,
                     Universe = request.universe,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now,
+                    Created_Date = Utility.GetDateNowThai(),
                     KeyIn_Status_ID = keyInStatusNew.ID,
                 };
 
@@ -210,6 +212,7 @@ namespace MarketData.Repositories.Repo
                          mu = e.MU,
                          ot = e.OT,
                          brandName = brand.Brand_Name,
+                         brandColor = brand.Brand_Color,
                          channelID = e.DistributionChannel_ID,
                          counterID = e.Counter_ID,
                          month = e.Month,
@@ -246,8 +249,9 @@ namespace MarketData.Repositories.Repo
             {
                 var baKeyInData = _dbContext.TTBAKeyIn.Find(request.BAKeyInID);
                 baKeyInData.Updated_By = request.userID;
-                baKeyInData.Updated_Date = DateTime.Now;
+                baKeyInData.Updated_Date = Utility.GetDateNowThai();
                 baKeyInData.KeyIn_Status_ID = status;
+                baKeyInData.Remark = request.remark;
 
                 int monthKeyIn = Int32.Parse(baKeyInData.Month);
                 int YearKeyIn = Int32.Parse(baKeyInData.Year);
@@ -258,41 +262,81 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 10, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "2")
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 18, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "3")
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 25, 0, 0, 0);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
                     else if (baKeyInData.Week == "4")
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 5, 0, 0, 0).AddMonths(1);
 
-                        if (DateTime.Now > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine)
                         {
-                            baKeyInData.Remark = "ล่าช้า";
+                            baKeyInData.Remark += " (ล่าช้า)";
                         }
                     }
 
-                    baKeyInData.Submited_Date = DateTime.Now;
+                    baKeyInData.Submited_Date = Utility.GetDateNowThai();
                 }
+
+                _dbContext.TTBAKeyIn.Update(baKeyInData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> ApproveBAKeyIn(Guid baKeyInID, Guid userID)
+        {
+            try
+            {
+                var keyInStatusApprove = _dbContext.TMKeyInStatus.FirstOrDefault(c => c.Status_Name == "Approve");
+
+                var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
+                baKeyInData.Approved_By = userID;
+                baKeyInData.KeyIn_Status_ID = keyInStatusApprove.ID;
+                baKeyInData.Approved_Date = Utility.GetDateNowThai();
+
+                _dbContext.TTBAKeyIn.Update(baKeyInData);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RejectBAKeyIn(Guid baKeyInID,Guid userID)
+        {
+            try
+            {
+                var keyInStatusReject = _dbContext.TMKeyInStatus.FirstOrDefault(c => c.Status_Name == "Reject");
+
+                var baKeyInData = _dbContext.TTBAKeyIn.Find(baKeyInID);
+                baKeyInData.Approved_By = userID;
+                baKeyInData.KeyIn_Status_ID = keyInStatusReject.ID;
+                baKeyInData.Approved_Date = Utility.GetDateNowThai();
 
                 _dbContext.TTBAKeyIn.Update(baKeyInData);
                 return await _dbContext.SaveChangesAsync() > 0;

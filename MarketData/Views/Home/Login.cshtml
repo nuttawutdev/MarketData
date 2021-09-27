@@ -1,7 +1,7 @@
-﻿@model MarketData.Models.LoginViewModel
-
-@{
+﻿@{
     Layout = null;
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
 }
 <!DOCTYPE html>
 <html>
@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Market</title>
     <link rel="stylesheet" href="~/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
     <link rel="stylesheet" href="~/fonts/ionicons.min.css">
     <link rel="stylesheet" href="~/css/Data-Table-with-Search-Sort-Filter-and-Zoom-using-TableSorter.css">
@@ -18,34 +19,116 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/css/theme.bootstrap_4.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="~/css/Login-Form-Dark.css">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        #blocker {
+            position: fixed;
+            display: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+            background-color: #000;
+            z-index: 1000;
+            overflow: auto;
+        }
+
+            #blocker div {
+                position: absolute;
+                border: 16px solid #f3f3f3;
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+                border-top: 16px solid #3498db;
+                width: 120px;
+                height: 120px;
+                -webkit-animation: spin 2s linear infinite; /* Safari */
+                animation: spin 2s linear infinite;
+            }
+
+        /* Safari */
+        @@-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="blocker">
+        <div></div>
+    </div>
     <section class="login-dark">
-        <form asp-action="Login">
+        <form>
             <h2 class="visually-hidden">Login Form</h2>
             <div class="illustration"><i class="icon ion-ios-locked-outline text-danger"></i></div>
             <div class="mb-3">
-                <input asp-for="userName" class="form-control text-danger" placeholder="User Name" />
-                @*<input class="form-control text-danger" type="email" name="email" placeholder="Email">*@
+                <input id="email" type="email" class="form-control text-danger" placeholder="Email" />
             </div>
             <div class="mb-3">
-                <input asp-for="password" class="form-control text-danger" type="password" placeholder="Password" />
-                @*<input class="form-control text-danger" type="password" name="password" placeholder="Password">*@
+                <input id="password" class="form-control text-danger" type="password" placeholder="Password" />
             </div>
-            <div class="mb-3"><button class="btn btn-danger d-block w-100" type="submit">Log In</button></div>
+            <div class="mb-3"><button id="btnSubmit" class="btn btn-danger d-block w-100" type="button">Log In</button></div>
 
-            <a class="forgot " asp-area="" asp-controller="Home" asp-action="ForgotPassword">Forgot your email or password?</a>
+            <a class="forgot " asp-area="" asp-controller="Home" asp-action="ForgotPassword">Forgot password?</a>
         </form>
     </section>
-    <script src="~/bootstrap/js/bootstrap.min.js"></script>
-    <script src="~/js/Data-Table-with-Search-Sort-Filter-and-Zoom-using-TableSorter.js"></script>
-    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/jquery.tablesorter.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/widgets/widget-filter.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/widgets/widget-storage.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#btnSubmit").click(function () {
+            var frmdata = {
+                email: $('#email').val(),
+                password: $('#password').val()
+            };
+
+            $("#blocker").show();
+
+               $.ajax({
+                   type: "POST",
+                   url: '@Url.Action("Login", "Home")',
+                   contentType: "application/json; charset=utf-8",
+                   data: JSON.stringify(frmdata),
+                   datatype: "json",
+               success: function (data) {
+                   $("#blocker").hide();
+                   if (data.isSuccess) {
+                       $('#successModalHref').attr("href", "../Home/Index");
+                       $('#successModal').modal('show');
+                       $('#txtResult').text("Login success");
+                   } else {
+                       $('#failedModal').modal('show');
+                       $('#myModalFailedResult').text(data.responseError != ""
+                           && data.responseError != null ? data.responseError : 'Login failed');
+                   }
+                   $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+                    },
+                   error: function () {
+                       $("#blocker").hide();
+                    }
+                });
+        })
+    });
+</script>

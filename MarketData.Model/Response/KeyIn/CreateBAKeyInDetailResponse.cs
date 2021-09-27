@@ -7,6 +7,7 @@ namespace MarketData.Model.Response.KeyIn
     public class CreateBAKeyInDetailResponse : BaseResponse
     {
         public bool isSuccess { get; set; }
+        public bool isSubmited { get; set; }
         public Guid baKeyInID { get; set; }
     }
 }

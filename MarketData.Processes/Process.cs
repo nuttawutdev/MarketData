@@ -11,12 +11,16 @@ namespace MarketData.Processes
         public MasterDataProcess masterData;
         public KeyInProcess keyIn;
         public UserProcess user;
+        public ApproveProcess approve;
+        public AdjustProcess adjust;
 
         public Process(Repository repository)
         {
             masterData = new MasterDataProcess(repository);
             keyIn = new KeyInProcess(repository);
             user = new UserProcess(repository);
+            approve = new ApproveProcess(repository);
+            adjust = new AdjustProcess(repository);
         }
     }
 }

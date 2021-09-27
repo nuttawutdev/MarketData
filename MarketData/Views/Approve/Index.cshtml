@@ -1,0 +1,336 @@
+﻿@model MarketData.Models.ApproveKeyInViewModel;
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Approve";
+}
+
+
+<h3>
+    @ViewData["Title"]
+</h3>
+
+
+<hr />
+<br />
+<br />
+<div class="row">
+    <div style="width: 100%; font-size: 13px;">
+        <div class="row col-sm-12">
+            <div class="col-sm-3">
+                <label>Distribution Channel</label>
+
+                @if (Model.channelList.Count > 1)
+                {
+                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), new { id = "channelList", @class = "form-control col-sm-12" })
+                }
+            </div>
+            <div class="col-sm-3">
+                <label>Retailer Group</label>
+
+                @if (Model.retailerGroupList.Count > 1)
+                {
+                    @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), new { id = "retailerGroupList", @class = "form-control col-sm-12" })
+                }
+
+            </div>
+            <div class="col-sm-3">
+                <label>Department Store</label>
+                @if (Model.departmentStoreList.Count > 1)
+                {
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), new { id = "departmentStoreList", @class = "form-control col-sm-12" })
+                }
+            </div>
+
+            <div class="col-sm-3">
+                <label>Brand</label>
+                @if (Model.brandList.Count > 1)
+                {
+                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control col-sm-12" })
+                }
+                else
+                {
+                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control col-sm-12" })
+                }
+
+            </div>
+        </div>
+
+        <div class="row col-sm-12" style="padding-top: 15px;">
+            <div class="col-sm-3">
+
+                <label> Week</label>
+                <select id="ddlWeek" class="form-control col-sm-12 ">
+                    <option value="">All</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+
+            </div>
+
+            <div class="col-sm-3">
+                <label>Month</label>
+                <select id="ddlMonth" class="form-control col-sm-12 ">
+                    <option value="">All</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+
+
+            </div>
+            <div class="col-sm-3">
+                <label>Year</label>
+                @Html.DropDownList(
+         "yearList",
+         new SelectList(
+             Model.yearList.Select(x => new { Value = x, Text = x }),
+             "Value",
+             "Text"
+         ), "All", new { id = "yearList", @class = "form-control col-sm-12" }
+     )
+            </div>
+            <div class="col-sm-3">
+                <label>Universe</label>
+                @{
+                    var defaultUniverse = "LPD";
+                    List<SelectListItem> listUniverse = new List<SelectListItem>();
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "CPD",
+                        Value = "CPD"
+                    });
+                    listUniverse.Add(new SelectListItem
+                    {
+                        Text = "LPD",
+                        Value = "LPD",
+
+                    });
+
+                    @Html.DropDownListFor(c => defaultUniverse, new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+
+                }
+
+
+            </div>
+        </div>
+        <div class="row col-sm-12" style="padding-top: 15px;padding-bottom:15px;">
+            <div class="col-sm-3">
+                <label>Status</label>
+                @Html.DropDownList("statusList", new SelectList(Model.statusList, "statusID", "statusName"), "All", new { id = "statusList", @class = "form-control col-sm-12" })
+
+
+            </div>
+            <div class="col-sm-3" style="align-self: flex-end;">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container-xl">
+    <table id="tableData" class="display" width="100%"></table>
+</div>
+
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var viewDataPermission = userPermission.viewData;
+    var approveDataPermission = userPermission.approveData;
+
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@viewDataPermission.ToString()" class="form-control input-sm" id="viewDataPermission" placeholder="">
+    <input hidden type="text" value="@approveDataPermission.ToString()" class="form-control input-sm" id="approveDataPermission" placeholder="">
+}
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var viewDataPermission = $('#viewDataPermission').val();
+        var approveDataPermission = $('#approveDataPermission').val();
+
+        $("#tableData").one("preInit.dt", function () {
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
+        var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetApproveKeyInList", "Approve")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.data;
+                }
+            },
+            "order": [],
+            "columns": [
+                { data: "approveKeyInID", title: "approveKeyInID", visible: false },
+                { data: "baKeyInID", title: "baKeyInID", visible: false },
+                { data: "year", title: "Year" },
+                { data: "month", title: "Month" },
+                { data: "week", title: "Week" },
+                { data: "departmentStoreID", title: "departmentStoreID", visible: false },
+                { data: "departmentStoreName", title: "Department Store" },
+                { data: "brandID", title: "brandID", visible: false },
+                { data: "brandName", title: "Brand" },
+                { data: "retailerGroupID", title: "retailerGroupID", visible: false },
+                { data: "distributionChannelID", title: "distributionChannelID", visible: false },
+                { data: "distributionChannelName", title: "Distribution Chanel" },
+                { data: "statusID", title: "statusID", visible: false },
+                { data: "statusName", title: "Status" },
+                { data: "approver", title: "Action By" },
+                { data: "approveDate", title: "Action Date" },
+                {
+                    orderable: false,
+                    title: "Action",
+                    className: "text-center",
+                    render: function (data, type, row) {
+
+                        if (approveDataPermission == 'True') {
+                            if (row.statusID.toUpperCase() == 'ADE8DDCA-743B-4A42-85AD-A6065D9C9F66') {
+                                return '<a href="Approve_Edit?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                            } else {
+                                return '<a href="Approve_Edit_View?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                            }
+                        }
+                        else if (viewDataPermission == 'True') {
+                            return '<a href="Approve_Edit_View?approveKeyInID=' + row.approveKeyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                        }
+                        else {
+                            return ''
+                        }
+
+                      }
+                }
+
+
+            ]
+        });
+
+
+        $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
+        });
+
+        $('#channelList').on('change', function (e) {
+            var status = $(this).val();
+            $('#channelList').val(status);
+            dataTable.column(10).search(status).draw();
+            getDepartmentStoreList()
+        });
+
+        $('#retailerGroupList').on('change', function (e) {
+            var status = $(this).val();
+            $('#retailerGroupList').val(status);
+            dataTable.column(9).search(status).draw();
+            getDepartmentStoreList()
+        });
+
+        $('#departmentStoreList').on('change', function (e) {
+            var status = $(this).val();
+            $('#departmentStoreList').val(status);
+            dataTable.column(5).search(status).draw();
+        });
+
+        $('#brandList').on('change', function (e) {
+            var status = $(this).val();
+            $('#brandList').val(status);
+            dataTable.column(7).search(status).draw();
+        });
+
+
+        $('#ddlWeek').on('change', function (e) {
+            var status = $(this).val();
+            $('#ddlWeek').val(status);
+            dataTable.column(4).search(status).draw();
+        });
+
+
+        $('#ddlMonth').on('change', function (e) {
+            var status = $(this).val();
+            $('#ddlMonth').val(status);
+            dataTable.column(3).search(status).draw();
+        });
+
+
+        $('#yearList').on('change', function (e) {
+            var status = $(this).val();
+            $('#yearList').val(status);
+            dataTable.column(2).search(status).draw();
+        });
+
+        $('#statusList').on('change', function (e) {
+            var status = $(this).val();
+            $('#statusList').val(status);
+            dataTable.column(12).search(status).draw();
+        });
+
+         function getDepartmentStoreList() {
+            var retailerGroupID = $("#retailerGroupList").val();
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (retailerGroupID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.retailerGroupID == retailerGroupID
+                });
+            }
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value=''>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+
+            dataTable.column(5).search('').draw();
+        }
+
+    });
+
+
+
+</script>

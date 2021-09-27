@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Middleware;
+using MarketData.Model.Data;
 using MarketData.Model.Request;
 using MarketData.Model.Request.MasterData;
 using MarketData.Model.Response;
@@ -31,44 +32,62 @@ namespace MarketData.Controllers
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Brand()
         {
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Brand_Edit(Guid brandID)
         {
             var viewData = GetBrandDetail(brandID);
             return View(viewData);
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Brand_Edit_View(Guid brandID)
         {
             var viewData = GetBrandDetail(brandID, true);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandGroup()
         {
             return View();
         }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandGroup_Edit(Guid brandGroupID)
         {
             var viewData = GetBrandGroupDetail(brandGroupID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandGroup_View(Guid brandGroupID)
         {
             var viewData = GetBrandGroupDetail(brandGroupID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult BrandType()
         {
             return View();
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandType_Edit(Guid brandTypeID)
         {
             var response = process.masterData.GetBrandTypeDetail(brandTypeID);
@@ -85,6 +104,8 @@ namespace MarketData.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandType_Edit_View(Guid brandTypeID)
         {
             var response = process.masterData.GetBrandTypeDetail(brandTypeID);
@@ -100,11 +121,15 @@ namespace MarketData.Controllers
             return View(brandTypeData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandSegment()
         {
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandSegment_Edit(Guid brandSegmentID)
         {
             var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
@@ -120,6 +145,8 @@ namespace MarketData.Controllers
             return View(brandSegmentData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandSegment_View(Guid brandSegmentID)
         {
             var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
@@ -135,57 +162,77 @@ namespace MarketData.Controllers
             return View(brandSegmentData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult RetailerGroup()
         {
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult RetailerGroup_Edit(Guid retailerGroupID)
         {
             var viewData = GetRetailerGroupDetail(retailerGroupID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult RetailerGroup_View(Guid retailerGroupID)
         {
             var viewData = GetRetailerGroupDetail(retailerGroupID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DistributionChannels()
         {
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DistributionChannels_Edit(Guid channelID)
         {
             var viewData = GetChannelDetail(channelID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DistributionChannels_View(Guid channelID)
         {
             var viewData = GetChannelDetail(channelID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DepartmentStore()
         {
             return View();
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DepartmentStore_Edit(Guid departmentStoreID)
         {
             var viewData = GetDepartmentStoreDetail(departmentStoreID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult DepartmentStore_Edit_View(Guid departmentStoreID)
         {
             var viewData = GetDepartmentStoreDetail(departmentStoreID, true);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Counter()
         {
             CounterListViewModel listView = new CounterListViewModel();
@@ -224,12 +271,16 @@ namespace MarketData.Controllers
 
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Counter_Edit(Guid counterID)
         {
             var viewData = GetCounterDetail(counterID);
             return View(viewData);
         }
 
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Counter_Edit_View(Guid counterID)
         {
             var viewData = GetCounterDetail(counterID);
@@ -859,16 +910,13 @@ namespace MarketData.Controllers
             if (ModelState.IsValid)
             {
                 var response = process.masterData.GetCounterList();
-                //var departmentStoreList = process.masterData.GetDepartmentStoreList();
-                //var brandList = process.masterData.GetBrandList();
-                //var channelList = process.masterData.GetDistributionChannelList();
-                //var retailerGroupList = process.masterData.GetRetailerGroupList();
 
                 if (response != null && response.data != null && response.data.Any())
                 {
                     listView.data = response.data.Select(c => new CounterViewModel
                     {
                         counterID = c.counterID,
+                        retailerGroupID = c.retailerGroupID,
                         retailerGroupName = c.retailerGroupName,
                         distributionChannelID = c.distributionChannelID,
                         distributionChannelName = c.distributionChannelName,
@@ -878,26 +926,6 @@ namespace MarketData.Controllers
                         brandName = c.brandName,
                         active = c.active
                     }).ToList();
-                    //listView.departmentStoreList = departmentStoreList != null && departmentStoreList.data != null ? departmentStoreList.data.Where(c => c.active).Select(e => new DepartmentStoreViewModel
-                    //{
-                    //    departmentStoreID = e.departmentStoreID,
-                    //    departmentStoreName = e.departmentStoreName
-                    //}).ToList() : new List<DepartmentStoreViewModel>();
-                    //listView.channelList = channelList != null && channelList.data != null ? channelList.data.Where(c => c.active).Select(e => new DistributionChannelViewModel
-                    //{
-                    //    distributionChannelID = e.distributionChannelID,
-                    //    distributionChannelName = e.distributionChannelName
-                    //}).ToList() : new List<DistributionChannelViewModel>();
-                    //listView.brandList = brandList != null && brandList.data != null ? brandList.data.Select(e => new BrandViewModel
-                    //{
-                    //    brandID = e.brandID,
-                    //    brandName = e.brandName
-                    //}).ToList() : new List<BrandViewModel>();
-                    //listView.retailerGroupList = retailerGroupList != null && retailerGroupList.data != null ? retailerGroupList.data.Select(e => new RetailerGroupViewModel
-                    //{
-                    //    retailerGroupID = e.retailerGroupID,
-                    //    retailerGroupName = e.retailerGroupName
-                    //}).ToList() : new List<RetailerGroupViewModel>();
                 }
                 else
                 {

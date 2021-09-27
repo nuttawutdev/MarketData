@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.CounterListViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "Counter";
@@ -7,80 +10,76 @@
     Html.RenderPartial("_ImportDataResultModal");
 }
 
-<h3>
-    @ViewData["Title"]
-    <a href="Counter_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var editMaster = userPermission.editMaster;
 
-</h3>
-<hr />
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@userPermission.viewMaster.ToString()" class="form-control input-sm" id="viewMaster" placeholder="">
+    <input hidden type="text" value="@userPermission.editMaster.ToString()" class="form-control input-sm" id="editMaster" placeholder="">
+
+    <h3>
+        @ViewData["Title"]
+
+        @if(editMaster)
+        {
+            <a href="Counter_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        }
+
+    </h3>
+    <hr />
 
 
-<div style="padding-bottom:10px;">
-    <div class="row" style="padding-bottom:10px">
-        <div class="col text-end d-flex  align-items-center">
-            <label class="form-label">Distribution Channel :&nbsp;</label>
-            @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
+    <div style="padding-bottom:10px;">
+        <div class="row" style="padding-bottom:10px">
+            <div class="col text-end d-flex  align-items-center">
+                <label class="form-label">Distribution Channel :&nbsp;</label>
+                @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName"), "All", new { id = "channelList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
 
-            <label class="form-label">Retailer Group :&nbsp;</label>
-            @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
+                <label class="form-label">Retailer Group :&nbsp;</label>
+                @Html.DropDownList("retailerGroupList", new SelectList(Model.retailerGroupList, "retailerGroupID", "retailerGroupName"), "All", new { id = "retailerGroupList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
 
-            <label class="form-label">Department Store :&nbsp;</label>
-            @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
-          
-            <label class="form-label">Brand :&nbsp;</label>
-            @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
-            @*<label class="form-label">Active:&nbsp;</label>
-        <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
-            <option value="">All</option>
-            <option value=true>Y</option>
-            <option value="false">N</option>
-        </select>
-        <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-              enctype="multipart/form-data">
-            <div class="filter-group ">
-                <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+                <label class="form-label">Department Store :&nbsp;</label>
+                @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
 
-                    <label for="file-upload" class="custom-file-upload1">
-                        <i class="ion-android-document"></i> Import by Excel
-                    </label>
-                    <input type="text" id="userID" name="userID" value="DDD" hidden />
-                    <input id="file-upload" type="file" name="excelFile" />
-                    <input type="submit" id="btnSubmit" value="Import" hidden />
-                </div>
+                <label class="form-label">Brand :&nbsp;</label>
+                @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control ", @style = "width:150px;margin-right: 5px;" })
             </div>
-        </form>*@
         </div>
-    </div>
 
-    <div class="row">
-       
-        <div class="col text-end d-flex justify-content-end align-items-center">
-            <label class="form-label">Active :&nbsp;</label>
-            <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
-                <option value="">All</option>
-                <option value=true>Y</option>
-                <option value="false">N</option>
-            </select>
-            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-                  enctype="multipart/form-data">
-                <div class="filter-group ">
-                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+        <div class="row">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Import by Excel
-                        </label>
-                        <input type="text" id="userID" name="userID" value="DDD" hidden />
-                        <input id="file-upload" type="file" name="excelFile" />
-                        <input type="submit" id="btnSubmit" value="Import" hidden />
-                    </div>
-                </div>
-            </form>
+            <div class="col text-end d-flex justify-content-end align-items-center">
+                <label class="form-label">Active :&nbsp;</label>
+                <select class="form-control status-dropdown" style="margin-right: 5px; width:70px!important">
+                    <option value="">All</option>
+                    <option value=true>Y</option>
+                    <option value="false">N</option>
+                </select>
+                @if (editMaster)
+                {
+                    <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                          enctype="multipart/form-data">
+                        <div class="filter-group ">
+                            <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
+                                <label for="file-upload" class="custom-file-upload1">
+                                    <i class="ion-android-document"></i> Import by Excel
+                                </label>
+                                <input type="text" id="userID" name="userID" value="DDD" hidden />
+                                <input id="file-upload" type="file" name="excelFile" />
+                                <input type="submit" id="btnSubmit" value="Import" hidden />
+                            </div>
+                        </div>
+                    </form>
+                }
+
+
+            </div>
         </div>
+
     </div>
-
-</div>
-
+}
 <div class="container-xl">
     <table id="tableData" class="display" width="100%"></table>
 </div>
@@ -88,6 +87,9 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        var viewMasterPermission = $('#viewMaster').val();
+        var editMasterPermission = $('#editMaster').val();
+
         function base64ToArrayBuffer(base64) {
             var binaryString = window.atob(base64);
             var binaryLen = binaryString.length;
@@ -114,7 +116,7 @@
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
 
-            fd.append('userID', 'Test');
+            fd.append('userID', $('#iduserID').val());
 
             // Check file selected or not
             if (files.length > 0) {
@@ -192,6 +194,9 @@
             },
             "columns": [
                 { data: "counterID", visible: false, searchable: false },
+                { data: "distributionChannelID", title: "distributionChannelID", visible: false },
+                { data: "retailerGroupID", title: "retailerGroupID", visible: false },
+                { data: "departmentStoreID", title: "departmentStoreID", visible: false },
                 { data: "distributionChannelName", title: "Distribution Channel Name" },
                 { data: "retailerGroupName", title: "Retailer Group Name" },
                 { data: "departmentStoreName", title: "Department Store Name" },
@@ -214,9 +219,17 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="Counter_Edit_View?counterID=' + row.counterID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="Counter_Edit?counterID=' + row.counterID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
-                            '<a href="#confirmModal" data-id="' + row.counterID + '" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                        if (editMasterPermission == 'True') {
+                            return '<a href="Counter_Edit_View?counterID=' + row.counterID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                                '<a href="Counter_Edit?counterID=' + row.counterID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' +
+                                '<a href="#confirmModal" data-id="' + row.counterID + '" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';
+                        }
+                        else if (viewMasterPermission == 'True' && editMasterPermission != 'True') {
+                            return '<a href="Counter_Edit_View?counterID=' + row.counterID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>';
+                        }
+                        else {
+                            return '';
+                        }                 
                 }}
             ]
         });
@@ -236,30 +249,18 @@
 
         $('#channelList').on('change', function (e) {
 
-            var txtSearch = $('#channelList option:selected').text();
-            console.log(txtSearch, 'txtSearch')
-            if (txtSearch != 'All') {
-                dataTable.column(1).search(txtSearch).draw();
-            }
-            else {
-                dataTable.column(1).search('').draw();
-            }
+            var status = $(this).val();
+            $('#channelList').val(status);
+            dataTable.column(1).search(status).draw();
             getDepartmentStoreList()
 
         });
 
 
         $('#retailerGroupList').on('change', function (e) {
-            var txtSearch = $('#retailerGroupList option:selected').text();
-
-            if (txtSearch != 'All') {
-                dataTable.column(2).search(txtSearch).draw();
-            }
-            else {
-                dataTable.column(2).search('').draw();
-            }
-
-            //debugger;
+            var status = $(this).val();
+            $('#retailerGroupList').val(status);
+            dataTable.column(2).search(status).draw();
 
             getDepartmentStoreList()
 
@@ -287,7 +288,7 @@
             var lengthSelect = $('#departmentStoreList');
 
             lengthSelect.empty();
-            lengthSelect.append("<option value='All'>All</option>")
+            lengthSelect.append("<option value=''>All</option>")
             $.each(departmentStoreList, function (index, row) {
                 lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
             });
@@ -296,14 +297,9 @@
         }
 
         $('#departmentStoreList').on('change', function (e) {
-            var txtSearch = $('#departmentStoreList option:selected').text();
-            if (txtSearch != 'All') {
-                dataTable.column(3).search(txtSearch).draw();
-            }
-            else {
-                dataTable.column(3).search('').draw();
-            }
-            
+            var status = $(this).val();
+            $('#departmentStoreList').val(status);
+            dataTable.column(3).search(status).draw();
         });
 
         $('#brandList').on('change', function (e) {

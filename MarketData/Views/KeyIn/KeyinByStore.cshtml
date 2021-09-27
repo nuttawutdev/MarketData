@@ -115,6 +115,7 @@
             <div class="col-sm-3">
                 <label>Universe</label>
                 @{
+                    var defaultUniverse = "LPD";
                     List<SelectListItem> listUniverse = new List<SelectListItem>();
                     listUniverse.Add(new SelectListItem
                     {
@@ -128,7 +129,7 @@
 
                     });
 
-                    @Html.DropDownList("iduniverseList", new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
+                    @Html.DropDownListFor(c => defaultUniverse, new SelectList(listUniverse, "Value", "Text", 1), "All", new { id = "iduniverseList", @class = "form-control " })
 
                 }
 
@@ -177,10 +178,10 @@
                 url: '@Url.Action("GetBAKeyInList", "KeyIn")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
-                    console.log(result)
                     return result.data;
                 }
             },
+            "order": [],
             "columns": [
 
                 { data: "keyInID", title: "keyInID", visible: false },
@@ -205,10 +206,10 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        if (row.statusID!='D66D23BB-DF1F-490F-A740-64CC357D6DE4' ){
+                        if (row.statusID.toUpperCase() != 'D66D23BB-DF1F-490F-A740-64CC357D6DE4' && row.statusID.toUpperCase() != '2F3658E4-AB9F-4935-9186-501AD1B9B507') {
                             return '<a href="KeyinByStore_Edit?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
                         }else{
-                            return '<a href="KeyinByStore_View?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
+                            return '<a href="KeyinByStore_Edit_View?baKeyInID=' + row.keyInID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>'
                         }
                       }
                 }
@@ -283,26 +284,27 @@
                 !$('#retailerGroupList').val() ||
                 !$('#departmentStoreList').val() ||
                 !$('#brandList').val() ||
+                !$('#yearList').val() ||               
+                !$('#ddlMonth').val() ||
+                !$('#ddlWeek').val() ||
                 !$('#iduniverseList').val()) {
                 $('#warningModal').modal('show');
+                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบถ้วน เพื่อบันทึกข้อมูลยอดขาย');
 
-                $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบเพื่อสร้างข้อมูลยอดขายรายร้านค้า');
             } else {
-                   var model = @Html.Raw(Json.Serialize(Model));
 
-
-
-
-             var frmdata = {
-                 year: $("#yearList").val(),
-                 month: $('#ddlMonth').val(),
-                 week: $('#ddlWeek').val(),
-                 distributionChannelID: $('#channelList').val(),
-                 retailerGroupID: $('#retailerGroupList').val(),
-                 departmentStoreID: $('#departmentStoreList').val(),
-                 brandID: $('#brandList').val(),
-                 universe: $('#iduniverseList').val(),
-                 userID: null//$('#iduserID').val()
+                $("#blocker").show();
+                var model = @Html.Raw(Json.Serialize(Model));
+                var frmdata = {
+                     year: $("#yearList").val(),
+                     month: $('#ddlMonth').val(),
+                     week: $('#ddlWeek').val(),
+                     distributionChannelID: $('#channelList').val(),
+                     retailerGroupID: $('#retailerGroupList').val(),
+                     departmentStoreID: $('#departmentStoreList').val(),
+                     brandID: $('#brandList').val(),
+                     universe: $('#iduniverseList').val() ?  $('#iduniverseList').val() : null,
+                     userID: null//$('#iduserID').val()
             };
 
             $.ajax({
@@ -313,11 +315,23 @@
                 datatype: "json",
                 success: function (data) {
                     if (data.isSuccess) {
-                        var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
-                        window.location.href = url.replace('_id_', data.baKeyInID);
+                        if (!data.isSubmited) {
+                            var url = '@Url.Action("KeyinByStore_Edit", "KeyIn", new { baKeyInID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.baKeyInID);
+                        }
+                        else {
+                            var url = '@Url.Action("KeyinByStore_Edit_View", "KeyIn", new { baKeyInID = "_id_" })';
+                            window.location.href = url.replace('_id_', data.baKeyInID);
+                        }
+                    }
+                    else {
+                        $("#blocker").hide();
+                        $('#warningModal').modal('show');
+                        $('#myModalWarningResult').text(data.responseError);
                     }
                 },
                 error: function () {
+                    $("#blocker").hide();
                 }
             });
             }

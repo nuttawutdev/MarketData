@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.BrandGroupViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = Model.brandGroupName == null ? "Add Brand Group" : "Edit Brand Group";
@@ -13,6 +16,11 @@
 <br />
 
 <form>
+    @{
+        var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+        <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    }
+
     <div class="col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Brand Group Name</label><label style="font-size:14px;color:red">*</label>
@@ -70,7 +78,8 @@
                  brandGroupID: model.brandGroupID,
                  brandGroupName: $('#groupname').val(),
                  active: $("#flagactive").prop("checked"),
-                 isLoreal: $("#flagloreal").prop("checked")
+                 isLoreal: $("#flagloreal").prop("checked"),
+                 userID: $('#iduserID').val()
              };
 
 

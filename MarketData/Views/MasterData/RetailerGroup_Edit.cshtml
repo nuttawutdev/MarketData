@@ -1,4 +1,7 @@
 ﻿@model MarketData.Models.RetailerGroupViewModel
+@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = Model.retailerGroupName == null ? "Add Retailer Group" : "Edit Retailer Group";
@@ -13,6 +16,11 @@
 <br />
 
 <form>
+    @{
+        var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+        <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    }
+
     <div class="col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label for="name">Retailer Group Name</label><label style="font-size:14px;color:red">*</label>
@@ -55,7 +63,8 @@
              var frmdata = {
                  retailerGroupID: model.retailerGroupID,
                  retailerGroupName: $('#retailername').val(),
-                 active: $("#flagactive").prop("checked")
+                 active: $("#flagactive").prop("checked"),
+                 userID: $('#iduserID').val()
              };
 
 

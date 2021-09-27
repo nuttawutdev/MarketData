@@ -11,6 +11,9 @@ namespace MarketData.Repositories
         public BAKeyInRepository baKeyIn;
         public UserRepository user;
         public AdminKeyInRepository adminKeyIn;
+        public ApproveRepository approve;
+        public AdjustDataRepository adjust;
+        public UrlRepository url;
 
         public Repository(MarketDataDBContext dbContext)
         {
@@ -18,6 +21,9 @@ namespace MarketData.Repositories
             baKeyIn = new BAKeyInRepository(dbContext);
             user = new UserRepository(dbContext);
             adminKeyIn = new AdminKeyInRepository(dbContext);
+            approve = new ApproveRepository(dbContext);
+            adjust = new AdjustDataRepository(dbContext);
+            url = new UrlRepository(dbContext);
         }
     }
 }

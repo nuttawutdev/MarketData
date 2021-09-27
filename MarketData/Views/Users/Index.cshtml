@@ -1,0 +1,319 @@
+﻿@model MarketData.Models.UserOptionViewModel;
+@{
+    ViewData["Title"] = "Users";
+    Html.RenderPartial("_ConfirmModal");
+    Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_ImportDataResultModal");
+    Html.RenderPartial("_SuccessModal");
+}
+
+
+
+<h3>
+    @ViewData["Title"]
+    <a href="Users_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+
+</h3>
+<hr />
+<br />
+<br />
+<div class="row">
+    <div class="table-filter" style="width: 100%; font-size: 13px;">
+        <div class="row">
+
+            <div class="col-sm-10">
+
+                <div class="filter-group">
+                    <label>Department Store</label>
+                    @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "All", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
+                </div>
+                <div class="filter-group">
+                    <label>Brand</label>
+                    @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "All", new { id = "brandList", @class = "form-control col-sm-12" })
+
+                </div>
+                <div class="filter-group">
+                    <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i></button>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="custom-file-upload">
+
+                    <label for="file-upload" class="custom-file-upload1">
+                        <i class="ion-android-document"></i> Import by Excel
+                    </label>
+                    <input id="file-upload" type="file" name="excelFile" />
+                    <input type="submit" id="btnSubmit" value="Import" hidden />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-xl">
+    <table id="tableData" class="display" width="100%"></table>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        function base64ToArrayBuffer(base64) {
+            var binaryString = window.atob(base64);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+            for (var i = 0; i < binaryLen; i++) {
+                var ascii = binaryString.charCodeAt(i);
+                bytes[i] = ascii;
+            }
+            return bytes;
+        }
+
+        function saveByteArray(reportName, byte) {
+            var blob = new Blob([byte], { type: "text/plain" });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            var fileName = reportName;
+            link.download = fileName;
+            link.click();
+        };
+
+        $("#file-upload").change(function () {
+            $("#blocker").show();
+
+            var fd = new FormData();
+            var files = $('#file-upload')[0].files;
+
+            // Check file selected or not
+            if (files.length > 0) {
+                fd.append('excelFile', files[0]);
+            }
+
+            $.ajax(
+                {
+                    url: '@Url.Action("ImportUser", "Users")',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    type: "POST",
+                    success: function (data) {
+
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                           // dataTable.ajax.reload();
+
+                            $('#importSuccess').text("Import Success : " + data.countImportSuccess);
+                            $('#importFailed').text("Import Failed : " + data.countImportFailed);
+
+                            if (data.importResult.length > 0) {
+
+                                for (var i = 0; i < data.importResult.length; i++) {
+                                    $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result+"</p>");
+                                }
+
+                                var sampleArr = base64ToArrayBuffer(data.fileResult);
+                                saveByteArray(data.fileName, sampleArr);
+
+                                $('#importDataModalHref').attr("href", "Index");
+                                $('#importDataModal').modal('show');
+                            }
+                            else {
+                                $('#importDataModalHref').attr("href", "Index");
+                                $('#importDataModal').modal('show');
+                            }
+                        }
+                        else {
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Import data failed!');
+                                $('#failedModal').modal('show');
+                        }
+
+                        $("#file-upload").val("");
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                        $('#myModalFailedResult').text('Import data failed!');
+                        $('#failedModal').modal('show');
+                        $("#file-upload").val("");
+                    }
+                }
+            );
+        });
+
+
+        $("#tableData").one("preInit.dt", function () {
+
+            $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
+            $("#tableData_filter label").append($button);
+            $button.button();
+
+        });
+
+        var dataTable=  $('#tableData').DataTable({
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("GetUserList", "Users")',
+                contentType: "application/json; charset=utf-8",
+                dataSrc: function (result) {
+                    return result.data;
+                }
+            },
+            "columns": [
+                { data: "userID", visible: false, searchable: false },
+                { data: "email", title: "Email" },
+                { data: "displayName", title: "Display Name"},
+                { data: "firstName", title: "First Name" },
+                { data: "lastName", title: "Last Name" },
+                { data: "validateEmail", title: "Validate Email", visible: false, searchable: false  },
+                {
+                    data: "validateEmail",
+                    title: "Validate Email",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
+                    },
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                { data: "departmentStoreID", title: "departmentStoreID", visible: false },
+                { data: "brandID", title: "brandID", visible: false },
+                { data: "active", title: "active", visible: false },
+                {
+                    data: "active",
+                    title: "Active",
+                    render: function (data, type, row) {
+                        var checkStatus = data ? "checked" : "";
+                        return '<input type="checkbox" disabled ' + checkStatus + '>';
+                    },
+                    className: "text-center",
+                    visible: true,
+                    searchable: true,
+                    orderable: false,
+                },
+                { data: "lastLogin", title: "Last Login" },
+                {
+                    orderable: false,
+                    title: "Action",
+                    className: "text-center",
+                    width:"16.666667%",
+                    render: function (data, type, row) {
+                        var view = '<a href="Users_Edit_View?userID=' + row.userID + '" class="btn btn-primary col-sm-12 col-md-3 btn-sm"><i class="ion-eye text-white"></i></a>';
+                        var edit = '<a href="Users_Edit?userID=' + row.userID + '" class="btn btn-warning col-sm-12 col-md-3 btn-sm"><i class="ion-edit text-white"></i></a>';
+                        var reset = '<a data-email="' + row.email + '" style="margin-top:5px;font-size:10px" href="#" class="btnReset btn btn-outline-danger col-sm-12 col-md-10 btn-sm">Reset Password</a>';
+                        var resend = '<a data-id="' + row.userID +'" style="margin-top:5px;font-size:10px" href="#" class="btnResend btn btn-outline-primary col-sm-12 col-md-10 btn-sm">Resend Welcome Email</a>';
+                        var actionButton = view + edit;
+
+
+
+                        if (row.validateEmail == true) {
+                            actionButton += reset
+                        }
+                        else {
+                            actionButton += resend
+                        }
+                        return actionButton;
+                   }
+                }
+            ]});
+
+        $('#departmentStoreList').on('change', function (e) {
+            var status = $(this).val();
+            $('#departmentStoreList').val(status);
+            dataTable.column(8).search(status).draw();
+        });
+
+        $('#brandList').on('change', function (e) {
+            var status = $(this).val();
+            $('#brandList').val(status);
+            dataTable.column(9).search(status).draw();
+        });
+
+       $('.btnReresh').on('click', function (e) {
+            $("#blocker").show();
+            dataTable.ajax.reload();
+            setTimeout(function () {
+                $("#blocker").hide();
+            }, 500);
+        });
+
+        $(document).on('click', '.btnResend', function () {
+
+            var userID  = $(this).data('id');
+
+                    $("#blocker").show();
+            var model = @Html.Raw(Json.Serialize(Model));
+           $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ResendWelcomeEmail", "Users")',
+                    contentType: "application/json; charset=utf-8",
+               data: {
+                   UserID: userID
+               },
+               success: function (data) {
+                   $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "");
+                            $('#successModal').modal('show');
+
+                            $('#txtResult').text("");
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Send email failed');
+                        }
+                        $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+
+                    },
+               error: function () {
+                   $("#blocker").hide();
+
+                    }
+                });
+        })
+
+        $(document).on('click', '.btnReset', function () {
+
+            var email = $(this).data('email');
+                  $("#blocker").show();
+             var model = @Html.Raw(Json.Serialize(Model));
+               $.ajax({
+                   type: "GET",
+                    url: '@Url.Action("ResetPassword", "Users")',
+                    contentType: "application/json; charset=utf-8",
+                   data: {
+                       email: email
+                   },
+               success: function (data) {
+                   $("#blocker").hide();
+                   if (data.isSuccess) {
+                       $('#successModalHref').attr("href", "");
+                       $('#successModal').modal('show');
+                       $('#txtResult').text("");
+                   } else {
+                       $('#failedModal').modal('show');
+                       $('#myModalFailedResult').text(data.responseError != ""
+                           && data.responseError != null ? data.responseError : 'Reset email failed');
+                   }
+                   $('#confirmID').val('');
+                   $('#myModalFailedResult').val('');
+                    },
+                   error: function () {
+                       $("#blocker").hide();
+                    }
+                });
+        })
+
+
+
+
+
+    });
+
+
+
+</script>

@@ -1,4 +1,8 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Brand";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
@@ -11,57 +15,70 @@
     }
 </style>
 
-<h3>
-    @ViewData["Title"]
-    <a href="Brand_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var editMaster = userPermission.editMaster;
 
-</h3>
-<hr />
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@userPermission.viewMaster.ToString()" class="form-control input-sm" id="viewMaster" placeholder="">
+    <input hidden type="text" value="@userPermission.editMaster.ToString()" class="form-control input-sm" id="editMaster" placeholder="">
 
-<div style="padding-bottom:10px;">
-    <div class="row">
-        <div class="col text-end d-flex justify-content-end align-items-center">
-            <label class="form-label">Active :&nbsp;</label>
-            <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
-                <option value="">All</option>
-                <option value=true>Y</option>
-                <option value="false">N</option>
-            </select>
-            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-                  enctype="multipart/form-data">
-                <div class="filter-group ">
-                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Import by Excel
-                        </label>
-                        <input type="text" id="userID" name="userID" value="DDD" hidden />
-                        <input id="file-upload" type="file" name="excelFile" />
-                        <input type="submit" id="btnSubmit" value="Import" hidden />
-                    </div>
-                </div>
-            </form>
+    <h3>
+        @ViewData["Title"]
 
+        @if (editMaster)
+        {
+            <a href="Brand_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        }
+    </h3>
+
+    <hr />
+
+    <div style="padding-bottom:10px;">
+        <div class="row">
+            <div class="col text-end d-flex justify-content-end align-items-center">
+                <label class="form-label">Active :&nbsp;</label>
+                <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
+                    <option value="">All</option>
+                    <option value=true>Y</option>
+                    <option value="false">N</option>
+                </select>
+                @if (editMaster)
+                {
+                    <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                          enctype="multipart/form-data">
+                        <div class="filter-group ">
+                            <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+
+                                <label for="file-upload" class="custom-file-upload1">
+                                    <i class="ion-android-document"></i> Import by Excel
+                                </label>
+                                <input type="text" id="userID" name="userID" value="DDD" hidden />
+                                <input id="file-upload" type="file" name="excelFile" />
+                            </div>
+                        </div>
+                    </form>
+                }
+
+
+            </div>
         </div>
+
     </div>
-
-</div>
-
+}
 <div class="container-xl">
 
-
     <table id="tableData" class="display" width="100%"></table>
-
 
 </div>
 
 
 <script type="text/javascript">
 
-
     $(document).ready(function () {
-        //$('#importDataModalHref').attr("href", "Brand");
-        //$('#importDataModal').modal('show');
+        var viewMasterPermission = $('#viewMaster').val();
+        var editMasterPermission = $('#editMaster').val();
 
         function base64ToArrayBuffer(base64) {
             var binaryString = window.atob(base64);
@@ -90,7 +107,7 @@
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
 
-            fd.append('userID', 'Test');
+            fd.append('userID', $('#iduserID').val());
 
             // Check file selected or not
             if (files.length > 0) {
@@ -105,7 +122,7 @@
                     contentType: false,
                     type: "POST",
                     success: function (data) {
-                        console.log(data,'data')
+
                         $("#blocker").hide();
                         if (data.isSuccess) {
                            // dataTable.ajax.reload();
@@ -157,8 +174,8 @@
 
         });
 
-        var dataTable=  $('#tableData').DataTable({
-            "ajax": {
+        var dataTable = $('#tableData').DataTable({
+               "ajax": {
                 type: "POST",
                 url: '@Url.Action("GetBrandList", "MasterData")',
                 contentType: "application/json; charset=utf-8",
@@ -166,6 +183,7 @@
                     return result.brandList;
                 }
             },
+            "order": [],
             "columns": [
                 { data: "brandID", visible: false, searchable: false },
                 { data: "brandName", title: "Brand Name"},
@@ -209,9 +227,17 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="Brand_Edit_View?brandID=' + row.brandID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="Brand_Edit?brandID=' + row.brandID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
-                          /*  '<a href="#confirmModal" data-id="' + row.brandID +'" class="delete-click buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>';*/
+
+                        if (editMasterPermission == 'True') {
+                            return '<a href="Brand_Edit_View?brandID=' + row.brandID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                                '<a href="Brand_Edit?brandID=' + row.brandID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        }
+                        else if (viewMasterPermission == 'True' && editMasterPermission != 'True') {
+                            return '<a href="Brand_Edit_View?brandID=' + row.brandID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>';
+                        }
+                        else {
+                            return '';
+                        }
                 }}
             ]
         });

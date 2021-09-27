@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request;
 using MarketData.Model.Request.MasterData;
@@ -50,7 +51,7 @@ namespace MarketData.Repositories.Repo
                         Active_Flag = request.active,
                         Delete_Flag = false,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMBrandType.Add(insertBrandType);
@@ -64,7 +65,7 @@ namespace MarketData.Repositories.Repo
                         brandTypeUpdate.Brand_Type_Name = request.brandTypeName;
                         brandTypeUpdate.Active_Flag = request.active;
                         brandTypeUpdate.Updated_By = request.userID;
-                        brandTypeUpdate.Updated_Date = DateTime.Now;
+                        brandTypeUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMBrandType.Update(brandTypeUpdate);
                     }
@@ -93,7 +94,7 @@ namespace MarketData.Repositories.Repo
                     Active_Flag = request.active,
                     Delete_Flag = false,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now
+                    Created_Date = Utility.GetDateNowThai()
                 };
 
                 _dbContext.TMBrandType.Add(insertBrandType);
@@ -136,7 +137,7 @@ namespace MarketData.Repositories.Repo
                     brandTypeUpdate.Active_Flag = false;
                     brandTypeUpdate.Delete_Flag = true;
                     brandTypeUpdate.Updated_By = request.userID;
-                    brandTypeUpdate.Updated_Date = DateTime.Now;
+                    brandTypeUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMBrandType.Update(brandTypeUpdate);
                 }
@@ -167,7 +168,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async  Task<bool> SaveBrandSegment(SaveBrandSegmentRequest request)
+        public async Task<bool> SaveBrandSegment(SaveBrandSegmentRequest request)
         {
             try
             {
@@ -179,7 +180,7 @@ namespace MarketData.Repositories.Repo
                         Brand_Segment_Name = request.brandSegmentName,
                         Active_Flag = request.active,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMBrandSegment.Add(insertBrandSegment);
@@ -193,7 +194,7 @@ namespace MarketData.Repositories.Repo
                         brandSegmentUpdate.Brand_Segment_Name = request.brandSegmentName;
                         brandSegmentUpdate.Active_Flag = request.active;
                         brandSegmentUpdate.Updated_By = request.userID;
-                        brandSegmentUpdate.Updated_Date = DateTime.Now;
+                        brandSegmentUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMBrandSegment.Update(brandSegmentUpdate);
                     }
@@ -222,7 +223,7 @@ namespace MarketData.Repositories.Repo
                     Active_Flag = request.active,
                     Delete_Flag = false,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now
+                    Created_Date = Utility.GetDateNowThai()
                 };
 
                 _dbContext.TMBrandSegment.Add(insertBrandSegment);
@@ -265,7 +266,7 @@ namespace MarketData.Repositories.Repo
                     brandSegmentUpdate.Active_Flag = false;
                     brandSegmentUpdate.Delete_Flag = true;
                     brandSegmentUpdate.Updated_By = request.userID;
-                    brandSegmentUpdate.Updated_Date = DateTime.Now;
+                    brandSegmentUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMBrandSegment.Update(brandSegmentUpdate);
                 }
@@ -309,7 +310,7 @@ namespace MarketData.Repositories.Repo
                         Is_Loreal_Brand = request.isLoreal,
                         Active_Flag = request.active,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMBrandGroup.Add(insertBrandGroup);
@@ -324,7 +325,7 @@ namespace MarketData.Repositories.Repo
                         brandGroupUpdate.Is_Loreal_Brand = request.isLoreal;
                         brandGroupUpdate.Active_Flag = request.active;
                         brandGroupUpdate.Updated_By = request.userID;
-                        brandGroupUpdate.Updated_Date = DateTime.Now;
+                        brandGroupUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMBrandGroup.Update(brandGroupUpdate);
                     }
@@ -354,7 +355,7 @@ namespace MarketData.Repositories.Repo
                     Active_Flag = request.active,
                     Delete_Flag = false,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now
+                    Created_Date = Utility.GetDateNowThai()
                 };
 
                 _dbContext.TMBrandGroup.Add(insertBrandGroup);
@@ -397,7 +398,7 @@ namespace MarketData.Repositories.Repo
                     brandGroupUpdate.Active_Flag = false;
                     brandGroupUpdate.Delete_Flag = true;
                     brandGroupUpdate.Updated_By = request.userID;
-                    brandGroupUpdate.Updated_Date = DateTime.Now;
+                    brandGroupUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMBrandGroup.Update(brandGroupUpdate);
                 }
@@ -457,6 +458,41 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<BrandData> GetBrandListLoreal(Expression<Func<TMBrand, bool>> expression)
+        {
+            try
+            {
+                var searchData = _dbContext.TMBrand.Where(expression).AsNoTracking();
+
+                var brandList = (
+                   from e in searchData
+                   join g in _dbContext.TMBrandGroup
+                       on e.Brand_Group_ID equals g.Brand_Group_ID
+                       into joinGroup
+                   from groups in joinGroup.DefaultIfEmpty()
+                   select new BrandData
+                   {
+                       brandID = e.Brand_ID,
+                       brandName = e.Brand_Name,
+                       brandShortName = e.Brand_Short_Name,
+                       brandGroupName = groups != null ? groups.Brand_Group_Name : "",
+                       universe = e.Universe,
+                       active = e.Active_Flag,
+                       color = e.Brand_Color,
+                       lorealBrandRank = e.Loreal_Brand_Rank,
+                       isLorealBrand = groups != null ? groups.Is_Loreal_Brand : false
+                   });
+
+                brandList = brandList.OrderBy(x => x.brandName).Where(c => c.isLorealBrand);
+                return brandList.ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMBrand FindBrandBy(Expression<Func<TMBrand, bool>> expression)
         {
             try
@@ -482,7 +518,7 @@ namespace MarketData.Repositories.Repo
         }
         public async Task<bool> SaveBrand(SaveBrandRequest request)
         {
-            string today = DateTime.Now.ToString();
+            string today = Utility.GetDateNowThai().ToString();
             DateTime dateNow;
             IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
             DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
@@ -526,7 +562,7 @@ namespace MarketData.Repositories.Repo
                         brandUpdate.Universe = request.universe;
                         brandUpdate.Active_Flag = request.active;
                         brandUpdate.Updated_By = request.userID;
-                        brandUpdate.Updated_Date = DateTime.Now;
+                        brandUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMBrand.Update(brandUpdate);
                     }
@@ -555,7 +591,7 @@ namespace MarketData.Repositories.Repo
                     brandUpdate.Active_Flag = false;
                     brandUpdate.Delete_Flag = true;
                     brandUpdate.Updated_By = request.userID;
-                    brandUpdate.Updated_Date = DateTime.Now;
+                    brandUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMBrand.Update(brandUpdate);
                 }
@@ -598,7 +634,7 @@ namespace MarketData.Repositories.Repo
                         Active_Flag = request.active,
                         Delete_Flag = false,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMRetailerGroup.Add(insertRetailerGroup);
@@ -612,7 +648,7 @@ namespace MarketData.Repositories.Repo
                         retailerGroupUpdate.Retailer_Group_Name = request.retailerGroupName;
                         retailerGroupUpdate.Active_Flag = request.active;
                         retailerGroupUpdate.Updated_By = request.userID;
-                        retailerGroupUpdate.Updated_Date = DateTime.Now;
+                        retailerGroupUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMRetailerGroup.Update(retailerGroupUpdate);
                     }
@@ -641,7 +677,7 @@ namespace MarketData.Repositories.Repo
                     Active_Flag = request.active,
                     Delete_Flag = false,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now
+                    Created_Date = Utility.GetDateNowThai()
                 };
 
                 _dbContext.TMRetailerGroup.Add(insertRetailerGroup);
@@ -684,7 +720,7 @@ namespace MarketData.Repositories.Repo
                     retailerGroupUpdate.Active_Flag = false;
                     retailerGroupUpdate.Delete_Flag = true;
                     retailerGroupUpdate.Updated_By = request.userID;
-                    retailerGroupUpdate.Updated_Date = DateTime.Now;
+                    retailerGroupUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMRetailerGroup.Update(retailerGroupUpdate);
                 }
@@ -715,6 +751,20 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMDistributionChannel> GetDistributionChannelListBy(Expression<Func<TMDistributionChannel, bool>> expression)
+        {
+            try
+            {
+                var searchData = _dbContext.TMDistributionChannel.Where(expression).AsNoTracking();
+                searchData = searchData.OrderByDescending(x => x.Distribution_Channel_Name);
+                return searchData.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> SaveDistributionChannel(SaveDistributionChannelRequest request)
         {
             try
@@ -728,7 +778,7 @@ namespace MarketData.Repositories.Repo
                         Active_Flag = request.active,
                         Delete_Flag = false,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMDistributionChannel.Add(insertChannel);
@@ -742,7 +792,7 @@ namespace MarketData.Repositories.Repo
                         channelUpdate.Distribution_Channel_Name = request.distributionChannelName;
                         channelUpdate.Active_Flag = request.active;
                         channelUpdate.Updated_By = request.userID;
-                        channelUpdate.Updated_Date = DateTime.Now;
+                        channelUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMDistributionChannel.Update(channelUpdate);
                     }
@@ -771,7 +821,7 @@ namespace MarketData.Repositories.Repo
                     Active_Flag = request.active,
                     Delete_Flag = false,
                     Created_By = request.userID,
-                    Created_Date = DateTime.Now
+                    Created_Date = Utility.GetDateNowThai()
                 };
 
                 _dbContext.TMDistributionChannel.Add(insertChannel);
@@ -814,7 +864,7 @@ namespace MarketData.Repositories.Repo
                     channelUpdate.Active_Flag = true;
                     channelUpdate.Delete_Flag = true;
                     channelUpdate.Updated_By = request.userID;
-                    channelUpdate.Updated_Date = DateTime.Now;
+                    channelUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMDistributionChannel.Update(channelUpdate);
                 }
@@ -877,6 +927,18 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public List<TMDepartmentStore> GetDepartmentStoreListBy(Expression<Func<TMDepartmentStore, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMDepartmentStore.Where(expression).AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TMDepartmentStore FindDepartmentStoreBy(Expression<Func<TMDepartmentStore, bool>> expression)
         {
             try
@@ -906,7 +968,7 @@ namespace MarketData.Repositories.Repo
                         Delete_Flag = false,
                         Active_Flag = request.active,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMDepartmentStore.Add(insertDepartmentStore);
@@ -924,7 +986,7 @@ namespace MarketData.Repositories.Repo
                         departmentStoreUpdate.Rank = request.rank;
                         departmentStoreUpdate.Active_Flag = request.active;
                         departmentStoreUpdate.Updated_By = request.userID;
-                        departmentStoreUpdate.Updated_Date = DateTime.Now;
+                        departmentStoreUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMDepartmentStore.Update(departmentStoreUpdate);
                     }
@@ -953,7 +1015,7 @@ namespace MarketData.Repositories.Repo
                     departmentStoreUpdate.Active_Flag = false;
                     departmentStoreUpdate.Delete_Flag = true;
                     departmentStoreUpdate.Updated_By = request.userID;
-                    departmentStoreUpdate.Updated_Date = DateTime.Now;
+                    departmentStoreUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMDepartmentStore.Update(departmentStoreUpdate);
                 }
@@ -1044,7 +1106,7 @@ namespace MarketData.Repositories.Repo
                         Delete_Flag = false,
                         Active_Flag = request.active,
                         Created_By = request.userID,
-                        Created_Date = DateTime.Now
+                        Created_Date = Utility.GetDateNowThai()
                     };
 
                     _dbContext.TMCounter.Add(insertCounter);
@@ -1060,7 +1122,7 @@ namespace MarketData.Repositories.Repo
                         counterUpdate.Department_Store_ID = request.departmentStoreID;
                         counterUpdate.Active_Flag = request.active;
                         counterUpdate.Updated_By = request.userID;
-                        counterUpdate.Updated_Date = DateTime.Now;
+                        counterUpdate.Updated_Date = Utility.GetDateNowThai();
 
                         _dbContext.TMCounter.Update(counterUpdate);
                     }
@@ -1089,7 +1151,7 @@ namespace MarketData.Repositories.Repo
                     counterUpdate.Active_Flag = false;
                     counterUpdate.Delete_Flag = true;
                     counterUpdate.Updated_By = request.userID;
-                    counterUpdate.Updated_Date = DateTime.Now;
+                    counterUpdate.Updated_Date = Utility.GetDateNowThai();
 
                     _dbContext.TMCounter.Update(counterUpdate);
                 }
@@ -1196,6 +1258,54 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TMKeyInRemark.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMApproveStatus> GetApproveStatusList()
+        {
+            try
+            {
+                return _dbContext.TMApproveStatus.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMApproveStatus GetApproveKeyInStatusBy(Expression<Func<TMApproveStatus, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMApproveStatus.Where(expression).AsNoTracking().FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMAdjustStatus> GetAdjustStatusList()
+        {
+            try
+            {
+                return _dbContext.TMAdjustStatus.AsNoTracking().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public TMAdjustStatus GetAdjustStatusBy(Expression<Func<TMAdjustStatus, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMAdjustStatus.Where(expression).AsNoTracking().FirstOrDefault();
             }
             catch (Exception ex)
             {

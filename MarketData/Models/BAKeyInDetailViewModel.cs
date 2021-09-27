@@ -11,12 +11,16 @@ namespace MarketData.Models
         public List<BAKeyInDetailData> BAKeyInDetailList { get; set; }
         public List<KeyInRemark> remarkList { get; set; }
         public string departmentStore { get; set; }
+        public string retailerGroup { get; set; }
         public string channel { get; set; }
         public string brand { get; set; }
         public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }
         public string status { get; set; }
+        public string universe { get; set; }
+        public string remark { get; set; }
+        public string rejectReason { get; set; }
     }
 
     public class BAKeyInDetailData
@@ -28,6 +32,7 @@ namespace MarketData.Models
         public Guid channelID { get; set; }
         public Guid brandID { get; set; }
         public string brandName { get; set; }
+        public string brandColor { get; set; }
         public string year { get; set; }
         public string month { get; set; }
         public string week { get; set; }

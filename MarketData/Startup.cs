@@ -1,5 +1,7 @@
+using MarketData.Middleware;
 using MarketData.Processes;
 using MarketData.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,15 +32,19 @@ namespace MarketData
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddScoped<Process>();
             services.AddScoped<Repository>();
+            services.AddScoped<AuthorizeFilter>();
+            services.AddScoped<PermissionFilter>();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(5000);//You can set Time   
+                options.IdleTimeout = TimeSpan.FromMinutes(60);//You can set Time   
             });
             services.AddHttpContextAccessor();
             services.AddDbContext<MarketDataDBContext>(options =>
             {
                 options.UseSqlServer(Configuration["ConnectionStrings:MARKETDATADB"]);
             });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

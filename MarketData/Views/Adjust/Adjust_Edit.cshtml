@@ -1,0 +1,694 @@
+﻿
+@model MarketData.Models.AdjustDetailViewModel
+
+@{
+    ViewData["Title"] = "Adjust Detail";
+    Html.RenderPartial("_WarningModal");
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
+}
+
+<style>
+    .width70 {
+        width:70px!important
+    }
+
+</style>
+<h3 style="padding-left:20px;padding-right:20px">
+    @ViewData["Title"]
+
+</h3>
+
+<hr />
+
+
+<div class="row" style="overflow-x:auto;padding-left:20px;padding-right:20px;width:100%">
+    <div style="width: 100%; font-size: 13px;">
+
+        <div class="row col-sm-12">
+
+            <div class="col-sm-2">
+                <label><b>Distribution Channel</b></label><br />
+                <label>
+                    @Model.channel
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Retailer Group</b></label><br />
+                <label>
+                    @Model.retailerGroup
+                </label>
+
+
+            </div>
+
+            <div class="col-sm-2">
+                <label><b>Department Store</b></label><br />
+                <label>
+                    @Model.departmentStore
+                </label>
+            </div>
+
+            <div class="col-sm-1">
+                <label><b>Year</b></label><br />
+                <label>
+                    @Model.year
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Month</b></label><br />
+                <label>
+                    @Model.month
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Week</b></label><br />
+                <label>
+                    @Model.week
+                </label>
+            </div>
+            <div class="col-sm-1">
+                <label><b>Universe</b></label><br />
+                <label>
+                    @Model.universe
+                </label>
+
+
+            </div>
+            <div class="col-sm-1">
+                <label><b>Status</b></label><br />
+                <label>
+                    @Model.status
+                </label>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div style="overflow-x:auto; padding-top:30px;padding-left:20px;padding-right:20px">
+    <div class="table-responsive table-sm">
+        <div class="table-wrapper">
+            <div style=" overflow-x: auto;">
+                <input type="hidden" value="@Model.adjustDataID" id="adjustDataID" />
+                <h6 class="text-danger">*หมายเหตุ : ข้อมูลจะถูกตรวจสอบและบันทึกอัตโนมัติ ถ้ามีการเปลี่ยนแถวที่ทำการคีย์ข้อมูล</h6>
+                <table class="table table-hover " id="tblDetails">
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="container-xl" style="overflow-x: auto; padding-top: 20px; padding-left: 20px; padding-right: 20px">
+
+
+    <div style="padding-top: 20px; text-align:right">
+        <button id="btnSave" class="btn btn-danger " type="button">Save</button>
+        <button id="btnAdjust" class="btn btn-primary text-white" type="button">Adjust</button>
+        <a href="Index" class="btn btn-outline-danger">Cancel</a>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var rowClick = null;
+        var editData = false;
+
+        initial();
+
+        function initial() {
+            $("#container").removeClass("container");
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            if (model.status =="Submit") {
+                $("#btnSave").hide();
+            }
+
+            DrawTable();
+            CalFooterTotal();
+        }
+
+        function DrawTable() {
+        var model = @Html.Raw(Json.Serialize(Model));
+        console.log(model)
+        var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
+
+        var titleTable = '<thead class="table-secondary">' +
+            '    <th >Brand</th>' +
+            '    <th >Amt. (' + lastYear +')</th>';
+
+        for (var i = 0; i < model.brandDataColumn.length; i++) {
+            titleTable += '    <th >' + model.brandDataColumn[i] + '</th>';
+        }
+
+        titleTable += '    <th >Admin-Amt.Sales</th>' +
+            '    <th >Adj.Amt.Sales</th>' +
+            '    <th >Adj.Whole Sales</th>' +
+            '    <th >Rank</th>' +
+            '    <th class="width70">SK (%)</th>' +
+            '    <th class="width70">MU (%)</th>' +
+            '    <th class="width70">FG (%)</th>' +
+            '    <th class="width70">OT (%)</th>' +
+            '    <th >Remark</th>' +
+            '    <th >Growth (%)</th>' +
+            '</tr></thead>';
+
+
+        $('#tblDetails').empty();
+            var rowTable = ' <tbody>';
+            var rowTotal = '<tr class="table-secondary" > <td>Total</td>';
+
+            for (var i = 0; i < model.data.length; i++) {
+                var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : formatCurrencyText(model.data[i].amountPreviousYear.toString());
+                var background = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? model.data[i].brandColor : "";
+                var color = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? "white" : "black";
+
+                rowTable += '<tr style="color:' + color + ';background:' + background  +'">' +
+                '<td hidden class="brandID">' + model.data[i].brandID + '</td>' +
+                '<td >' + model.data[i].brandName + '</td>' +
+                '<td class="amountPreviousYear">' + amountPreviousYear + '</td>' +
+                '<td hidden class="week">' + model.data[i].week + '</td>';
+
+                rowTotal += i != 0 ? "" : '<td class="totalAmountPreviousYear"></td>';
+
+            var brandKeyInAmount = model.data[i].brandKeyInAmount;
+            Object.keys(brandKeyInAmount).forEach(function (key) {
+                var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : formatCurrencyText(brandKeyInAmount[key].toString());
+                var keyBrandKeyInAmount = key;
+
+                rowTable += '<td data-id=' + keyBrandKeyInAmount + ' class="brandKeyInAmount">' + valueBrandKeyInAmount + '</td>';
+
+                rowTotal += i != 0 ? "" : '<td class="totalbrandKeyInAmount" data-id=' + keyBrandKeyInAmount + ' ></td>';
+
+             var brandKeyInRank = model.data[i].brandKeyInRank;
+            Object.keys(brandKeyInRank).forEach(function (keys) {
+                var valueBrandKeyInRank = brandKeyInRank[keys] == null ? "" : brandKeyInRank[keys];
+                var keyBrandKeyInRank = keys;
+
+                if (keyBrandKeyInRank == keyBrandKeyInAmount) {
+                    rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank" >' + valueBrandKeyInRank + '</td>';
+
+                    rowTotal += i != 0 ? "" : '<td></td>';
+
+                }
+            });
+            });
+
+                var adminAmountSale = model.data[i].adminAmountSale == null ? "" : formatCurrencyText(model.data[i].adminAmountSale.toString());
+                var adjustAmountSale = model.data[i].adjustAmountSale == null ? "" : formatCurrencyText(model.data[i].adjustAmountSale.toString());
+                var adjustWholeSale = model.data[i].adjustWholeSale == null ? "" : formatCurrencyText(model.data[i].adjustWholeSale.toString());
+
+
+                var rank = model.data[i].rank == null ? "" : model.data[i].rank;
+                var sk = model.data[i].sk == null ? "" : formatCurrencyText(model.data[i].sk.toString());
+                var mu = model.data[i].mu == null ? "" : formatCurrencyText(model.data[i].mu.toString());
+                var fg = model.data[i].fg == null ? "" : formatCurrencyText(model.data[i].fg.toString());
+                var ot = model.data[i].ot == null ? "" : formatCurrencyText(model.data[i].ot.toString());
+                var remark = model.data[i].remark == null ? "" : model.data[i].remark;
+                var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.toString());
+
+                rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
+                '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
+                '  <td > <input data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '  <td class="rank" >' + rank + '</td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk width70" value=' + sk + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu width70" value=' + mu + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="fg" type="text" class="form-control input-sm checkInput fg width70" value=' + fg + '></td>' +
+                '  <td > <input data-index=' + i +'  data-type="currency" data-id="ot" type="text" class="form-control input-sm checkInput ot width70" value=' + ot + '></td>' +
+                '  <td class="remark">' + remark + '</td>' +
+                '  <td class="percentGrowth" >' + percentGrowth + '</td>' +
+                '</tr>';
+
+            rowTotal += i != 0 ? "" : '<td class="totalAdminAmountSale"></td>' +
+                '<td class="totalAdjustAmountSale"></td>' +
+                '<td class="totalAdjustWholeSale"></td>' +
+                '<td></td>' +
+                '<td class="totalsk"></td>' +
+                '<td class="totalmu"></td>' +
+                '<td class="totalfg"></td>' +
+                '<td class="totalot"></td>' +
+                '<td></td>' +
+                '<td class="totalpercentGrowth"></td><tr/>';
+        }
+
+            $('#tblDetails').append(titleTable + rowTable + rowTotal+' </tbody>');
+
+        }
+
+        $('#tblDetails tbody').on('click', 'tr', function () {
+            if (rowClick != ($(this).index()) && editData) {
+                editData = false;
+                save('save');
+            }
+
+            rowClick = ($(this).index());
+        });
+
+        $(document).on('keydown', '.checkInput', function (event) {
+            editData = true;
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                var dataID = $(event.target).attr('data-id');
+                rowClick = currentIndex + 1;
+                $('input[data-index=' + (currentIndex + 1) + '][data-id=' + dataID + ']').focus();
+            }
+        })
+
+        $(document).on('change', '.checkInput', function (event) {
+            CalFooterTotal();
+        })
+
+        $('#btnSave').on('click', function (e) {
+            save('btnSave');
+        });
+
+        $('#btnAdjust').on('click', function (e) {
+            save('btnAdjust');
+        });
+
+        $(document).on('change', '.adjustAmountSale', function () {
+            var adjustAmountSale = isNaN(parseFloat($(this).val())) ? 0 : parseFloat($(this).val().replace(/\,/g, ""));
+            var row = $(this).closest("tr");
+
+            var amountPreviousYear = isNaN(parseFloat(row.find(".amountPreviousYear").text())) ? 0 : parseFloat(row.find(".amountPreviousYear").text().replace(/\,/g, ""));
+            if (amountPreviousYear) {
+                var percentGrowth = ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) * 100;
+                row.find(".percentGrowth").text(percentGrowth.toFixed(2));
+            }
+            
+        })
+
+        function save(type) {
+            editData = false;
+            var frmdata = getDataFromTable();
+            console.log(frmdata,'Save')
+            if (validate_Sum_Percent(frmdata) &&
+                validate_WholeSales(frmdata) &&
+                validate_WholeSales_AmountSales(frmdata) &&
+                validate_AmountSales_Lessthan_Previouse(frmdata)) {
+                var urlAction = '';
+                if (type == 'btnAdjust') {
+                     urlAction = '@Url.Action("SubmitAdjustDataDetail", "Adjust")';
+                } else {
+
+                    urlAction = '@Url.Action("SaveAdjustDataDetail", "Adjust")';
+                }
+
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: urlAction,
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                        success: function (data) {
+                            $("#blocker").hide();
+
+                            if (data.isSuccess) {                            
+                               $('#successModalHref').attr("data-dismiss", "modal");
+                               $('#successModal').modal('show');
+                            } else if (data.isDuplicated) {
+                                $('#failedModal').modal('show');
+                                $('#myModalFailedResult').text('Duplicate data!');
+                            } else {
+                                $('#failedModal').modal('show');
+                                $('#myModalFailedResult').text(data.responseError != ""
+                                    && data.responseError != null ? data.responseError : 'Save data failed');
+                            }
+                            $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+    }
+
+
+        }
+
+        function getDataFromTable() {
+            var model = @Html.Raw(Json.Serialize(Model));
+            var frmdata  = {};
+            var memberDetails = new Array();
+            var adjustDataID = $('#adjustDataID').val();
+
+            console.log(model)
+
+
+            $("#tblDetails TBODY TR").each(function (index, el) {
+                var brandID = $(el).find(".brandID").text();
+                for (var i = 0; i < model.data.length; i++) {
+                    if ( model.data[i].brandID == brandID) {
+                        var memberDetail = {};
+
+                        var percentGrowth = $(el).find(".percentGrowth").text();
+                        var sk = $(el).find(".sk").val();
+                        var mu = $(el).find(".mu").val();
+                        var fg = $(el).find(".fg").val();
+                        var ot = $(el).find(".ot").val();
+                        var adjustAmountSale = $(el).find(".adjustAmountSale").val();
+                        var adjustWholeSale = $(el).find(".adjustWholeSale").val();
+
+                        memberDetail.brandID =  model.data[i].brandID;
+                        memberDetail.amountPreviousYear =  model.data[i].amountPreviousYear;
+                        memberDetail.adminAmountSale =  model.data[i].adminAmountSale;
+                        memberDetail.adjustAmountSale = adjustAmountSale ? parseFloat(adjustAmountSale.replace(/\,/g, "")) : null;
+                        memberDetail.adjustWholeSale = adjustWholeSale ? parseFloat(adjustWholeSale.replace(/\,/g, "")) : null;
+                        memberDetail.percentGrowth = percentGrowth ? parseFloat(percentGrowth.replace(/\,/g, "")) : null;
+                        memberDetail.rank =  model.data[i].rank;
+                        memberDetail.sk = sk ? parseFloat(sk.replace(/\,/g, "")) : null;
+                        memberDetail.mu = mu ? parseFloat(mu.replace(/\,/g, "")) : null;
+                        memberDetail.fg = fg ? parseFloat(fg.replace(/\,/g, "")) : null;
+                        memberDetail.ot = ot ? parseFloat(ot.replace(/\,/g, "")) : null;
+                        memberDetail.week =  model.data[i].week;
+                        memberDetail.remark =  model.data[i].remark;
+                        memberDetail.brandKeyInAmount =  model.data[i].brandKeyInAmount;
+                        memberDetail.brandKeyInRank =  model.data[i].brandKeyInRank;
+                        memberDetails.push(memberDetail);
+
+                    }
+                }
+
+
+            });
+
+              frmdata.adjustDataDetail = memberDetails;
+              frmdata.adjustDataID = adjustDataID;
+            //frmdata.userID = ;
+
+            //cal Total
+            CalFooterTotal();
+
+            return frmdata;
+        };
+
+        function showWarningAlert(typeWarning) {
+            var msg = '';
+            switch (typeWarning) {
+                case 'NullAmount':
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    break;
+                case '100Percent':
+                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100% เท่านั้น';
+                    break;
+                case 'NullWholeSales':
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    break;
+                case 'NullWholeSales_AmountSales':
+                    msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
+                    break;
+                case 'DuplicateRank':
+                    msg = 'Duplicate Rank!';
+                    break;
+                case 'IncorrectAmountRank':
+                    msg = 'ข้อมูล Amount sales และ Rank ไม่สอดคล้องกัน';
+                    break;
+                case 'AmountSales_Lessthan_Previouse':
+                    msg = 'ค่า Amount sales ต้องมากกว่า ค่า Amount sales ของ Rank ถัดไป'
+                    break;
+                default:
+            }
+
+
+            $('#warningModal').modal('show');
+
+            $('#myModalWarningResult').text(msg);
+
+        }
+
+        function validate_Sum_Percent(data) {
+
+            var validateData = data.adjustDataDetail.some(function (i) {
+                var sk = isNaN(parseFloat(i.sk)) ? 0 : parseFloat(i.sk);
+                var mu = isNaN(parseFloat(i.mu)) ? 0 : parseFloat(i.mu);
+                var fg = isNaN(parseFloat(i.fg)) ? 0 : parseFloat(i.fg);
+                var ot = isNaN(parseFloat(i.ot)) ? 0 : parseFloat(i.ot);
+
+                var sum = sk + mu + fg + ot;
+                return sum != 0 && sum != 100;
+            })
+            if (validateData) {
+                showWarningAlert('100Percent');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales(data) {
+
+            var validateData = data.adjustDataDetail.some(function (i) {
+                return i.week == 4 && i.adjustWholeSale == null
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_WholeSales_AmountSales(data) {
+
+            var validateData = data.adjustDataDetail.some(function (i) {
+                var adjustWholeSale = isNaN(parseFloat(i.adjustWholeSale)) ? 0 : parseFloat(i.adjustWholeSale);
+                var adjustAmountSale = isNaN(parseFloat(i.adjustAmountSale)) ? 0 : parseFloat(i.adjustAmountSale);
+
+                return adjustAmountSale < adjustWholeSale;
+            })
+
+            if (validateData) {
+                showWarningAlert('NullWholeSales_AmountSales');
+                return 0;
+            } else return 1;
+        }
+
+        function validate_AmountSales_Lessthan_Previouse(data) {
+
+            var orderByList = data.adjustDataDetail.sort(function (a, b) {
+                return parseFloat(a.rank) - parseFloat(b.rank);
+            });
+            var validateData = false;
+            for (var i = 0; i < orderByList.length; i++) {
+
+                if (i != orderByList.length - 1) {
+                    var adjustAmountSale = isNaN(parseFloat(data.adjustDataDetail[i].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i].adjustAmountSale);
+
+                    var adjustAmountSaleNext = isNaN(parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale)) ? 0 : parseFloat(data.adjustDataDetail[i + 1].adjustAmountSale);
+                    if (adjustAmountSale < adjustAmountSaleNext) {
+                        validateData = true;
+                        break;
+                    }
+
+                }
+            }
+
+            if (validateData) {
+                showWarningAlert('AmountSales_Lessthan_Previouse');
+                return 0;
+            } else return 1;
+        }
+
+       function CalFooterTotal() {
+                var model = @Html.Raw(Json.Serialize(Model));
+            var totalAmountPreviousYear = 0;
+            var totalAdminAmountSale = 0;
+            var totalAdjustAmountSale = 0;
+            var totalAdjustWholeSale = 0;
+            var totalpercentGrowth = 0;
+
+            console.log('cal')
+            $("#tblDetails TBODY TR").each(function (index, el) {
+                var brandID = $(el).find(".brandID").text();
+
+                for (var i = 0; i < model.data.length; i++) {
+                    if (model.data[i].brandID == brandID) {
+
+                        var amountPreviousYear = isNaN(parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".amountPreviousYear").text().replace(/\,/g, ""));
+                        totalAmountPreviousYear += amountPreviousYear;
+
+                        var adminAmountSale = isNaN(parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adminAmountSale").text().replace(/\,/g, ""));
+                        totalAdminAmountSale += adminAmountSale;
+
+                        var adjustAmountSale = isNaN(parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustAmountSale").val().replace(/\,/g, ""));
+                        totalAdjustAmountSale += adjustAmountSale;
+
+
+                        var adjustWholeSale = isNaN(parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""))) ? 0 : parseFloat($(el).find(".adjustWholeSale").val().replace(/\,/g, ""));
+                        totalAdjustWholeSale += adjustWholeSale;
+
+
+                    }
+                }
+
+                var row = $(this).closest("tr");
+                var totalpercentGrowth = 0;
+
+                if (totalAmountPreviousYear > 0) {
+                    totalpercentGrowth = ((totalAdjustAmountSale - totalAmountPreviousYear) / totalAmountPreviousYear) * 100;
+                }
+
+        
+                $(el).find(".totalAmountPreviousYear").text(formatCurrencyText(totalAmountPreviousYear.toString()));
+                $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
+                $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));
+                $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
+                $(el).find(".totalpercentGrowth").text(formatCurrencyText(totalpercentGrowth.toString()));
+
+
+                var brandTotalAmount = model.brandTotalAmount;
+                Object.keys(brandTotalAmount).forEach(function (key) {
+                    var valueBrandTotalAmount = brandTotalAmount[key] == null ? "" : formatCurrencyText(brandTotalAmount[key].toString());
+                    var keyBrandTotalAmount = key;
+
+                    $(el).find('.totalbrandKeyInAmount[data-id=' + key + ']').text(valueBrandTotalAmount);
+
+                });
+            });
+        }
+
+        $("input[data-type='currency']").on({
+            keyup: function () {
+                formatCurrency($(this));
+            },
+            blur: function () {
+                formatCurrency($(this), "blur");
+            }
+        });
+
+
+        function formatCurrency(input, blur) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = input.val();
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position
+            var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+                // On blur make sure 2 numbers after decimal
+                if (blur === "blur") {
+                    right_side += "00";
+                }
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side + "." + right_side;
+
+            } else {
+                // no decimal entered
+                // add commas to number
+                // remove all non-digits
+                input_val = formatNumber(input_val);
+                input_val = input_val;
+
+                // final formatting
+                if (blur === "blur") {
+                    input_val += ".00";
+                }
+            }
+
+            // send updated string to input
+            input.val(input_val);
+
+            // put caret back in the right position
+            var updated_len = input_val.length;
+            caret_pos = updated_len - original_len + caret_pos;
+            input[0].setSelectionRange(caret_pos, caret_pos);
+        }
+
+        function formatCurrencyText(text) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = text;
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position
+            //var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+
+                right_side += "00";
+
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side + "." + right_side;
+
+            } else {
+                input_val = formatNumber(input_val);
+                input_val = input_val;
+                input_val += ".00";
+            }
+
+            return input_val;
+        }
+
+        function formatNumber(n) {
+            // format number 1000000 to 1,234,567
+            if (n < 0) {
+                return "-"+n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            } else {
+                return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+           
+        }
+    });
+
+</script>

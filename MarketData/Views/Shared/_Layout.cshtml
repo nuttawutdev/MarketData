@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -31,7 +35,7 @@
         }
 
             #blocker div {
-                position: absolute ;
+                position: absolute;
                 border: 16px solid #f3f3f3;
                 border-radius: 50%;
                 top: 50%;
@@ -79,30 +83,86 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse">
+
+
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="MasterData">Master Data</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Users" asp-action="Users">User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Reports">Report</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="KeyIn">Key-In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Approve" asp-action="Approve">Approve</a>
-                        </li>
-                    </ul> <ul class="navbar-nav">
+
+                        @{
+                            if (HttpContextAccessor.HttpContext.Session.GetString("userDetail") != null)
+                            {
+                                var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+
+                                if (userPermission.editMaster || userPermission.viewMaster)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="MasterData">Master Data</a>
+                                    </li>
+                                }
+
+                                if (userPermission.editUser)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-controller="Users" asp-action="Index">User</a>
+                                    </li>
+                                }
+
+                                if (userPermission.viewReport)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Reports">Report</a>
+                                    </li>
+                                }
+
+                                if (userPermission.keyInData || userPermission.approveData)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="KeyIn">Key-In</a>
+                                    </li>
+                                }
+
+                                if (userPermission.approveData || userPermission.viewData)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Approve" asp-action="Index">Approve</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Adjust" asp-action="Index">Adjust</a>
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        @{
+                            if (HttpContextAccessor.HttpContext.Session.GetString("userDetail") != null)
+                            {
+                                var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+
+                                if (userPermission.editUser)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Users" asp-action="ManualChangePassword">Change Password</a>
+                                    </li>
+                                }
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-white">User : @userPermission.displayName | </a>
+                                </li>
+                            }
+                        }
+
+
                         <li>
-                            <a asp-controller="Home" asp-action="Login" class="btn btn-light text-danger">
-                                Logout   <span class="ion-android-exit"></span>
-                            </a>
+                            @using (Html.BeginForm("Logout", "Home", FormMethod.Post, new { @class = "ui large form" }))
+                            {
+                                <a asp-controller="Home" asp-action="Logout" class="btn btn-light text-danger">
+                                    Logout   <span class="ion-android-exit"></span>
+                                </a>
+                            }
                         </li>
                     </ul>
                 </div>

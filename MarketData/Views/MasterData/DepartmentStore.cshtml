@@ -1,53 +1,65 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Text.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
     ViewData["Title"] = "Department Store";
     Html.RenderPartial("_ConfirmModal");
     Html.RenderPartial("_FailedModal");
     Html.RenderPartial("_ImportDataResultModal");
 }
 
+@{
+    var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(HttpContextAccessor.HttpContext.Session.GetString("userDetail"));
+    var editMaster = userPermission.editMaster;
 
-<h3>
-    @ViewData["Title"]
-    <a href="DepartmentStore_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+    <input hidden type="text" value="@userPermission.userID" class="form-control input-sm" id="iduserID" placeholder="">
+    <input hidden type="text" value="@userPermission.viewMaster.ToString()" class="form-control input-sm" id="viewMaster" placeholder="">
+    <input hidden type="text" value="@userPermission.editMaster.ToString()" class="form-control input-sm" id="editMaster" placeholder="">
+    <h3>
+        @ViewData["Title"]
+        @if (editMaster)
+        {
+            <a href="DepartmentStore_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+        }
 
-</h3>
-<hr />
+    </h3>
+    <hr />
 
 
-<div style="padding-bottom:10px;">
-    <div class="row">
-        <div class="col text-end d-flex justify-content-end align-items-center">
-            <label class="form-label">Active :&nbsp;</label>
-            <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
-                <option value="">All</option>
-                <option value=true>Y</option>
-                <option value="false">N</option>
-            </select>
-            <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
-                  enctype="multipart/form-data">
-                <div class="filter-group ">
-                    <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
+    <div style="padding-bottom:10px;">
+        <div class="row">
+            <div class="col text-end d-flex justify-content-end align-items-center">
+                <label class="form-label">Active :&nbsp;</label>
+                <select class="form-control status-dropdown" style="margin-right: 10px; width:70px!important">
+                    <option value="">All</option>
+                    <option value=true>Y</option>
+                    <option value="false">N</option>
+                </select>
+                @if(editMaster) {
+                    <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                          enctype="multipart/form-data">
+                        <div class="filter-group ">
+                            <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
 
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Import by Excel
-                        </label>
-                        <input type="text" id="userID" name="userID" value="DDD" hidden />
-                        <input id="file-upload" type="file" name="excelFile" />
-                        <input type="submit" id="btnSubmit" value="Import" hidden />
-                    </div>
-                </div>
-            </form>
+                                <label for="file-upload" class="custom-file-upload1">
+                                    <i class="ion-android-document"></i> Import by Excel
+                                </label>
+                                <input type="text" id="userID" name="userID" value="DDD" hidden />
+                                <input id="file-upload" type="file" name="excelFile" />
+                                <input type="submit" id="btnSubmit" value="Import" hidden />
+                            </div>
+                        </div>
+                    </form>
+                }
 
+            </div>
         </div>
+
     </div>
-
-</div>
-
+}
 <div class="container-xl">
-
-
     <table id="tableData" class="display" width="100%"></table>
-
 
 </div>
 
@@ -56,6 +68,8 @@
 
 
     $(document).ready(function () {
+        var viewMasterPermission = $('#viewMaster').val();
+        var editMasterPermission = $('#editMaster').val();
 
         function base64ToArrayBuffer(base64) {
             var binaryString = window.atob(base64);
@@ -83,7 +97,7 @@
             var fd = new FormData();
             var files = $('#file-upload')[0].files;
 
-            fd.append('userID', 'Test');
+            fd.append('userID', $('#iduserID').val());
 
             // Check file selected or not
             if (files.length > 0) {
@@ -158,6 +172,7 @@
                     return result.data;
                 }
             },
+            "order": [],
             "columns": [
                 { data: "departmentStoreID", visible: false, searchable: false },
                 { data: "departmentStoreName", title: "Department Store Name"},
@@ -184,8 +199,18 @@
                     title: "Action",
                     className: "text-center",
                     render: function (data, type, row) {
-                        return '<a href="DepartmentStore_Edit_View?departmentStoreID=' + row.departmentStoreID +'" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
-                            '<a href="DepartmentStore_Edit?departmentStoreID=' + row.departmentStoreID+'" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>' ;
+                        if(editMasterPermission == 'True') {
+                            return '<a href="DepartmentStore_Edit_View?departmentStoreID=' + row.departmentStoreID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>' +
+                                '<a href="DepartmentStore_Edit?departmentStoreID=' + row.departmentStoreID + '" class="buttonIcon btn btn-warning btn-sm"><i class="ion-edit text-white"></i></a>';
+                        }
+                        else if (viewMasterPermission == 'True' && editMasterPermission != 'True') {
+                            return '<a href="DepartmentStore_Edit_View?departmentStoreID=' + row.departmentStoreID + '" class="buttonIcon btn btn-primary btn-sm"><i class="ion-eye text-white" ></i></a>';
+                        }
+                        else {
+                            return '';
+                        }
+
+                       
                 }}
             ]
         });
