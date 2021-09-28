@@ -126,7 +126,7 @@
                         @{
                             foreach (var item in Model.BAKeyInDetailList)
                             {
-                                <tr class="row m-0" style="color:@(item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"? "white" : "black"); background: @( item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"?item.brandColor:"" )">
+                                <tr class="row m-0" style="color: black; background: @( item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"?item.brandColor:"" )">
                                     <td class="col-2 ID" hidden>@item.ID</td>
                                     <td class="col-2" hidden>@item.keyInID</td>
                                     <td class="col-2" hidden>@item.counterID</td>
@@ -221,7 +221,7 @@
             var frmdata = getDataFromTable('Submit');
 
             if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
- 
+
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",

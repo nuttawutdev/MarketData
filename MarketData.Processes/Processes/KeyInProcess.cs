@@ -775,9 +775,9 @@ namespace MarketData.Processes.Processes
 
                 yearList.Add(currentYear);
 
-                var keyInData = repository.baKeyIn.GetBAKeyInBy(c => c.ID != Guid.Empty);
+                var keyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.ID != Guid.Empty);
 
-                var olldYearList = keyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key);
+                var olldYearList = keyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).OrderByDescending(t => t); ;
 
                 if (olldYearList.Any())
                 {

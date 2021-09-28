@@ -162,8 +162,8 @@
 
             for (var i = 0; i < model.data.length; i++) {
                 var amountPreviousYear = model.data[i].amountPreviousYear == null ? "" : formatCurrencyText(model.data[i].amountPreviousYear.toString());
-                var background = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? model.data[i].brandColor : "";
-                var color = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "#ffffff" ? "white" : "black";
+                var background = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "black" ? model.data[i].brandColor : "";
+                var color = model.data[i].brandColor != "" && model.data[i].brandColor != null && model.data[i].brandColor != "black" ? "black" : "black";
 
                 rowTable += '<tr style="color:' + color + ';background:' + background  +'">' +
                 '<td hidden class="brandID">' + model.data[i].brandID + '</td>' +
@@ -176,8 +176,8 @@
             var brandKeyInAmount = model.data[i].brandKeyInAmount;
             Object.keys(brandKeyInAmount).forEach(function (key) {
                 var valueBrandKeyInAmount = brandKeyInAmount[key] == null ? "" : formatCurrencyText(brandKeyInAmount[key].toString());
-                var keyBrandKeyInAmount = key;
-
+                var keyBrandKeyInAmount = key.replace(/\s/g, '');
+                keyBrandKeyInAmount = keyBrandKeyInAmount.replace(/[&\/\\#,;+()$~%.'":*?<>{}]/g, '');
                 rowTable += '<td data-id=' + keyBrandKeyInAmount + ' class="brandKeyInAmount">' + valueBrandKeyInAmount + '</td>';
 
                 rowTotal += i != 0 ? "" : '<td class="totalbrandKeyInAmount" data-id=' + keyBrandKeyInAmount + ' ></td>';
@@ -185,7 +185,8 @@
              var brandKeyInRank = model.data[i].brandKeyInRank;
             Object.keys(brandKeyInRank).forEach(function (keys) {
                 var valueBrandKeyInRank = brandKeyInRank[keys] == null ? "" : brandKeyInRank[keys];
-                var keyBrandKeyInRank = keys;
+                var keyBrandKeyInRank = keys.replace(/\s/g, '');;
+                keyBrandKeyInRank = keyBrandKeyInRank.replace(/[&\/\\#,;+()$~%.'":*?<>{}]/g, '');
 
                 if (keyBrandKeyInRank == keyBrandKeyInAmount) {
                     rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank" >' + valueBrandKeyInRank + '</td>';
@@ -210,8 +211,8 @@
                 var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.toString());
 
                 rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
-                '  <td > <input data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
-                '  <td > <input data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '<td > <input style="width:105px" data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
+                '  <td > <input style="width:105px" data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank" >' + rank + '</td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk width70" value=' + sk + '></td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu width70" value=' + mu + '></td>' +
@@ -526,7 +527,6 @@
 
                 var row = $(this).closest("tr");
                 var totalpercentGrowth = 0;
-
                 if (totalAmountPreviousYear > 0) {
                     totalpercentGrowth = ((totalAdjustAmountSale - totalAmountPreviousYear) / totalAmountPreviousYear) * 100;
                 }
@@ -538,13 +538,12 @@
                 $(el).find(".totalAdjustWholeSale").text(formatCurrencyText(totalAdjustWholeSale.toString()));
                 $(el).find(".totalpercentGrowth").text(formatCurrencyText(totalpercentGrowth.toString()));
 
-
                 var brandTotalAmount = model.brandTotalAmount;
                 Object.keys(brandTotalAmount).forEach(function (key) {
                     var valueBrandTotalAmount = brandTotalAmount[key] == null ? "" : formatCurrencyText(brandTotalAmount[key].toString());
-                    var keyBrandTotalAmount = key;
-
-                    $(el).find('.totalbrandKeyInAmount[data-id=' + key + ']').text(valueBrandTotalAmount);
+                    var keyBrandTotalAmount = key.replace(/\s/g, '');
+                    keyBrandTotalAmount = keyBrandTotalAmount.replace(/[&\/\\#,;+()$~%.'":*?<>{}]/g, '');
+                    $(el).find('.totalbrandKeyInAmount[data-id=' + keyBrandTotalAmount + ']').text(valueBrandTotalAmount);
 
                 });
             });
