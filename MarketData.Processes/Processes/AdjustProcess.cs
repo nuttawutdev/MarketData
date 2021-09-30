@@ -233,6 +233,10 @@ namespace MarketData.Processes.Processes
                        && e.Department_Store_ID == adjustData.DepartmentStore_ID
                        && e.Active_Flag && e.Delete_Flag != true);
 
+                var allBrandByCounterData = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounterData.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe && e.active);
+                var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
+
                 if (adjustData.Week != "4")
                 {
                     // Filter Brand Type Fragrances
@@ -264,9 +268,7 @@ namespace MarketData.Processes.Processes
 
                 var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
                 var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Active_Flag && c.Universe == adjustData.Universe);
-                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe);
-                var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
-
+               
                 #endregion
 
                 #region Get BAKeyIn Data
