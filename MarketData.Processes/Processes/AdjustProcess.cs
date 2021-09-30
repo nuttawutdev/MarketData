@@ -44,7 +44,7 @@ namespace MarketData.Processes.Processes
 
                 var allBrandByCounter = counterByDepartmentStoreList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
 
-                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe);
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounter.Contains(c.Brand_ID)).Where(e => e.universe == request.universe && e.active);
                 var allApproveKeyInData = repository.approve.GetApproveKeyInData();
 
                 var approveKeyInDataFilter = allApproveKeyInData.Where(
@@ -286,7 +286,7 @@ namespace MarketData.Processes.Processes
                 string previousYear = (int.Parse(adjustData.Year) - 1).ToString();
 
                 // BA Key-in ข้อมูลปีที่แล้ว Week 4 ที่ถูก Approve แล้วเฉพาะ Counter ของ Brand Loreal
-                var adjustDataPreviousYear = repository.adjust.FindAdjustDataBy(
+                var adjustDataPreviousYearWeek4 = repository.adjust.FindAdjustDataBy(
                     c => c.Year == previousYear
                     && c.Month == adjustData.Month
                     && c.Week == "4"
@@ -296,16 +296,31 @@ namespace MarketData.Processes.Processes
                     && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
                     && c.Status_ID == adjustStatusAdjusted.ID);
 
+                var adjustDataPreviousYear = repository.adjust.FindAdjustDataBy(
+                   c => c.Year == previousYear
+                   && c.Month == adjustData.Month
+                   && c.Week == adjustData.Week
+                   && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
+                   && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
+                   && c.Universe == adjustData.Universe
+                   && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
+                   && c.Status_ID == adjustStatusAdjusted.ID);
+
                 var baKeyInIDApprove = baKeyInDataApprove.Select(t => t.ID);
 
                 var baKeyInDetailApprove = repository.baKeyIn.GetBAKeyInDetailListData(p => baKeyInIDApprove.Contains(p.BAKeyIn_ID));
 
                 List<TTAdjustDataDetail> adjustDetailPreviousYear = new List<TTAdjustDataDetail>();
+                List<TTAdjustDataDetail> adjustDetailPreviousYearWeek4 = new List<TTAdjustDataDetail>();
                 if (adjustDataPreviousYear != null)
                 {
                     adjustDetailPreviousYear = repository.adjust.GetAdjustDataDetaillBy(p => p.AdjustData_ID == adjustDataPreviousYear.ID);
                 }
 
+                if (adjustDataPreviousYearWeek4 != null)
+                {
+                    adjustDetailPreviousYearWeek4 = repository.adjust.GetAdjustDataDetaillBy(p => p.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
+                }
                 #endregion
 
                 var adminKeyInDetailData = repository.adminKeyIn.GetAdminKeyInDetailBy(
@@ -322,6 +337,7 @@ namespace MarketData.Processes.Processes
                 {
                     decimal? adminAmountSale = null;
                     decimal? amountPreviousYear = null;
+                    decimal? amountPreviousYearWeek = null;
                     decimal? adjustAmountSale = null;
                     decimal? adjustWholeSale = null;
                     decimal? sk = null;
@@ -330,14 +346,24 @@ namespace MarketData.Processes.Processes
                     decimal? ot = null;
                     string remark = null;
 
-                    // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว
+                    // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว Week 4
+                    var adjustKeyDataPreviousYearWeek4 = adjustDetailPreviousYearWeek4.Where(
+                        c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
+                        .OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+
+                    if (adjustKeyDataPreviousYearWeek4 != null)
+                    {
+                        amountPreviousYear = adjustKeyDataPreviousYearWeek4.Adjust_AmountSale;
+                    }
+
+                    // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว Week 4
                     var adjustKeyDataPreviousYear = adjustDetailPreviousYear.Where(
                         c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
                         .OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
 
                     if (adjustKeyDataPreviousYear != null)
                     {
-                        amountPreviousYear = adjustKeyDataPreviousYear.Adjust_AmountSale;
+                        amountPreviousYearWeek = adjustKeyDataPreviousYear.Adjust_AmountSale;
                     }
 
                     // ค่าที่ Admin กรอก
@@ -467,6 +493,7 @@ namespace MarketData.Processes.Processes
                         week = adjustData.Week,
                         brandName = itemBrandInDepartment.Brand_Name,
                         amountPreviousYear = amountPreviousYear,
+                        amountPreviousYearWeek = amountPreviousYearWeek,
                         brandKeyInAmount = new Dictionary<string, decimal?>(),
                         brandKeyInRank = new Dictionary<string, string>(),
                         adminAmountSale = adminAmountSale,
@@ -511,10 +538,10 @@ namespace MarketData.Processes.Processes
                 foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale))
                 {
                     itemAdjustData.rank = rankAdjust;
-                    if (itemAdjustData.amountPreviousYear.HasValue && itemAdjustData.adjustAmountSale.HasValue)
+                    if (itemAdjustData.amountPreviousYearWeek.HasValue && itemAdjustData.adjustAmountSale.HasValue)
                     {
-                        // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
-                        itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYear.GetValueOrDefault()) / itemAdjustData.amountPreviousYear.GetValueOrDefault()) * 100;
+                        // ((adjustAmountSale - amountPreviousYearWeek) / amountPreviousYearWeek) X 100
+                        itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYearWeek.GetValueOrDefault()) / itemAdjustData.amountPreviousYearWeek.GetValueOrDefault()) * 100;
                         itemAdjustData.percentGrowth = Math.Round(itemAdjustData.percentGrowth.Value, 2);
                     }
 

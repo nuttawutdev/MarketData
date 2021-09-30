@@ -26,6 +26,7 @@ namespace MarketData.Models
         public Guid brandID { get; set; }
         public string brandName { get; set; }
         public decimal? amountPreviousYear { get; set; }
+        public decimal? amountPreviousYearWeek { get; set; }
         public decimal? adminAmountSale { get; set; }
         public decimal? adjustAmountSale { get; set; }
         public decimal? adjustWholeSale { get; set; }
