@@ -381,30 +381,43 @@ namespace MarketData.Processes.Processes
 
                 string previousYear = (Int32.Parse(BAKeyInData.Year) - 1).ToString();
 
-                var baKeyInDataApprovePreViousYear = repository.baKeyIn.FindBAKeyInBy(
-                    c => c.Year == previousYear
-                    && c.Month == BAKeyInData.Month
-                    && c.Week == "4"
-                    && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
-                    && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
-                    && c.Brand_ID == BAKeyInData.Brand_ID
-                    && c.Universe == BAKeyInData.Universe);
+                var adjustDataPreviousYearWeek4 = repository.adjust.FindAdjustDataBy(
+                  c => c.Year == previousYear
+                  && c.Month == BAKeyInData.Month
+                  && c.Week == "4"
+                  && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
+                  && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
+                  && c.Universe == BAKeyInData.Universe
+                  && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
 
-                if(baKeyInDataApprovePreViousYear != null)
+                //var baKeyInDataApprovePreViousYear = repository.baKeyIn.FindBAKeyInBy(
+                //    c => c.Year == previousYear
+                //    && c.Month == BAKeyInData.Month
+                //    && c.Week == "4"
+                //    && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
+                //    && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
+                //    && c.Brand_ID == BAKeyInData.Brand_ID
+                //    && c.Universe == BAKeyInData.Universe);
+
+                if (adjustDataPreviousYearWeek4 != null)
                 {
                     foreach (var itemBADetail in BAKeyInDetailList)
                     {
-                        var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
-                            c => c.BAKeyIn_ID == baKeyInDataApprovePreViousYear.ID
-                            && c.Brand_ID == itemBADetail.brandID).FirstOrDefault();
+                        var adjustDataPreviousYear = repository.adjust.GetAdjustDataDetaillBy(
+                            p => p.AdjustData_ID == adjustDataPreviousYearWeek4.ID
+                            && p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
 
-                        if (BAKeyInDetailPreviousYear != null)
+                        //var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
+                        //    c => c.BAKeyIn_ID == baKeyInDataApprovePreViousYear.ID
+                        //    && c.Brand_ID == itemBADetail.brandID).FirstOrDefault();
+
+                        if (adjustDataPreviousYear != null)
                         {
-                            itemBADetail.amountSalePreviousYear = BAKeyInDetailPreviousYear.Amount_Sales;
+                            itemBADetail.amountSalePreviousYear = adjustDataPreviousYear.Adjust_AmountSale;
                         }
                     }
                 }
-               
+
 
                 var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == BAKeyInData.Brand_ID);
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
@@ -421,7 +434,7 @@ namespace MarketData.Processes.Processes
                 response.year = BAKeyInData.Year;
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
-                response.data = BAKeyInDetailList.OrderBy(c => c.brandName).ToList();
+                response.data = BAKeyInDetailList.Where(e => e.amountSalePreviousYear.HasValue || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year).OrderBy(c => c.brandName).ToList();
 
                 var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(r => r.Status_Name == "Reject");
                 var approveData = repository.approve.GetApproveKeyInBy(c => c.BAKeyIn_ID == BAKeyInData.ID).OrderByDescending(d => d.Action_Date).FirstOrDefault();
@@ -533,13 +546,19 @@ namespace MarketData.Processes.Processes
                 var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID));
                 var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
 
-                var allAdminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(e => e.Year == request.year 
+                var allAdminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(e => e.Year == request.year
                                         && e.Month == request.month && e.Week == request.week);
 
                 string previousYear = (int.Parse(request.year) - 1).ToString();
 
-                var allAdminKeyInDataPreviousYear = repository.adminKeyIn.GetAdminKeyInDetailBy(e => 
-                e.Month == request.month && e.Week == "4" && e.Year == previousYear);
+                var adjustDataPreviousYearWeek4 = repository.adjust.GetAdjustDataBy(
+                         c => c.Year == previousYear
+                        && c.Month == request.month
+                        && c.Week == "4"
+                        && c.Universe == request.universe);
+
+                //var allAdminKeyInDataPreviousYear = repository.adminKeyIn.GetAdminKeyInDetailBy(e =>
+                //e.Month == request.month && e.Week == "4" && e.Year == previousYear);
 
                 var allBAKeyInData = repository.baKeyIn.GetBAKeyInDetailListData(e => e.ID != Guid.Empty);
 
@@ -553,13 +572,13 @@ namespace MarketData.Processes.Processes
                         if (brandTypeData?.Brand_Type_Name != "Fragrances")
                         {
 
-                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allAdminKeyInDataPreviousYear, allBAKeyInData);
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
                     }
                     else
                     {
-                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allAdminKeyInDataPreviousYear, allBAKeyInData);
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allBAKeyInData);
                         adminKeyInDetailList.Add(dataDetail);
                     }
                 }
@@ -597,7 +616,7 @@ namespace MarketData.Processes.Processes
             DateTime dateNoew = Utility.GetDateNowThai();
 
             try
-            {          
+            {
                 bool addDetailResult = true;
                 bool updateDetailResult = true;
 
@@ -784,11 +803,11 @@ namespace MarketData.Processes.Processes
 
                 int startYear = 2000;
 
-                for(int i = startYear; i < Utility.GetDateNowThai().Year; i++)
+                for (int i = startYear; i < Utility.GetDateNowThai().Year; i++)
                 {
                     yearList.Add(i.ToString());
                 }
-                response.year = yearList.OrderByDescending(c=>c).ToList();
+                response.year = yearList.OrderByDescending(c => c).ToList();
             }
             catch (Exception ex)
             {
@@ -903,7 +922,7 @@ namespace MarketData.Processes.Processes
         }
 
         private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request,
-            List<TTAdminKeyInDetail> allAdminKeyInData, List<TTAdminKeyInDetail> allAdminKeyInDataPreviousYear, List<TTBAKeyInDetail> allBAKeyInDetail)
+            List<TTAdminKeyInDetail> allAdminKeyInData, List<TTAdjustData> adjustDataPreviousYearWeek4, List<TTBAKeyInDetail> allBAKeyInDetail)
         {
 
             var adminKeyInData = allAdminKeyInData.FirstOrDefault(
@@ -913,10 +932,13 @@ namespace MarketData.Processes.Processes
                 && c.Brand_ID == itemCounter.brandID);
 
 
-            var adminKeyInDetailPreviousYear = allAdminKeyInDataPreviousYear.FirstOrDefault(
+            var adminKeyInDetailPreviousYear = adjustDataPreviousYearWeek4.FirstOrDefault(
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
-               && c.DistributionChannel_ID == itemCounter.distributionChannelID
-               && c.Brand_ID == itemCounter.brandID);
+               && c.DistributionChannel_ID == itemCounter.distributionChannelID);
+
+            var adjustDataPreviousYear = repository.adjust.GetAdjustDataDetaillBy(
+                           p => p.AdjustData_ID == adminKeyInDetailPreviousYear.ID
+                           && p.Brand_ID == itemCounter.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault(); ;
 
             AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
             {
@@ -940,7 +962,7 @@ namespace MarketData.Processes.Processes
                 rank = adminKeyInData != null ? adminKeyInData.Rank : null,
                 remark = adminKeyInData != null ? adminKeyInData.Remark : null,
                 universe = request.universe,
-                amountSalePreviousYear = adminKeyInDetailPreviousYear != null ? adminKeyInDetailPreviousYear.Amount_Sales : null
+                amountSalePreviousYear = adjustDataPreviousYear != null ? adjustDataPreviousYear.Adjust_AmountSale : null
             };
 
             return dataDetail;

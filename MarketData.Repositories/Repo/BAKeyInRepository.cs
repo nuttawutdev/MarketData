@@ -200,6 +200,22 @@ namespace MarketData.Repositories.Repo
                          on e.Brand_ID equals b.Brand_ID
                          into joinBrand
                      from brand in joinBrand.DefaultIfEmpty()
+                     join c in _dbContext.TMCounter
+                         on new 
+                         {
+                             Key1 = e.Brand_ID,
+                             Key2 = e.DepartmentStore_ID,
+                             Key3 = e.DistributionChannel_ID,
+                         }
+                         equals
+                         new
+                         {
+                             Key1 = c.Brand_ID,
+                             Key2 = c.Department_Store_ID,
+                             Key3 = c.Distribution_Channel_ID
+                         }
+                         into joinCounter
+                     from counter in joinCounter.DefaultIfEmpty()
                      select new BAKeyInDetailData
                      {
                          ID = e.ID,
@@ -221,6 +237,7 @@ namespace MarketData.Repositories.Repo
                          week = e.Week,
                          wholeSale = e.Whole_Sales,
                          year = e.Year,
+                         counterCreateDate = counter.Created_Date
                      }).ToList();
 
                 return baKeyInDetailDataList;
@@ -327,7 +344,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<bool> RejectBAKeyIn(Guid baKeyInID,Guid userID)
+        public async Task<bool> RejectBAKeyIn(Guid baKeyInID, Guid userID)
         {
             try
             {

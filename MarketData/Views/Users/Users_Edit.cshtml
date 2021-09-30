@@ -189,7 +189,11 @@
 
 <br />
 <div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-3 col-sm-3">
+        <label>Distribution Chanels</label>
+        @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
 
+    </div>
     <div class="form-group col-md-3 col-sm-3 " style=" align-self: flex-end;">
         <label>Department Store</label>
         @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Please select", new { id = "departmentStoreList", @class = "form-control col-sm-12" })
@@ -200,11 +204,8 @@
         @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control col-sm-12" })
 
     </div>
-    <div class="form-group col-md-3 col-sm-3">
-        <label>Distribution Chanels</label>
-        @Html.DropDownList("channelList", new SelectList(Model.channelList, "distributionChannelID", "distributionChannelName", 1), "Please select", new { id = "channelList", @class = "form-control " })
 
-    </div> <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
         <button id="Add" class="btn btn-danger " type="button">Add</button>
     </div>
 </div>
@@ -395,6 +396,32 @@
                 $('#ConfirmModalWithText').modal('show');
 
         })
+
+        $('#channelList').on('change', function (e) {
+            getDepartmentStoreList()
+        });
+
+     function getDepartmentStoreList() {
+            var distributionChannelID = $("#channelList").val();
+
+            var model = @Html.Raw(Json.Serialize(Model));
+            var departmentStoreList = model.departmentStoreList;
+
+            if (distributionChannelID != "") {
+                departmentStoreList = departmentStoreList.filter(function (items) {
+                    return items.distributionChannelID == $('#channelList').val()
+                });
+            }
+
+            var lengthSelect = $('#departmentStoreList');
+
+            lengthSelect.empty();
+            lengthSelect.append("<option value=''>All</option>")
+            $.each(departmentStoreList, function (index, row) {
+                lengthSelect.append("<option value='" + row.departmentStoreID + "'>" + row.departmentStoreName + "</option>")
+            });
+
+        }
 
     $(".btnConfirmModalWithText").click(function () {
 

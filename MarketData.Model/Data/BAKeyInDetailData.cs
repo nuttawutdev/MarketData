@@ -26,5 +26,6 @@ namespace MarketData.Model.Data
         public decimal? fg { get; set; }
         public decimal? ot { get; set; }
         public string remark { get; set; }
+        public DateTime? counterCreateDate { get; set; }
     }
 }
