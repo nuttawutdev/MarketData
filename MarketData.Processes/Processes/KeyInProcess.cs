@@ -569,9 +569,9 @@ namespace MarketData.Processes.Processes
                         && c.Month == request.month
                         && c.Week == "4"
                         && c.Universe == request.universe);
+                var adjustDataIDList = adjustDataPreviousYearWeek4.Select(e => e.ID);
 
-                //var allAdminKeyInDataPreviousYear = repository.adminKeyIn.GetAdminKeyInDetailBy(e =>
-                //e.Month == request.month && e.Week == "4" && e.Year == previousYear);
+                var allAdjustDataDetail = repository.adjust.GetAdjustDataDetaillBy(c => adjustDataIDList.Contains(c.AdjustData_ID));
 
                 var allBAKeyInData = repository.baKeyIn.GetBAKeyInDetailListData(e => e.ID != Guid.Empty);
 
@@ -585,13 +585,13 @@ namespace MarketData.Processes.Processes
                         if (brandTypeData?.Brand_Type_Name != "Fragrances")
                         {
 
-                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allBAKeyInData);
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
                     }
                     else
                     {
-                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allBAKeyInData);
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                         adminKeyInDetailList.Add(dataDetail);
                     }
                 }
@@ -947,7 +947,7 @@ namespace MarketData.Processes.Processes
         }
 
         private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request,
-            List<TTAdminKeyInDetail> allAdminKeyInData, List<TTAdjustData> adjustDataPreviousYearWeek4, List<TTBAKeyInDetail> allBAKeyInDetail)
+            List<TTAdminKeyInDetail> allAdminKeyInData, List<TTAdjustData> adjustDataPreviousYearWeek4, List<TTAdjustDataDetail> allAdjustDataDetail, List<TTBAKeyInDetail> allBAKeyInDetail)
         {
 
             var adminKeyInData = allAdminKeyInData.FirstOrDefault(
@@ -956,14 +956,20 @@ namespace MarketData.Processes.Processes
                 && c.DistributionChannel_ID == itemCounter.distributionChannelID
                 && c.Brand_ID == itemCounter.brandID);
 
-
+            decimal? amountPreviousYear = null;
             var adminKeyInDetailPreviousYear = adjustDataPreviousYearWeek4.FirstOrDefault(
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
                && c.DistributionChannel_ID == itemCounter.distributionChannelID);
 
-            var adjustDataPreviousYear = repository.adjust.GetAdjustDataDetaillBy(
-                           p => p.AdjustData_ID == adminKeyInDetailPreviousYear.ID
-                           && p.Brand_ID == itemCounter.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault(); ;
+            if(adminKeyInDetailPreviousYear != null)
+            {
+                var adjustDataPreviousYear = allAdjustDataDetail.Where(
+                          p => p.AdjustData_ID == adminKeyInDetailPreviousYear.ID
+                          && p.Brand_ID == itemCounter.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+
+                amountPreviousYear = adjustDataPreviousYear != null ? adjustDataPreviousYear.Adjust_AmountSale : null;
+            }
+           
 
             AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
             {
@@ -988,7 +994,7 @@ namespace MarketData.Processes.Processes
                 rank = adminKeyInData != null ? adminKeyInData.Rank : null,
                 remark = adminKeyInData != null ? adminKeyInData.Remark : null,
                 universe = request.universe,
-                amountSalePreviousYear = adjustDataPreviousYear != null ? adjustDataPreviousYear.Adjust_AmountSale : null
+                amountSalePreviousYear = amountPreviousYear
             };
 
             return dataDetail;
