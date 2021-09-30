@@ -1067,7 +1067,8 @@ namespace MarketData.Repositories.Repo
                        brandName = brand != null ? brand.Brand_Name : string.Empty,
                        distributionChannelID = channel != null ? channel.Distribution_Channel_ID : Guid.Empty,
                        distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
-                       active = e.Active_Flag
+                       active = e.Active_Flag,
+                       createDate = e.Created_Date
                    }).OrderBy(c => c.departmentStoreName).ToList();
 
                 return counterList;
