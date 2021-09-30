@@ -435,19 +435,19 @@ namespace MarketData.Processes.Processes
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
 
-                if(BAKeyInData.Year == GetDateNowThai().Year.ToString())
+                if (BAKeyInData.Year == GetDateNowThai().Year.ToString())
                 {
                     response.data = BAKeyInDetailList
-                       .Where(e => e.amountSalePreviousYear.HasValue
+                       .Where(e => e.amountSalePreviousYear > 0
                        || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year)
                        .OrderBy(c => c.brandName).ToList();
                 }
                 else
                 {
                     response.data = BAKeyInDetailList
-                    .Where(e => e.amountSalePreviousYear.HasValue)
+                    .Where(e => e.amountSalePreviousYear > 0)
                     .OrderBy(c => c.brandName).ToList();
-                }       
+                }
 
                 var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(r => r.Status_Name == "Reject");
                 var approveData = repository.approve.GetApproveKeyInBy(c => c.BAKeyIn_ID == BAKeyInData.ID).OrderByDescending(d => d.Action_Date).FirstOrDefault();
@@ -601,18 +601,18 @@ namespace MarketData.Processes.Processes
                     itemAdmin.brandColor = brandDataList.FirstOrDefault(c => c.Brand_ID == itemAdmin.brandID).Brand_Color;
                 }
 
-                if(request.year == GetDateNowThai().Year.ToString())
+                if (request.year == GetDateNowThai().Year.ToString())
                 {
-                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear.HasValue
+                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0
                          || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year)
                          .OrderBy(c => c.brandName).ToList();
                 }
                 else
                 {
-                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear.HasValue)
+                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0)
                          .OrderBy(c => c.brandName).ToList();
                 }
-              
+
 
                 var amountPreviousYear = adminKeyInDetailList.Where(c => c.amountSalePreviousYear > 0);
 
@@ -961,7 +961,7 @@ namespace MarketData.Processes.Processes
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
                && c.DistributionChannel_ID == itemCounter.distributionChannelID);
 
-            if(adminKeyInDetailPreviousYear != null)
+            if (adminKeyInDetailPreviousYear != null)
             {
                 var adjustDataPreviousYear = allAdjustDataDetail.Where(
                           p => p.AdjustData_ID == adminKeyInDetailPreviousYear.ID
@@ -969,7 +969,7 @@ namespace MarketData.Processes.Processes
 
                 amountPreviousYear = adjustDataPreviousYear != null ? adjustDataPreviousYear.Adjust_AmountSale : null;
             }
-           
+
 
             AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
             {

@@ -543,12 +543,12 @@ namespace MarketData.Processes.Processes
 
                 if (adjustData.Year == GetDateNowThai().Year.ToString())
                 {
-                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear.HasValue
+                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0
                     || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year).ToList();
                 }
                 else
                 {
-                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear.HasValue).ToList();
+                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0).ToList();
                 }
 
                 int rankAdjust = 1;
