@@ -44,5 +44,6 @@ namespace MarketData.Model.Response.AdjustData
 
         // ((adjustAmountSale - amountPreviousYear) / amountPreviousYear) X 100
         public decimal? percentGrowth { get; set; }
+        public DateTime? counterCreateDate { get; set; }
     }
 }

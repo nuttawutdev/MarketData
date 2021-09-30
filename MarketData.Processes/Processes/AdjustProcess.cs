@@ -267,7 +267,7 @@ namespace MarketData.Processes.Processes
                 #region Get Brand Data
 
                 var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
-                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Active_Flag && c.Universe == adjustData.Universe);
+                var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == adjustData.Universe);
                
                 #endregion
 
@@ -486,6 +486,11 @@ namespace MarketData.Processes.Processes
                         }
                     }
 
+                    var counterData = counterList
+                        .FirstOrDefault(c => c.Department_Store_ID == adjustData.DepartmentStore_ID
+                        && c.Distribution_Channel_ID == adjustData.DistributionChannel_ID
+                        && c.Brand_ID == itemBrandInDepartment.Brand_ID);
+
                     AdjustDetailData adjustDetailData = new AdjustDetailData
                     {
                         brandID = itemBrandInDepartment.Brand_ID,
@@ -505,7 +510,8 @@ namespace MarketData.Processes.Processes
                         mu = mu,
                         fg = fg,
                         ot = ot,
-                        remark = remark
+                        remark = remark,
+                        counterCreateDate = counterData?.Created_Date
                     };
 
                     foreach (var itemBrandLoreal in onlyBrandLorel)
@@ -535,9 +541,19 @@ namespace MarketData.Processes.Processes
                     listAdjustDetailData.Add(adjustDetailData);
                 }
 
+                if (adjustData.Year == GetDateNowThai().Year.ToString())
+                {
+                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear.HasValue
+                    || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year).ToList();
+                }
+                else
+                {
+                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear.HasValue).ToList();
+                }
+
                 int rankAdjust = 1;
 
-                foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale))
+                foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale).ThenByDescending(c=>c.amountPreviousYear))
                 {
                     itemAdjustData.rank = rankAdjust;
                     if (itemAdjustData.amountPreviousYearWeek.HasValue && itemAdjustData.adjustAmountSale.HasValue)
