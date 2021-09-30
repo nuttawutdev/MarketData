@@ -58,7 +58,8 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
-                else if (controller == ControllerPermission.Users.ToString() && !userData.editUser)
+                else if (controller == ControllerPermission.Users.ToString() && !userData.editUser
+                    && actionName != ViewPermission.ManualChangePassword.ToString())
                 {
                     GoToHome(filterContext);
                 }
@@ -102,11 +103,6 @@ namespace MarketData.Middleware
                 }
                 else if ((actionName == ViewPermission.Approve_Edit.ToString() ||
                     actionName == ViewPermission.Adjust_Edit.ToString()) && !userData.approveData)
-                {
-                    GoToHome(filterContext);
-                }
-
-                else if ((actionName == ViewPermission.ManualChangePassword.ToString() && !userData.editUser))
                 {
                     GoToHome(filterContext);
                 }
