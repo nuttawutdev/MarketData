@@ -533,7 +533,14 @@ namespace MarketData.Processes.Processes
                 var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID));
                 var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
 
-                var allAdminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(e => e.ID != Guid.Empty);
+                var allAdminKeyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(e => e.Year == request.year 
+                                        && e.Month == request.month && e.Week == request.week);
+
+                string previousYear = (int.Parse(request.year) - 1).ToString();
+
+                var allAdminKeyInDataPreviousYear = repository.adminKeyIn.GetAdminKeyInDetailBy(e => 
+                e.Month == request.month && e.Week == "4" && e.Year == previousYear);
+
                 var allBAKeyInData = repository.baKeyIn.GetBAKeyInDetailListData(e => e.ID != Guid.Empty);
 
                 foreach (var itemCounter in counterByFilter)
@@ -546,13 +553,13 @@ namespace MarketData.Processes.Processes
                         if (brandTypeData?.Brand_Type_Name != "Fragrances")
                         {
 
-                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allBAKeyInData);
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allAdminKeyInDataPreviousYear, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
                     }
                     else
                     {
-                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allBAKeyInData);
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, allAdminKeyInDataPreviousYear, allBAKeyInData);
                         adminKeyInDetailList.Add(dataDetail);
                     }
                 }
@@ -775,16 +782,13 @@ namespace MarketData.Processes.Processes
 
                 yearList.Add(currentYear);
 
-                var keyInData = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.ID != Guid.Empty);
+                int startYear = 2000;
 
-                var olldYearList = keyInData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).OrderByDescending(t => t); ;
-
-                if (olldYearList.Any())
+                for(int i = startYear; i < Utility.GetDateNowThai().Year; i++)
                 {
-                    yearList.AddRange(olldYearList);
+                    yearList.Add(i.ToString());
                 }
-
-                response.year = yearList;
+                response.year = yearList.OrderByDescending(c=>c).ToList();
             }
             catch (Exception ex)
             {
@@ -898,27 +902,21 @@ namespace MarketData.Processes.Processes
             }
         }
 
-        private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request, List<TTAdminKeyInDetail> allAdminKeyInData, List<TTBAKeyInDetail> allBAKeyInDetail)
+        private AdminKeyInDetailData GetAdminKeyInDetailData(CounterData itemCounter, GetAdminKeyInRequest request,
+            List<TTAdminKeyInDetail> allAdminKeyInData, List<TTAdminKeyInDetail> allAdminKeyInDataPreviousYear, List<TTBAKeyInDetail> allBAKeyInDetail)
         {
 
             var adminKeyInData = allAdminKeyInData.FirstOrDefault(
                 c => c.RetailerGroup_ID == itemCounter.retailerGroupID
                 && c.DepartmentStore_ID == itemCounter.departmentStoreID
                 && c.DistributionChannel_ID == itemCounter.distributionChannelID
-                && c.Brand_ID == itemCounter.brandID
-                && c.Year == request.year
-                && c.Month == request.month
-                && c.Week == request.week);
+                && c.Brand_ID == itemCounter.brandID);
 
-            string previousYear = (int.Parse(request.year) - 1).ToString();
 
-            var adminKeyInDetailPreviousYear = allAdminKeyInData.FirstOrDefault(
+            var adminKeyInDetailPreviousYear = allAdminKeyInDataPreviousYear.FirstOrDefault(
                c => c.DepartmentStore_ID == itemCounter.departmentStoreID
                && c.DistributionChannel_ID == itemCounter.distributionChannelID
-               && c.Brand_ID == itemCounter.brandID
-               && c.Year == previousYear
-               && c.Month == request.month
-               && c.Week == "4");
+               && c.Brand_ID == itemCounter.brandID);
 
             AdminKeyInDetailData dataDetail = new AdminKeyInDetailData
             {

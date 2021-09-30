@@ -239,7 +239,7 @@ namespace MarketData.Processes.Processes
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
                     var brandIDCounter = counterList.GroupBy(c => c.Brand_ID).Select(e => e.Key);
-                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID) && c.Active_Flag && c.Universe == adjustData.Universe);
+                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID)  && c.Universe == adjustData.Universe);
                     var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
 
                     foreach (var itemCounter in counterList)

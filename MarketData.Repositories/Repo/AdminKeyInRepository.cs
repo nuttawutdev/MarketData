@@ -1,4 +1,5 @@
 ﻿using MarketData.Model.Entiry;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,19 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TTAdminKeyInDetail.Where(expression).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IEnumerable<TTAdminKeyInDetail> GetAllAdminKeyInDetailBy()
+        {
+            try
+            {
+                return _dbContext.TTAdminKeyInDetail.AsNoTracking();
 
             }
             catch (Exception ex)
