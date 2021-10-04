@@ -535,8 +535,9 @@
                 if (totalAmountPreviousYearWeek > 0) {
                     totalpercentGrowth = ((totalAdjustAmountSale - totalAmountPreviousYearWeek) / totalAmountPreviousYearWeek) * 100;
                 }
-
-
+                console.log(totalAdjustAmountSale, 'totalAdjustAmountSale')
+                console.log(totalAmountPreviousYearWeek, 'totalAmountPreviousYearWeek')
+                console.log(totalpercentGrowth,'totalpercentGrowth')
                 $(el).find(".totalAmountPreviousYear").text(formatCurrencyText(totalAmountPreviousYear.toString()));
                 $(el).find(".totalAdminAmountSale").text(formatCurrencyText(totalAdminAmountSale.toString()));
                 $(el).find(".totalAdjustAmountSale").text(formatCurrencyText(totalAdjustAmountSale.toString()));

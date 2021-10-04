@@ -569,6 +569,13 @@ namespace MarketData.Processes.Processes
                 var brandAmountSale = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).GroupBy(e=>e.Key);
                 Dictionary<string, decimal?> summaryBrandAmount = new Dictionary<string, decimal?>();
 
+                var listBrandCounterHaveValue = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).Where(e => e.Value.HasValue).GroupBy(k=>k.Key).Select(d=>d.Key);
+                
+                foreach (var itemAdjustList in listAdjustDetailData)
+                {
+                    itemAdjustList.brandKeyInAmount = itemAdjustList.brandKeyInAmount.Where(c => listBrandCounterHaveValue.Contains(c.Key)).ToDictionary(c => c.Key,c=>c.Value) ;
+                }
+
                 foreach(var itemGroupBrand in brandAmountSale)
                 {
                     var summaryAmount = itemGroupBrand.Sum(c => c.Value.GetValueOrDefault());
@@ -581,12 +588,12 @@ namespace MarketData.Processes.Processes
 
                 List<string> brandColumn = new List<string>();
 
-                foreach (var itemBrandLoreal in onlyBrandLorel)
+                foreach (var itemBrandLoreal in listBrandCounterHaveValue)
                 {
-                    string brandName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
+                    //string brandName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
 
-                    brandColumn.Add($"{brandName}-Amt.Sales");
-                    brandColumn.Add($"{brandName}-Rank");
+                    brandColumn.Add($"{itemBrandLoreal}-Amt.Sales");
+                    brandColumn.Add($"{itemBrandLoreal}-Rank");
                 }
 
                 var adjustStatus = repository.masterData.GetAdjustStatusBy(e => e.ID == adjustData.Status_ID);
@@ -785,7 +792,7 @@ namespace MarketData.Processes.Processes
                 var saveAdjustDetailResult = await repository.adjust.InsertAdjustDataDetail(listInsertAdjustDataDetail);
                 var saveAdjustBrandDetailResult = await repository.adjust.InsertAdjustDataBrandDetail(listInsertAdjustDataBrandDetail);
 
-                if (saveAdjustDetailResult && saveAdjustBrandDetailResult)
+                if (saveAdjustDetailResult)
                 {
                     response.isSuccess = true;
                 }
