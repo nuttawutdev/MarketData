@@ -112,7 +112,7 @@
                                 if (userPermission.viewReport)
                                 {
                                     <li class="nav-item">
-                                        <a class="nav-link text-white" href="http://61.91.3.75:1437/mds/report_main.php">Report</a>
+                                        <a class="nav-link text-white" id="linkReport"href="#">Report</a>
                                     </li>
                                 }
 
@@ -171,10 +171,24 @@
             @RenderBody()
         </main>
     </div>
-
+    <form action="http://61.91.3.75:1437/mds2/login.php" method="post" id="frmReport"target="_blank">
+        <input type="hidden" id="user" name="user" value="admin">
+        <input type="hidden" id="password" name="password" value="123456">
+    </form>
 
 
     @RenderSection("Scripts", required: false)
 </body>
 </html>
 
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#linkReport").click(function () {
+             $("#frmReport").submit();
+        })
+    });
+</script>
