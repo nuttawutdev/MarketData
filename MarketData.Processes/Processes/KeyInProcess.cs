@@ -618,7 +618,7 @@ namespace MarketData.Processes.Processes
 
                 if (amountPreviousYear.Any())
                 {
-                    response.totalAmountPreviosYear = amountPreviousYear.Sum(e => e.amountSalePreviousYear.Value).ToString("0.00");
+                    response.totalAmountPreviosYear = string.Format("{0:#,0}", amountPreviousYear.Sum(e => e.amountSalePreviousYear.Value));
                 }
                 else
                 {
