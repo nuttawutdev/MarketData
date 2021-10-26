@@ -237,7 +237,8 @@ namespace MarketData.Repositories.Repo
                          week = e.Week,
                          wholeSale = e.Whole_Sales,
                          year = e.Year,
-                         counterCreateDate = counter.Created_Date
+                         counterCreateDate = counter.Created_Date,
+                         alwayShow = counter.Alway_Show_Current_Year.GetValueOrDefault()
                      }).ToList();
 
                 return baKeyInDetailDataList;

@@ -49,6 +49,17 @@
                 }
                 Active
             </label>
+            <label style="margin-left:4rem">
+                @if (Model.alwayShow)
+                {
+                    <input value="" id="flagalway" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagalway" type="checkbox" data-toggle="toggle">
+                }
+                Alway show in current year
+            </label>
         </div>
 
     </div>

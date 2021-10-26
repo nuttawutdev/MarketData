@@ -263,7 +263,7 @@ namespace MarketData.Processes.Processes
                                             var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
                                             var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
                                             {
                                                 listCounterFilterFragrances.Add(itemCounter);
                                             }
@@ -329,7 +329,7 @@ namespace MarketData.Processes.Processes
                         e => e.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID
                         && e.Department_Store_ID == BAKeyInData.DepartmentStore_ID
                         && e.Active_Flag && e.Delete_Flag != true);
-
+                 
 
                 // New Counter
                 if (counterList.Count > BAKeyInDetailList.Count)
@@ -351,7 +351,7 @@ namespace MarketData.Processes.Processes
                             var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }
@@ -390,26 +390,14 @@ namespace MarketData.Processes.Processes
                   && c.Universe == BAKeyInData.Universe
                   && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
 
-                //var baKeyInDataApprovePreViousYear = repository.baKeyIn.FindBAKeyInBy(
-                //    c => c.Year == previousYear
-                //    && c.Month == BAKeyInData.Month
-                //    && c.Week == "4"
-                //    && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
-                //    && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
-                //    && c.Brand_ID == BAKeyInData.Brand_ID
-                //    && c.Universe == BAKeyInData.Universe);
+                var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
 
                 if (adjustDataPreviousYearWeek4 != null)
                 {
                     foreach (var itemBADetail in BAKeyInDetailList)
                     {
-                        var adjustDataPreviousYear = repository.adjust.GetAdjustDataDetaillBy(
-                            p => p.AdjustData_ID == adjustDataPreviousYearWeek4.ID
-                            && p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
-
-                        //var BAKeyInDetailPreviousYear = repository.baKeyIn.GetBAKeyInDetailListData(
-                        //    c => c.BAKeyIn_ID == baKeyInDataApprovePreViousYear.ID
-                        //    && c.Brand_ID == itemBADetail.brandID).FirstOrDefault();
+                        var adjustDataPreviousYear = adjustDetailPreviousYearList
+                            .Where(p => p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
 
                         if (adjustDataPreviousYear != null)
                         {
@@ -439,7 +427,8 @@ namespace MarketData.Processes.Processes
                 {
                     response.data = BAKeyInDetailList
                        .Where(e => e.amountSalePreviousYear > 0
-                       || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year)
+                       || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
+                       || e.alwayShow == true)
                        .OrderBy(c => c.brandName).ToList();
                 }
                 else
@@ -582,9 +571,8 @@ namespace MarketData.Processes.Processes
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.brandID);
                         var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.alwayShow)
                         {
-
                             AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
@@ -604,7 +592,8 @@ namespace MarketData.Processes.Processes
                 if (request.year == GetDateNowThai().Year.ToString())
                 {
                     response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0
-                         || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year)
+                         || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
+                         || e.alwayShow)
                          .OrderBy(c => c.brandName).ToList();
                 }
                 else
@@ -870,7 +859,7 @@ namespace MarketData.Processes.Processes
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
                         var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                        if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
                         {
                             listCounterFilterFragrances.Add(itemCounter);
                         }
@@ -994,7 +983,8 @@ namespace MarketData.Processes.Processes
                 rank = adminKeyInData != null ? adminKeyInData.Rank : null,
                 remark = adminKeyInData != null ? adminKeyInData.Remark : null,
                 universe = request.universe,
-                amountSalePreviousYear = amountPreviousYear
+                amountSalePreviousYear = amountPreviousYear,
+                alwayShow = itemCounter.alwayShow
             };
 
             return dataDetail;

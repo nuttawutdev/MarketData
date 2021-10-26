@@ -1503,6 +1503,7 @@ namespace MarketData.Processes.Processes
                     response.departmentStoreID = counterData.Department_Store_ID;
                     response.distributionChannelID = counterData.Distribution_Channel_ID;
                     response.active = counterData.Active_Flag;
+                    response.alwayShow = counterData.Alway_Show_Current_Year.GetValueOrDefault();
                 }
             }
             catch (Exception ex)

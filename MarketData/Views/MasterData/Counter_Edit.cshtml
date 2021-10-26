@@ -62,11 +62,21 @@
                 }
                 Active
             </label>
+            <label style="margin-left:4rem">
+                @if (Model.alwayShow)
+                {
+                    <input value="" id="flagalway" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagalway" type="checkbox" data-toggle="toggle">
+                }
+                Alway show in current year
+            </label>
         </div>
-
     </div>
     <div class="modal-footer">
-        <button id="save" class="btn btn-danger " type="button">Save</button>
+        <button id="save" class="btn btn-danger" type="button">Save</button>
         <a href="Counter" class="btn btn-outline-danger">Cancel</a>
 
     </div>
@@ -90,6 +100,7 @@
                  brandID: $('#brandList').val(),
                  brandName: $('#brandList option:selected').text(),
                  active: $("#flagactive").prop("checked"),
+                 alwayShow: $("#flagalway").prop("checked"),
                  userID: $('#iduserID').val()
             };
 

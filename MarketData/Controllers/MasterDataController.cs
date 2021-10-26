@@ -981,6 +981,7 @@ namespace MarketData.Controllers
                 data.distributionChannelID = response.distributionChannelID;
                 data.distributionChannelName = response.distributionChannelName;
                 data.active = response.active;
+                data.alwayShow = response.alwayShow;
             }
 
             return data;

@@ -18,5 +18,6 @@ namespace MarketData.Model.Entiry
         public string Created_By { get; set; }
         public DateTime? Updated_Date { get; set; }
         public string Updated_By { get; set; }
+        public bool? Alway_Show_Current_Year { get; set; }
     }
 }

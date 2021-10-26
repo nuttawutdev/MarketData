@@ -254,7 +254,7 @@ namespace MarketData.Processes.Processes
                         {
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if (brandTypeData?.Brand_Type_Name != "Fragrances")
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }
@@ -511,7 +511,8 @@ namespace MarketData.Processes.Processes
                         fg = fg,
                         ot = ot,
                         remark = remark,
-                        counterCreateDate = counterData?.Created_Date
+                        counterCreateDate = counterData?.Created_Date,
+                        alwayShow = counterData != null ? counterData.Alway_Show_Current_Year.GetValueOrDefault() : false
                     };
 
                     foreach (var itemBrandLoreal in onlyBrandLorel)
@@ -544,7 +545,8 @@ namespace MarketData.Processes.Processes
                 if (adjustData.Year == GetDateNowThai().Year.ToString())
                 {
                     listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0
-                    || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year).ToList();
+                    || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
+                    || c.alwayShow).ToList();
                 }
                 else
                 {

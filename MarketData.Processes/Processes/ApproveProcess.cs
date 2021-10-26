@@ -129,13 +129,14 @@ namespace MarketData.Processes.Processes
                        && c.Universe == BAKeyInData.Universe
                        && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
 
+                var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
+
                 if (adjustDataPreviousYearWeek4 != null)
                 {
                     foreach (var itemBADetail in baKeyInList)
                     {
-                        var adjustDataPreviousYear = repository.adjust.GetAdjustDataDetaillBy(
-                            p => p.AdjustData_ID == adjustDataPreviousYearWeek4.ID
-                            && p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+                        var adjustDataPreviousYear = adjustDetailPreviousYearList
+                            .Where(p => p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
 
                         if (adjustDataPreviousYear != null)
                         {
@@ -165,7 +166,8 @@ namespace MarketData.Processes.Processes
                 {
                     response.data = baKeyInList
                        .Where(e => e.amountSalePreviousYear > 0
-                       || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year)
+                       || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
+                       || e.alwayShow)
                        .OrderBy(c => c.brandName).ToList();
                 }
                 else
@@ -174,8 +176,6 @@ namespace MarketData.Processes.Processes
                     .Where(e => e.amountSalePreviousYear > 0)
                     .OrderBy(c => c.brandName).ToList();
                 }
-
-
             }
             catch (Exception ex)
             {
