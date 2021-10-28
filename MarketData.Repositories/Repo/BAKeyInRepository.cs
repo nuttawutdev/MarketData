@@ -280,7 +280,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 10, 0, 0, 0);
 
-                        if (Utility.GetDateNowThai() > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine && !baKeyInData.Remark.Contains(" (ล่าช้า)"))
                         {
                             baKeyInData.Remark += " (ล่าช้า)";
                         }
@@ -289,7 +289,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 18, 0, 0, 0);
 
-                        if (Utility.GetDateNowThai() > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine && !baKeyInData.Remark.Contains(" (ล่าช้า)"))
                         {
                             baKeyInData.Remark += " (ล่าช้า)";
                         }
@@ -298,7 +298,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 25, 0, 0, 0);
 
-                        if (Utility.GetDateNowThai() > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine && !baKeyInData.Remark.Contains(" (ล่าช้า)"))
                         {
                             baKeyInData.Remark += " (ล่าช้า)";
                         }
@@ -307,7 +307,7 @@ namespace MarketData.Repositories.Repo
                     {
                         DateTime dateDeadLine = new DateTime(YearKeyIn, monthKeyIn, 5, 0, 0, 0).AddMonths(1);
 
-                        if (Utility.GetDateNowThai() > dateDeadLine)
+                        if (Utility.GetDateNowThai() > dateDeadLine && !baKeyInData.Remark.Contains(" (ล่าช้า)"))
                         {
                             baKeyInData.Remark += " (ล่าช้า)";
                         }
