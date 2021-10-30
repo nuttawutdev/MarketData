@@ -119,6 +119,8 @@ namespace MarketData.Controllers
                 compareYear = "2020",
                 universe = "LPD",
                 storeRankStart = 1,
+                brandRankStart = 1,
+                brandRankEnd = 10,
                 storeRankEnd = 50
             };
             var file = process.report.ExportStoreMarketShareZone(request);
