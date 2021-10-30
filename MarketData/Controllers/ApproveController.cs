@@ -108,6 +108,12 @@ namespace MarketData.Controllers
             return View(viewData);
         }
 
+        public IActionResult Export()
+        {
+            var file = process.approve.Export();
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
+        }
+
         [HttpPost]
         public IActionResult GetApproveKeyInList()
         {
@@ -226,5 +232,6 @@ namespace MarketData.Controllers
             var viewData = await process.approve.RejectKeyInData(request);
             return Json(viewData);
         }
+
     }
 }

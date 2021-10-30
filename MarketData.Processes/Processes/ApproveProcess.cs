@@ -1,4 +1,6 @@
-﻿using MarketData.Helper;
+﻿using AspNetCore.Reporting;
+using ClosedXML.Excel;
+using MarketData.Helper;
 using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.Approve;
@@ -8,6 +10,9 @@ using MarketData.Model.Response.KeyIn;
 using MarketData.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -342,6 +347,170 @@ namespace MarketData.Processes.Processes
             }
 
             return response;
+        }
+
+        public byte[] Export()
+        {
+            try
+            {
+                using (var workbook = new XLWorkbook())
+                {
+                    int currentRow = 1;
+                    Color yellowHead = Color.FromArgb(250, 250, 181);
+                    XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+
+                    var worksheet = workbook.Worksheets.Add("Transaction");
+                    worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Merge();
+                    worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Value = "DEPARTMENT STORES PANEL - TOP 10";
+                    worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Merge();
+                    worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Value = "MARKET SHARE AND GROWTH";                  
+                    worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).Merge();
+                    worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).SetValue(Convert.ToString("Jul-21"));
+                    worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Column(1).Width = 30;
+                    worksheet.Column(2).Width = 19;
+                    worksheet.Column(3).Width = 19;
+                    worksheet.Column(4).Width = 19;
+                    worksheet.Column(5).Width = 19;
+
+                    worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Value = "DEPARTMENT STORES";
+
+                    worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Cell(4, 2).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Cell(5, 2).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Cell(6, 2).Style.Fill.BackgroundColor = yellowXL;
+
+                    worksheet.Cell(4, 2).Value = "RETAIL";
+                    worksheet.Cell(5, 2).Value = "SALES";
+                    worksheet.Cell(6, 2).SetValue(Convert.ToString("Jul-20"));
+                    worksheet.Cell(4, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(5, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(6, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Cell(4, 3).Value = "RETAIL";
+                    worksheet.Cell(5, 3).Value = "SALES";
+                    worksheet.Cell(6, 3).SetValue(Convert.ToString("Jul-21"));
+                    worksheet.Cell(4, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(5, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(6, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Cell(4, 4).Value = "%OF";
+                    worksheet.Cell(5, 4).Value = "GROWTH*";
+                    worksheet.Cell(6, 4).SetValue(Convert.ToString("2021"));
+                    worksheet.Cell(4, 4).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(5, 4).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(6, 4).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Cell(4, 5).Value = "%OF";
+                    worksheet.Cell(5, 5).Value = "SHARE*";
+                    worksheet.Cell(6, 5).SetValue(Convert.ToString("2021"));
+                    worksheet.Cell(4, 5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(5, 5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(6, 5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, 30)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, 30)).Value = "RANKING";
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                    //worksheet.Cell(currentRow, 1).Value = "วันที่";
+                    //worksheet.Cell(currentRow, 2).Value = "Action";
+                    //worksheet.Cell(currentRow, 3).Value = "Employee Name";
+                    //worksheet.Cell(currentRow, 4).Value = "Product Heat Number";
+                    //worksheet.Cell(currentRow, 5).Value = "Cert Number";
+                    //worksheet.Cell(currentRow, 6).Value = "Product Name";
+                    //worksheet.Cell(currentRow, 7).Value = "Product Type";
+                    //worksheet.Cell(currentRow, 8).Value = "Product Group";
+                    //worksheet.Cell(currentRow, 9).Value = "เส้นผ่านศูนย์กลางเหล็กกลม (mm)";
+                    //worksheet.Cell(currentRow, 10).Value = "ความยาวเหล็กกลม (mm)";
+                    //worksheet.Cell(currentRow, 11).Value = "ความหนาเหล็กแบน (mm)";
+                    //worksheet.Cell(currentRow, 12).Value = "ความกว้าง (mm)";
+                    //worksheet.Cell(currentRow, 13).Value = "ขนาดเหล็กที่ตัด (mm)";
+                    //worksheet.Cell(currentRow, 14).Value = "ขนาดเหล็กที่เหลือ (mm)";
+                    //worksheet.Cell(currentRow, 15).Value = "ความยาวเหล็ก (mm)";
+                    //worksheet.Cell(currentRow, 16).Value = "จำนวน";
+                    //worksheet.Cell(currentRow, 17).Value = "น้ำหนักจริง (kg)";
+                    //worksheet.Cell(currentRow, 18).Value = "น้ำหนักต่อชิ้น (kg)";
+                    //worksheet.Cell(currentRow, 19).Value = "น้ำหนัก (kg)";
+                    //worksheet.Cell(currentRow, 20).Value = "ราคาต่อกิโลกรัม";
+                    //worksheet.Cell(currentRow, 21).Value = "ราคาต่อชิ้น";
+                    //worksheet.Cell(currentRow, 22).Value = "x_asis";
+                    //worksheet.Cell(currentRow, 23).Value = "y_asis";
+                    //worksheet.Cell(currentRow, 24).Value = "z_asis";
+                    //worksheet.Cell(currentRow, 25).Value = "คลังสินค้า";
+                    //worksheet.Cell(currentRow, 26).Value = "โซนวางสินค้า";
+                    //worksheet.Cell(currentRow, 27).Value = "ล็อค";
+                    //worksheet.Cell(currentRow, 28).Value = "แถว";
+
+                    //foreach (var itemTransaction in productHistoryTransaction)
+                    //{
+                    //    string actionName = string.Empty;
+
+                    //    if (itemTransaction.action == "C")
+                    //    {
+                    //        actionName = "Insert";
+                    //    }
+                    //    else if (itemTransaction.action == "U")
+                    //    {
+                    //        actionName = "Update";
+                    //    }
+                    //    else if (itemTransaction.action == "D")
+                    //    {
+                    //        actionName = "Delete";
+                    //    }
+
+                    //    currentRow++;
+                    //    worksheet.Cell(currentRow, 1).Value = itemTransaction.createDate.ToString("dd/MM/yyyy HH:mm:ss");
+                    //    worksheet.Cell(currentRow, 2).Value = actionName;
+                    //    worksheet.Cell(currentRow, 3).Value = itemTransaction.createBy;
+                    //    worksheet.Cell(currentRow, 4).Value = !string.IsNullOrWhiteSpace(itemTransaction.heatNumber) ? itemTransaction.heatNumber : "-";
+                    //    worksheet.Cell(currentRow, 5).Value = !string.IsNullOrWhiteSpace(itemTransaction.certificateNumber) ? itemTransaction.certificateNumber : "-";
+                    //    worksheet.Cell(currentRow, 6).Value = !string.IsNullOrWhiteSpace(itemTransaction.productName) ? itemTransaction.productName : "-";
+                    //    worksheet.Cell(currentRow, 7).Value = !string.IsNullOrWhiteSpace(itemTransaction.productTypeName) ? itemTransaction.productTypeName : "-";
+                    //    worksheet.Cell(currentRow, 8).Value = !string.IsNullOrWhiteSpace(itemTransaction.productGroupName) ? itemTransaction.productGroupName : "-";
+                    //    worksheet.Cell(currentRow, 9).Value = itemTransaction.dia.HasValue ? itemTransaction.dia : 0;
+                    //    worksheet.Cell(currentRow, 10).Value = itemTransaction.diaLenght.HasValue ? itemTransaction.diaLenght : 0;
+                    //    worksheet.Cell(currentRow, 11).Value = itemTransaction.thickness.HasValue ? itemTransaction.thickness : 0;
+                    //    worksheet.Cell(currentRow, 12).Value = itemTransaction.width.HasValue ? itemTransaction.width : 0;
+                    //    worksheet.Cell(currentRow, 13).Value = itemTransaction.steelLengthCutting.HasValue ? itemTransaction.steelLengthCutting : 0;
+                    //    worksheet.Cell(currentRow, 14).Value = itemTransaction.steelLengthLeft.HasValue ? itemTransaction.steelLengthLeft : 0;
+                    //    worksheet.Cell(currentRow, 15).Value = itemTransaction.steelLength.HasValue ? itemTransaction.steelLength : 0;
+                    //    worksheet.Cell(currentRow, 16).Value = itemTransaction.qty.HasValue && itemTransaction.qty > 0 ? itemTransaction.qty : 0;
+                    //    worksheet.Cell(currentRow, 17).Value = itemTransaction.actualWeight.HasValue ? itemTransaction.actualWeight : 0;
+                    //    worksheet.Cell(currentRow, 18).Value = itemTransaction.kg_pc.HasValue ? itemTransaction.kg_pc : 0;
+                    //    worksheet.Cell(currentRow, 19).Value = itemTransaction.weight.HasValue ? itemTransaction.width : 0;
+                    //    worksheet.Cell(currentRow, 20).Value = itemTransaction.price_kg.HasValue ? itemTransaction.price_kg : 0;
+                    //    worksheet.Cell(currentRow, 21).Value = itemTransaction.price_pc.HasValue ? itemTransaction.price_pc : 0;
+                    //    worksheet.Cell(currentRow, 22).Value = itemTransaction.x_asis.HasValue ? itemTransaction.x_asis : 0;
+                    //    worksheet.Cell(currentRow, 23).Value = itemTransaction.y_asis.HasValue ? itemTransaction.y_asis : 0;
+                    //    worksheet.Cell(currentRow, 24).Value = itemTransaction.z_asis.HasValue ? itemTransaction.z_asis : 0;
+                    //    worksheet.Cell(currentRow, 25).Value = !string.IsNullOrWhiteSpace(itemTransaction.warehouseName) ? itemTransaction.warehouseName : "-";
+                    //    worksheet.Cell(currentRow, 26).Value = !string.IsNullOrWhiteSpace(itemTransaction.zone) ? itemTransaction.zone : "-";
+                    //    worksheet.Cell(currentRow, 27).Value = !string.IsNullOrWhiteSpace(itemTransaction.column) ? itemTransaction.column : "-";
+                    //    worksheet.Cell(currentRow, 28).Value = !string.IsNullOrWhiteSpace(itemTransaction.row) ? itemTransaction.row : "-";
+
+                    //}
+
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+                        return content;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return null;
         }
     }
 }
