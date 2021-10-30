@@ -19,17 +19,17 @@
         <div class="row">
             <div class="col-sm-2 d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-group mb-3">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Rank<br></label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-1">Select Store<br></label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="checkRank"><label class="form-check-label">Rank<br></label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="checkSelectStore"><label class="form-check-label">Select Store<br></label></div>
                     <br />
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Top 5<br></label>
+                        <input class="form-check-input" type="radio" name="top" value="5"><label class="form-check-label">Top 5<br></label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Top 10<br></label>
+                        <input class="form-check-input" type="radio" name="top" value="10"><label class="form-check-label">Top 10<br></label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Top 15<br></label>
+                        <input class="form-check-input" type="radio" name="top" value="15"><label class="form-check-label">Top 15<br></label>
                     </div>
                 </div>
             </div>
@@ -38,28 +38,28 @@
                     <div class="col d-flex flex-wrap">
                         <div class="col-md-4">
                             <label><b>Start <i class="ion-clock"></i></b>  Week</label>
-                            <select class="form-control col-sm-12 col-lg-4">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekStart">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Month</label>
-                            <select class="form-control col-sm-12 col-lg-8">
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthStart">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -72,32 +72,32 @@
 
                     </div>
                 </div>
-                <div class="row d-flex" style="padding-top: 10px;">
+                <div class="row d-flex" style="padding-top: 10px;display:none!important" id="divYearEnd">
                     <div class="col d-flex flex-wrap">
                         <div class="col-md-4">
                             <label><b>End &nbsp; <i class="ion-clock"></i></b>  Week</label>
-                            <select class="form-control col-sm-12 col-lg-4">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekEnd">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Month</label>
-                            <select class="form-control col-sm-12 col-lg-8">
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthEnd">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -115,7 +115,7 @@
             <div class="col-sm-3 d-flex flex-wrap align-items-md-start" style="padding:0px;">
                 <label class="form-label d-md-flex align-items-md-start">Compare with year</label>
                 <div class="form-group mb-3">
-                    <select class="form-control" style="width:100px;">
+                    <select class="form-control" style="width:100px;" id="ddlCompareYear">
                         <option>2019</option>
                         <option>2020</option>
                     </select>
@@ -125,83 +125,16 @@
 
 
 
-        <div class="w-100">
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Central</label></div>
-                            </header>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Central Bangna</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Central Festival Chiangmai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Central Chidlom</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Central Eastville</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-6"><label class="form-check-label" for="formCheck-6">Central Rama II</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-7"><label class="form-check-label" for="formCheck-7">Central Rama III</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-8"><label class="form-check-label" for="formCheck-8">Central Phuket</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-9"><label class="form-check-label" for="formCheck-9">Central Westgate</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-10"><label class="form-check-label" for="formCheck-10">Central Ladprao</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-11"><label class="form-check-label" for="formCheck-11">Central Samui</label></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-12"><label class="form-check-label" for="formCheck-12">The Mall</label></div>
-                            </header>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-13"><label class="form-check-label" for="formCheck-13">Siam Paragon</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-14"><label class="form-check-label" for="formCheck-14">The Mall Bangkae</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-15"><label class="form-check-label" for="formCheck-15">The Mall Bangkapi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-16"><label class="form-check-label" for="formCheck-16">The Mall Blueport</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-17"><label class="form-check-label" for="formCheck-17">The Mall Emporium</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-18"><label class="form-check-label" for="formCheck-18">The Mall Emquartier</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-19"><label class="form-check-label" for="formCheck-19">The Mall Korat</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-20"><label class="form-check-label" for="formCheck-20">The Mall Ngam Wong Wan</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-21"><label class="form-check-label" for="formCheck-21">The Mall Ramkamhang</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-22"><label class="form-check-label" for="formCheck-22">The Mall Thonburi</label></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-23"><label class="form-check-label" for="formCheck-23">Robinson</label></div>
-                            </header>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-24"><label class="form-check-label" for="formCheck-24">Robinson Ayudhaya</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-25"><label class="form-check-label" for="formCheck-25">Robinson Bangrak</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-26"><label class="form-check-label" for="formCheck-26">Robinson Chantaburi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-27"><label class="form-check-label" for="formCheck-27">Robinson Chiangmai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-28"><label class="form-check-label" for="formCheck-28">Robinson Chiangrai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-29"><label class="form-check-label" for="formCheck-29">Robinson Chonburi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-30"><label class="form-check-label" for="formCheck-30">Robinson Fasion Island</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-31"><label class="form-check-label" for="formCheck-31">Robinson Hadyai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-32"><label class="form-check-label" for="formCheck-32">Robinson Mahachai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-33"><label class="form-check-label" for="formCheck-33">Robinson Phuket</label></div>
-                        </div>
-                    </div>
-                </div>
+        <div class="w-100" id="divSelectStore" style="display:none!important">
+
+        </div>
+        <div class="w-100 text-center" style="display:flex;justify-content:center">
+            <div >
+
             </div>
         </div>
 
-        <div class="table-filter" style="width: 100%; font-size: 13px;">
-
-
-            <div class="row row-filter" style=" justify-content: center;">
-
+        <div class="w-100 text-center" style="display:flex;justify-content:center">
                 <div class="filter-group">
                     <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Preview</button>
                 </div>
@@ -216,9 +149,84 @@
 
                 </div>
             </div>
+        <div class="container-xl">
+                <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
         </div>
     </div>
 </div>
-<div class="container-xl">
-    <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
-</div>
+            <script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        getDepartmentStore();
+        $("#checkRank").on('click', function (e) {
+            if ($("#checkRank:checked").is(":checked")) {
+                $("#divYearEnd").attr('style', 'display:block !important');
+            } else {
+                $("#divYearEnd").attr('style', 'display:none !important');
+            }
+
+
+        });
+        $("#checkSelectStore").on('click', function (e) {
+            if ($("#checkSelectStore:checked").is(":checked")) {
+                $("#divSelectStore").attr('style', 'display:block !important');
+
+            } else {
+                $("#divSelectStore").attr('style', 'display:none !important');
+            }
+
+        });
+
+        function getDepartmentStore(){
+              $.ajax(
+                {
+                    url: '@Url.Action("GetDepartmentStoreList", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                      success: function (data) {
+                          console.log(data.data)
+                          if (data.data.length > 0) {
+                              var group = "";
+                              var groupId = 0;
+                              var htmlStoreinside = "";
+                              var html = "";
+
+                              for (var i = 0; i < data.data.length-1; i++) {
+                                  if (group != data.data[i].retailerGroupName) {
+                                      html = html.replace("storeinside", htmlStoreinside);
+                                      htmlStoreinside = "";
+                                      groupId += 1;
+                                      group = data.data[i].retailerGroupName;
+                                      html += "<div style='padding-top: 20px;'>";
+                                      html += "<div class='card'>";
+                                      html += "<div class='card-body'>";
+                                      html += " <div>";
+                                      html += "     <header>";
+                                      html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input' type='checkbox' id='store-" + groupId + "'><label class='form-check-label' >" + data.data[i].retailerGroupName + "</label></div>";
+                                      html += "     </header>";
+                                      html += " </div>";
+                                      html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
+                                      html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
+                                      html += " storeinside";
+                                      html += "  </div> </div > </div > </div > ";
+
+                                  }
+
+                                  if (group == data.data[i].retailerGroupName) {
+                                      htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
+                                  }
+
+                              }
+                              $("#divSelectStore").append(html.replace("storeinside",""));
+                          }
+
+                    },
+                     error: function () {
+                    }
+                }
+            );
+        }
+    });
+            </script>

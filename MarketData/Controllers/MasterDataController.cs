@@ -818,7 +818,7 @@ namespace MarketData.Controllers
                         region = c.region,
                         rank = c.rank,
                         active = c.active
-                    }).ToList();
+                    }).OrderBy(x => x.retailerGroupName).ToList();
                 }
                 else
                 {
