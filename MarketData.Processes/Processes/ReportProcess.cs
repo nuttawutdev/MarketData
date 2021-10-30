@@ -42,9 +42,9 @@ namespace MarketData.Processes.Processes
                     if (brandRankingData.Any())
                     {
                         var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
-                        var groupStoreStartYear = brandRankingStartYear.GroupBy(c => c.Store_Id).Select(e => new GroupBrandRanking
+                        var groupStoreStartYear = brandRankingStartYear.GroupBy(c => c.Department_Store_Name).Select(e => new GroupBrandRanking
                         {
-                            storeID = e.Key,
+                            storeName = e.Key,
                             sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
                             brandDetail = e.OrderByDescending(s=>s.Amount_Sales).ToList()
                         }).OrderByDescending(s => s.sumStore).ToList();
@@ -74,23 +74,83 @@ namespace MarketData.Processes.Processes
                             && storeFilter.Contains(w.Store_Id));
 
                         var groupStoreCompareYear = brandRankingCompareYear
-                            .GroupBy(c => c.Store_Id).Select(e => new GroupBrandRanking
+                            .GroupBy(c => c.Department_Store_Name).Select(e => new GroupBrandRanking
                             {
-                                storeID = e.Key,
+                                storeName = e.Key,
                                 sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
                                 brandDetail = e.OrderByDescending(s => s.Amount_Sales).ToList()
                             }).OrderByDescending(s => s.sumStore).ToList();
                     }
                     else
                     {
-
+                       
                     }
 
                 }
                 // YTD
                 else
                 {
+                    List<GroupBrandRanking> groupBrandStore = new List<GroupBrandRanking>();
+                    int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
+                    int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
 
+                    brandRankingData = repository.report.GetBrandRankingBy(
+                       c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                       && (request.universe == null || c.Universe == request.universe)
+                       && (request.departmentStoreList == null
+                       || !request.departmentStoreList.Any()
+                       || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
+                       && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                    var groupStoreStartYear = brandRankingData.GroupBy(
+                        x => new
+                        {
+                            x.Store_Id,
+                            x.Department_Store_Name
+                        })
+                        .Select(e => new GroupBrandRanking
+                        {
+                            storeName = e.Key.Department_Store_Name,
+                            storeID = e.Key.Store_Id,
+                            sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
+                            brandDetail = e.OrderByDescending(s => s.Amount_Sales).ToList()
+                        }).OrderByDescending(s => s.sumStore).ToList();
+
+                    if (request.storeRankEnd.HasValue)
+                    {
+                        if (!request.storeRankStart.HasValue)
+                        {
+                            request.storeRankStart = 1;
+                        }
+
+                        for (int i = request.storeRankStart.GetValueOrDefault() - 1; i <= request.storeRankEnd.GetValueOrDefault() - 1; i++)
+                        {
+                            if (groupStoreStartYear.ElementAtOrDefault(i) != null)
+                            {
+                                groupBrandStore.Add(groupStoreStartYear.ElementAt(i));
+                            }
+                        }
+
+                        groupStoreStartYear = groupBrandStore;
+                    }
+
+                    var storeFilter = groupStoreStartYear.Select(e => e.storeID);
+                    int timeFilterCompareStart = int.Parse(request.compareYear + request.startMonth + request.startWeek);
+                    int timeFilterCompareEnd = int.Parse(request.compareYear + request.endMonth + request.endWeek);
+
+                    var brandRankingCompareData = repository.report.GetBrandRankingBy(
+                       c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                       && (request.universe == null || c.Universe == request.universe)
+                       && storeFilter.Contains(c.Store_Id)
+                       && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
+
+                    var groupStoreCompareYear = brandRankingCompareData
+                         .GroupBy(c => c.Department_Store_Name).Select(e => new GroupBrandRanking
+                         {
+                             storeName = e.Key,
+                             sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
+                             brandDetail = e.OrderByDescending(s => s.Amount_Sales).ToList()
+                         }).OrderByDescending(s => s.sumStore).ToList();
                 }
             }
             catch (Exception ex)
@@ -178,13 +238,13 @@ namespace MarketData.Processes.Processes
                 }
             }
         }
-
-
     }
 
+    
     public class GroupBrandRanking
     {
         public Guid storeID { get; set; }
+        public string storeName { get; set; }
         public decimal sumStore { get; set; }
         public List<Brand_Ranking> brandDetail { get; set; }
     }

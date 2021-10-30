@@ -23,5 +23,7 @@ namespace MarketData.Model.Entiry
         public decimal? Net_Sales { get; set; }
         public Guid Brand_Type_ID { get; set; }
         public bool Is_Loreal_Brand { get; set; }
+        public int Time_Keyin { get; set; }
+        public string Department_Store_Name { get; set; }
     }
 }

@@ -113,13 +113,16 @@ namespace MarketData.Controllers
         {
             ReportStoreMarketShareZoneRequest request = new ReportStoreMarketShareZoneRequest
             {
-                startWeek = "4",
-                startMonth = "07",
+                startWeek = "1",
+                startMonth = "01",
                 startYear = "2021",
+                endWeek = "3",
+                endMonth = "07",
+                endYear = "2021",
                 compareYear = "2020",
                 universe = "LPD",
                 storeRankStart = 1,
-                storeRankEnd = 12
+                storeRankEnd = 10
             };
             var file = process.report.ExportStoreMarketShareZone(request);
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
