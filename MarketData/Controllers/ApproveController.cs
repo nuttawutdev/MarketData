@@ -1,5 +1,6 @@
 ﻿using MarketData.Middleware;
 using MarketData.Model.Request.Approve;
+using MarketData.Model.Request.Report;
 using MarketData.Models;
 using MarketData.Processes;
 using Microsoft.AspNetCore.Http;
@@ -110,7 +111,17 @@ namespace MarketData.Controllers
 
         public IActionResult Export()
         {
-            var file = process.approve.Export();
+            ReportStoreMarketShareZoneRequest request = new ReportStoreMarketShareZoneRequest
+            {
+                startWeek = "4",
+                startMonth = "07",
+                startYear = "2021",
+                compareYear = "2020",
+                universe = "LPD",
+                storeRankStart = 1,
+                storeRankEnd = 12
+            };
+            var file = process.report.ExportStoreMarketShareZone(request);
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 

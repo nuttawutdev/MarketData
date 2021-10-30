@@ -14,6 +14,7 @@ namespace MarketData.Repositories
         public ApproveRepository approve;
         public AdjustDataRepository adjust;
         public UrlRepository url;
+        public ReportRepository report;
 
         public Repository(MarketDataDBContext dbContext)
         {
@@ -24,6 +25,7 @@ namespace MarketData.Repositories
             approve = new ApproveRepository(dbContext);
             adjust = new AdjustDataRepository(dbContext);
             url = new UrlRepository(dbContext);
+            report = new ReportRepository(dbContext);
         }
     }
 }

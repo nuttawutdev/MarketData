@@ -13,7 +13,7 @@ namespace MarketData.Processes
         public UserProcess user;
         public ApproveProcess approve;
         public AdjustProcess adjust;
-
+        public ReportProcess report;
         public Process(Repository repository)
         {
             masterData = new MasterDataProcess(repository);
@@ -21,6 +21,7 @@ namespace MarketData.Processes
             user = new UserProcess(repository);
             approve = new ApproveProcess(repository);
             adjust = new AdjustProcess(repository);
+            report = new ReportProcess(repository);
         }
     }
 }
