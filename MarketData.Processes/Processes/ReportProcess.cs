@@ -245,18 +245,33 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, 30)).Value = "RANKING";
                 worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
-                int rowBrand = 6;
+                int columnBrand = 6;
                 for (int i = 1; i <= request.brandRankEnd; i++)
                 {
-                    worksheet.Range(worksheet.Cell(6, rowBrand), worksheet.Cell(7, rowBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(6, rowBrand), worksheet.Cell(7, rowBrand + 1)).Merge();
-                    worksheet.Range(worksheet.Cell(6, rowBrand), worksheet.Cell(7, rowBrand + 1)).Value = $"#{i}";
-                    rowBrand = rowBrand + 2;
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(7, columnBrand + 1)).Merge();
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(7, columnBrand + 1)).Value = $"#{i}";
+                    columnBrand = columnBrand + 2;
                 }
 
+                columnBrand++;
+                // Loreal Brand
+                var brandLorealList = listGroup.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d=>d).ToArray();
+                
+                for (int i = 0; i < brandLorealList.Count(); i++)
+                {
+
+                    // worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(7, columnBrand + 1)).Value = $"{brandLorealList[i]} If Not In Top {request.brandRankEnd}";
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Value = $"{brandLorealList[i]}";
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Value = $"If Not In Top {request.brandRankEnd}";
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Merge();
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Merge();
+                    columnBrand = columnBrand + 2;
+                }
 
                 int rowData = 8;
-
                 decimal sumAllStore = listGroup.Sum(c => c.sumStore);
                 decimal sumAllStoreCompare = listGroupCompare.Sum(c => c.sumStore);
 
@@ -307,7 +322,7 @@ namespace MarketData.Processes.Processes
 
                     foreach (var itemBrand in itemGroup.brandDetail)
                     {
-                        if(storeCompare != null)
+                        if (storeCompare != null)
                         {
                             var brandCompare = storeCompare.brandDetail.FirstOrDefault(c => c.Brand_ID == itemBrand.Brand_ID);
                             var percentGrowthBrand = Math.Round(brandCompare != null ? ((itemBrand.Amount_Sales.GetValueOrDefault() / brandCompare.Amount_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
@@ -317,7 +332,7 @@ namespace MarketData.Processes.Processes
                         {
                             worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue($"-100%");
                         }
-                      
+
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Merge();
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).SetValue(itemBrand.Brand_Name);
@@ -327,6 +342,8 @@ namespace MarketData.Processes.Processes
                         columnBrandDetail = columnBrandDetail + 2;
 
                     }
+
+
 
                     rowData = rowData + 2;
                 }
