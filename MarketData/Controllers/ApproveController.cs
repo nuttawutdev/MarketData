@@ -121,7 +121,7 @@ namespace MarketData.Controllers
                 storeRankStart = 1,
                 brandRankStart = 1,
                 brandRankEnd = 10,
-                storeRankEnd = 50
+                storeRankEnd = 10
             };
             var file = process.report.ExportStoreMarketShareZone(request);
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");

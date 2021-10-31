@@ -39,6 +39,18 @@ namespace MarketData.Processes.Processes
                         || !request.departmentStoreList.Any()
                         || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
 
+
+                    var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
+                    var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
+                       c => c.Sales_Week == request.startWeek
+                       && c.Sales_Month == request.startMonth
+                       && c.Sales_Year == oldCompareYear
+                       && (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                       && (request.universe == null || c.Universe == request.universe)
+                       && (request.departmentStoreList == null
+                       || !request.departmentStoreList.Any()
+                       || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
                     if (brandRankingData.Any())
                     {
                         var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
@@ -94,7 +106,21 @@ namespace MarketData.Processes.Processes
                                 brandDetail = e.OrderByDescending(s => s.Amount_Sales).ToList()
                             }).OrderByDescending(s => s.sumStore).ToList();
 
-                        return GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear);
+                        var groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c=> storeFilter.Contains(c.Store_Id)).GroupBy(
+                          x => new
+                          {
+                              x.Store_Id,
+                              x.Department_Store_Name
+                          })
+                          .Select(e => new GroupBrandRanking
+                          {
+                              storeName = e.Key.Department_Store_Name,
+                              storeID = e.Key.Store_Id,
+                              sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
+                              brandDetail = e.OrderByDescending(s => s.Amount_Sales).ToList()
+                          }).OrderByDescending(s => s.sumStore).ToList();
+
+                        return GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
                     }
                     else
                     {
@@ -176,12 +202,11 @@ namespace MarketData.Processes.Processes
         }
 
 
-        private byte[] GenerateReportStoreMarketShareZone(ReportStoreMarketShareZoneRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare)
+        private byte[] GenerateReportStoreMarketShareZone(ReportStoreMarketShareZoneRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare, List<GroupBrandRanking> listGroupOldCompare)
 
         {
             using (var workbook = new XLWorkbook())
             {
-                int currentRow = 1;
                 Color yellowHead = Color.FromArgb(250, 250, 181);
                 XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
 
@@ -256,8 +281,19 @@ namespace MarketData.Processes.Processes
 
                 columnBrand++;
                 // Loreal Brand
-                var brandLorealList = listGroup.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d=>d).ToArray();
-                
+
+
+                List<string> brandLorealList = new List<string>();
+                var brandLorealListCurrent = listGroup.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+                var brandLorealListCompare = listGroupCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+                var brandLorealListOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+
+                brandLorealList.AddRange(brandLorealListCurrent);
+                brandLorealList.AddRange(brandLorealListCompare);
+                brandLorealList.AddRange(brandLorealListOldCompare);
+
+                brandLorealList = brandLorealList.GroupBy(d => d).Select(x => x.Key).OrderBy(d => d).ToList();
+
                 for (int i = 0; i < brandLorealList.Count(); i++)
                 {
 
@@ -338,7 +374,7 @@ namespace MarketData.Processes.Processes
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).SetValue(itemBrand.Brand_Name);
 
                         var percentShareBrand = Math.Round((itemBrand.Amount_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2);
-                        worksheet.Cell(rowData + 1, columnBrandDetail).SetValue($"{percentShareBrand}%");
+                        worksheet.Cell(rowData + 1, columnBrandDetail).SetValue($"{percentShareBrand}% {itemBrand.Amount_Sales.GetValueOrDefault()}");
                         columnBrandDetail = columnBrandDetail + 2;
 
                     }
@@ -348,13 +384,130 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 2;
                 }
 
+                var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100, 2);
+                var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
+                var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
+                var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
 
-                worksheet.Cell(rowData, 1).Value = $"TOTAL {request.startYear}";
-                worksheet.Cell(rowData, 2).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
-                worksheet.Cell(rowData, 3).SetValue(string.Format("{0:#,0}", sumAllStore));
+                var groupBrandDetail = allBrandDetail.GroupBy(
+                       x => new
+                       {
+                           x.Brand_ID,
+                           x.Brand_Name
+                       })
+                       .Select(e => new
+                       {
+                           brandID = e.Key.Brand_ID,
+                           brandName = e.Key.Brand_Name,
+                           sumTotalBrand = e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                       }).OrderByDescending(s => s.sumTotalBrand).ToList();
 
-                worksheet.Cell(rowData + 1, 1).Value = $"TOTAL {request.compareYear}";
-                worksheet.Cell(rowData + 1, 2).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
+                var groupBrandDetailCompare = allBrandDetailCompare.GroupBy(
+                     x => new
+                     {
+                         x.Brand_ID,
+                         x.Brand_Name
+                     })
+                     .Select(e => new
+                     {
+                         brandID = e.Key.Brand_ID,
+                         brandName = e.Key.Brand_Name,
+                         sumTotalBrand = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
+                         detail = e.ToList()
+                     }).OrderByDescending(s => s.sumTotalBrand).ToList();
+
+                var groupBrandDetailOldCompare = allBrandDetailOldCompare.GroupBy(
+                    x => new
+                    {
+                        x.Brand_ID,
+                        x.Brand_Name
+                    })
+                    .Select(e => new
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumTotalBrand = e.Sum(d => d.Amount_Sales.GetValueOrDefault()),
+                        detail = e.ToList()
+                    }).OrderByDescending(s => s.sumTotalBrand).ToList();
+
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Merge();
+                worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 1, 2)).Merge();
+                worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).Merge();
+                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Merge();
+                worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Merge();
+
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+                worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 1, 2)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Value = $"TOTAL {request.startYear}";
+                worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 1, 2)).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
+                worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).SetValue(string.Format("{0:#,0}", sumAllStore));
+                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).SetValue($"{percentGrowthTotal}%");
+                worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).SetValue($"100%");
+
+                int columnBrandTotal = 6;
+                for (int i = 0; i < request.brandRankEnd; i++)
+                {
+                    var brandDetail = groupBrandDetail[i];
+                    var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
+
+                    var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStore) * 100, 2);
+                    worksheet.Cell(rowData + 1, columnBrandTotal).SetValue($"{percentShareBrand}%");
+
+                    if (brandCompare != null)
+                    {
+                        var percentGrowthBrand = Math.Round(brandCompare != null ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
+                    }
+                    else
+                    {
+                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue($"-100%");
+                    }
+
+
+                    worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Merge();
+                    worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).SetValue(brandDetail.brandName);
+                    columnBrandTotal = columnBrandTotal + 2;
+                }
+
+                worksheet.Range(worksheet.Cell(rowData + 2, 1), worksheet.Cell(rowData + 3, 1)).Merge();
+                worksheet.Range(worksheet.Cell(rowData + 2, 2), worksheet.Cell(rowData + 3, 2)).Merge();
+                worksheet.Range(worksheet.Cell(rowData + 2, 3), worksheet.Cell(rowData + 3, 3)).Merge();
+                worksheet.Range(worksheet.Cell(rowData + 2, 4), worksheet.Cell(rowData + 3, 4)).Merge();
+                worksheet.Range(worksheet.Cell(rowData + 2, 5), worksheet.Cell(rowData + 3, 5)).Merge();
+
+                worksheet.Range(worksheet.Cell(rowData + 2, 1), worksheet.Cell(rowData + 3, 1)).Value = $"TOTAL {request.compareYear}";
+                worksheet.Range(worksheet.Cell(rowData + 2, 2), worksheet.Cell(rowData + 3, 2)).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
+
+                int columnBrandTotalCompare = 6;
+
+                for (int i = 0; i < request.brandRankEnd; i++)
+                {
+                    var brandDetail = groupBrandDetailCompare[i];
+                    var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
+
+                    var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
+                    worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue($"{percentShareBrand}%");
+
+                    if (brandCompare != null)
+                    {
+                        var percentGrowthBrand = Math.Round(brandCompare != null ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"{percentGrowthBrand}%");
+                    }
+                    else
+                    {
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"-100%");
+                    }
+
+
+                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Merge();
+                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).SetValue(brandDetail.brandName);
+                    columnBrandTotalCompare = columnBrandTotalCompare + 2;
+                }
 
                 using (var stream = new MemoryStream())
                 {
