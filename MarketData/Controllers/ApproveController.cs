@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -117,12 +118,16 @@ namespace MarketData.Controllers
                 startMonth = "07",
                 startYear = "2021",
                 compareYear = "2020",
+                endWeek = "4",
+                endMonth = "08",
+                endYear = "2021",
                 universe = "LPD",
                 storeRankStart = 1,
                 brandRankStart = 1,
                 brandRankEnd = 10,
                 storeRankEnd = 10
             };
+
             var file = process.report.ExportStoreMarketShareZone(request);
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
