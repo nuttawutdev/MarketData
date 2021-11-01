@@ -118,14 +118,15 @@ namespace MarketData.Controllers
                 startMonth = "07",
                 startYear = "2021",
                 compareYear = "2020",
-                endWeek = "4",
-                endMonth = "08",
-                endYear = "2021",
+                //endWeek = "4",
+                //endMonth = "08",
+                //endYear = "2021",
                 universe = "LPD",
                 storeRankStart = 1,
                 brandRankStart = 1,
                 brandRankEnd = 10,
-                storeRankEnd = 10
+                storeRankEnd = 10,
+                saleType = "Net"
             };
 
             var file = process.report.ExportStoreMarketShareZone(request);
