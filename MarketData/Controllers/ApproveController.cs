@@ -204,6 +204,8 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> ApproveKeyInData([FromBody] ApproveKeyInDataRequest request)
         {
             var userDetailSession = HttpContext.Session.GetString("userDetail");
@@ -216,6 +218,8 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> RejectKeyInData([FromBody] RejectKeyInDataRequest request)
         {
             var userDetailSession = HttpContext.Session.GetString("userDetail");
