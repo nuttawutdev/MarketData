@@ -320,7 +320,10 @@ namespace MarketData.Controllers
             return Json(dataModel);
         }
 
+
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> SaveBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response;
@@ -347,6 +350,8 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> SubmitBAKeyInDetail([FromBody] SaveBAKeyInDetailRequest request)
         {
             SaveDataResponse response;
@@ -424,6 +429,8 @@ namespace MarketData.Controllers
         }
        
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> SaveAdminKeyIn([FromBody] SaveAdminKeyInDetailRequest request)
         {
             SaveDataResponse response;

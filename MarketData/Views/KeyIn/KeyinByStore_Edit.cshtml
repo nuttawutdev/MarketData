@@ -208,8 +208,11 @@
                     $('#confirmID').val('');
                     $('#myModalFailedResult').val('');
                 },
-                error: function () {
-                    $("#blocker").hide();
+                error: function (xhr, status, error) {
+                     var errorMessage = xhr.status + ': ' + xhr.statusText
+                     $("#blocker").hide();
+                     $('#failedModal').modal('show');
+                     $('#myModalFailedResult').text(errorMessage);
                 }
             });
             }

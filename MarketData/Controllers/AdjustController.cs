@@ -231,6 +231,8 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> SaveAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
             var userDetailSession = HttpContext.Session.GetString("userDetail");
@@ -251,6 +253,8 @@ namespace MarketData.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public async Task<IActionResult> SubmitAdjustDataDetail([FromBody] SaveAdjustDataRequest request)
         {
             var userDetailSession = HttpContext.Session.GetString("userDetail");
