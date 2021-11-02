@@ -138,13 +138,13 @@
                                     <td class="col-2" hidden>@item.brandID</td>
                                     <td class="col-2">@item.brandName</td>
                                     <td class="col-2">@item.amountSalePreviousYear</td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input type="number" class="form-control input-sm rank" value="@item.rank"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm amountSale" value="@item.amountSale"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale" value="@item.wholeSale"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm sk" value="@item.sk"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm mu" value="@item.mu"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm fg" value="@item.fg"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-type="currency" type="text" class="form-control input-sm ot" value="@item.ot"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="rank" type="number" class="form-control input-sm rank checkInput" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="amountSale" data-type="currency" type="text" class="form-control input-sm amountSale checkInput" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="wholeSale" data-type="currency" type="text" class="form-control input-sm wholeSale checkInput" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="sk" data-type="currency" type="text" class="form-control input-sm sk checkInput" value="@item.sk"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="mu" data-type="currency" type="text" class="form-control input-sm mu checkInput" value="@item.mu"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="fg" data-type="currency" type="text" class="form-control input-sm fg checkInput" value="@item.fg"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="ot" data-type="currency" type="text" class="form-control input-sm ot checkInput" value="@item.ot"></td>
                                     <td class="col-1 d-inline-flex" style=" align-items:center">
                                         @Html.DropDownListFor(c => item.remark, new SelectList(Model.remarkList, "remark", "remark"), "", new { id = "remarkList", @class = "form-control col-sm-12 remark" })
                                     </td>
@@ -178,84 +178,93 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+        var rowClick = null;
+        var editData = false;
         $("#blocker").hide();
         $("#container").removeClass("container");
         $('#btnSave').on('click', function (e) {
-            var frmdata = getDataFromTable();
-
-            if (validate_AmountSale_Rank_Save(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-                $("#blocker").show();
-                   $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBAKeyInDetail", "KeyIn")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                    success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "");
-                        $('#successModal').modal('show');
-
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function (xhr, status, error) {
-                     var errorMessage = xhr.status + ': ' + xhr.statusText
-                     $("#blocker").hide();
-                     $('#failedModal').modal('show');
-                     $('#myModalFailedResult').text(errorMessage);
-                }
-            });
-            }
-
-
+             save('save');
         });
 
         $('#btnSubmit').on('click', function (e) {
-            var frmdata = getDataFromTable('Submit');
+            save('submit');
 
-            if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+        });
 
+        $('#tblDetails tbody').on('click', 'tr', function () {
+            if (rowClick != ($(this).index()) && editData) {
+                editData = false;
+                save('save');
+            }
+
+            rowClick = ($(this).index());
+        });
+
+        $(document).on('keydown', '.checkInput', function (event) {
+            editData = true;
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+
+            if (keycode == '13') {
+                save('save');
+                var currentIndex = parseFloat($(event.target).attr('data-index'));
+                var dataID = $(event.target).attr('data-id');
+                rowClick = currentIndex + 1;
+                $('input[data-index=' + (currentIndex + 1) + '][data-id=' + dataID + ']').focus();
+            }
+        })
+
+       function save(type) {
+            editData = false;
+            var frmdata = getDataFromTable();
+           var urlAction = '';
+
+           if (type == 'save') {
+               //if (validate_AmountSale_Rank_Save(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+               if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
+                   urlAction = '@Url.Action("SaveBAKeyInDetail", "KeyIn")';
+               }
+
+           }
+           else {
+               if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+                    urlAction = '@Url.Action("SubmitBAKeyInDetail", "KeyIn")';
+               }
+           }
+
+           if (urlAction != '') {
                 $("#blocker").show();
-                $.ajax({
+                   $.ajax({
                     type: "POST",
-                    url: '@Url.Action("SubmitBAKeyInDetail", "KeyIn")',
+                    url: urlAction,
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
-                        success: function (data) {
-                        $("#blocker").hide();
-                        if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "KeyinByStore");
-                            $('#successModal').modal('show');
-                        } else if (data.isDuplicated) {
-                            $('#failedModal').modal('show');
-                            $('#myModalFailedResult').text('Duplicate data!');
-                        } else {
-                            $('#failedModal').modal('show');
-                            $('#myModalFailedResult').text(data.responseError != ""
-                                && data.responseError != null ? data.responseError : 'Save data failed');
-                         }
-                        $('#confirmID').val('');
-                        $('#myModalFailedResult').val('');
-                    },
-                    error: function () {
-                        $("#blocker").hide();
-                    }
+                    success: function (data) {
+                      $("#blocker").hide();
+                      if (data.isSuccess) {
+                          $('#successModalHref').attr("href", "");
+                          $('#successModal').modal('show');
+
+                      } else if (data.isDuplicated) {
+                          $('#failedModal').modal('show');
+                          $('#myModalFailedResult').text('Duplicate data!');
+                      } else {
+                          $('#failedModal').modal('show');
+                          $('#myModalFailedResult').text(data.responseError != ""
+                              && data.responseError != null ? data.responseError : 'Save data failed');
+                      }
+                      $('#confirmID').val('');
+                      $('#myModalFailedResult').val('');
+                  },
+                  error: function (xhr, status, error) {
+                      var errorMessage = xhr.status + ': ' + xhr.statusText
+                      $("#blocker").hide();
+                      $('#failedModal').modal('show');
+                      $('#myModalFailedResult').text(errorMessage);
+                       }
                 });
             }
-
-
-        });
+        }
 
         function getDataFromTable(type){
             var model = @Html.Raw(Json.Serialize(Model));
@@ -449,14 +458,9 @@
 
         }
 
-        $("input[data-type='currency']").on({
-            keyup: function () {
-                formatCurrency($(this));
-            },
-            blur: function () {
-                formatCurrency($(this), "blur");
-            }
-        });
+        $("input[data-type='currency']").keyup(function (e) {
+            formatCurrency($(this));
+        })
 
 
         function formatNumber(n) {
