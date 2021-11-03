@@ -104,6 +104,7 @@
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
+                <h6 class="text-danger">*หมายเหตุ : ข้อมูลจะบันทึกอัตโนมัติ เมื่อมีการเปลี่ยนแถวที่ทำการคีย์ข้อมูล</h6>
                 <table class="table table-hover " id="tblDetails">
                     <thead class="table-secondary">
                         <tr class="row m-0">
@@ -170,7 +171,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button id="btnSave" class="btn btn-danger " type="button">Save</button>
+        @*<button id="btnSave" class="btn btn-danger " type="button">Save</button>*@
         <button id="btnSubmit" class="btn btn-primary text-white" type="button">Submit</button>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
@@ -191,15 +192,19 @@
 
         $('#btnSubmit').on('click', function (e) {
             save('submit');
-
         });
+
+
+        $(document).on('change', '#remarkList', function (event) {
+            save('autosave');
+        });
+
 
         $('#tblDetails tbody').on('click', 'tr', function () {
             if (rowClick != ($(this).index()) && editData) {
                 editData = false;
                 save('autosave');
             }
-
             rowClick = ($(this).index());
         });
 
@@ -222,11 +227,11 @@
            var urlAction = '';
 
            if (type == 'save' || type == 'autosave') {
-               if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+                urlAction = '@Url.Action("SaveBAKeyInDetail", "KeyIn")';
+               @*if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
                //if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
                    urlAction = '@Url.Action("SaveBAKeyInDetail", "KeyIn")';
-               }
-
+               }*@
            }
            else {
                if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
@@ -245,8 +250,8 @@
                     success: function (data) {
                       $("#blocker").hide();
                         if (data.isSuccess) {
-                            if (type == 'save') {
-                                $('#successModalHref').attr("href", "");
+                            if (type != 'autosave') {
+                                $('#successModalHref').attr("href", "KeyinByStore");
                                 $('#successModal').modal('show');
                             }
                       } else if (data.isDuplicated) {
@@ -265,18 +270,16 @@
                       $("#blocker").hide();
                       $('#failedModal').modal('show');
                       $('#myModalFailedResult').text(errorMessage);
-                       }
+                     }
                 });
             }
         }
 
         function getDataFromTable(type){
             var model = @Html.Raw(Json.Serialize(Model));
-
             var frmdata  = {};
             var memberDetails = new Array();
             var bAKeyInID = '';
-
 
             $("#tblDetails TBODY TR").each(function () {
                 var row = $(this);
@@ -376,9 +379,10 @@
 
             var week = data.BAKeyInDetailList[0].week;
             if (week == 4) {
-                for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
-                    if (data.BAKeyInDetailList[i].wholeSale == null) {
-                        messageError = "*Brand " + data.BAKeyInDetailList[i].brandName + "*";
+                var dataHaveValue = data.BAKeyInDetailList.filter(c => c.amountSale > 0);
+                for (var i = 0; i < dataHaveValue.length; i++) {
+                    if (dataHaveValue[i].wholeSale == null) {
+                        messageError = "*Brand " + dataHaveValue[i].brandName + "*";
                         showWarningAlert('NullWholeSales');
                         return 0;
                     }
@@ -449,13 +453,13 @@
             var msg = '';
             switch (typeWarning) {
                 case 'NullAmount':
-                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่มีข้อมูล กรุณาเลือกหตุผลในช่อง Remark เพียงอย่างเดียว';
                     break;
                 case '100Percent':
                     msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100%';
                     break;
                 case 'NullWholeSales':
-                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
                     break;
                 case 'NullWholeSales_AmountSales':
                     msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
