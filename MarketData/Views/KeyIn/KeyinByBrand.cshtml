@@ -239,7 +239,7 @@
                                     '<td class="col-1">' + data.data[i].departmentStoreName + '</td>' +
                                     '<td class="col-2">' + amountSalePreviousYear + '</td>' +
                                     '<td class="col-1" style="align-items:center"><input  type="number" class="form-control input-sm rank" value=' + rank + '></td>' +
-                                    '<td class="col-1" style="align-items:center"><input type="text" data-type="currency" class="form-control input-sm amountSale" value=' + amountSale + '></td>' +
+                                    '<td class="col-1" style="align-items:center"><input  type="text" data-type="currency" class="form-control input-sm amountSale currency" value=' + amountSale + '></td>' +
                                     '<td class="col-1" style="align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale" value=' + wholeSale + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm sk" value=' + sk + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm mu" value=' + mu + '></td>' +
@@ -275,6 +275,11 @@
                 });
             }
         })
+
+        //$("input[data-type='currency']").keyup(function (e) {
+        //    formatCurrency($(this));
+        //})
+      
 
         $(document).on("keyup", "input[data-type='currency']", function (event) {
             formatCurrency($(this));
@@ -362,6 +367,11 @@
         }
 
         function formatCurrencyText(text) {
+
+            console.log(text,'text')
+            if (text == '') {
+                return '0';
+            }
             // appends $ to value, validates decimal side
             // and puts cursor back in right position.
 
