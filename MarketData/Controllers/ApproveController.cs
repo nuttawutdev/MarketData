@@ -27,7 +27,6 @@ namespace MarketData.Controllers
         public IActionResult Index()
         {
             ApproveKeyInViewModel dataModel = new ApproveKeyInViewModel();
-
             try
             {
                 var approveOption = process.approve.GetApproveKeyInOption();

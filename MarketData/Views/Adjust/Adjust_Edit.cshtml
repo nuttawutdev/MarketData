@@ -555,14 +555,19 @@
             });
         }
 
-        $("input[data-type='currency']").on({
-            keyup: function () {
-                formatCurrency($(this));
-            },
-            blur: function () {
-                formatCurrency($(this), "blur");
-            }
-        });
+
+        $("input[data-type='currency']").keyup(function (e) {
+            formatCurrency($(this));
+        })
+
+        //$("input[data-type='currency']").on({
+        //    keyup: function () {
+        //        formatCurrency($(this));
+        //    },
+        //    blur: function () {
+        //        formatCurrency($(this), "blur");
+        //    }
+        //});
 
 
         function formatCurrency(input, blur) {

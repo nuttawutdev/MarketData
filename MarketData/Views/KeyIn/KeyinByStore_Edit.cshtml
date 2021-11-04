@@ -104,6 +104,7 @@
     <div class="table-responsive table-sm">
         <div class="table-wrapper">
             <div style=" overflow-x: auto;">
+                <h6 class="text-danger">*หมายเหตุ : ข้อมูลจะบันทึกอัตโนมัติ เมื่อมีการเปลี่ยนแถวที่ทำการคีย์ข้อมูล</h6>
                 <table class="table table-hover " id="tblDetails">
                     <thead class="table-secondary">
                         <tr class="row m-0">
@@ -124,6 +125,7 @@
                     </thead>
                     <tbody>
                         @{
+                            int dataindex = 1;
                             foreach (var item in Model.BAKeyInDetailList)
                             {
                                 <tr class="row m-0" style="color: black; background: @( item.brandColor!="" && item.brandColor!=null && item.brandColor!="#ffffff"?item.brandColor:"" )">
@@ -138,17 +140,18 @@
                                     <td class="col-2" hidden>@item.brandID</td>
                                     <td class="col-2">@item.brandName</td>
                                     <td class="col-2">@item.amountSalePreviousYear</td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="rank" type="number" class="form-control input-sm rank checkInput" value="@item.rank"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="amountSale" data-type="currency" type="text" class="form-control input-sm amountSale checkInput" value="@item.amountSale"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="wholeSale" data-type="currency" type="text" class="form-control input-sm wholeSale checkInput" value="@item.wholeSale"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="sk" data-type="currency" type="text" class="form-control input-sm sk checkInput" value="@item.sk"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="mu" data-type="currency" type="text" class="form-control input-sm mu checkInput" value="@item.mu"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="fg" data-type="currency" type="text" class="form-control input-sm fg checkInput" value="@item.fg"></td>
-                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-id="ot" data-type="currency" type="text" class="form-control input-sm ot checkInput" value="@item.ot"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="rank" type="number" class="form-control input-sm rank checkInput" value="@item.rank"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="amountSale" data-type="currency" type="text" class="form-control input-sm amountSale checkInput" value="@item.amountSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="wholeSale" data-type="currency" type="text" class="form-control input-sm wholeSale checkInput" value="@item.wholeSale"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="sk" data-type="currency" type="text" class="form-control input-sm sk checkInput" value="@item.sk"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="mu" data-type="currency" type="text" class="form-control input-sm mu checkInput" value="@item.mu"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="fg" data-type="currency" type="text" class="form-control input-sm fg checkInput" value="@item.fg"></td>
+                                    <td class="col-1 d-inline-flex" style=" align-items:center"><input data-index=@dataindex data-id="ot" data-type="currency" type="text" class="form-control input-sm ot checkInput" value="@item.ot"></td>
                                     <td class="col-1 d-inline-flex" style=" align-items:center">
                                         @Html.DropDownListFor(c => item.remark, new SelectList(Model.remarkList, "remark", "remark"), "", new { id = "remarkList", @class = "form-control col-sm-12 remark" })
                                     </td>
                                 </tr>
+                                dataindex++;
                             }
 
                         }
@@ -168,7 +171,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button id="btnSave" class="btn btn-danger " type="button">Save</button>
+        @*<button id="btnSave" class="btn btn-danger " type="button">Save</button>*@
         <button id="btnSubmit" class="btn btn-primary text-white" type="button">Submit</button>
         <a href="KeyInByStore" class="btn btn-outline-danger">Cancel</a>
 
@@ -178,6 +181,7 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+        var messageError = "";
         var rowClick = null;
         var editData = false;
         $("#blocker").hide();
@@ -188,15 +192,19 @@
 
         $('#btnSubmit').on('click', function (e) {
             save('submit');
-
         });
+
+
+        $(document).on('change', '#remarkList', function (event) {
+            save('autosave');
+        });
+
 
         $('#tblDetails tbody').on('click', 'tr', function () {
             if (rowClick != ($(this).index()) && editData) {
                 editData = false;
-                save('save');
+                save('autosave');
             }
-
             rowClick = ($(this).index());
         });
 
@@ -205,7 +213,7 @@
             var keycode = (event.keyCode ? event.keyCode : event.which);
 
             if (keycode == '13') {
-                save('save');
+                save('autosave');
                 var currentIndex = parseFloat($(event.target).attr('data-index'));
                 var dataID = $(event.target).attr('data-id');
                 rowClick = currentIndex + 1;
@@ -218,12 +226,12 @@
             var frmdata = getDataFromTable();
            var urlAction = '';
 
-           if (type == 'save') {
-               //if (validate_AmountSale_Rank_Save(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
-               if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
+           if (type == 'save' || type == 'autosave') {
+                urlAction = '@Url.Action("SaveBAKeyInDetail", "KeyIn")';
+               @*if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
+               //if (validate_Sum_Percent(frmdata) && validate_WholeSales_AmountSales(frmdata)) {
                    urlAction = '@Url.Action("SaveBAKeyInDetail", "KeyIn")';
-               }
-
+               }*@
            }
            else {
                if (validate_AmountSale_Rank(frmdata) && validate_Sum_Percent(frmdata) && validate_WholeSales(frmdata) && validate_WholeSales_AmountSales(frmdata) && validate_Rank_AmountSales(frmdata)) {
@@ -232,7 +240,7 @@
            }
 
            if (urlAction != '') {
-                $("#blocker").show();
+                   $("#blocker").show();
                    $.ajax({
                     type: "POST",
                     url: urlAction,
@@ -241,10 +249,11 @@
                     datatype: "json",
                     success: function (data) {
                       $("#blocker").hide();
-                      if (data.isSuccess) {
-                          $('#successModalHref').attr("href", "");
-                          $('#successModal').modal('show');
-
+                        if (data.isSuccess) {
+                            if (type != 'autosave') {
+                                $('#successModalHref').attr("href", "KeyinByStore");
+                                $('#successModal').modal('show');
+                            }
                       } else if (data.isDuplicated) {
                           $('#failedModal').modal('show');
                           $('#myModalFailedResult').text('Duplicate data!');
@@ -261,18 +270,16 @@
                       $("#blocker").hide();
                       $('#failedModal').modal('show');
                       $('#myModalFailedResult').text(errorMessage);
-                       }
+                     }
                 });
             }
         }
 
         function getDataFromTable(type){
             var model = @Html.Raw(Json.Serialize(Model));
-
             var frmdata  = {};
             var memberDetails = new Array();
             var bAKeyInID = '';
-
 
             $("#tblDetails TBODY TR").each(function () {
                 var row = $(this);
@@ -319,107 +326,122 @@
         };
 
         function validate_AmountSale_Rank(data) {
-            var isNullAmount = data.BAKeyInDetailList.some(function (i) {
-                return (i.amountSale == null && i.rank != null) ||
-                  (i.amountSale != null && i.rank == null) ||
-                  (i.amountSale == null && i.rank == null && i.remark == '');
-          })
-            if (isNullAmount) {
-                showWarningAlert('NullAmount');
-                return 0;
-            } else return 1;
+            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
+                var detailData = data.BAKeyInDetailList[i];
+                if ((detailData.amountSale == null && detailData.rank != null) ||
+                    (detailData.amountSale != null && detailData.rank == null) ||
+                    (detailData.amountSale == null && detailData.rank == null && detailData.remark == '')) {
+                    messageError = "*Brand " + detailData.brandName + "*";
+                    showWarningAlert('NullAmount');
+                    return 0;
+                }
+            }
+
+            return 1;
         }
 
         function validate_AmountSale_Rank_Save(data) {
-            var isNullAmount = data.BAKeyInDetailList.some(function (i) {
-                return (i.amountSale == null && i.rank != null) ||
-                    (i.amountSale != null && i.rank == null);
-            })
-            if (isNullAmount) {
-                showWarningAlert('NullAmount');
-                return 0;
-            } else return 1;
+            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
+                var detailData = data.BAKeyInDetailList[i];
+                if ((detailData.amountSale == null && detailData.rank != null) ||
+                    (detailData.amountSale != null && detailData.rank == null)) {
+                    messageError = "*Brand " + detailData.brandName + "*";
+                    showWarningAlert('NullAmount');
+                    return 0;
+                }
+            }
+
+            return 1;
         }
 
         function validate_Sum_Percent(data) {
 
-            var validateData = data.BAKeyInDetailList.some(function (i) {
-                var sk = i.sk != null ? parseFloat(i.sk) : 0;
-                var mu = i.mu != null ? parseFloat(i.mu) : 0;
-                var fg = i.fg != null ? parseFloat(i.fg) : 0;
-                var ot = i.ot != null ? parseFloat(i.ot) : 0;
+            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
+                var detailData = data.BAKeyInDetailList[i];
+                var sk = detailData.sk != null ? parseFloat(detailData.sk) : 0;
+                var mu = detailData.mu != null ? parseFloat(detailData.mu) : 0;
+                var fg = detailData.fg != null ? parseFloat(detailData.fg) : 0;
+                var ot = detailData.ot != null ? parseFloat(detailData.ot) : 0;
 
                 var sum = sk + mu + fg + ot;
-                return sum != 0 && sum != 100;
-            })
-            if (validateData) {
-                showWarningAlert('100Percent');
-                return 0;
-            } else return 1;
+                if (sum != 0 && sum != 100) {
+                    messageError = "*Brand " + detailData.brandName + "*";
+                    showWarningAlert('100Percent');
+                    return 0;
+                }
+            }
+
+            return 1;
         }
 
 
         function validate_WholeSales(data) {
 
-            var validateData = data.BAKeyInDetailList.some(function (i) {
-                return i.week == 4 && i.wholeSale == null
-            })
+            var week = data.BAKeyInDetailList[0].week;
+            if (week == 4) {
+                var dataHaveValue = data.BAKeyInDetailList.filter(c => c.amountSale > 0);
+                for (var i = 0; i < dataHaveValue.length; i++) {
+                    if (dataHaveValue[i].wholeSale == null) {
+                        messageError = "*Brand " + dataHaveValue[i].brandName + "*";
+                        showWarningAlert('NullWholeSales');
+                        return 0;
+                    }
+                }
+            }
 
-            if (validateData) {
-                showWarningAlert('NullWholeSales');
-                return 0;
-            } else return 1;
+            return 1;
         }
 
         function validate_WholeSales_AmountSales(data) {
 
-            var validateData = data.BAKeyInDetailList.some(function (i) {
-                var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
-                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
-                return amountSale < wholeSale ;
-            })
+            var dataHaveValue = data.BAKeyInDetailList.filter(c => c.amountSale > 0 && c.wholeSale > 0);
+            for (var i = 0; i < dataHaveValue.length; i++) {
+                var dataValidate = dataHaveValue[i];
+                if (dataValidate.amountSale < dataValidate.wholeSale) {
+                    messageError = "*Brand " + dataValidate.brandName + "*";
+                    showWarningAlert('NullWholeSales_AmountSales');
+                    return 0;
+                }
+            }
 
-            if (validateData) {
-                showWarningAlert('NullWholeSales_AmountSales');
-                return 0;
-            } else return 1;
+            return 1;
         }
 
         function validate_Rank_AmountSales(data) {
-
             var number = 0;
             var duplicateRank = false;
-            for (var i = 0; i < data.BAKeyInDetailList.length; i++) {
-
-                if (data.BAKeyInDetailList[i].rank != null && data.BAKeyInDetailList[i].rank != '' && number == data.BAKeyInDetailList[i].rank) {
+            var sortRank = data.BAKeyInDetailList.filter(c => c.rank != null).sort((a, b) => (a.rank > b.rank) ? 1 : -1)
+            for (var i = 0; i < sortRank.length; i++) {
+                if (sortRank[i].rank != null && sortRank[i].rank != '' && number == sortRank[i].rank) {
                     duplicateRank = true;
+                    var rankDuplicate = sortRank.find(c => c.rank == number);
+                    messageError = "*Brand " + sortRank[i].brandName + " และ Brand " + rankDuplicate.brandName+"*";
                     break;
                 } else {
-                    number = data.BAKeyInDetailList[i].rank
+                    number = sortRank[i].rank
                 }
             }
 
             if (duplicateRank) {
-                showWarningAlert('DuplicateRank');
+                showWarningAlert('DuplicateRank', messageError);
                 return 0;
             }
 
-            var sortAmount = data.BAKeyInDetailList.sort((a, b) => (a.amountSale > b.amountSale) ? -1 : 1)
-
             var inCorrectAmountRank = false;
-            var sort = 1;
-            for (var i = 0; i < sortAmount.length; i++) {
-                if (sortAmount[i].amountSale != null && sortAmount[i].rank != null) {
-                if (  sortAmount[i].rank == sort ) {
-                    sort++;
-                } else {
-                    inCorrectAmountRank = true;
-                    break;
+            for (var i = 0; i < sortRank.length; i++) {
+                if (sortRank[i].amountSale != null && sortRank[i].rank != null) {
+                    if (sortRank[i + 1] != null) {
+                        if (sortRank[i].amountSale > sortRank[i + 1].amountSale) {
+                        } else {
+                            messageError = "ค่า Amount Sales ของ Brand " + sortRank[i].brandName + " ควรมากกว่าค่า Amount Sales ของ Brand " + sortRank[i + 1].brandName;
+                            inCorrectAmountRank = true;
+                            break;
+                        }
                     }
                 }
             }
             if (inCorrectAmountRank) {
-                showWarningAlert('IncorrectAmountRank');
+                showWarningAlert('IncorrectAmountRank', messageError);
                 return 0;
             } else {
                 return 1;
@@ -431,13 +453,13 @@
             var msg = '';
             switch (typeWarning) {
                 case 'NullAmount':
-                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่กรอกข้อมูล กรุณาใส่เหตุผลในช่อง Remark';
+                    msg = 'กรุณากรอกข้อมูล Amount sales และ Rank กรณีไม่มีข้อมูล กรุณาเลือกหตุผลในช่อง Remark เพียงอย่างเดียว';
                     break;
                 case '100Percent':
-                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100% เท่านั้น';
+                    msg = 'ค่ารวมของ SK, MU, FG, OT ต้องมีค่าเท่ากับ 100%';
                     break;
                 case 'NullWholeSales':
-                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales ของทุก Brand กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
+                    msg = 'การกรอกข้อมูลของ Week ที่ 4 จะต้องใส่ค่า Whole sales กรณีไม่มียอดขาย whole sales จะต้องใส่ค่าเป็น 0';
                     break;
                 case 'NullWholeSales_AmountSales':
                     msg = 'Whole sales ต้องน้อยกว่า Amount Sales';
@@ -455,7 +477,8 @@
             $('#warningModal').modal('show');
 
             $('#myModalWarningResult').text(msg);
-
+            $('#myModalWarningMessage').text(messageError);
+            messageError = "";
         }
 
         $("input[data-type='currency']").keyup(function (e) {

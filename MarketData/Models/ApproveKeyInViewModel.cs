@@ -7,6 +7,7 @@ namespace MarketData.Models
 {
     public class ApproveKeyInViewModel
     {
+        public string htmlText { get; set; }
         public List<ChannelKeyInViewModel> channelList { get; set; } = new List<ChannelKeyInViewModel>();
         public List<RetailerGroupKeyInViewModel> retailerGroupList { get; set; } = new List<RetailerGroupKeyInViewModel>();
         public List<DepartmentStoreKeyInViewModel> departmentStoreList { get; set; } = new List<DepartmentStoreKeyInViewModel>();
