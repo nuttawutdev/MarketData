@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.Report;
+using MarketData.Model.Response.Report;
 using MarketData.Repositories;
 using Spire.Xls;
 using System;
@@ -24,285 +25,111 @@ namespace MarketData.Processes.Processes
         {
             this.repository = repository;
         }
-        public string PreviewStoreMarketShareZone(ReportStoreMarketShareZoneRequest request)
+
+        public GenerateReportResponse GetReportStoreMarketShareZone(ReportStoreMarketShareRequest request)
         {
+            GenerateReportResponse response = new GenerateReportResponse();
+
             try
             {
-                List<Brand_Ranking> brandRankingData;
-                // MTD
-                if (string.IsNullOrWhiteSpace(request.endWeek))
-                {
-                    List<GroupBrandRanking> groupBrandStore = new List<GroupBrandRanking>();
-                    brandRankingData = repository.report.GetBrandRankingBy(
-                        c => c.Sales_Week == request.startWeek
-                        && c.Sales_Month == request.startMonth
-                        && (c.Sales_Year == request.startYear || c.Sales_Year == request.compareYear)
-                        && (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                        && (request.universe == null || c.Universe == request.universe)
-                        && (request.departmentStoreList == null
-                        || !request.departmentStoreList.Any()
-                        || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+                (List<GroupStoreRanking> groupStoreStartYear, List<GroupStoreRanking> groupStoreCompareYear, List<GroupStoreRanking> groupStoreCompareOldYear) = GetDataForReportStoreMarketShare(request);
+                (byte[] fileContent, string filePreview) = GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
 
-                    if (brandRankingData.Any())
-                    {
-                        var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
-
-                        List<GroupBrandRanking> groupStoreStartYear = new List<GroupBrandRanking>();
-                        groupStoreStartYear = brandRankingStartYear.GroupBy(
-                            x => new
-                            {
-                                x.Store_Id,
-                                x.Department_Store_Name
-                            })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        if (request.storeRankEnd.HasValue)
-                        {
-                            if (!request.storeRankStart.HasValue)
-                            {
-                                request.storeRankStart = 1;
-                            }
-
-                            for (int i = request.storeRankStart.GetValueOrDefault() - 1; i <= request.storeRankEnd.GetValueOrDefault() - 1; i++)
-                            {
-                                if (groupStoreStartYear.ElementAtOrDefault(i) != null)
-                                {
-                                    groupBrandStore.Add(groupStoreStartYear.ElementAt(i));
-                                }
-                            }
-
-                            groupStoreStartYear = groupBrandStore;
-                        }
-
-                        var storeFilter = groupStoreStartYear.Select(e => e.storeID);
-                        var brandRankingCompareYear = brandRankingData.Where(
-                            w => w.Sales_Year == request.compareYear
-                            && storeFilter.Contains(w.Store_Id));
-
-                        List<GroupBrandRanking> groupStoreCompareYear = new List<GroupBrandRanking>();
-
-                        groupStoreCompareYear = brandRankingCompareYear.GroupBy(
-                        x => new
-                        {
-                            x.Store_Id,
-                            x.Department_Store_Name
-                        })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
-                        var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
-                           c => c.Sales_Week == request.startWeek
-                           && c.Sales_Month == request.startMonth
-                           && c.Sales_Year == oldCompareYear
-                           && (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                           && (request.universe == null || c.Universe == request.universe)
-                           && (request.departmentStoreList == null
-                           || !request.departmentStoreList.Any()
-                           || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
-
-                        List<GroupBrandRanking> groupStoreCompareOldYear = new List<GroupBrandRanking>();
-
-                        groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
-                        x => new
-                        {
-                            x.Store_Id,
-                            x.Department_Store_Name
-                        })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        return PreviewReportStoreMarketShareValue(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
-                    }
-                }
-              
+                response.fileContent = fileContent;
+                response.filePreview = filePreview;
+                response.success = true;
             }
             catch (Exception ex)
             {
-
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
             }
-            return null;
+
+            return response;
         }
 
-        public byte[] ExportStoreMarketShareZone(ReportStoreMarketShareZoneRequest request)
+        public GenerateReportResponse GetReportStoreMarketShareValue(ReportStoreMarketShareRequest request)
         {
+            GenerateReportResponse response = new GenerateReportResponse();
+
             try
             {
-                List<Brand_Ranking> brandRankingData;
-                // MTD
-                if (string.IsNullOrWhiteSpace(request.endWeek))
-                {
-                    List<GroupBrandRanking> groupBrandStore = new List<GroupBrandRanking>();
-                    brandRankingData = repository.report.GetBrandRankingBy(
-                        c => c.Sales_Week == request.startWeek
-                        && c.Sales_Month == request.startMonth
-                        && (c.Sales_Year == request.startYear || c.Sales_Year == request.compareYear)
-                        && (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                        && (request.universe == null || c.Universe == request.universe)
-                        && (request.departmentStoreList == null
-                        || !request.departmentStoreList.Any()
-                        || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+                (List<GroupStoreRanking> groupStoreStartYear, List<GroupStoreRanking> groupStoreCompareYear, List<GroupStoreRanking> groupStoreCompareOldYear) = GetDataForReportStoreMarketShare(request);
+                (byte[] fileContent, string filePreview) = GenerateReportStoreMarketShareValue(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
 
-                    if (brandRankingData.Any())
+                response.fileContent = fileContent;
+                response.filePreview = filePreview;
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GenerateReportResponse GetReportSelectiveMarket(ReportSelectiveMarketRequest request)
+        {
+            GenerateReportResponse response = new GenerateReportResponse();
+
+            try
+            {
+                (List<GroupBrandRanking> groupBrandStartYear, List<GroupBrandRanking> groupBrandCompareYear, List<GroupBrandRanking> groupBrandCompareOldYear) = GetDataForReportSelectiveMarket(request);
+                (byte[] fileContent, string filePreview) = GenerateReportSelectiveMarket(request, groupBrandStartYear, groupBrandCompareYear, groupBrandCompareOldYear);
+
+                response.fileContent = fileContent;
+                response.filePreview = filePreview;
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        private (List<GroupStoreRanking>, List<GroupStoreRanking>, List<GroupStoreRanking>) GetDataForReportStoreMarketShare(ReportStoreMarketShareRequest request)
+        {
+            List<GroupStoreRanking> groupStoreStartYear = new List<GroupStoreRanking>();
+            List<GroupStoreRanking> groupStoreCompareYear = new List<GroupStoreRanking>();
+            List<GroupStoreRanking> groupStoreCompareOldYear = new List<GroupStoreRanking>();
+
+            // MTD
+            if (string.IsNullOrWhiteSpace(request.endWeek))
+            {
+                List<GroupStoreRanking> groupBrandStore = new List<GroupStoreRanking>();
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                    c => c.Sales_Week == request.startWeek
+                    && c.Sales_Month == request.startMonth
+                    && (c.Sales_Year == request.startYear || c.Sales_Year == request.compareYear)
+                    && (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                    && (request.universe == null || c.Universe == request.universe)
+                    && (request.departmentStoreList == null
+                    || !request.departmentStoreList.Any()
+                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+                if (brandRankingData.Any())
+                {
+                    var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
+
+                    groupStoreStartYear = brandRankingStartYear.GroupBy(
+                        x => new
+                        {
+                            x.Store_Id,
+                            x.Department_Store_Name
+                        })
+                    .Select(e => new GroupStoreRanking
                     {
-                        var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
-
-                        List<GroupBrandRanking> groupStoreStartYear = new List<GroupBrandRanking>();
-                        groupStoreStartYear = brandRankingStartYear.GroupBy(
-                            x => new
-                            {
-                                x.Store_Id,
-                                x.Department_Store_Name
-                            })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        if (request.storeRankEnd.HasValue)
-                        {
-                            if (!request.storeRankStart.HasValue)
-                            {
-                                request.storeRankStart = 1;
-                            }
-
-                            for (int i = request.storeRankStart.GetValueOrDefault() - 1; i <= request.storeRankEnd.GetValueOrDefault() - 1; i++)
-                            {
-                                if (groupStoreStartYear.ElementAtOrDefault(i) != null)
-                                {
-                                    groupBrandStore.Add(groupStoreStartYear.ElementAt(i));
-                                }
-                            }
-
-                            groupStoreStartYear = groupBrandStore;
-                        }
-
-                        var storeFilter = groupStoreStartYear.Select(e => e.storeID);
-                        var brandRankingCompareYear = brandRankingData.Where(
-                            w => w.Sales_Year == request.compareYear
-                            && storeFilter.Contains(w.Store_Id));
-
-                        List<GroupBrandRanking> groupStoreCompareYear = new List<GroupBrandRanking>();
-
-                        groupStoreCompareYear = brandRankingCompareYear.GroupBy(
-                        x => new
-                        {
-                            x.Store_Id,
-                            x.Department_Store_Name
-                        })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
-                        var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
-                           c => c.Sales_Week == request.startWeek
-                           && c.Sales_Month == request.startMonth
-                           && c.Sales_Year == oldCompareYear
-                           && (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                           && (request.universe == null || c.Universe == request.universe)
-                           && (request.departmentStoreList == null
-                           || !request.departmentStoreList.Any()
-                           || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
-
-                        List<GroupBrandRanking> groupStoreCompareOldYear = new List<GroupBrandRanking>();
-
-                        groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
-                        x => new
-                        {
-                            x.Store_Id,
-                            x.Department_Store_Name
-                        })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
-
-                        return GenerateReportStoreMarketShareValue(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
-                    }
-                }
-                // YTD
-                else
-                {
-                    List<GroupBrandRanking> groupBrandStore = new List<GroupBrandRanking>();
-                    int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
-                    int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
-
-                    brandRankingData = repository.report.GetBrandRankingBy(
-                       c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                       && (request.universe == null || c.Universe == request.universe)
-                       && (request.departmentStoreList == null
-                       || !request.departmentStoreList.Any()
-                       || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
-                       && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
-
-                    var groupStoreStartYear = brandRankingData.GroupBy(
-                        x => new
-                        {
-                            x.Store_Id,
-                            x.Department_Store_Name
-                        })
-                        .Select(e => new GroupBrandRanking
-                        {
-                            storeName = e.Key.Department_Store_Name,
-                            storeID = e.Key.Store_Id,
-                            sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                      : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                      : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                            brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                      : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                      : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                        }).OrderByDescending(s => s.sumStore).ToList();
+                        storeName = e.Key.Department_Store_Name,
+                        storeID = e.Key.Store_Id,
+                        sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumStore).ToList();
 
                     if (request.storeRankEnd.HasValue)
                     {
@@ -323,72 +150,351 @@ namespace MarketData.Processes.Processes
                     }
 
                     var storeFilter = groupStoreStartYear.Select(e => e.storeID);
-                    int timeFilterCompareStart = int.Parse(request.compareYear + request.startMonth + request.startWeek);
-                    int timeFilterCompareEnd = int.Parse(request.compareYear + request.endMonth + request.endWeek);
+                    var brandRankingCompareYear = brandRankingData.Where(
+                        w => w.Sales_Year == request.compareYear
+                        && storeFilter.Contains(w.Store_Id));
 
-                    var brandRankingCompareData = repository.report.GetBrandRankingBy(
-                       c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
-                       && (request.universe == null || c.Universe == request.universe)
-                       && storeFilter.Contains(c.Store_Id)
-                       && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
-
-                    var groupStoreCompareYear = brandRankingCompareData.GroupBy(
-                       x => new
-                       {
-                           x.Store_Id,
-                           x.Department_Store_Name
-                       })
-                       .Select(e => new GroupBrandRanking
-                       {
-                           storeName = e.Key.Department_Store_Name,
-                           storeID = e.Key.Store_Id,
-                           sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                      : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                      : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                           brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                      : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                      : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                       }).OrderByDescending(s => s.sumStore).ToList();
+                    groupStoreCompareYear = brandRankingCompareYear.GroupBy(
+                    x => new
+                    {
+                        x.Store_Id,
+                        x.Department_Store_Name
+                    })
+                    .Select(e => new GroupStoreRanking
+                    {
+                        storeName = e.Key.Department_Store_Name,
+                        storeID = e.Key.Store_Id,
+                        sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumStore).ToList();
 
                     var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
-                    int timeFilterOldCompareStart = int.Parse(oldCompareYear + request.startMonth + request.startWeek);
-                    int timeFilterOldCompareEnd = int.Parse(oldCompareYear + request.endMonth + request.endWeek);
-
                     var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
-                       c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                       c => c.Sales_Week == request.startWeek
+                       && c.Sales_Month == request.startMonth
+                       && c.Sales_Year == oldCompareYear
+                       && (request.brandType == null || c.Brand_Type_ID == request.brandType)
                        && (request.universe == null || c.Universe == request.universe)
-                       && storeFilter.Contains(c.Store_Id)
-                       && (c.Time_Keyin >= timeFilterOldCompareStart && c.Time_Keyin <= timeFilterOldCompareEnd));
+                       && (request.departmentStoreList == null
+                       || !request.departmentStoreList.Any()
+                       || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
 
-                    var groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
-                      x => new
-                      {
-                          x.Store_Id,
-                          x.Department_Store_Name
-                      })
-                      .Select(e => new GroupBrandRanking
-                      {
-                          storeName = e.Key.Department_Store_Name,
-                          storeID = e.Key.Store_Id,
-                          sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                                      : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                                      : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                          brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
-                                      : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
-                                      : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
-                      }).OrderByDescending(s => s.sumStore).ToList();
-
-                    return GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
+                    groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
+                    x => new
+                    {
+                        x.Store_Id,
+                        x.Department_Store_Name
+                    })
+                    .Select(e => new GroupStoreRanking
+                    {
+                        storeName = e.Key.Department_Store_Name,
+                        storeID = e.Key.Store_Id,
+                        sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumStore).ToList();
                 }
             }
-            catch (Exception ex)
+            // YTD
+            else
             {
+                List<GroupStoreRanking> groupBrandStore = new List<GroupStoreRanking>();
+                int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
+                int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
 
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && (request.departmentStoreList == null
+                   || !request.departmentStoreList.Any()
+                   || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
+                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                groupStoreStartYear = brandRankingData.GroupBy(
+                    x => new
+                    {
+                        x.Store_Id,
+                        x.Department_Store_Name
+                    })
+                    .Select(e => new GroupStoreRanking
+                    {
+                        storeName = e.Key.Department_Store_Name,
+                        storeID = e.Key.Store_Id,
+                        sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumStore).ToList();
+
+                if (request.storeRankEnd.HasValue)
+                {
+                    if (!request.storeRankStart.HasValue)
+                    {
+                        request.storeRankStart = 1;
+                    }
+
+                    for (int i = request.storeRankStart.GetValueOrDefault() - 1; i <= request.storeRankEnd.GetValueOrDefault() - 1; i++)
+                    {
+                        if (groupStoreStartYear.ElementAtOrDefault(i) != null)
+                        {
+                            groupBrandStore.Add(groupStoreStartYear.ElementAt(i));
+                        }
+                    }
+
+                    groupStoreStartYear = groupBrandStore;
+                }
+
+                var storeFilter = groupStoreStartYear.Select(e => e.storeID);
+                int timeFilterCompareStart = int.Parse(request.compareYear + request.startMonth + request.startWeek);
+                int timeFilterCompareEnd = int.Parse(request.compareYear + request.endMonth + request.endWeek);
+
+                var brandRankingCompareData = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && storeFilter.Contains(c.Store_Id)
+                   && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
+
+                groupStoreCompareYear = brandRankingCompareData.GroupBy(
+                   x => new
+                   {
+                       x.Store_Id,
+                       x.Department_Store_Name
+                   })
+                   .Select(e => new GroupStoreRanking
+                   {
+                       storeName = e.Key.Department_Store_Name,
+                       storeID = e.Key.Store_Id,
+                       sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                       brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                   }).OrderByDescending(s => s.sumStore).ToList();
+
+                var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
+                int timeFilterOldCompareStart = int.Parse(oldCompareYear + request.startMonth + request.startWeek);
+                int timeFilterOldCompareEnd = int.Parse(oldCompareYear + request.endMonth + request.endWeek);
+
+                var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && storeFilter.Contains(c.Store_Id)
+                   && (c.Time_Keyin >= timeFilterOldCompareStart && c.Time_Keyin <= timeFilterOldCompareEnd));
+
+                groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
+                  x => new
+                  {
+                      x.Store_Id,
+                      x.Department_Store_Name
+                  })
+                  .Select(e => new GroupStoreRanking
+                  {
+                      storeName = e.Key.Department_Store_Name,
+                      storeID = e.Key.Store_Id,
+                      sumStore = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                                  : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                                  : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                      brandDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                                  : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                                  : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                  }).OrderByDescending(s => s.sumStore).ToList();
             }
-            return null;
+
+            return (groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
         }
 
-        private byte[] GenerateReportStoreMarketShareZone(ReportStoreMarketShareZoneRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare, List<GroupBrandRanking> listGroupOldCompare)
+        private (List<GroupBrandRanking>, List<GroupBrandRanking>, List<GroupBrandRanking>) GetDataForReportSelectiveMarket(ReportSelectiveMarketRequest request)
+        {
+            List<GroupBrandRanking> groupBrandStartYear = new List<GroupBrandRanking>();
+            List<GroupBrandRanking> groupBrandCompareYear = new List<GroupBrandRanking>();
+            List<GroupBrandRanking> groupBrandCompareOldYear = new List<GroupBrandRanking>();
+
+            // MTD
+            if (string.IsNullOrWhiteSpace(request.endWeek))
+            {
+                List<GroupStoreRanking> groupBrandStore = new List<GroupStoreRanking>();
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                    c => c.Sales_Week == request.startWeek
+                    && c.Sales_Month == request.startMonth
+                    && (c.Sales_Year == request.startYear || c.Sales_Year == request.compareYear)
+                    && (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                    && (request.universe == null || c.Universe == request.universe)
+                    && (request.departmentStoreList == null
+                    || !request.departmentStoreList.Any()
+                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+                if (brandRankingData.Any())
+                {
+                    var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
+
+                    groupBrandStartYear = brandRankingStartYear.GroupBy(
+                        x => new
+                        {
+                            x.Brand_ID,
+                            x.Brand_Name
+                        })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+
+                    var brandRankingCompareYear = brandRankingData.Where(w => w.Sales_Year == request.compareYear);
+
+                    groupBrandCompareYear = brandRankingCompareYear.GroupBy(
+                    x => new
+                    {
+                        x.Brand_ID,
+                        x.Brand_Name
+                    })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+
+                    var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
+                    var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
+                       c => c.Sales_Week == request.startWeek
+                       && c.Sales_Month == request.startMonth
+                       && c.Sales_Year == oldCompareYear
+                       && (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                       && (request.universe == null || c.Universe == request.universe)
+                       && (request.departmentStoreList == null
+                       || !request.departmentStoreList.Any()
+                       || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+                    groupBrandCompareOldYear = brandRankingDataOlpCompare.GroupBy(
+                    x => new
+                    {
+                        x.Brand_ID,
+                        x.Brand_Name
+                    })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+                }
+            }
+            // YTD
+            else
+            {
+                int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
+                int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
+
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && (request.departmentStoreList == null
+                   || !request.departmentStoreList.Any()
+                   || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
+                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                groupBrandStartYear = brandRankingData.GroupBy(
+                   x => new
+                   {
+                       x.Brand_ID,
+                       x.Brand_Name
+                   })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+
+                int timeFilterCompareStart = int.Parse(request.compareYear + request.startMonth + request.startWeek);
+                int timeFilterCompareEnd = int.Parse(request.compareYear + request.endMonth + request.endWeek);
+
+                var brandRankingCompareData = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
+
+                groupBrandCompareYear = brandRankingCompareData.GroupBy(
+                  x => new
+                  {
+                      x.Brand_ID,
+                      x.Brand_Name
+                  })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+
+                var oldCompareYear = (int.Parse(request.compareYear) - 1).ToString();
+                int timeFilterOldCompareStart = int.Parse(oldCompareYear + request.startMonth + request.startWeek);
+                int timeFilterOldCompareEnd = int.Parse(oldCompareYear + request.endMonth + request.endWeek);
+
+                var brandRankingDataOlpCompare = repository.report.GetBrandRankingBy(
+                   c => (request.brandType == null || c.Brand_Type_ID == request.brandType)
+                   && (request.universe == null || c.Universe == request.universe)
+                   && (c.Time_Keyin >= timeFilterOldCompareStart && c.Time_Keyin <= timeFilterOldCompareEnd));
+
+                groupBrandCompareOldYear = brandRankingDataOlpCompare.GroupBy(
+                x => new
+                {
+                    x.Brand_ID,
+                    x.Brand_Name
+                })
+                    .Select(e => new GroupBrandRanking
+                    {
+                        brandID = e.Key.Brand_ID,
+                        brandName = e.Key.Brand_Name,
+                        sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                              : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                              : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                        storeDetail = request.saleType == "Amount" ? e.OrderByDescending(s => s.Amount_Sales).ToList()
+                              : request.saleType == "Whole" ? e.OrderByDescending(s => s.Whole_Sales).ToList()
+                              : request.saleType == "Net" ? e.OrderByDescending(s => s.Net_Sales).ToList() : e.ToList()
+                    }).OrderByDescending(s => s.sumBrand).ToList();
+            }
+
+            return (groupBrandStartYear, groupBrandCompareYear, groupBrandCompareOldYear);
+        }
+
+        private (byte[], string) GenerateReportStoreMarketShareZone(ReportStoreMarketShareRequest request, List<GroupStoreRanking> listGroup, List<GroupStoreRanking> listGroupCompare, List<GroupStoreRanking> listGroupOldCompare)
         {
             using (var workbook = new XLWorkbook())
             {
@@ -890,12 +996,12 @@ namespace MarketData.Processes.Processes
                     htmlBody = regex.Replace(htmlBody, "");
 
                     File.Delete(excelHtmlPath);
-                    return content;
+                    return (content, htmlBody);
                 }
             }
         }
 
-        private byte[] GenerateReportStoreMarketShareValue(ReportStoreMarketShareZoneRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare, List<GroupBrandRanking> listGroupOldCompare)
+        private (byte[], string) GenerateReportStoreMarketShareValue(ReportStoreMarketShareRequest request, List<GroupStoreRanking> listGroup, List<GroupStoreRanking> listGroupCompare, List<GroupStoreRanking> listGroupOldCompare)
         {
             using (var workbook = new XLWorkbook())
             {
@@ -1304,12 +1410,13 @@ namespace MarketData.Processes.Processes
 
                     File.Delete(excelHtmlPath);
 
-                    return content;
+
+                    return (content, htmlBody);
                 }
             }
         }
 
-        private string PreviewReportStoreMarketShareValue(ReportStoreMarketShareZoneRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare, List<GroupBrandRanking> listGroupOldCompare)
+        private (byte[], string) GenerateReportSelectiveMarket(ReportSelectiveMarketRequest request, List<GroupBrandRanking> listGroup, List<GroupBrandRanking> listGroupCompare, List<GroupBrandRanking> listGroupOldCompare)
         {
             using (var workbook = new XLWorkbook())
             {
@@ -1319,382 +1426,76 @@ namespace MarketData.Processes.Processes
                 #region Header
                 var worksheet = workbook.Worksheets.Add("Transaction");
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Merge();
-                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Value = $"Luxury Products - TOP {request.brandRankEnd}";
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Value = $"SELECTIVE MARKET THAILAND";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Merge();
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Value = "Brand Ranking Perfomance Key Counters";
+
+                string typeReport = string.Empty;
+                if (request.saleType == "Amount")
+                {
+                    typeReport = "TOTAL MARKET";
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Value = "Jul-20"; ///
+
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Value = "Jul-21"; ///
+
+                    worksheet.Cell(5, 3).Value = "Value";
+                    worksheet.Cell(5, 4).Value = "Market Share";
+                    worksheet.Cell(5, 5).Value = "# POS";
+
+                    worksheet.Cell(5, 6).Value = "Value";
+                    worksheet.Cell(5, 7).Value = "Market Share";
+                    worksheet.Cell(5, 8).Value = "Growth";
+                    worksheet.Cell(5, 9).Value = "MS Evol";
+                    worksheet.Cell(5, 10).Value = "# POS";
+                }
+                else if (request.saleType == "Whole")
+                {
+                    typeReport = "TOTAL MARKET - BULK SALES";
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Value = "Jul-20"; ///
+
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Value = "Jul-21"; ///
+                }
+                else if (request.saleType == "Net")
+                {
+                    typeReport = "TOTAL MARKET WO BULK";
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Value = "Jul-20"; ///
+
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Value = "Jul-21"; ///
+                }
+
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Value = typeReport;
                 worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).Merge();
 
                 string dateQuery = string.Empty;
-                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).SetValue(Convert.ToString("Jul-21"));
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).SetValue(Convert.ToString("July-21")); ///
                 worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 worksheet.Column(1).Width = 3;
-                worksheet.Column(2).Width = 30;
+                worksheet.Column(2).Width = 19;
 
                 worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Merge();
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Merge();
 
-                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Merge();
-                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Value = "DEPARTMENT STORES";
-
-                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Style.Fill.BackgroundColor = yellowXL;
-
-                worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 50)).Merge();
-
-                int columnBrand = 3;
-                for (int i = 1; i <= request.brandRankEnd; i++)
-                {
-                    worksheet.Column(columnBrand).Width = 19;
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue($"#{i}");
-                    columnBrand++;
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue("%");
-                    columnBrand++;
-                }
-
-                columnBrand++;
-
-                // Loreal Brand
-                List<string> brandLorealList = new List<string>();
-                var brandLorealListCurrent = listGroup.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
-                var brandLorealListCompare = listGroupCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
-                var brandLorealListOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
-
-                brandLorealList.AddRange(brandLorealListCurrent);
-                brandLorealList.AddRange(brandLorealListCompare);
-                brandLorealList.AddRange(brandLorealListOldCompare);
-
-                brandLorealList = brandLorealList.GroupBy(d => d).Select(x => x.Key).OrderBy(d => d).ToList();
-
-                for (int i = 0; i < brandLorealList.Count(); i++)
-                {
-                    worksheet.Column(columnBrand).Width = 19;
-                    worksheet.Cell(5, columnBrand).Value = $"{brandLorealList[i]}";
-                    worksheet.Cell(6, columnBrand).Value = $"If Not In Top {request.brandRankEnd}";
-                    worksheet.Cell(5, columnBrand).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Cell(6, columnBrand).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                    columnBrand++;
-
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
-                    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue("%");
-                    columnBrand++;
-                }
+                worksheet.Cell(5, 1).Value = "#";
+                worksheet.Cell(5, 2).Value = "Brand";
+                worksheet.Row(5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 #endregion
 
-                int rowData = 7;
-                int countStore = 1;
-                decimal sumAllStore = listGroup.Sum(c => c.sumStore);
-                decimal sumAllStoreCompare = listGroupCompare.Sum(c => c.sumStore);
-
-                foreach (var itemGroup in listGroup)
-                {
-                    var storeCompare = listGroupCompare.FirstOrDefault(c => c.storeID == itemGroup.storeID);
-
-                    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Merge();
-                    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Value = countStore;
-
-                    countStore++;
-
-                    worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Cell(rowData, 2).SetValue(itemGroup.storeName);
-
-                    worksheet.Cell(rowData + 1, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                    worksheet.Cell(rowData + 1, 2).SetValue(string.Format("{0:#,0}", itemGroup.sumStore));
-
-                    int columnBrandDetail = 3;
-                    List<Brand_Ranking> listBrandSelect = new List<Brand_Ranking>();
-
-                    if (!request.brandRankStart.HasValue)
-                    {
-                        request.brandRankStart = 1;
-                    }
-
-                    for (int i = request.brandRankStart.GetValueOrDefault() - 1; i <= request.brandRankEnd.GetValueOrDefault() - 1; i++)
-                    {
-                        if (itemGroup.brandDetail.ElementAtOrDefault(i) != null)
-                        {
-                            listBrandSelect.Add(itemGroup.brandDetail.ElementAtOrDefault(i));
-                        }
-                    }
-
-                    foreach (var itemBrand in listBrandSelect)
-                    {
-
-                        var brandCompare = storeCompare.brandDetail.FirstOrDefault(c => c.Brand_ID == itemBrand.Brand_ID);
-
-                        worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                        worksheet.Cell(rowData, columnBrandDetail).SetValue(itemBrand.Brand_Name);
-
-                        worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                        worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", itemBrand.Amount_Sales));
-
-                        decimal percentShareBrand = 0;
-                        if (request.saleType == "Amount")
-                        {
-                            percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.Amount_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                        }
-                        else if (request.saleType == "Whole")
-                        {
-                            percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.Whole_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                        }
-                        else if (request.saleType == "Net")
-                        {
-                            percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.Net_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                        }
-
-                        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                        worksheet.Cell(rowData + 2, columnBrandDetail).SetValue($"{percentShareBrand}%");
-
-                        columnBrandDetail++;
-
-
-                        if (storeCompare != null)
-                        {
-                            decimal percentGrowthBrand = -100;
-                            if (request.saleType == "Amount")
-                            {
-                                percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Amount_Sales.GetValueOrDefault() != 0
-                                    ? ((itemBrand.Amount_Sales.GetValueOrDefault() / brandCompare.Amount_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                            }
-                            else if (request.saleType == "Whole")
-                            {
-                                percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Whole_Sales.GetValueOrDefault() != 0
-                                     ? ((itemBrand.Whole_Sales.GetValueOrDefault() / brandCompare.Whole_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                            }
-                            else if (request.saleType == "Net")
-                            {
-                                percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Net_Sales.GetValueOrDefault() != 0
-                                    ? ((itemBrand.Net_Sales.GetValueOrDefault() / brandCompare.Net_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                            }
-
-                            worksheet.Cell(rowData, columnBrandDetail).SetValue($"{percentGrowthBrand}%");
-                        }
-                        else
-                        {
-                            worksheet.Cell(rowData, columnBrandDetail).SetValue($"-100%");
-                        }
-
-                        columnBrandDetail++;
-                    }
-
-                    var listBrandTopSelectName = listBrandSelect.Select(c => c.Brand_Name);
-                    columnBrandDetail++;
-
-                    foreach (var itemBrandLoreal in brandLorealList)
-                    {
-                        for (int i = 0; i < itemGroup.brandDetail.Count(); i++)
-                        {
-                            var brandNotTopDetail = itemGroup.brandDetail[i];
-                            if (brandNotTopDetail.Brand_Name == itemBrandLoreal
-                                && !listBrandTopSelectName.Contains(brandNotTopDetail.Brand_Name))
-                            {
-                                worksheet.Cell(rowData, columnBrandDetail).SetValue($"{itemBrandLoreal} [#{i + 1}]");
-                                worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                                worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                                decimal percentShareBrand = 0;
-                                if (request.saleType == "Amount")
-                                {
-                                    worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", brandNotTopDetail.Amount_Sales));
-                                    percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.Amount_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                                }
-                                else if (request.saleType == "Whole")
-                                {
-                                    worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", brandNotTopDetail.Whole_Sales));
-                                    percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.Whole_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                                }
-                                else if (request.saleType == "Net")
-                                {
-                                    worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", brandNotTopDetail.Net_Sales));
-                                    percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.Net_Sales.GetValueOrDefault() / itemGroup.sumStore) * 100, 2) : 0;
-                                }
-
-                                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                                worksheet.Cell(rowData + 2, columnBrandDetail).SetValue($"{percentShareBrand}%");
-
-                                worksheet.Cell(rowData, columnBrandDetail + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                                if (storeCompare != null)
-                                {
-                                    var brandCompare = storeCompare.brandDetail.FirstOrDefault(c => c.Brand_ID == brandNotTopDetail.Brand_ID);
-                                    decimal percentGrowthBrand = Math.Round(-100M, 2);
-                                    if (request.saleType == "Amount")
-                                    {
-                                        percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Amount_Sales.GetValueOrDefault() != 0 ? ((brandNotTopDetail.Amount_Sales.GetValueOrDefault() / brandCompare.Amount_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                                    }
-                                    else if (request.saleType == "Whole")
-                                    {
-                                        percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Whole_Sales.GetValueOrDefault() != 0 ? ((brandNotTopDetail.Whole_Sales.GetValueOrDefault() / brandCompare.Whole_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                                    }
-                                    else if (request.saleType == "Net")
-                                    {
-                                        percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.Net_Sales.GetValueOrDefault() != 0 ? ((brandNotTopDetail.Net_Sales.GetValueOrDefault() / brandCompare.Net_Sales.GetValueOrDefault()) - 1) * 100 : -100, 2);
-                                    }
-
-                                    worksheet.Cell(rowData, columnBrandDetail + 1).SetValue($"{percentGrowthBrand}%");
-                                }
-                                else
-                                {
-                                    worksheet.Cell(rowData, columnBrandDetail + 1).SetValue($"-100%");
-                                }
-
-                                break;
-                            }
-                        }
-
-                        columnBrandDetail = columnBrandDetail + 2;
-                    }
-
-                    rowData = rowData + 3;
-                }
-
-                var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100, 2);
-                var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
-                var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
-                var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
-
-                var groupBrandDetail = allBrandDetail.GroupBy(
-                       x => new
-                       {
-                           x.Brand_ID,
-                           x.Brand_Name
-                       })
-                       .Select(e => new
-                       {
-                           brandID = e.Key.Brand_ID,
-                           brandName = e.Key.Brand_Name,
-                           sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                           detail = e.ToList()
-                       }).OrderByDescending(s => s.sumTotalBrand).ToList();
-
-                var groupBrandDetailCompare = allBrandDetailCompare.GroupBy(
-                     x => new
-                     {
-                         x.Brand_ID,
-                         x.Brand_Name
-                     })
-                     .Select(e => new
-                     {
-                         brandID = e.Key.Brand_ID,
-                         brandName = e.Key.Brand_Name,
-                         sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                         detail = e.ToList()
-                     }).OrderByDescending(s => s.sumTotalBrand).ToList();
-
-                var groupBrandDetailOldCompare = allBrandDetailOldCompare.GroupBy(
-                    x => new
-                    {
-                        x.Brand_ID,
-                        x.Brand_Name
-                    })
-                    .Select(e => new
-                    {
-                        brandID = e.Key.Brand_ID,
-                        brandName = e.Key.Brand_Name,
-                        sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                        detail = e.ToList()
-                    }).OrderByDescending(s => s.sumTotalBrand).ToList();
-
-
-                rowData++;
-                #region Total 1
-                worksheet.Cell(rowData, 2).Value = "Year";
-                worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                worksheet.Cell(rowData + 1, 2).Value = $"TOTAL {request.startYear}";
-                worksheet.Cell(rowData + 1, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                worksheet.Cell(rowData + 2, 2).Value = $"TOTAL {request.compareYear}";
-                worksheet.Cell(rowData + 2, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                int columnBrandTotal = 3;
-                List<string> brandTotalSelect = new List<string>();
-                for (int i = 0; i < request.brandRankEnd; i++)
-                {
-                    var brandDetail = groupBrandDetail[i];
-                    brandTotalSelect.Add(brandDetail.brandName);
-
-                    worksheet.Cell(rowData, columnBrandTotal).Value = brandDetail.brandName;
-                    worksheet.Cell(rowData, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Cell(rowData, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                    var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
-
-                    worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandDetail.sumTotalBrand));
-                    worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                    worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
-                    worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                    if (brandCompare != null)
-                    {
-                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
-                        worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
-                    }
-                    else
-                    {
-                        worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"-100%");
-                    }
-
-                    columnBrandTotal = columnBrandTotal + 2;
-                }
-
-                columnBrandTotal++;
-
-                foreach (var itemBrandLoreal in brandLorealList)
-                {
-                    for (int i = 0; i < groupBrandDetail.Count(); i++)
-                    {
-                        var brandNotTopDetail = groupBrandDetail[i];
-                        if (brandNotTopDetail.brandName == itemBrandLoreal
-                            && !brandTotalSelect.Contains(brandNotTopDetail.brandName))
-                        {
-                            worksheet.Cell(rowData, columnBrandTotal).Value = $"{itemBrandLoreal} [#{i + 1}]";
-                            worksheet.Cell(rowData, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                            worksheet.Cell(rowData, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                            var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
-
-                            worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandNotTopDetail.sumTotalBrand));
-                            worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                            worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
-                            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-
-                            if (brandCompare != null)
-                            {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
-                                worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
-                            }
-                            else
-                            {
-                                worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"-100%");
-                            }
-
-                            break;
-                        }
-                    }
-
-                    columnBrandTotal = columnBrandTotal + 2;
-                }
-                #endregion
 
                 using (var stream = new MemoryStream())
                 {
@@ -1718,17 +1519,27 @@ namespace MarketData.Processes.Processes
 
                     File.Delete(excelHtmlPath);
 
-                    return htmlBody;
+
+                    return (content, htmlBody);
                 }
             }
         }
     }
 
-    public class GroupBrandRanking
+    public class GroupStoreRanking
     {
         public Guid storeID { get; set; }
         public string storeName { get; set; }
         public decimal sumStore { get; set; }
         public List<Brand_Ranking> brandDetail { get; set; }
     }
+
+    public class GroupBrandRanking
+    {
+        public Guid brandID { get; set; }
+        public string brandName { get; set; }
+        public decimal sumBrand { get; set; }
+        public List<Brand_Ranking> storeDetail { get; set; }
+    }
+
 }

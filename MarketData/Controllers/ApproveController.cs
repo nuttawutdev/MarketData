@@ -111,7 +111,7 @@ namespace MarketData.Controllers
 
         public IActionResult Export()
         {
-            ReportStoreMarketShareZoneRequest request = new ReportStoreMarketShareZoneRequest
+            ReportStoreMarketShareRequest request = new ReportStoreMarketShareRequest
             {
                 startWeek = "4",
                 startMonth = "07",
@@ -128,8 +128,8 @@ namespace MarketData.Controllers
                 saleType = "Net"
             };
 
-            var file = process.report.ExportStoreMarketShareZone(request);
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
+            var file = process.report.GetReportStoreMarketShareValue(request);
+            return File(file.fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 
         [HttpPost]

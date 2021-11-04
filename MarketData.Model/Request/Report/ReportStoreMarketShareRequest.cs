@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MarketData.Model.Request.Report
 {
-    public class ReportStoreMarketShareZoneRequest
+    public class ReportStoreMarketShareRequest
     {
         public string startWeek { get; set; }
         public string endWeek { get; set; }
