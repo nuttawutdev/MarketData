@@ -191,6 +191,7 @@ namespace MarketData.Processes.Processes
                                 && c.DistributionChannel_ID == request.distributionChannelID
                                 && c.Brand_ID == request.brandID
                                 && c.RetailerGroup_ID == request.retailerGroupID
+                                && c.Universe == request.universe
                                 && c.Year == request.year
                                 && c.Month == request.month
                                 && c.Week == request.week);
@@ -388,12 +389,11 @@ namespace MarketData.Processes.Processes
                   && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
                   && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
                   && c.Universe == BAKeyInData.Universe
-                  && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
-
-                var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
+                  && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);          
 
                 if (adjustDataPreviousYearWeek4 != null)
                 {
+                    var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
                     foreach (var itemBADetail in BAKeyInDetailList)
                     {
                         var adjustDataPreviousYear = adjustDetailPreviousYearList
@@ -405,7 +405,6 @@ namespace MarketData.Processes.Processes
                         }
                     }
                 }
-
 
                 var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == BAKeyInData.Brand_ID);
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
@@ -437,6 +436,28 @@ namespace MarketData.Processes.Processes
                     .Where(e => e.amountSalePreviousYear > 0)
                     .OrderBy(c => c.brandName).ToList();
                 }
+
+                //if (adjustDataPreviousYearWeek4 != null)
+                //{
+                //    if (BAKeyInData.Year == GetDateNowThai().Year.ToString())
+                //    {
+                //        response.data = BAKeyInDetailList
+                //           .Where(e => e.amountSalePreviousYear > 0
+                //           || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
+                //           || e.alwayShow == true)
+                //           .OrderBy(c => c.brandName).ToList();
+                //    }
+                //    else
+                //    {
+                //        response.data = BAKeyInDetailList
+                //        .Where(e => e.amountSalePreviousYear > 0)
+                //        .OrderBy(c => c.brandName).ToList();
+                //    }
+                //}
+                //else
+                //{
+                //    response.data = BAKeyInDetailList.OrderBy(c => c.brandName).ToList();
+                //}
 
                 var rejectStatus = repository.masterData.GetApproveKeyInStatusBy(r => r.Status_Name == "Reject");
                 var approveData = repository.approve.GetApproveKeyInBy(c => c.BAKeyIn_ID == BAKeyInData.ID).OrderByDescending(d => d.Action_Date).FirstOrDefault();
