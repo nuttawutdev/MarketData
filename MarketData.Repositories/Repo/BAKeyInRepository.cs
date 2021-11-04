@@ -227,8 +227,8 @@ namespace MarketData.Repositories.Repo
                          sk = e.SK,
                          mu = e.MU,
                          ot = e.OT,
-                         brandName = brand.Brand_Name,
-                         brandColor = brand.Brand_Color,
+                         brandName = brand != null ? brand.Brand_Name : "",
+                         brandColor = brand != null ? brand.Brand_Color : "",
                          channelID = e.DistributionChannel_ID,
                          counterID = e.Counter_ID,
                          month = e.Month,
@@ -237,7 +237,7 @@ namespace MarketData.Repositories.Repo
                          week = e.Week,
                          wholeSale = e.Whole_Sales,
                          year = e.Year,
-                         counterCreateDate = counter.Created_Date,
+                         counterCreateDate = counter?.Created_Date,
                          alwayShow = counter.Alway_Show_Current_Year.GetValueOrDefault()
                      }).ToList();
 

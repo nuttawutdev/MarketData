@@ -375,8 +375,7 @@ namespace MarketData.Controllers
             }
         }
 
-        [ServiceFilter(typeof(AuthorizeFilter))]
-        [ServiceFilter(typeof(PermissionFilter))]
+
         [HttpGet]
         public async Task<IActionResult> ResetPassword(string email)
         {
