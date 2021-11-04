@@ -17,6 +17,6 @@ namespace MarketData.Model.Request.Report
         public Guid? brandType { get; set; }
         public string universe { get; set; }
         public string saleType { get; set; }
-        public bool allStore { get; set; }
+        public bool lorealStore { get; set; }
     }
 }

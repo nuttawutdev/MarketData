@@ -38,5 +38,6 @@ namespace MarketData.Repositories
         public DbSet<TMUrl> TMUrl { get; set; }
         public DbSet<TMUserToken> TMUserToken { get; set; }
         public DbSet<Brand_Ranking> Brand_Ranking { get; set; }
+        public DbSet<Loreal_Store> Loreal_Store { get; set; }
     }
 }

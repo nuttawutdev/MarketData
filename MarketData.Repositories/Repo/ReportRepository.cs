@@ -29,5 +29,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<Loreal_Store> GetLorealStore()
+        {
+            try
+            {
+                return _dbContext.Loreal_Store.AsNoTracking().ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
