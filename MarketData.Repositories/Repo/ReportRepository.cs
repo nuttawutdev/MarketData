@@ -42,5 +42,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<Brand_Frangances> GetBrandFragances()
+        {
+            try
+            {
+                return _dbContext.Brand_Frangances.AsNoTracking().ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

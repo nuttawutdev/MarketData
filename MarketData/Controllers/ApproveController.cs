@@ -135,7 +135,7 @@ namespace MarketData.Controllers
                 startYear = "2021",
                 compareYear = "2020",
                 universe = "LPD",
-                saleType = "Amount",
+                saleType = "Whole",
                 lorealStore = false
             };
 
