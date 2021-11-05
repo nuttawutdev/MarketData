@@ -89,7 +89,6 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
-            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
              var frmdata = {
                  counterID: model.counterID,
@@ -104,32 +103,54 @@
                  userID: $('#iduserID').val()
             };
 
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveCounter", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "Counter");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
+            console.log(frmdata,'frmdata')
+            if (frmdata.distributionChannelID != "" && frmdata.distributionChannelID != "Please select"
+                && frmdata.departmentStoreID != "" && frmdata.departmentStoreID != "Please select"
+                && frmdata.brandID != "") {
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveCounter", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "Counter");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                        }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+            else {
+                if (frmdata.distributionChannelID == "" || frmdata.distributionChannelID == "Please select") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Distribution Channels!');
                 }
-            });
+                else if (frmdata.departmentStoreID == "" || frmdata.departmentStoreID == "Please select") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Department Store!');
+                }
+                else if (frmdata.brandID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Brand!');
+                }
+            }
+
+
         });
 
         $('#channelList').on('change', function (e) {

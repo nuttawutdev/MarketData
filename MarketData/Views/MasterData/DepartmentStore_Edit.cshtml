@@ -82,7 +82,6 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
-            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
 
              var frmdata = {
@@ -99,32 +98,53 @@
                  userID: $('#iduserID').val()
             };
 
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveDepartmentStore", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "DepartmentStore");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
+            if (frmdata.departmentStoreName.trim() != "" && frmdata.distributionChannelID != ""
+                && frmdata.regionID != "" && frmdata.retailerGroupID != "") {
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveDepartmentStore", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "DepartmentStore");
+                            $('#successModal').modal('show');
+                        }
+                        else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                        }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+            else {
+                if (frmdata.departmentStoreName.trim() == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please input Department Store Name!');
                 }
-            });
+                else if (frmdata.retailerGroupID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Retailer group!');
+                }
+                else if (frmdata.regionID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Region!');
+                }
+                else if (frmdata.distributionChannelID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Distribution Channels!');
+                }
+            }
+
         });
 
  });
