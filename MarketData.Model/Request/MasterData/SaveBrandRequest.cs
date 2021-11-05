@@ -8,7 +8,6 @@ namespace MarketData.Model.Request.MasterData
     public class SaveBrandRequest
     {
         public Guid? brandID { get; set; }
-        [Required]
         public string brandName { get; set; }
         public string brandShortName { get; set; }
         public Guid brandGroupID { get; set; }

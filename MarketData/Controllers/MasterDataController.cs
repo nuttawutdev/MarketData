@@ -380,22 +380,9 @@ namespace MarketData.Controllers
         public async Task<IActionResult> SaveBrand([FromBody] SaveBrandRequest request)
         {
             SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
-                response = await process.masterData.SaveBrand(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
+            response = await process.masterData.SaveBrand(request);
+            return Json(response);
         }
 
         [HttpPost]
@@ -879,23 +866,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveDepartmentStore([FromBody] SaveDepsrtmentStoreRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.departmentStoreID = request.departmentStoreID == Guid.Empty ? null : request.departmentStoreID;
-                response = await process.masterData.SaveDepartmentStore(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.departmentStoreID = request.departmentStoreID == Guid.Empty ? null : request.departmentStoreID;
+            var response = await process.masterData.SaveDepartmentStore(request);
+            return Json(response);
         }
 
         #endregion
@@ -940,7 +913,7 @@ namespace MarketData.Controllers
             }
         }
 
-        public CounterViewModel GetCounterDetail(Guid counterID,bool viewOnly = false)
+        public CounterViewModel GetCounterDetail(Guid counterID, bool viewOnly = false)
         {
             var response = process.masterData.GetCounterDetail(counterID);
 

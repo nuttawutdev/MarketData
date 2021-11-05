@@ -120,7 +120,6 @@
 
     $(document).ready(function () {
         $("#save").click(function () {
-            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
 
              var frmdata = {
@@ -139,32 +138,59 @@
                  active: $("#flagactive").prop("checked"),
                  userID: $('#iduserID').val()
             };
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBrand", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "Brand");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
+
+
+            if (frmdata.brandName.trim() != "" && frmdata.brandGroupID != ""
+                && frmdata.brandSegmentID != "" && frmdata.brandTypeID != "") {
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveBrand", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "Brand");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                        }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+            else {
+                if (frmdata.brandName.trim() == "")
+                {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please input Brand Name!');
                 }
-            });
+                else if (frmdata.brandGroupID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Brand Group!');
+                }
+                else if (frmdata.brandSegmentID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Brand Segment!');
+                }
+                else if (frmdata.brandTypeID == "") {
+                    $('#failedModal').modal('show');
+                    $('#myModalFailedResult').text('Please select Brand Type!');
+                }
+            }
+
+
         });
 
  });
