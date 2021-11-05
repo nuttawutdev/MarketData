@@ -6,6 +6,13 @@
     .row-filter {
         padding-top: 20px;
     }
+    .row50{
+        width:70px!important
+    }
+    .flexCenter {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
 </style>
 <h3>
     @ViewData["Title"]
@@ -128,9 +135,90 @@
         <div class="w-100" id="divSelectStore" style="display:none!important">
 
         </div>
-        <div class="w-100 text-center" style="display:flex;justify-content:center">
-            <div >
+        <div class="row">
+            <div class="col flex-wrap align-items-md-start" style="padding:20px;">
+                <div class="row d-flex">
+                    <div class="col d-flex flex-wrap" style="justify-content: space-evenly;">
+                        <div class="col-md-2">
+                            <label><b>Type </b> </label>
+                            <select class="form-control " id="ddlType">
+                                <option value="">Please Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label><b>Store Rank </b> </label>
+                            <div class="row flexCenter" >
+                                <input type="number" class="form-control input-sm row50" id="txtStoreRankStart"  value="1" > 
+                                <i class="ion-android-arrow-forward" style="padding: 5px;"></i>
+                                <input type="number" class="form-control input-sm row50" id="txtStoreRankEnd" value="10">
+                            </div>
+                           
+                        </div>
+                        <div class="col-md-2">
+                            <label><b>Brand Rank </b> </label>
+                            <div class="row flexCenter">
+                                <input type="number" class="form-control input-sm row50" id="txtBrandRankStart" value="1">
+                                <i class="ion-android-arrow-forward" style="padding: 5px;"></i>
+                                <input type="number" class="form-control input-sm row50" id="txtBrandRankEnd" value="10">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label><b>Universe </b> </label>
+                            <div class="row flexCenter">
+                                <select class="form-control " id="ddlUniverse">
+                                    <option value="">All</option>
+                                    <option value="LPD">LPD</option>
+                                    <option value="CPD">CPD</option>
+                                </select>
+                            </div>
+                        </div>
+                            <div class="col-md-2">
+                                <label><b>Sum </b> </label>
+                                <select class="form-control " id="ddlSum">
+                                    <option value="Average">Average</option>
+                                    <option value="Total">Total</option>
+                                </select>
+                            </div>
+                        </div>
+                </div>
+                <div class="row d-flex" style="padding-top: 10px;display:none!important" id="divYearEnd">
+                    <div class="col d-flex flex-wrap">
+                        <div class="col-md-4">
+                            <label><b>End &nbsp; <i class="ion-clock"></i></b>  Week</label>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekEnd">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Month</label>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthEnd">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Year</label>
+                            <select class="form-control col-sm-12 col-lg-6">
+                                <option>2019</option>
+                                <option>2020</option>
+                            </select>
+                        </div>
 
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -179,6 +267,16 @@
 
         });
 
+        $(document).on('click', '.headerChecked', function () {
+            var checked = $(this).prop('checked');
+            var id = $(this).attr('id');
+            $("input:checkbox[name="+id+"]").each(function () {
+                $(this).prop("checked", checked);
+            });
+
+        });
+
+
         function getDepartmentStore(){
               $.ajax(
                 {
@@ -186,36 +284,36 @@
                     contentType: "application/json; charset=utf-8",
                     type: "POST",
                       success: function (data) {
-                          console.log(data.data)
                           if (data.data.length > 0) {
                               var group = "";
                               var groupId = 0;
                               var htmlStoreinside = "";
                               var html = "";
-
+                              var storeId = "";
                               for (var i = 0; i < data.data.length-1; i++) {
                                   if (group != data.data[i].retailerGroupName) {
                                       html = html.replace("storeinside", htmlStoreinside);
                                       htmlStoreinside = "";
                                       groupId += 1;
+                                      storeId = "store_"+groupId ;
                                       group = data.data[i].retailerGroupName;
                                       html += "<div style='padding-top: 20px;'>";
                                       html += "<div class='card'>";
                                       html += "<div class='card-body'>";
                                       html += " <div>";
                                       html += "     <header>";
-                                      html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input' type='checkbox' id='store-" + groupId + "'><label class='form-check-label' >" + data.data[i].retailerGroupName + "</label></div>";
+                                      html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' type='checkbox' id='" + storeId +"'><label class='form-check-label' >" + data.data[i].retailerGroupName + "</label></div>";
                                       html += "     </header>";
                                       html += " </div>";
                                       html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
-                                      html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
+                                      html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input ' type='checkbox' name='" + storeId +"' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
                                       html += " storeinside";
                                       html += "  </div> </div > </div > </div > ";
 
                                   }
 
                                   if (group == data.data[i].retailerGroupName) {
-                                      htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
+                                      htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' name='" + storeId +"' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
                                   }
 
                               }
