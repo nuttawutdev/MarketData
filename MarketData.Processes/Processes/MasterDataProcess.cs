@@ -102,7 +102,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Type Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Segment Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -322,7 +322,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Group Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -921,8 +921,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Retailer group name is duplicated";
+                    response.responseError = "Retailer Group Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -1031,8 +1030,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Distribution channel name is duplicated";
+                    response.responseError = "Distribution Channels Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -1557,8 +1555,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Counter is exist";
+                    response.responseError = "Counter ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)

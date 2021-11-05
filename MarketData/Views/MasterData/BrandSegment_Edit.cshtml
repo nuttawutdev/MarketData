@@ -57,7 +57,6 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
-            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
 
              var frmdata = {
@@ -67,33 +66,39 @@
                  userID: $('#iduserID').val()
              };
 
-
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBrandSegment", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "BrandSegment");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
-                }
-            });
+            if (frmdata.brandSegmentName.trim() != "") {
+                $("#blocker").show();
+                  $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("SaveBrandSegment", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "BrandSegment");
+                            $('#successModal').modal('show');
+                        } else if (data.isDuplicated) {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+            else {
+                $('#failedModal').modal('show');
+                $('#myModalFailedResult').text("Please input Brand Segment Name!");
+            }
         });
 
  });

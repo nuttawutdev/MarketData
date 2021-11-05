@@ -71,7 +71,6 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
-            $("#blocker").show();
             var model = @Html.Raw(Json.Serialize(Model));
 
              var frmdata = {
@@ -82,33 +81,38 @@
                  userID: $('#iduserID').val()
              };
 
+            if (frmdata.brandGroupName.trim() != "") {
+                $("#blocker").show();
+                  $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("SaveBrandGroup", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "BrandGroup");
+                            $('#successModal').modal('show');
+                        }
+                        else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            }
+            else {
+                $('#failedModal').modal('show');
+                $('#myModalFailedResult').text("Please input Brand Group Name!");
+            }
 
-            $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("SaveBrandGroup", "MasterData")',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(frmdata),
-                datatype: "json",
-                success: function (data) {
-                    $("#blocker").hide();
-                    if (data.isSuccess) {
-                        $('#successModalHref').attr("href", "BrandGroup");
-                        $('#successModal').modal('show');
-                    } else if (data.isDuplicated) {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text('Duplicate data!');
-                    } else {
-                        $('#failedModal').modal('show');
-                        $('#myModalFailedResult').text(data.responseError != ""
-                            && data.responseError != null ? data.responseError : 'Save data failed');
-                     }
-                    $('#confirmID').val('');
-                    $('#myModalFailedResult').val('');
-                },
-                error: function () {
-                    $("#blocker").hide();
-                }
-            });
         });
 
  });

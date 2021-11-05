@@ -444,23 +444,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveBrandType([FromBody] SaveBrandTypeRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID;
-                response = await process.masterData.SaveBrandType(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.brandTypeID = request.brandTypeID == Guid.Empty ? null : request.brandTypeID;
+            var response = await process.masterData.SaveBrandType(request);
+            return Json(response);
         }
 
         [HttpPost]
@@ -521,23 +507,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveBrandSegment([FromBody] SaveBrandSegmentRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.brandSegmentID = request.brandSegmentID == Guid.Empty ? null : request.brandSegmentID;
-                response = await process.masterData.SaveBrandSegment(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.brandSegmentID = request.brandSegmentID == Guid.Empty ? null : request.brandSegmentID;
+            var response = await process.masterData.SaveBrandSegment(request);
+            return Json(response);
         }
 
         [HttpPost]
@@ -598,23 +570,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveRetailerGroup([FromBody] SaveRetailerGroupRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.retailerGroupID = request.retailerGroupID == Guid.Empty ? null : request.retailerGroupID;
-                response = await process.masterData.SaveRetailerGroup(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.retailerGroupID = request.retailerGroupID == Guid.Empty ? null : request.retailerGroupID;
+            var response = await process.masterData.SaveRetailerGroup(request);
+            return Json(response);
         }
 
         public RetailerGroupViewModel GetRetailerGroupDetail(Guid retailerGroupID)
@@ -671,23 +629,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveChannel([FromBody] SaveDistributionChannelRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.distributionChannelID = request.distributionChannelID == Guid.Empty ? null : request.distributionChannelID;
-                response = await process.masterData.SaveDistributionChannel(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.distributionChannelID = request.distributionChannelID == Guid.Empty ? null : request.distributionChannelID;
+            var response = await process.masterData.SaveDistributionChannel(request);
+            return Json(response);
         }
 
         public DistributionChannelViewModel GetChannelDetail(Guid channelID)
@@ -744,23 +688,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveBrandGroup([FromBody] SaveBrandGroupRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.brandGroupID = request.brandGroupID == Guid.Empty ? null : request.brandGroupID;
-                response = await process.masterData.SaveBrandGroup(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.brandGroupID = request.brandGroupID == Guid.Empty ? null : request.brandGroupID;
+            var response = await process.masterData.SaveBrandGroup(request);
+            return Json(response);
         }
 
         public BrandGroupViewModel GetBrandGroupDetail(Guid brandGroupID)
@@ -964,23 +894,9 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveCounter([FromBody] SaveCounterRequest request)
         {
-            SaveDataResponse response;
-
-            if (ModelState.IsValid)
-            {
-                request.counterID = request.counterID == Guid.Empty ? null : request.counterID;
-                response = await process.masterData.SaveCounter(request);
-                return Json(response);
-            }
-            else
-            {
-                response = new SaveDataResponse
-                {
-                    isSuccess = false,
-                    responseError = "Please input required field."
-                };
-                return Json(response);
-            }
+            request.counterID = request.counterID == Guid.Empty ? null : request.counterID;
+            var response = await process.masterData.SaveCounter(request);
+            return Json(response);
         }
 
         [HttpPost]
