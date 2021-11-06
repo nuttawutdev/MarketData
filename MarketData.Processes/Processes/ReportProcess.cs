@@ -89,6 +89,27 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public GenerateReportResponse GetReportDetailSaleByBrand(ReportDetailSaleByBrandRequest request)
+        {
+            GenerateReportResponse response = new GenerateReportResponse();
+
+            try
+            {
+                var reportData = GetDataForReportDetailSaleByBrand(request);
+                (byte[] fileContent, string filePreview) = GenerateReportDetailSaleByBrand(request, reportData);
+
+                response.fileContent = fileContent;
+                response.filePreview = filePreview;
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
         private (List<GroupStoreRanking>, List<GroupStoreRanking>, List<GroupStoreRanking>) GetDataForReportStoreMarketShare(ReportStoreMarketShareRequest request)
         {
             List<GroupStoreRanking> groupStoreStartYear = new List<GroupStoreRanking>();
@@ -455,6 +476,78 @@ namespace MarketData.Processes.Processes
             }
 
             return (groupBrandStartYear, groupBrandCompareYear);
+        }
+
+        private List<GroupStoreRanking> GetDataForReportDetailSaleByBrand(ReportDetailSaleByBrandRequest request)
+        {
+            List<GroupStoreRanking> groupStoreStartYear = new List<GroupStoreRanking>();
+            var lorealStore = repository.report.GetLorealStore().Select(d => d.Store_Id);
+
+            // MTD
+            if (string.IsNullOrWhiteSpace(request.endWeek))
+            {
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                    c => c.Sales_Week == request.startWeek
+                    && c.Sales_Month == request.startMonth
+                    && c.Sales_Year == request.startYear
+                    && c.Brand_ID == request.brandID
+                    && (request.departmentStoreList == null
+                    || !request.departmentStoreList.Any()
+                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+                if (brandRankingData.Any())
+                {
+                    groupStoreStartYear = brandRankingData.GroupBy(
+                        x => new
+                        {
+                            x.Store_Id,
+                            x.Department_Store_Name,
+                            x.Sales_Year,
+                            x.Sales_Month
+                        })
+                    .Select(e => new GroupStoreRanking
+                    {
+                        storeName = e.Key.Department_Store_Name,
+                        storeID = e.Key.Store_Id,
+                        year = e.Key.Sales_Year,
+                        month = e.Key.Sales_Month,
+                        sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                    }).OrderByDescending(s => s.sumStore).ToList();
+                }
+            }
+            // YTD
+            else
+            {
+                int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
+                int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
+
+                var brandRankingData = repository.report.GetBrandRankingBy(
+                   c =>
+                   (request.departmentStoreList == null
+                   || !request.departmentStoreList.Any()
+                   || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
+                    && c.Brand_ID == request.brandID
+                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                groupStoreStartYear = brandRankingData.GroupBy(
+                         x => new
+                         {
+                             x.Store_Id,
+                             x.Department_Store_Name,
+                             x.Sales_Year,
+                             x.Sales_Month
+                         })
+                     .Select(e => new GroupStoreRanking
+                     {
+                         storeName = e.Key.Department_Store_Name,
+                         storeID = e.Key.Store_Id,
+                         year = e.Key.Sales_Year,
+                         month = e.Key.Sales_Month,
+                         sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                     }).OrderByDescending(s => s.sumStore).ToList();
+            }
+
+            return groupStoreStartYear;
         }
 
         private (byte[], string) GenerateReportStoreMarketShareZone(ReportStoreMarketShareRequest request, List<GroupStoreRanking> listGroup, List<GroupStoreRanking> listGroupCompare, List<GroupStoreRanking> listGroupOldCompare)
@@ -1721,6 +1814,68 @@ namespace MarketData.Processes.Processes
                 }
             }
         }
+
+        private (byte[], string) GenerateReportDetailSaleByBrand(ReportDetailSaleByBrandRequest request, List<GroupStoreRanking> listGroup)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var brandFragrances = repository.report.GetBrandFragances();
+                Color yellowHead = Color.FromArgb(250, 250, 181);
+                XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+
+                #region Header
+                var worksheet = workbook.Worksheets.Add("Transaction");
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Merge();
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"SELECTIVE MARKET THAILAND";
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Merge();
+
+                string dateQuery = string.Empty;
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).SetValue(Convert.ToString("July-21")); ///
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                worksheet.Column(1).Width = 3;
+                worksheet.Column(2).Width = 19;
+
+                worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Merge();
+
+                worksheet.Cell(5, 1).Value = "#";
+                worksheet.Cell(5, 2).Value = "Brand";
+                worksheet.Row(5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Merge();
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                #endregion
+
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    Workbook workbookC = new Workbook();
+                    workbookC.LoadFromStream(stream);
+                    Worksheet sheet = workbookC.Worksheets[0];
+                    sheet.SaveToHtml("report3.html");
+
+                    string htmlBody = string.Empty;
+                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report3.html"));
+                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+                    {
+                        htmlBody = reader.ReadToEnd();
+                    }
+
+                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                    htmlBody = regex.Replace(htmlBody, "");
+
+                    File.Delete(excelHtmlPath);
+                    return (content, htmlBody);
+                }
+            }
+        }
     }
 
     public class GroupStoreRanking
@@ -1728,6 +1883,8 @@ namespace MarketData.Processes.Processes
         public Guid storeID { get; set; }
         public string storeName { get; set; }
         public decimal sumStore { get; set; }
+        public string year { get; set; }
+        public string month { get; set; }
         public List<Brand_Ranking> brandDetail { get; set; }
     }
 
