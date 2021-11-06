@@ -111,35 +111,35 @@ namespace MarketData.Controllers
 
         public IActionResult Export()
         {
-            //ReportStoreMarketShareRequest request = new ReportStoreMarketShareRequest
-            //{
-            //    startWeek = "4",
-            //    startMonth = "07",
-            //    startYear = "2021",
-            //    compareYear = "2020",
-            //    //endWeek = "4",
-            //    //endMonth = "08",
-            //    //endYear = "2021",
-            //    universe = "LPD",
-            //    storeRankStart = 1,
-            //    brandRankStart = 1,
-            //    brandRankEnd = 10,
-            //    storeRankEnd = 10,
-            //    saleType = "Net"
-            //};
-
-            ReportSelectiveMarketRequest request = new ReportSelectiveMarketRequest
+            ReportStoreMarketShareRequest request = new ReportStoreMarketShareRequest
             {
                 startWeek = "4",
                 startMonth = "07",
                 startYear = "2021",
                 compareYear = "2020",
+                //endWeek = "4",
+                //endMonth = "08",
+                //endYear = "2021",
                 universe = "LPD",
-                saleType = "Whole",
-                lorealStore = false
+                storeRankStart = 1,
+                brandRankStart = 1,
+                brandRankEnd = 10,
+                storeRankEnd = 10,
+                saleType = "Net"
             };
 
-            var file = process.report.GetReportSelectiveMarket(request);
+            //ReportSelectiveMarketRequest request = new ReportSelectiveMarketRequest
+            //{
+            //    startWeek = "4",
+            //    startMonth = "07",
+            //    startYear = "2021",
+            //    compareYear = "2020",
+            //    universe = "LPD",
+            //    saleType = "Whole",
+            //    lorealStore = false
+            //};
+
+            var file = process.report.GetReportStoreMarketShareZone(request);
             return File(file.fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 
