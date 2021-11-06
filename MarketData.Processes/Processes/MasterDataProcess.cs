@@ -423,7 +423,7 @@ namespace MarketData.Processes.Processes
             {
                 request.brandName = request.brandName.Trim();
 
-                var brandByName = repository.masterData.FindBrandBy(
+                var brandByName = repository.masterData.GetBrandListBy(
                     c => c.Brand_Name.ToLower() == request.brandName.ToLower() && c.Delete_Flag != true);
 
                 var brrandGroupSelect = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == request.brandGroupID);
@@ -447,27 +447,28 @@ namespace MarketData.Processes.Processes
 
 
                 TMBrand brandByShortName = null;
-                TMBrand brandByColor = null;
+                //TMBrand brandByColor = null;
 
                 if (!string.IsNullOrWhiteSpace(request.brandShortName))
                 {
                     request.brandShortName = request.brandShortName.Trim();
 
                     brandByShortName = repository.masterData.FindBrandBy(
-                                        c => c.Brand_Short_Name != null 
+                                        c => c.Brand_Short_Name != null
                                         && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
                                         && c.Delete_Flag != true);
                 }
 
-                if (!string.IsNullOrWhiteSpace(request.brandColor) && request.brandColor.ToLower() != "#ffffff")
-                {
-                    brandByColor = repository.masterData.FindBrandBy(c => !string.IsNullOrWhiteSpace(c.Brand_Color) && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
-                }
+                //if (!string.IsNullOrWhiteSpace(request.brandColor) && request.brandColor.ToLower() != "#ffffff")
+                //{
+                //    brandByColor = repository.masterData.FindBrandBy(c => !string.IsNullOrWhiteSpace(c.Brand_Color) && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
+                //}
 
                 // Brand name not exist Or Update old Brand
-                if ((brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
+                if ((!brandByName.Any() || (brandByName != null && brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault())))
                     && (brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID))
-                    && (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
+                    //&& (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID))
+                    )
                 {
                     var saveResult = await repository.masterData.SaveBrand(request);
                     if (saveResult)
@@ -479,11 +480,10 @@ namespace MarketData.Processes.Processes
                         response.isSuccess = false;
                         response.responseError = "บันทึกข้อมูลไม่สำเร็จ กรุณาติดต่อผู้ดูแลระบบ";
                     }
-                    
                 }
                 else
                 {
-                    if(brandByName != null && brandByName.Brand_ID != request.brandID)
+                    if (brandByName != null && !brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault()))
                     {
                         response.responseError = "Brand Name ซ้ำกับที่มีอยู่ในระบบ";
                     }
@@ -491,10 +491,10 @@ namespace MarketData.Processes.Processes
                     {
                         response.responseError = "Brand Short Name ซ้ำกับที่มีอยู่ในระบบ";
                     }
-                    else if (brandByColor != null && brandByColor.Brand_ID != request.brandID)
-                    {
-                        response.responseError = "Brand Color ซ้ำกับที่มีอยู่ในระบบ";
-                    }
+                    //else if (brandByColor != null && brandByColor.Brand_ID != request.brandID)
+                    //{
+                    //    response.responseError = "Brand Color ซ้ำกับที่มีอยู่ในระบบ";
+                    //}
 
                     response.isSuccess = false;
                 }
@@ -1124,13 +1124,13 @@ namespace MarketData.Processes.Processes
             {
                 request.departmentStoreName = request.departmentStoreName.Trim();
 
-                var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
+                var departmentStoreByName = repository.masterData.GetDepartmentStoreListBy(
                     c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower()
                     && c.Delete_Flag != true);
 
                 // Department Store name not exist Or Update old Department Store
                 if (departmentStoreByName == null ||
-                    (departmentStoreByName != null && departmentStoreByName.Department_Store_ID == request.departmentStoreID))
+                    (departmentStoreByName.Any() && departmentStoreByName.Select(c => c.Department_Store_ID).Contains(request.departmentStoreID.GetValueOrDefault())))
                 {
                     response.isSuccess = await repository.masterData.SaveDepartmentStore(request);
                 }
