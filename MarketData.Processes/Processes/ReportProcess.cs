@@ -657,7 +657,19 @@ namespace MarketData.Processes.Processes
             using (var workbook = new XLWorkbook())
             {
                 Color yellowHead = Color.FromArgb(250, 250, 181);
+                Color greenHead = Color.FromArgb(184, 246, 184);
+                Color storeHead = Color.FromArgb(199, 188, 222);
+                Color totalHead = Color.FromArgb(239, 82, 227);
+                Color black = Color.FromArgb(0, 0, 0);
+                Color lorealHead = Color.FromArgb(229, 132, 121);
+
                 XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+                XLColor greenXL = XLColor.FromArgb(greenHead.A, greenHead.R, greenHead.G, greenHead.B);
+                XLColor storeXL = XLColor.FromArgb(storeHead.A, storeHead.R, storeHead.G, storeHead.B);
+                XLColor totalXL = XLColor.FromArgb(totalHead.A, totalHead.R, totalHead.G, totalHead.B);
+                XLColor blackXL = XLColor.FromArgb(black.A, black.R, black.G, black.B);
+                XLColor lorealXL = XLColor.FromArgb(lorealHead.A, lorealHead.R, lorealHead.G, lorealHead.B);
+
                 var worksheet = workbook.Worksheets.Add("Transaction");
 
                 int columnBrand = 6;
@@ -686,14 +698,18 @@ namespace MarketData.Processes.Processes
                 for (int i = 0; i < brandLorealList.Count(); i++)
                 {
                     worksheet.Column(columnBrand).Width = 22;
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Fill.BackgroundColor = lorealXL;
                     worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Value = $"{brandLorealList[i]}";
                     worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Value = $"If Not In Top {request.brandRankEnd}";
                     worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Style.Border.RightBorder = XLBorderStyleValues.Thin;
 
                     worksheet.Range(worksheet.Cell(6, columnBrand), worksheet.Cell(6, columnBrand + 1)).Merge();
                     worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                     worksheet.Range(worksheet.Cell(7, columnBrand), worksheet.Cell(7, columnBrand + 1)).Merge();
                     columnBrand = columnBrand + 2;
                 }
@@ -725,16 +741,13 @@ namespace MarketData.Processes.Processes
                 worksheet.Column(4).Width = 19;
                 worksheet.Column(5).Width = 19;
 
-
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Merge();
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Value = "DEPARTMENT STORES";
 
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(7, 1)).Style.Fill.BackgroundColor = yellowXL;
-                worksheet.Cell(4, 2).Style.Fill.BackgroundColor = yellowXL;
-                worksheet.Cell(5, 2).Style.Fill.BackgroundColor = yellowXL;
-                worksheet.Cell(6, 2).Style.Fill.BackgroundColor = yellowXL;
+                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(7, 5)).Style.Fill.BackgroundColor = yellowXL;
 
                 worksheet.Cell(4, 2).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                 worksheet.Cell(5, 2).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -798,6 +811,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, columnBrand - 1)).Merge();
                 worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, columnBrand - 1)).Value = "RANKING";
                 worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, columnBrand - 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(5, columnBrand - 1)).Style.Fill.BackgroundColor = greenXL;
                 #endregion
 
                 int rowData = 8;
@@ -826,6 +840,7 @@ namespace MarketData.Processes.Processes
                     worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
 
                     worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Value = itemGroup.storeName;
+                    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Style.Fill.BackgroundColor = storeXL;
                     worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 1, 2)).SetValue(storeCompare != null ? string.Format("{0:#,0}", storeCompare.sumStore) : "0");
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).SetValue(string.Format("{0:#,0}", itemGroup.sumStore));
 
@@ -854,6 +869,22 @@ namespace MarketData.Processes.Processes
                     int countBrandRender = 1;
                     foreach (var itemBrand in listBrandSelect)
                     {
+                        if (!string.IsNullOrWhiteSpace(itemBrand.Report_Color) && itemBrand.Report_Color.ToLower() != "#ffffff")
+                        {
+                            try
+                            {
+                                Color colorBrand = System.Drawing.ColorTranslator.FromHtml(itemBrand.Report_Color);
+                                XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+
+                                worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+
+
                         if (storeCompare != null)
                         {
                             var brandCompare = storeCompare.brandDetail.FirstOrDefault(c => c.Brand_ID == itemBrand.Brand_ID);
@@ -934,6 +965,17 @@ namespace MarketData.Processes.Processes
                             if (brandNotTopDetail.Brand_Name == itemBrandLoreal
                                 && !listBrandTopSelectName.Contains(brandNotTopDetail.Brand_Name))
                             {
+                                try
+                                {
+                                    Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandNotTopDetail.Report_Color);
+                                    XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                                    worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+
                                 haveData = true;
                                 worksheet.Column(columnBrandDetail).Width = 11;
                                 worksheet.Column(columnBrandDetail + 1).Width = 11;
@@ -1019,6 +1061,7 @@ namespace MarketData.Processes.Processes
                        {
                            brandID = e.Key.Brand_ID,
                            brandName = e.Key.Brand_Name,
+                           Report_Color = e.FirstOrDefault().Report_Color,
                            sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                         : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                         : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -1035,6 +1078,7 @@ namespace MarketData.Processes.Processes
                      {
                          brandID = e.Key.Brand_ID,
                          brandName = e.Key.Brand_Name,
+                         Report_Color = e.FirstOrDefault().Report_Color,
                          sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                         : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                         : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -1051,6 +1095,7 @@ namespace MarketData.Processes.Processes
                     {
                         brandID = e.Key.Brand_ID,
                         brandName = e.Key.Brand_Name,
+                        Report_Color = e.FirstOrDefault().Report_Color,
                         sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                         : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                         : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -1077,6 +1122,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 4)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 5)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Style.Fill.BackgroundColor = totalXL;
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 1, 1)).Value = $"TOTAL {request.startYear}";
                 worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 1, 2)).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
                 worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).SetValue(string.Format("{0:#,0}", sumAllStore));
@@ -1088,6 +1134,18 @@ namespace MarketData.Processes.Processes
                 for (int i = 0; i < request.brandRankEnd; i++)
                 {
                     var brandDetail = groupBrandDetail[i];
+
+                    try
+                    {
+                        Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandDetail.Report_Color);
+                        XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                        worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
                     brandTotalSelect.Add(brandDetail.brandName);
                     var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
@@ -1127,6 +1185,17 @@ namespace MarketData.Processes.Processes
                         if (brandNotTopDetail.brandName == itemBrandLoreal
                             && !brandTotalSelect.Contains(brandNotTopDetail.brandName))
                         {
+                            try
+                            {
+                                Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandNotTopDetail.Report_Color);
+                                XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                                worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+
                             haveData = true;
                             worksheet.Column(columnBrandTotal).Width = 11;
                             worksheet.Column(columnBrandTotal + 1).Width = 11;
@@ -1185,6 +1254,11 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(rowData + 2, 4), worksheet.Cell(rowData + 3, 4)).Merge();
                 worksheet.Range(worksheet.Cell(rowData + 2, 5), worksheet.Cell(rowData + 3, 5)).Merge();
 
+                worksheet.Range(worksheet.Cell(rowData + 2, 3), worksheet.Cell(rowData + 3, 3)).Style.Fill.BackgroundColor = blackXL;
+                worksheet.Range(worksheet.Cell(rowData + 2, 4), worksheet.Cell(rowData + 3, 4)).Style.Fill.BackgroundColor = blackXL;
+                worksheet.Range(worksheet.Cell(rowData + 2, 5), worksheet.Cell(rowData + 3, 5)).Style.Fill.BackgroundColor = blackXL;
+
+                worksheet.Range(worksheet.Cell(rowData + 2, 1), worksheet.Cell(rowData + 3, 1)).Style.Fill.BackgroundColor = totalXL;
                 worksheet.Range(worksheet.Cell(rowData + 2, 1), worksheet.Cell(rowData + 3, 1)).Value = $"TOTAL {request.compareYear}";
                 worksheet.Range(worksheet.Cell(rowData + 2, 2), worksheet.Cell(rowData + 3, 2)).SetValue(string.Format("{0:#,0}", sumAllStoreCompare));
 
@@ -1193,6 +1267,17 @@ namespace MarketData.Processes.Processes
                 for (int i = 0; i < request.brandRankEnd; i++)
                 {
                     var brandDetail = groupBrandDetailCompare[i];
+                    try
+                    {
+                        Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandDetail.Report_Color);
+                        XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
                     var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
                     var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
@@ -1231,6 +1316,17 @@ namespace MarketData.Processes.Processes
                         if (brandNotTopDetail.brandName == itemBrandLoreal
                             && !brandTotalSelect.Contains(brandNotTopDetail.brandName))
                         {
+                            try
+                            {
+                                Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandNotTopDetail.Report_Color);
+                                XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                                worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+
                             haveData = true;
                             worksheet.Column(columnBrandTotalCompare).Width = 11;
                             worksheet.Column(columnBrandTotalCompare + 1).Width = 11;
