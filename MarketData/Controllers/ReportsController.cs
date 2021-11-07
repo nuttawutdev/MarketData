@@ -115,7 +115,7 @@ namespace MarketData.Controllers
             if (reportData.fileContent != null)
             {
                 reportData.fileName = fileName;
-                TempData[fileName] = reportData.fileContent;
+                //TempData[fileName] = reportData.fileContent;
             }
 
             return Json(reportData);

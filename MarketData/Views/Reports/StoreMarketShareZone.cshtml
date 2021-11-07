@@ -247,18 +247,19 @@
                 <button type="button" class="btn btn-outline-primary" id="btnPreview"><i class="ion-search"></i> Preview</button>
             </div>
             <div class="filter-group">
-                <div class="custom-file-upload">
+                @*<div class="custom-file-upload">
 
-                    <label for="file-upload" class="custom-file-upload1">
-                        <i class="ion-android-document"></i> Export to Excel
-                    </label>
-                    <input id="file-upload" type="file" />
-                </div>
-
+                        <label for="file-upload" class="custom-file-upload1">
+                            <i class="ion-android-document"></i> Export to Excel
+                        </label>
+                        <input id="file-upload" type="file" />
+                    </div>*@
+                <button type="button" class="btn btn-success" id="btnExport">   <i class="ion-android-document"></i> Export to Excel</button>
             </div>
         </div>
-        <div class="container-xl">
-
+        <div class="container-xl"><div id="ifr"></div>
+            <iframe id='result'>
+            </iframe>
         </div>
     </div>
 </div>
@@ -266,6 +267,7 @@
 
 
     $(document).ready(function () {
+
 
         getDepartmentStore();
         $("#checkRank").on('click', function (e) {
@@ -298,10 +300,8 @@
 
 
         function getDepartmentStore() {
-            //(departmentStoreList)
             var model = @Html.Raw(Json.Serialize(Model));
-            console.log("ss:: ", model.departmentStoreList)
-            console.log("ss1:: ", model.departmentStoreList.length)
+
             if (model.departmentStoreList.length > 0) {
                 var group = "";
                 var groupId = 0;
@@ -309,7 +309,7 @@
                 var html = "";
                 var storeId = "";
                 for (var i = 0; i < model.departmentStoreList.length; i++) {
-                    console.log("ss2:: ", model.departmentStoreList[i].retailerGroupName)
+
                     if (group != model.departmentStoreList[i].retailerGroupName) {
                         html = html.replace("storeinside", htmlStoreinside);
                         htmlStoreinside = "";
@@ -374,18 +374,21 @@
                  $.ajax({
                      type: "POST",
                      url: '@Url.Action("GetReportStoreMarketShareZone", "Reports")',
-                    contentType: "application/json; charset=utf-8",
+                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
                     success: function (data) {
                         $("#blocker").hide();
                         console.log(data)
+                        //console.log(data.filePreview)
                         if (data.isSuccess) {
+                            var dstFrame = document.getElementById('result');
+                            var dstDoc = dstFrame.contentDocument || dstFrame.contentWindow.document;
+                            dstDoc.write(data.filePreview);
+                            dstDoc.close()
+
                         //    $('#successModalHref').attr("href", "BrandType");
                         //    $('#successModal').modal('show');
-                        //} else if (data.isDuplicated) {
-                        //    $('#failedModal').modal('show');
-                        //    $('#myModalFailedResult').text('Duplicate data!');
                         } else {
                         //    $('#failedModal').modal('show');
                         //    $('#myModalFailedResult').text(data.responseError != "" && data.responseError != null ? data.responseError : 'Save data failed');
@@ -397,6 +400,10 @@
                         $("#blocker").hide();
                     }
                 });
+
+        });
+
+        $("#btnExport").on('click', function (e) {
 
         });
     });
