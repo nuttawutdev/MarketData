@@ -20,6 +20,7 @@ namespace MarketData.Processes.Processes
     public class ReportProcess
     {
         private readonly Repository repository;
+        private string[] monthList = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
         public ReportProcess(Repository repository)
         {
@@ -512,7 +513,7 @@ namespace MarketData.Processes.Processes
                         year = e.Key.Sales_Year,
                         month = e.Key.Sales_Month,
                         sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                    }).OrderByDescending(s => s.sumStore).ToList();
+                    }).OrderBy(s => s.year).ThenBy(b => b.month).ToList();
                 }
             }
             // YTD
@@ -544,7 +545,7 @@ namespace MarketData.Processes.Processes
                          year = e.Key.Sales_Year,
                          month = e.Key.Sales_Month,
                          sumStore = e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                     }).OrderByDescending(s => s.sumStore).ToList();
+                     }).OrderBy(s => s.year).ThenBy(b => b.month).ToList();
             }
 
             return groupStoreStartYear;
@@ -1826,30 +1827,110 @@ namespace MarketData.Processes.Processes
                 #region Header
                 var worksheet = workbook.Worksheets.Add("Transaction");
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Merge();
-                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"SELECTIVE MARKET THAILAND";
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"Details Sales by Brand {request.brandName}";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Merge();
+                string dateRepport = string.Empty;
+
+                int monthStart = int.Parse(request.startMonth);
+
+                dateRepport = $"{monthList[monthStart - 1]}/{request.startYear}";
+                dateRepport += request.endMonth != null ? $" - {monthList[int.Parse(request.endMonth) - 1]}/{request.endYear}" : "";
 
                 worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Merge();
-
-                string dateQuery = string.Empty;
-                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).SetValue(Convert.ToString("July-21")); ///
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Value = dateRepport;
                 worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                worksheet.Column(1).Width = 3;
-                worksheet.Column(2).Width = 19;
-
-                worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Merge();
-
-                worksheet.Cell(5, 1).Value = "#";
-                worksheet.Cell(5, 2).Value = "Brand";
-                worksheet.Row(5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Merge();
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
                 #endregion
 
+                worksheet.Column(1).Width = 3;
+                worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Column(2).Width = 30;
+                worksheet.Row(4).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Row(5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(5, 1)).Merge();
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(5, 1)).Value = "#";
+                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(5, 2)).Merge();
+                worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(5, 2)).Value = "DEPARTMENT STORES";
+
+                var periodTime = GetPeriodTime(request.startMonth, request.startYear, request.endMonth, request.endYear);
+
+
+                worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 2 + periodTime.Count())).Merge();
+                worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 2 + periodTime.Count())).Value = "Month";
+
+                int columnnPeriod = 3;
+                foreach (var period in periodTime)
+                {
+                    worksheet.Column(columnnPeriod).Width = 19;
+                    worksheet.Cell(5, columnnPeriod).SetValue(Convert.ToString($"{period.monthDisplay}-{period.yearDisplay}"));
+                    columnnPeriod++;
+                }
+
+                worksheet.Column(columnnPeriod).Width = 19;
+                worksheet.Range(worksheet.Cell(4, columnnPeriod), worksheet.Cell(5, columnnPeriod)).Merge();
+                worksheet.Range(worksheet.Cell(4, columnnPeriod), worksheet.Cell(5, columnnPeriod)).Value = "TOTAL";
+
+                var allStoreList = listGroup.GroupBy(
+                         x => new
+                         {
+                             x.storeName,
+                             x.storeID,
+                         })
+                     .Select(e => new
+                     {
+                         storeName = e.Key.storeName,
+                         storeID = e.Key.storeID,
+                     }).OrderBy(z => z.storeName).ToList();
+
+                int rowStore = 6;
+                int countStore = 1;
+
+                foreach (var itemStore in allStoreList)
+                {
+                    worksheet.Cell(rowStore, 1).SetValue(Convert.ToString($"{countStore}"));
+                    worksheet.Cell(rowStore, 2).SetValue($"{itemStore.storeName}");
+
+                    int columnnPeriodDetail = 3;
+                    decimal sumTotalOnPeriod = 0;
+                    foreach (var itemPeriod in periodTime)
+                    {
+                        worksheet.Cell(rowStore, columnnPeriodDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                        var totalInPeriod = listGroup.FirstOrDefault(c => c.month == itemPeriod.month && c.year == itemPeriod.year && c.storeID == itemStore.storeID);
+                        worksheet.Cell(rowStore, columnnPeriodDetail).SetValue(totalInPeriod != null ? string.Format("{0:#,0}", totalInPeriod.sumStore) : "0");
+
+                        if (totalInPeriod != null)
+                        {
+                            sumTotalOnPeriod += totalInPeriod.sumStore;
+                        }
+                        columnnPeriodDetail++;
+                    }
+
+                    worksheet.Cell(rowStore, columnnPeriodDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                    worksheet.Cell(rowStore, columnnPeriodDetail).SetValue(string.Format("{0:#,0}", sumTotalOnPeriod));
+
+                    rowStore++;
+                    countStore++;
+                }
+
+                worksheet.Range(worksheet.Cell(rowStore, 1), worksheet.Cell(rowStore, 2)).Merge();
+                worksheet.Range(worksheet.Cell(rowStore, 1), worksheet.Cell(rowStore, 2)).Value = "TOTAL";
+                worksheet.Range(worksheet.Cell(rowStore, 1), worksheet.Cell(rowStore, 2)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                int columnnPeriodTotal = 3;
+                decimal allSummaryPeriod = 0;
+                foreach (var itemPeriod in periodTime)
+                {
+                    worksheet.Cell(rowStore, columnnPeriodTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                    var sumTotalPeriod = listGroup.Where(c => c.month == itemPeriod.month && c.year == itemPeriod.year).Sum(c => c.sumStore);
+                    worksheet.Cell(rowStore, columnnPeriodTotal).SetValue(string.Format("{0:#,0}", sumTotalPeriod));
+
+                    allSummaryPeriod += sumTotalPeriod;
+                    columnnPeriodTotal++;
+                }
+
+                worksheet.Cell(rowStore, columnnPeriodTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                worksheet.Cell(rowStore, columnnPeriodTotal).SetValue(string.Format("{0:#,0}", allSummaryPeriod));
 
                 using (var stream = new MemoryStream())
                 {
@@ -1876,6 +1957,101 @@ namespace MarketData.Processes.Processes
                 }
             }
         }
+
+        private List<PeriodTime> GetPeriodTime(string startMonth, string startYear, string endMonth, string endYear)
+        {
+            List<PeriodTime> periodList = new List<PeriodTime>();
+
+            if (endMonth != null && endYear != null)
+            {
+                int yearStart = int.Parse(startYear);
+                int monthStart = int.Parse(startMonth);
+                int yearEnd = int.Parse(endYear);
+                int monthEnd = int.Parse(endMonth);
+
+                if (yearStart != yearEnd)
+                {
+                    int diffYear = yearEnd - yearStart;
+
+                    for (int j = 0; j <= diffYear; j++)
+                    {
+                        if (yearStart != yearEnd)
+                        {
+                            for (int i = monthStart - 1; i < 12; i++)
+                            {
+                                var monthText = (i + 1).ToString();
+
+                                PeriodTime time = new PeriodTime
+                                {
+                                    year = startYear,
+                                    month = monthText.Length == 1 ? $"0{monthText}" : monthText,
+                                    yearDisplay = startYear,
+                                    monthDisplay = monthList[i]
+                                };
+
+                                periodList.Add(time);
+                            }
+
+                            monthStart = 1;
+                            yearStart++;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < monthEnd; i++)
+                            {
+                                var monthText = (i + 1).ToString();
+
+                                PeriodTime time = new PeriodTime
+                                {
+                                    year = endYear,
+                                    month = monthText.Length == 1 ? $"0{monthText}" : monthText,
+                                    yearDisplay = endYear,
+                                    monthDisplay = monthList[i]
+                                };
+
+                                periodList.Add(time);
+                            }
+                        }
+
+                    }
+
+                }
+                else
+                {
+                    for (int i = monthStart - 1; i < monthEnd; i++)
+                    {
+                        var monthText = (i + 1).ToString();
+
+                        PeriodTime time = new PeriodTime
+                        {
+                            year = startYear,
+                            month = monthText.Length == 1 ? $"0{monthText}" : monthText,
+                            yearDisplay = startYear,
+                            monthDisplay = monthList[i]
+                        };
+
+                        periodList.Add(time);
+                    }
+                }
+            }
+            else
+            {
+                int monthStart = int.Parse(startMonth);
+
+                PeriodTime time = new PeriodTime
+                {
+                    year = startYear,
+                    month = startMonth,
+                    yearDisplay = startYear,
+                    monthDisplay = monthList[monthStart - 1]
+                };
+
+                periodList.Add(time);
+            }
+
+
+            return periodList;
+        }
     }
 
     public class GroupStoreRanking
@@ -1895,5 +2071,15 @@ namespace MarketData.Processes.Processes
         public decimal sumBrand { get; set; }
         public List<Brand_Ranking> storeDetail { get; set; }
     }
+
+    public class PeriodTime
+    {
+        public string year { get; set; }
+        public string month { get; set; }
+        public string yearDisplay { get; set; }
+        public string monthDisplay { get; set; }
+    }
+
+
 
 }

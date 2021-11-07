@@ -12,8 +12,8 @@ namespace MarketData.Model.Request.Report
         public string endMonth { get; set; }
         public string startYear { get; set; }
         public string endYear { get; set; }
-        public string compareYear { get; set; }
         public List<Guid> departmentStoreList { get; set; }
         public Guid brandID { get; set; }
+        public string brandName { get; set; }
     }
 }
