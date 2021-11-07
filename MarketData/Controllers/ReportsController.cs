@@ -44,7 +44,7 @@ namespace MarketData.Controllers
                             departmentStoreID = c.departmentStoreID,
                             departmentStoreName = c.departmentStoreName,
                             retailerGroupName = c.retailerGroupName
-                        }).ToList();
+                        }).OrderBy(d => d.departmentStoreName).ToList();
 
                         dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel
                         {
@@ -111,7 +111,7 @@ namespace MarketData.Controllers
         {
             var reportData = process.report.GetReportStoreMarketShareZone(request);
             string fileName = $"StoreMarketShareZone_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
-           
+
             if (reportData.fileContent != null)
             {
                 reportData.fileName = fileName;
@@ -136,17 +136,17 @@ namespace MarketData.Controllers
         {
             var reportData = process.report.GetReportStoreMarketShareZone(request);
 
-            if(reportData != null && reportData.fileContent != null)
+            if (reportData != null && reportData.fileContent != null)
             {
                 return File(
-                    reportData.fileContent, 
+                    reportData.fileContent,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     $"StoreMarketShareZone_{DateTime.Now.ToString("ddMMyyyyHHmm")}.xlsx");
             }
             else
             {
                 return Json(reportData);
-            }         
+            }
         }
     }
 }
