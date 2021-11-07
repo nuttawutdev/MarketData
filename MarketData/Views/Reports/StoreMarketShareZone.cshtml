@@ -6,9 +6,11 @@
     .row-filter {
         padding-top: 20px;
     }
-    .row50{
-        width:70px!important
+
+    .row50 {
+        width: 70px !important
     }
+
     .flexCenter {
         flex-wrap: nowrap;
         align-items: center;
@@ -147,12 +149,12 @@
                         </div>
                         <div class="col-md-2">
                             <label><b>Store Rank </b> </label>
-                            <div class="row flexCenter" >
-                                <input type="number" class="form-control input-sm row50" id="txtStoreRankStart"  value="1" > 
+                            <div class="row flexCenter">
+                                <input type="number" class="form-control input-sm row50" id="txtStoreRankStart" value="1">
                                 <i class="ion-android-arrow-forward" style="padding: 5px;"></i>
                                 <input type="number" class="form-control input-sm row50" id="txtStoreRankEnd" value="10">
                             </div>
-                           
+
                         </div>
                         <div class="col-md-2">
                             <label><b>Brand Rank </b> </label>
@@ -172,14 +174,14 @@
                                 </select>
                             </div>
                         </div>
-                            <div class="col-md-2">
-                                <label><b>Sum </b> </label>
-                                <select class="form-control " id="ddlSum">
-                                    <option value="Average">Average</option>
-                                    <option value="Total">Total</option>
-                                </select>
-                            </div>
+                        <div class="col-md-2">
+                            <label><b>Sum </b> </label>
+                            <select class="form-control " id="ddlSum">
+                                <option value="Average">Average</option>
+                                <option value="Total">Total</option>
+                            </select>
                         </div>
+                    </div>
                 </div>
                 <div class="row d-flex" style="padding-top: 10px;display:none!important" id="divYearEnd">
                     <div class="col d-flex flex-wrap">
@@ -223,26 +225,26 @@
         </div>
 
         <div class="w-100 text-center" style="display:flex;justify-content:center">
-                <div class="filter-group">
-                    <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Preview</button>
-                </div>
-                <div class="filter-group">
-                    <div class="custom-file-upload">
-
-                        <label for="file-upload" class="custom-file-upload1">
-                            <i class="ion-android-document"></i> Export to Excel
-                        </label>
-                        <input id="file-upload" type="file" />
-                    </div>
-
-                </div>
+            <div class="filter-group">
+                <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Preview</button>
             </div>
+            <div class="filter-group">
+                <div class="custom-file-upload">
+
+                    <label for="file-upload" class="custom-file-upload1">
+                        <i class="ion-android-document"></i> Export to Excel
+                    </label>
+                    <input id="file-upload" type="file" />
+                </div>
+
+            </div>
+        </div>
         <div class="container-xl">
-                <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
+            <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
         </div>
     </div>
 </div>
-            <script type="text/javascript">
+<script type="text/javascript">
 
 
     $(document).ready(function () {
@@ -327,4 +329,4 @@
             );
         }
     });
-            </script>
+</script>
