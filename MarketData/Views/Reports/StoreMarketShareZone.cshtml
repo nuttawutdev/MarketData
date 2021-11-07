@@ -257,9 +257,13 @@
                 <button type="button" class="btn btn-success" id="btnExport">   <i class="ion-android-document"></i> Export to Excel</button>
             </div>
         </div>
-        <div class="container-xl"><div id="ifr"></div>
-            <iframe id='result'>
-            </iframe>
+        <div class="container-xl">
+            <div id="divPreview">
+                <input type="hidden"/ id="txtFileName">
+                <iframe id="result" style="width: 100%; height: 200vh; margin-top: 30px;">
+                </iframe>
+            </div>
+     
         </div>
     </div>
 </div>
@@ -267,7 +271,7 @@
 
 
     $(document).ready(function () {
-
+        $("#divPreview").hide();
 
         getDepartmentStore();
         $("#checkRank").on('click', function (e) {
@@ -369,7 +373,6 @@
                 saleType: $("#ddlSales").val(),
                 preview: true
             };
-            console.log(frmdata);
              $("#blocker").show();
                  $.ajax({
                      type: "POST",
@@ -380,21 +383,11 @@
                     success: function (data) {
                         $("#blocker").hide();
                         console.log(data)
-                        //console.log(data.filePreview)
-                        if (data.isSuccess) {
-                            var dstFrame = document.getElementById('result');
-                            var dstDoc = dstFrame.contentDocument || dstFrame.contentWindow.document;
-                            dstDoc.write(data.filePreview);
-                            dstDoc.close()
-
-                        //    $('#successModalHref').attr("href", "BrandType");
-                        //    $('#successModal').modal('show');
-                        } else {
-                        //    $('#failedModal').modal('show');
-                        //    $('#myModalFailedResult').text(data.responseError != "" && data.responseError != null ? data.responseError : 'Save data failed');
+                        if (data.success) {
+                            $("#txtFileName").val(data.fileName);
+                            $("#result").attr("srcdoc", data.filePreview);
+                            $("#divPreview").show();
                          }
-                        //$('#confirmID').val('');
-                        //$('#myModalFailedResult').val('');
                     },
                     error: function () {
                         $("#blocker").hide();
@@ -404,7 +397,55 @@
         });
 
         $("#btnExport").on('click', function (e) {
+               var checkRank = $("#checkRank").prop("checked");
+            var checkSelectStore = $("#checkSelectStore").prop("checked");
+            var brandType = $("#ddlType").val();
+            var universe = $("#ddlUniverse").val();
+            var departmentStoreList = [];
 
+            $('.departmentStore:checkbox:checked').each(function () {
+                departmentStoreList.push($(this).data('value'))
+            });
+
+            var frmdata = {
+                startWeek: $("#ddlWeekStart").val(),
+                endWeek: checkRank? $("#ddlWeekEnd").val():null,
+                startMonth: $("#ddlMonthStart").val(),
+                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                startYear: $("#ddlYearStart").val(),
+                endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                compareYear: $("#ddlCompareYear").val(),
+                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                brandType: brandType != "" ? brandType : null,
+                storeRankStart: parseInt($("#txtStoreRankStart").val()),
+                storeRankEnd: parseInt($("#txtStoreRankEnd").val()),
+                brandRankStart: parseInt($("#txtBrandRankStart").val()),
+                brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
+                universe: universe != "" ? universe : null,
+                saleType: $("#ddlSales").val(),
+                preview: true
+            };
+             $("#blocker").show();
+                 $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("ExportReportStoreMarketShareZone", "Reports")',
+                     contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                     success: function (data) {
+
+                        $("#blocker").hide();
+                         var bytes = new Uint8Array(result.FileContents);
+                         var blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                         var link = document.createElement('a');
+                         link.href = window.URL.createObjectURL(blob);
+                         link.download = "myFileName.xlsx";
+                         link.click();
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
         });
     });
 </script>
