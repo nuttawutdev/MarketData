@@ -1,4 +1,5 @@
-﻿@{
+﻿@model MarketData.Models.StoreMarketShareZoneViewModel
+@{
     ViewData["Title"] = "Store market share & growth (zone)";
 }
 
@@ -18,7 +19,6 @@
 </style>
 <h3>
     @ViewData["Title"]
-
 </h3>
 <hr />
 <br />
@@ -73,9 +73,13 @@
                         </div>
                         <div class="col-md-4">
                             <label>Year</label>
-                            <select class="form-control col-sm-12 col-lg-6">
-                                <option>2019</option>
-                                <option>2020</option>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlYearStart">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -111,9 +115,13 @@
                         </div>
                         <div class="col-md-4">
                             <label>Year</label>
-                            <select class="form-control col-sm-12 col-lg-6">
-                                <option>2019</option>
-                                <option>2020</option>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlYearEnd">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -124,9 +132,14 @@
             <div class="col-sm-3 d-flex flex-wrap align-items-md-start" style="padding:0px;">
                 <label class="form-label d-md-flex align-items-md-start">Compare with year</label>
                 <div class="form-group mb-3">
+
                     <select class="form-control" style="width:100px;" id="ddlCompareYear">
-                        <option>2019</option>
-                        <option>2020</option>
+                        @{
+                            for (int i = 0; i < Model.yearList.Count; i++)
+                            {
+                                <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                            }
+                        }
                     </select>
                 </div>
             </div>
@@ -143,9 +156,9 @@
                     <div class="col d-flex flex-wrap" style="justify-content: space-evenly;">
                         <div class="col-md-2">
                             <label><b>Type </b> </label>
-                            <select class="form-control " id="ddlType">
-                                <option value="">Please Select</option>
-                            </select>
+
+                            @Html.DropDownList("ddlType", new SelectList(Model.brandTypeList, "brandTypeID", "brandTypeName"), "Please select", new { id = "ddlType", @class = "form-control " })
+
                         </div>
                         <div class="col-md-2">
                             <label><b>Store Rank </b> </label>
@@ -175,10 +188,11 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <label><b>Sum </b> </label>
-                            <select class="form-control " id="ddlSum">
-                                <option value="Average">Average</option>
-                                <option value="Total">Total</option>
+                            <label><b>Sales </b> </label>
+                            <select class="form-control " id="ddlSales">
+                                <option value="Amount">Amount</option>
+                                <option value="Whole">Whole</option>
+                                <option value="Net">Net</option>
                             </select>
                         </div>
                     </div>
@@ -213,9 +227,13 @@
                         </div>
                         <div class="col-md-4">
                             <label>Year</label>
-                            <select class="form-control col-sm-12 col-lg-6">
-                                <option>2019</option>
-                                <option>2020</option>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlEndYear">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -226,7 +244,7 @@
 
         <div class="w-100 text-center" style="display:flex;justify-content:center">
             <div class="filter-group">
-                <button type="button" class="btn btn-outline-primary"><i class="ion-search"></i> Preview</button>
+                <button type="button" class="btn btn-outline-primary" id="btnPreview"><i class="ion-search"></i> Preview</button>
             </div>
             <div class="filter-group">
                 <div class="custom-file-upload">
@@ -240,7 +258,7 @@
             </div>
         </div>
         <div class="container-xl">
-            <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
+
         </div>
     </div>
 </div>
@@ -279,54 +297,107 @@
         });
 
 
-        function getDepartmentStore(){
-              $.ajax(
-                {
-                    url: '@Url.Action("GetDepartmentStoreList", "MasterData")',
-                    contentType: "application/json; charset=utf-8",
-                    type: "POST",
-                      success: function (data) {
-                          if (data.data.length > 0) {
-                              var group = "";
-                              var groupId = 0;
-                              var htmlStoreinside = "";
-                              var html = "";
-                              var storeId = "";
-                              for (var i = 0; i < data.data.length-1; i++) {
-                                  if (group != data.data[i].retailerGroupName) {
-                                      html = html.replace("storeinside", htmlStoreinside);
-                                      htmlStoreinside = "";
-                                      groupId += 1;
-                                      storeId = "store_"+groupId ;
-                                      group = data.data[i].retailerGroupName;
-                                      html += "<div style='padding-top: 20px;'>";
-                                      html += "<div class='card'>";
-                                      html += "<div class='card-body'>";
-                                      html += " <div>";
-                                      html += "     <header>";
-                                      html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' type='checkbox' id='" + storeId +"'><label class='form-check-label' >" + data.data[i].retailerGroupName + "</label></div>";
-                                      html += "     </header>";
-                                      html += " </div>";
-                                      html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
-                                      html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input ' type='checkbox' name='" + storeId +"' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
-                                      html += " storeinside";
-                                      html += "  </div> </div > </div > </div > ";
+        function getDepartmentStore() {
+            //(departmentStoreList)
+            var model = @Html.Raw(Json.Serialize(Model));
+            console.log("ss:: ", model.departmentStoreList)
+            console.log("ss1:: ", model.departmentStoreList.length)
+            if (model.departmentStoreList.length > 0) {
+                var group = "";
+                var groupId = 0;
+                var htmlStoreinside = "";
+                var html = "";
+                var storeId = "";
+                for (var i = 0; i < model.departmentStoreList.length; i++) {
+                    console.log("ss2:: ", model.departmentStoreList[i].retailerGroupName)
+                    if (group != model.departmentStoreList[i].retailerGroupName) {
+                        html = html.replace("storeinside", htmlStoreinside);
+                        htmlStoreinside = "";
+                        groupId += 1;
+                        storeId = "store_" + groupId;
+                        group = model.departmentStoreList[i].retailerGroupName;
 
-                                  }
+                        html += "<div style='padding-top: 20px;'>";
+                        html += "<div class='card'>";
+                        html += "<div class='card-body'>";
+                        html += " <div>";
+                        html += "     <header>";
+                        html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' type='checkbox' id='" + storeId + "'><label class='form-check-label' >" + model.departmentStoreList[i].retailerGroupName + "</label></div>";
+                        html += "     </header>";
+                        html += " </div>";
+                        html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
+                        html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"' ><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
+                        html += " storeinside";
+                        html += "  </div> </div > </div > </div > ";
 
-                                  if (group == data.data[i].retailerGroupName) {
-                                      htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input' type='checkbox' name='" + storeId +"' id='formCheck-" + i + "' ><label class='form-check-label' >" + data.data[i].departmentStoreName + "</label></div>";
-                                  }
-
-                              }
-                              $("#divSelectStore").append(html.replace("storeinside",""));
-                          }
-
-                    },
-                     error: function () {
+                    }else if (group == model.departmentStoreList[i].retailerGroupName) {
+                        htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"'><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
                     }
+
                 }
-            );
+                $("#divSelectStore").append(html.replace("storeinside", ""));
+            }
+
         }
+
+        $("#btnPreview").on('click', function (e) {
+            var checkRank = $("#checkRank").prop("checked");
+            var checkSelectStore = $("#checkSelectStore").prop("checked");
+            var brandType = $("#ddlType").val();
+            var universe = $("#ddlUniverse").val();
+            var departmentStoreList = [];
+
+            $('.departmentStore:checkbox:checked').each(function () {
+                departmentStoreList.push($(this).data('value'))
+            });
+
+            var frmdata = {
+                startWeek: $("#ddlWeekStart").val(),
+                endWeek: checkRank? $("#ddlWeekEnd").val():null,
+                startMonth: $("#ddlMonthStart").val(),
+                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                startYear: $("#ddlYearStart").val(),
+                endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                compareYear: $("#ddlCompareYear").val(),
+                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                brandType: brandType != "" ? brandType : null,
+                storeRankStart: parseInt($("#txtStoreRankStart").val()),
+                storeRankEnd: parseInt($("#txtStoreRankEnd").val()),
+                brandRankStart: parseInt($("#txtBrandRankStart").val()),
+                brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
+                universe: universe != "" ? universe : null,
+                saleType: $("#ddlSales").val(),
+                preview: true
+            };
+            console.log(frmdata);
+             $("#blocker").show();
+                 $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("GetReportStoreMarketShareZone", "Reports")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        console.log(data)
+                        if (data.isSuccess) {
+                        //    $('#successModalHref').attr("href", "BrandType");
+                        //    $('#successModal').modal('show');
+                        //} else if (data.isDuplicated) {
+                        //    $('#failedModal').modal('show');
+                        //    $('#myModalFailedResult').text('Duplicate data!');
+                        } else {
+                        //    $('#failedModal').modal('show');
+                        //    $('#myModalFailedResult').text(data.responseError != "" && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        //$('#confirmID').val('');
+                        //$('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+
+        });
     });
 </script>
