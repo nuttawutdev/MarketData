@@ -55,5 +55,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public List<Data_Exporting> GetDataExportingBy(Expression<Func<Data_Exporting, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.Data_Exporting.AsNoTracking().Where(expression).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

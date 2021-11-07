@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using MarketData.Helper;
 using MarketData.Model.Entiry;
 using MarketData.Model.Request.Report;
 using MarketData.Model.Response.Report;
@@ -27,6 +28,47 @@ namespace MarketData.Processes.Processes
             this.repository = repository;
         }
 
+        public GetOptionReportResponse GetOptionReport()
+        {
+            GetOptionReportResponse response = new GetOptionReportResponse();
+
+            try
+            {
+                var allDepartmentStore = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
+                var brandTypeList = repository.masterData.GetBrandTypeList().Where(c => c.Active_Flag);
+
+                response.departmentStore = allDepartmentStore.Select(c => new Model.Data.DepartmentStoreData
+                {
+                    departmentStoreID = c.Department_Store_ID,
+                    departmentStoreName = c.Department_Store_Name
+                }).ToList();
+
+                response.brandType = brandTypeList.Select(c => new Model.Data.BrandTypeData
+                {
+                    brandTypeID = c.Brand_Type_ID,
+                    brandTypeName = c.Brand_Type_Name
+                }).ToList();
+
+                List<string> yearList = new List<string>();
+                string currentYear = Utility.GetDateNowThai().Year.ToString();
+
+                yearList.Add(currentYear);
+
+                int startYear = 2000;
+
+                for (int i = startYear; i < Utility.GetDateNowThai().Year; i++)
+                {
+                    yearList.Add(i.ToString());
+                }
+                response.year = yearList.OrderByDescending(c => c).ToList();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return response;
+        }
         public GenerateReportResponse GetReportStoreMarketShareZone(ReportStoreMarketShareRequest request)
         {
             GenerateReportResponse response = new GenerateReportResponse();
@@ -98,6 +140,27 @@ namespace MarketData.Processes.Processes
             {
                 var reportData = GetDataForReportDetailSaleByBrand(request);
                 (byte[] fileContent, string filePreview) = GenerateReportDetailSaleByBrand(request, reportData);
+
+                response.fileContent = fileContent;
+                response.filePreview = filePreview;
+                response.success = true;
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GenerateReportResponse GetReportExcelDataExporting(ReportExcelDataExportRequest request)
+        {
+            GenerateReportResponse response = new GenerateReportResponse();
+
+            try
+            {
+                var reportData = GetDataForReportDataExporting(request);
+                (byte[] fileContent, string filePreview) = GenerateReportExcelDataExporting(request, reportData);
 
                 response.fileContent = fileContent;
                 response.filePreview = filePreview;
@@ -549,6 +612,41 @@ namespace MarketData.Processes.Processes
             }
 
             return groupStoreStartYear;
+        }
+
+        private List<Data_Exporting> GetDataForReportDataExporting(ReportExcelDataExportRequest request)
+        {
+            List<Data_Exporting> data = new List<Data_Exporting>();
+
+            // MTD
+            if (string.IsNullOrWhiteSpace(request.endWeek))
+            {
+                data = repository.report.GetDataExportingBy(
+                    c => c.Sales_Week == request.startWeek
+                    && c.Sales_Month == request.startMonth
+                    && c.Sales_Year == request.startYear
+                    && (request.universe == null || c.Universe == request.universe)
+                    && (request.departmentStoreList == null
+                    || !request.departmentStoreList.Any()
+                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+            }
+            // YTD
+            else
+            {
+                int timeFilterStart = int.Parse(request.startYear + request.startMonth + request.startWeek);
+                int timeFilterEnd = int.Parse(request.endYear + request.endMonth + request.endWeek);
+
+                data = repository.report.GetDataExportingBy(
+                   c =>
+                   (request.departmentStoreList == null
+                   || !request.departmentStoreList.Any()
+                   || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
+                   && (request.universe == null || c.Universe == request.universe)
+                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+            }
+
+            return data;
         }
 
         private (byte[], string) GenerateReportStoreMarketShareZone(ReportStoreMarketShareRequest request, List<GroupStoreRanking> listGroup, List<GroupStoreRanking> listGroupCompare, List<GroupStoreRanking> listGroupOldCompare)
@@ -1958,6 +2056,61 @@ namespace MarketData.Processes.Processes
             }
         }
 
+        private (byte[], string) GenerateReportExcelDataExporting(ReportExcelDataExportRequest request, List<Data_Exporting> listData)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var brandFragrances = repository.report.GetBrandFragances();
+                Color yellowHead = Color.FromArgb(250, 250, 181);
+                XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+
+                #region Header
+
+                var worksheet = workbook.Worksheets.Add("Transaction");
+
+                worksheet.Row(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                string dateRepport = string.Empty;
+
+                int monthStart = int.Parse(request.startMonth);
+
+                dateRepport = $"{monthList[monthStart - 1]}/{request.startYear}";
+                dateRepport += request.endMonth != null ? $" - {monthList[int.Parse(request.endMonth) - 1]}/{request.endYear}" : "";
+
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Merge();
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"Excel Data Exporing File {dateRepport}";
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+
+                #endregion
+
+
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    Workbook workbookC = new Workbook();
+                    workbookC.LoadFromStream(stream);
+                    Worksheet sheet = workbookC.Worksheets[0];
+                    sheet.SaveToHtml("report3.html");
+
+                    string htmlBody = string.Empty;
+                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report3.html"));
+                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+                    {
+                        htmlBody = reader.ReadToEnd();
+                    }
+
+                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                    htmlBody = regex.Replace(htmlBody, "");
+
+                    File.Delete(excelHtmlPath);
+                    return (content, htmlBody);
+                }
+            }
+        }
+
         private List<PeriodTime> GetPeriodTime(string startMonth, string startYear, string endMonth, string endYear)
         {
             List<PeriodTime> periodList = new List<PeriodTime>();
@@ -2079,7 +2232,4 @@ namespace MarketData.Processes.Processes
         public string yearDisplay { get; set; }
         public string monthDisplay { get; set; }
     }
-
-
-
 }

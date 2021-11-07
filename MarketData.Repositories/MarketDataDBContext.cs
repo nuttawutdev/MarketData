@@ -40,5 +40,6 @@ namespace MarketData.Repositories
         public DbSet<Brand_Ranking> Brand_Ranking { get; set; }
         public DbSet<Loreal_Store> Loreal_Store { get; set; }
         public DbSet<Brand_Frangances> Brand_Frangances { get; set; }
+        public DbSet<Data_Exporting> Data_Exporting { get; set; }
     }
 }
