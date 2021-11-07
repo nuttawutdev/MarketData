@@ -111,22 +111,22 @@ namespace MarketData.Controllers
 
         public IActionResult Export()
         {
-            //ReportStoreMarketShareRequest request = new ReportStoreMarketShareRequest
-            //{
-            //    startWeek = "4",
-            //    startMonth = "07",
-            //    startYear = "2021",
-            //    compareYear = "2020",
-            //    //endWeek = "4",
-            //    //endMonth = "08",
-            //    //endYear = "2021",
-            //    universe = "LPD",
-            //    storeRankStart = 1,
-            //    brandRankStart = 1,
-            //    brandRankEnd = 10,
-            //    storeRankEnd = 10,
-            //    saleType = "Net"
-            //};
+            ReportStoreMarketShareRequest request = new ReportStoreMarketShareRequest
+            {
+                startWeek = "4",
+                startMonth = "07",
+                startYear = "2021",
+                compareYear = "2020",
+                //endWeek = "4",
+                //endMonth = "08",
+                //endYear = "2021",
+                universe = "LPD",
+                storeRankStart = 1,
+                brandRankStart = 1,
+                brandRankEnd = 10,
+                storeRankEnd = 10,
+                saleType = "Amount"
+            };
 
             //ReportSelectiveMarketRequest request = new ReportSelectiveMarketRequest
             //{
@@ -151,17 +151,17 @@ namespace MarketData.Controllers
             //    brandName = "Estee Lauder"
             //};
 
-            ReportExcelDataExportRequest request = new ReportExcelDataExportRequest
-            {
-                startWeek = "4",
-                startMonth = "07",
-                startYear = "2021",
-                //endWeek = "4",
-                //endMonth = "07",
-                //endYear = "2021",
-            };
+            //ReportExcelDataExportRequest request = new ReportExcelDataExportRequest
+            //{
+            //    startWeek = "4",
+            //    startMonth = "07",
+            //    startYear = "2021",
+            //    //endWeek = "4",
+            //    //endMonth = "07",
+            //    //endYear = "2021",
+            //};
 
-            var file = process.report.GetReportExcelDataExporting(request);
+            var file = process.report.GetReportStoreMarketShareZone(request);
             return File(file.fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 
