@@ -34,13 +34,14 @@ namespace MarketData.Processes.Processes
 
             try
             {
-                var allDepartmentStore = repository.masterData.GetDepartmentStoreListBy(c => c.Active_Flag);
+                var allDepartmentStore = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
                 var brandTypeList = repository.masterData.GetBrandTypeList().Where(c => c.Active_Flag);
 
                 response.departmentStore = allDepartmentStore.Select(c => new Model.Data.DepartmentStoreData
                 {
-                    departmentStoreID = c.Department_Store_ID,
-                    departmentStoreName = c.Department_Store_Name
+                    departmentStoreID = c.departmentStoreID,
+                    departmentStoreName = c.departmentStoreName,
+                    retailerGroupName = c.retailerGroupName
                 }).ToList();
 
                 response.brandType = brandTypeList.Select(c => new Model.Data.BrandTypeData
@@ -2065,7 +2066,6 @@ namespace MarketData.Processes.Processes
                 XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
 
                 #region Header
-
                 var worksheet = workbook.Worksheets.Add("Transaction");
 
                 worksheet.Row(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -2080,10 +2080,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"Excel Data Exporing File {dateRepport}";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
-
                 #endregion
-
-
 
                 using (var stream = new MemoryStream())
                 {
