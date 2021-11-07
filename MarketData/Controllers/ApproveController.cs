@@ -128,18 +128,31 @@ namespace MarketData.Controllers
             //    saleType = "Net"
             //};
 
-            ReportSelectiveMarketRequest request = new ReportSelectiveMarketRequest
+            //ReportSelectiveMarketRequest request = new ReportSelectiveMarketRequest
+            //{
+            //    startWeek = "4",
+            //    startMonth = "07",
+            //    startYear = "2021",
+            //    compareYear = "2020",
+            //    universe = "LPD",
+            //    saleType = "Whole",
+            //    lorealStore = false
+            //};
+
+            ReportDetailSaleByBrandRequest request = new ReportDetailSaleByBrandRequest
             {
                 startWeek = "4",
                 startMonth = "07",
-                startYear = "2021",
-                compareYear = "2020",
-                universe = "LPD",
-                saleType = "Amount",
-                lorealStore = false
+                startYear = "2020",
+                //endWeek = "4",
+                //endMonth = "07",
+                //endYear = "2021",
+                brandID = new Guid("EEB79A33-E411-4813-AC3B-4E74C8B1B177"),
+                brandName = "Estee Lauder"
             };
 
-            var file = process.report.GetReportSelectiveMarket(request);
+
+            var file = process.report.GetReportDetailSaleByBrand(request);
             return File(file.fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 

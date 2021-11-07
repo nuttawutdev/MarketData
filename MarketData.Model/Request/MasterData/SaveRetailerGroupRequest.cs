@@ -8,7 +8,6 @@ namespace MarketData.Model.Request.MasterData
     public class SaveRetailerGroupRequest
     {
         public Guid? retailerGroupID { get; set; }
-        [Required]
         public string retailerGroupName { get; set; }
         public bool active { get; set; }
         public string userID { get; set; }

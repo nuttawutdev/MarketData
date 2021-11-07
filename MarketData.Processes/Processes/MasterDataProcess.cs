@@ -102,7 +102,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Type Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Segment Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -322,7 +322,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
+                    response.responseError = "Brand Group Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -423,8 +423,8 @@ namespace MarketData.Processes.Processes
             {
                 request.brandName = request.brandName.Trim();
 
-                var brandByName = repository.masterData.FindBrandBy(c => c.Brand_Name.ToLower() == request.brandName.ToLower()
-                && c.Delete_Flag != true);
+                var brandByName = repository.masterData.GetBrandListBy(
+                    c => c.Brand_Name.ToLower() == request.brandName.ToLower() && c.Delete_Flag != true);
 
                 var brrandGroupSelect = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == request.brandGroupID);
 
@@ -433,46 +433,70 @@ namespace MarketData.Processes.Processes
                     if (string.IsNullOrWhiteSpace(request.brandShortName))
                     {
                         response.isSuccess = false;
-                        response.responseError = "Short name is required on Loreal Brand group.";
+                        response.responseError = "กรุณาระบุ Brand Short Name ใน Brand Group ของ Loreal";
                         return response;
                     }
 
                     if (!request.lorealBrandRank.HasValue)
                     {
                         response.isSuccess = false;
-                        response.responseError = "Loreal brand rank is required on Loreal Brand group.";
+                        response.responseError = "กรุณาระบุ Loreal Brand Rank ใน Brand Group ของ Loreal";
                         return response;
                     }
                 }
 
 
                 TMBrand brandByShortName = null;
-                TMBrand brandByColor = null;
+                //TMBrand brandByColor = null;
 
                 if (!string.IsNullOrWhiteSpace(request.brandShortName))
                 {
                     request.brandShortName = request.brandShortName.Trim();
 
-                    brandByShortName = repository.masterData.FindBrandBy(c => c.Brand_Short_Name != null && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
+                    brandByShortName = repository.masterData.FindBrandBy(
+                                        c => c.Brand_Short_Name != null
+                                        && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
                                         && c.Delete_Flag != true);
                 }
 
-                if (request.brandColor != "#ffffff" && !string.IsNullOrWhiteSpace(request.brandColor))
-                {
-                    brandByColor = repository.masterData.FindBrandBy(c => !string.IsNullOrWhiteSpace(c.Brand_Color) && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
-                }
+                //if (!string.IsNullOrWhiteSpace(request.brandColor) && request.brandColor.ToLower() != "#ffffff")
+                //{
+                //    brandByColor = repository.masterData.FindBrandBy(c => !string.IsNullOrWhiteSpace(c.Brand_Color) && c.Brand_Color == request.brandColor && c.Delete_Flag != true);
+                //}
 
                 // Brand name not exist Or Update old Brand
-                if ((brandByName == null || (brandByName != null && brandByName.Brand_ID == request.brandID))
+                if ((!brandByName.Any() || (brandByName != null && brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault())))
                     && (brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID))
-                    && (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID)))
+                    //&& (brandByColor == null || (brandByColor != null && brandByColor.Brand_ID == request.brandID))
+                    )
                 {
-                    response.isSuccess = await repository.masterData.SaveBrand(request);
+                    var saveResult = await repository.masterData.SaveBrand(request);
+                    if (saveResult)
+                    {
+                        response.isSuccess = true;
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "บันทึกข้อมูลไม่สำเร็จ กรุณาติดต่อผู้ดูแลระบบ";
+                    }
                 }
                 else
                 {
+                    if (brandByName != null && !brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault()))
+                    {
+                        response.responseError = "Brand Name ซ้ำกับที่มีอยู่ในระบบ";
+                    }
+                    else if (brandByShortName != null && brandByShortName.Brand_ID != request.brandID)
+                    {
+                        response.responseError = "Brand Short Name ซ้ำกับที่มีอยู่ในระบบ";
+                    }
+                    //else if (brandByColor != null && brandByColor.Brand_ID != request.brandID)
+                    //{
+                    //    response.responseError = "Brand Color ซ้ำกับที่มีอยู่ในระบบ";
+                    //}
+
                     response.isSuccess = false;
-                    response.isDuplicated = true;
                 }
             }
             catch (Exception ex)
@@ -897,8 +921,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Retailer group name is duplicated";
+                    response.responseError = "Retailer Group Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -1007,8 +1030,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Distribution channel name is duplicated";
+                    response.responseError = "Distribution Channels Name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -1102,21 +1124,20 @@ namespace MarketData.Processes.Processes
             {
                 request.departmentStoreName = request.departmentStoreName.Trim();
 
-                var departmentStoreByName = repository.masterData.FindDepartmentStoreBy(
+                var departmentStoreByName = repository.masterData.GetDepartmentStoreListBy(
                     c => c.Department_Store_Name.ToLower() == request.departmentStoreName.ToLower()
                     && c.Delete_Flag != true);
 
                 // Department Store name not exist Or Update old Department Store
                 if (departmentStoreByName == null ||
-                    (departmentStoreByName != null && departmentStoreByName.Department_Store_ID == request.departmentStoreID))
+                    (departmentStoreByName.Any() && departmentStoreByName.Select(c => c.Department_Store_ID).Contains(request.departmentStoreID.GetValueOrDefault())))
                 {
                     response.isSuccess = await repository.masterData.SaveDepartmentStore(request);
                 }
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Department Store name is duplicated";
+                    response.responseError = "Department Store name ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
@@ -1534,8 +1555,7 @@ namespace MarketData.Processes.Processes
                 else
                 {
                     response.isSuccess = false;
-                    response.isDuplicated = true;
-                    response.responseError = "Counter is exist";
+                    response.responseError = "Counter ซ้ำกับที่มีอยู่ในระบบ";
                 }
             }
             catch (Exception ex)
