@@ -25,5 +25,6 @@ namespace MarketData
                     webBuilder.UseWebRoot("wwwroot");
                     webBuilder.UseStartup<Startup>();
                 });
+
     }
 }
