@@ -24,7 +24,6 @@ namespace MarketData
                     webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
                     webBuilder.UseWebRoot("wwwroot");
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseKestrel(o => { o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10); });
                 });
     }
 }
