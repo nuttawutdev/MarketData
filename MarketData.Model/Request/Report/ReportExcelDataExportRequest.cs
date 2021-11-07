@@ -14,5 +14,6 @@ namespace MarketData.Model.Request.Report
         public string endYear { get; set; }
         public List<Guid> departmentStoreList { get; set; }
         public string universe { get; set; }
+        public bool preview { get; set; }
     }
 }

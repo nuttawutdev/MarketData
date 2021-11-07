@@ -21,5 +21,6 @@ namespace MarketData.Model.Request.Report
         public int? brandRankEnd { get; set; }
         public string universe { get; set; }
         public string saleType { get; set; }
+        public bool preview { get; set; }
     }
 }

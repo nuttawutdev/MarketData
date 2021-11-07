@@ -18,5 +18,6 @@ namespace MarketData.Model.Request.Report
         public string universe { get; set; }
         public string saleType { get; set; }
         public bool lorealStore { get; set; }
+        public bool preview { get; set; }
     }
 }

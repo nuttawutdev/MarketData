@@ -629,8 +629,7 @@ namespace MarketData.Processes.Processes
                     && (request.universe == null || c.Universe == request.universe)
                     && (request.departmentStoreList == null
                     || !request.departmentStoreList.Any()
-                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
-
+                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))).OrderBy(s=>s.Store_Name).ToList();
             }
             // YTD
             else
@@ -644,7 +643,7 @@ namespace MarketData.Processes.Processes
                    || !request.departmentStoreList.Any()
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && (request.universe == null || c.Universe == request.universe)
-                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+                   && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd)).OrderBy(s => s.Store_Name).ToList();
             }
 
             return data;
@@ -1177,28 +1176,34 @@ namespace MarketData.Processes.Processes
                 }
                 #endregion
 
-
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    Workbook workbookC = new Workbook();
-                    workbookC.LoadFromStream(stream);
-                    Worksheet sheet = workbookC.Worksheets[0];
-                    sheet.SaveToHtml("report.html");
-
                     string htmlBody = string.Empty;
-                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report.html"));
-                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+
+                    if (request.preview)
                     {
-                        htmlBody = reader.ReadToEnd();
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report5{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
                     }
 
-                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
-                    htmlBody = regex.Replace(htmlBody, "");
-
-                    File.Delete(excelHtmlPath);
                     return (content, htmlBody);
                 }
             }
@@ -1595,24 +1600,29 @@ namespace MarketData.Processes.Processes
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    Workbook workbookC = new Workbook();
-                    workbookC.LoadFromStream(stream);
-                    Worksheet sheet = workbookC.Worksheets[0];
-                    sheet.SaveToHtml("report2.html");
-
                     string htmlBody = string.Empty;
-                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report2.html"));
-                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+
+                    if (request.preview)
                     {
-                        htmlBody = reader.ReadToEnd();
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report2{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
                     }
-
-                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
-                    htmlBody = regex.Replace(htmlBody, "");
-
-                    File.Delete(excelHtmlPath);
-
 
                     return (content, htmlBody);
                 }
@@ -1888,28 +1898,34 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 9).SetValue($"{percentGrowthTotal}%");
                 }
 
-
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    Workbook workbookC = new Workbook();
-                    workbookC.LoadFromStream(stream);
-                    Worksheet sheet = workbookC.Worksheets[0];
-                    sheet.SaveToHtml("report3.html");
-
                     string htmlBody = string.Empty;
-                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report3.html"));
-                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+
+                    if (request.preview)
                     {
-                        htmlBody = reader.ReadToEnd();
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report3{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
                     }
 
-                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
-                    htmlBody = regex.Replace(htmlBody, "");
-
-                    File.Delete(excelHtmlPath);
                     return (content, htmlBody);
                 }
             }
@@ -2035,23 +2051,30 @@ namespace MarketData.Processes.Processes
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    Workbook workbookC = new Workbook();
-                    workbookC.LoadFromStream(stream);
-                    Worksheet sheet = workbookC.Worksheets[0];
-                    sheet.SaveToHtml("report3.html");
-
                     string htmlBody = string.Empty;
-                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report3.html"));
-                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+
+                    if (request.preview)
                     {
-                        htmlBody = reader.ReadToEnd();
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report4{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
                     }
 
-                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
-                    htmlBody = regex.Replace(htmlBody, "");
-
-                    File.Delete(excelHtmlPath);
                     return (content, htmlBody);
                 }
             }
@@ -2080,29 +2103,87 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"Excel Data Exporing File {dateRepport}";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
+                worksheet.Column(1).Width = 22;
+                worksheet.Column(2).Width = 30;
+                worksheet.Column(3).Width = 22;
+                worksheet.Column(4).Width = 10;
+                worksheet.Column(5).Width = 30;
+                worksheet.Column(6).Width = 19;
+                worksheet.Column(7).Width = 19;
+                worksheet.Column(8).Width = 19;
+                worksheet.Column(9).Width = 10;
+                worksheet.Column(10).Width = 10;
+                worksheet.Column(11).Width = 10;
+                worksheet.Column(12).Width = 19;
+                worksheet.Column(13).Width = 19;
+
+                worksheet.Row(2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                worksheet.Cell(2, 1).Value = "Department Stores Group";
+                worksheet.Cell(2, 2).Value = "Department Stores";
+                worksheet.Cell(2, 3).Value = "Department Stores Rank";
+                worksheet.Cell(2, 4).Value = "Region";
+                worksheet.Cell(2, 5).Value = "Brand Group";
+                worksheet.Cell(2, 6).Value = "Brand Type";
+                worksheet.Cell(2, 7).Value = "Brand Segment";
+                worksheet.Cell(2, 8).Value = "Brand";
+                worksheet.Cell(2, 9).Value = "Week";
+                worksheet.Cell(2, 10).Value = "Month";
+                worksheet.Cell(2, 11).Value = "Year";
+                worksheet.Cell(2, 12).Value = "Amount";
+                worksheet.Cell(2, 13).Value = "Whole";
+
                 #endregion
+
+                int rowData = 3;
+                foreach(var itemData in listData)
+                {
+                    worksheet.Row(rowData).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    worksheet.Cell(rowData, 1).Value = itemData.StoreG_Name;
+                    worksheet.Cell(rowData, 2).Value = itemData.Store_Name;
+                    worksheet.Cell(rowData, 3).SetValue(Convert.ToString($"{itemData.Store_Rank}"));
+                    worksheet.Cell(rowData, 4).Value = itemData.Region_Name;
+                    worksheet.Cell(rowData, 5).Value = itemData.BrandG_Name;
+                    worksheet.Cell(rowData, 6).Value = itemData.Brand_Type_Name;
+                    worksheet.Cell(rowData, 7).Value = itemData.Brand_Segment_Name;
+                    worksheet.Cell(rowData, 8).Value = itemData.Brand_Name;
+                    worksheet.Cell(rowData, 9).Value = itemData.Sales_Week;
+                    worksheet.Cell(rowData, 10).Value = itemData.Sales_Month;
+                    worksheet.Cell(rowData, 11).Value = itemData.Sales_Year;
+                    worksheet.Cell(rowData, 12).SetValue(string.Format("{0:#,0}", itemData.Amount_Sales));
+                    worksheet.Cell(rowData, 13).SetValue(string.Format("{0:#,0}", itemData.Whole_Sales));
+
+                    rowData++;
+                }
 
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    Workbook workbookC = new Workbook();
-                    workbookC.LoadFromStream(stream);
-                    Worksheet sheet = workbookC.Worksheets[0];
-                    sheet.SaveToHtml("report3.html");
-
                     string htmlBody = string.Empty;
-                    string excelHtmlPath = Path.GetFullPath(Path.Combine("report3.html"));
-                    using (StreamReader reader = File.OpenText(excelHtmlPath))
+
+                    if (request.preview)
                     {
-                        htmlBody = reader.ReadToEnd();
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report5{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
                     }
-
-                    var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
-                    htmlBody = regex.Replace(htmlBody, "");
-
-                    File.Delete(excelHtmlPath);
+                   
                     return (content, htmlBody);
                 }
             }
