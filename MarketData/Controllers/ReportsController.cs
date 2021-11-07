@@ -42,7 +42,8 @@ namespace MarketData.Controllers
                         dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
                         {
                             departmentStoreID = c.departmentStoreID,
-                            departmentStoreName = c.departmentStoreName
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
                         }).ToList();
 
                         dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel
