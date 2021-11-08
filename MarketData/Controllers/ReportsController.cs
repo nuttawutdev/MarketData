@@ -70,7 +70,40 @@ namespace MarketData.Controllers
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult StoreMarketShareValue()
         {
-            return View();
+            StoreMarketShareZoneViewModel dataModel = new StoreMarketShareZoneViewModel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionReport();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+
+                        dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel
+                        {
+                            brandTypeID = c.brandTypeID,
+                            brandTypeName = c.brandTypeName
+                        }).ToList();
+                    }
+
+                    dataModel.yearList = reportOption.year;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
@@ -123,6 +156,22 @@ namespace MarketData.Controllers
             return Json(reportData);
         }
 
+        [HttpPost]
+        public IActionResult GetReportStoreMarketShareValue([FromBody] ReportStoreMarketShareRequest request)
+        {
+            var reportData = process.report.GetReportStoreMarketShareValue(request);
+            string fileName = $"StoreMarketShareValue_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
+
+            if (reportData.fileContent != null)
+            {
+                reportData.fileName = fileName;
+                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
+            }
+
+            return Json(reportData);
+        }
+
+
         [HttpGet]
         public virtual ActionResult Download(string fileName)
         {
@@ -135,24 +184,6 @@ namespace MarketData.Controllers
                     data,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     $"{fileName}.xlsx");
-        }
-
-        [HttpPost]
-        public IActionResult ExportReportStoreMarketShareZone([FromBody] ReportStoreMarketShareRequest request)
-        {
-            var reportData = process.report.GetReportStoreMarketShareZone(request);
-
-            if (reportData != null && reportData.fileContent != null)
-            {
-                return File(
-                    reportData.fileContent,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    $"StoreMarketShareZone_{DateTime.Now.ToString("ddMMyyyyHHmm")}.xlsx");
-            }
-            else
-            {
-                return Json(reportData);
-            }
         }
     }
 }
