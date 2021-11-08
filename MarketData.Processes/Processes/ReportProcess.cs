@@ -71,6 +71,7 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+       
         public GenerateReportResponse GetReportStoreMarketShareZone(ReportStoreMarketShareRequest request)
         {
             GenerateReportResponse response = new GenerateReportResponse();
@@ -78,11 +79,21 @@ namespace MarketData.Processes.Processes
             try
             {
                 (List<GroupStoreRanking> groupStoreStartYear, List<GroupStoreRanking> groupStoreCompareYear, List<GroupStoreRanking> groupStoreCompareOldYear) = GetDataForReportStoreMarketShare(request);
-                (byte[] fileContent, string filePreview) = GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
+                
+                if(groupStoreStartYear.Any() || groupStoreCompareYear.Any() || groupStoreCompareOldYear.Any())
+                {
+                    (byte[] fileContent, string filePreview) = GenerateReportStoreMarketShareZone(request, groupStoreStartYear, groupStoreCompareYear, groupStoreCompareOldYear);
 
-                response.fileContent = fileContent;
-                response.filePreview = filePreview;
-                response.success = true;
+                    response.fileContent = fileContent;
+                    response.filePreview = filePreview;
+                    response.success = true;
+                }
+                else
+                {
+                    response.success = false;
+                    response.responseError = "ไม่พบข้อมูล";
+                }
+               
             }
             catch (Exception ex)
             {
@@ -736,8 +747,8 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, columnBrand - 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 worksheet.Column(1).Width = 30;
-                worksheet.Column(2).Width = 19;
-                worksheet.Column(3).Width = 19;
+                worksheet.Column(2).Width = 22;
+                worksheet.Column(3).Width = 22;
                 worksheet.Column(4).Width = 19;
                 worksheet.Column(5).Width = 19;
 
@@ -758,7 +769,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Cell(4, 2).Value = "RETAIL";
                 worksheet.Cell(5, 2).Value = "SALES";
                 string periodTimeCompare = $"w{request.startWeek},{request.startMonth}/{request.compareYear}";
-                periodTimeCompare += !string.IsNullOrWhiteSpace(request.endWeek) ? $"w{request.endWeek},{request.endMonth}/{request.compareYear}" : "";
+                periodTimeCompare += !string.IsNullOrWhiteSpace(request.endWeek) ? $" - w{request.endWeek},{request.endMonth}/{request.compareYear}" : "";
 
                 worksheet.Cell(6, 2).SetValue(Convert.ToString(periodTimeCompare));
                 worksheet.Cell(4, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -769,7 +780,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Cell(4, 3).Value = "RETAIL";
                 worksheet.Cell(5, 3).Value = "SALES";
                 string periodTime = $"w{request.startWeek},{request.startMonth}/{request.startYear}";
-                periodTime += !string.IsNullOrWhiteSpace(request.endWeek) ? $"w{request.endWeek},{request.endMonth}/{request.endYear}" : "";
+                periodTime += !string.IsNullOrWhiteSpace(request.endWeek) ? $" - w{request.endWeek},{request.endMonth}/{request.endYear}" : "";
 
                 worksheet.Cell(6, 3).SetValue(Convert.ToString(periodTime));
                 worksheet.Cell(4, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);

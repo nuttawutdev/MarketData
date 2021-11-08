@@ -2,6 +2,7 @@
 using MarketData.Model.Request.Report;
 using MarketData.Models;
 using MarketData.Processes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -39,12 +40,13 @@ namespace MarketData.Controllers
                 {
                     if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
                     {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
                         dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
                         {
                             departmentStoreID = c.departmentStoreID,
                             departmentStoreName = c.departmentStoreName,
                             retailerGroupName = c.retailerGroupName
-                        }).OrderBy(d => d.departmentStoreName).ToList();
+                        }).OrderBy(a => a.retailerGroupName).ToList();
 
                         dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel
                         {
@@ -115,7 +117,7 @@ namespace MarketData.Controllers
             if (reportData.fileContent != null)
             {
                 reportData.fileName = fileName;
-                //TempData[fileName] = reportData.fileContent;
+                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
             }
 
             return Json(reportData);
@@ -124,7 +126,11 @@ namespace MarketData.Controllers
         [HttpGet]
         public virtual ActionResult Download(string fileName)
         {
-            byte[] data = TempData[fileName] as byte[];
+            var fileBase64 = HttpContext.Session.GetString(fileName);
+
+            byte[] data = Convert.FromBase64String(fileBase64);
+
+            HttpContext.Session.Remove(fileName);
             return File(
                     data,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

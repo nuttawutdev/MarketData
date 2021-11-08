@@ -1,6 +1,7 @@
 ﻿@model MarketData.Models.StoreMarketShareZoneViewModel
 @{
     ViewData["Title"] = "Store market share & growth (zone)";
+    Html.RenderPartial("_WarningModal");
 }
 
 <style>
@@ -260,7 +261,7 @@
         <div class="container-xl">
             <div id="divPreview">
                 <input type="hidden"/ id="txtFileName">
-                <iframe id="result" style="width: 100%; height: 200vh; margin-top: 30px;">
+                <iframe id="result" style="width: 100%; height: 90vh; margin-top: 30px;">
                 </iframe>
             </div>
      
@@ -313,7 +314,6 @@
                 var html = "";
                 var storeId = "";
                 for (var i = 0; i < model.departmentStoreList.length; i++) {
-
                     if (group != model.departmentStoreList[i].retailerGroupName) {
                         html = html.replace("storeinside", htmlStoreinside);
                         htmlStoreinside = "";
@@ -334,11 +334,13 @@
                         html += " storeinside";
                         html += "  </div> </div > </div > </div > ";
 
-                    }else if (group == model.departmentStoreList[i].retailerGroupName) {
+                    }else {
                         htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"'><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
                     }
 
                 }
+
+                html = html.replace("storeinside", htmlStoreinside);
                 $("#divSelectStore").append(html.replace("storeinside", ""));
             }
 
@@ -382,12 +384,16 @@
                     datatype: "json",
                     success: function (data) {
                         $("#blocker").hide();
-                        console.log(data)
                         if (data.success) {
                             $("#txtFileName").val(data.fileName);
                             $("#result").attr("srcdoc", data.filePreview);
                             $("#divPreview").show();
-                         }
+                        }
+                        else {
+                            $('#warningModal').modal('show');
+
+                            $('#myModalWarningResult').text(data.responseError);
+                        }
                     },
                     error: function () {
                         $("#blocker").hide();
@@ -423,24 +429,25 @@
                 brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
                 universe: universe != "" ? universe : null,
                 saleType: $("#ddlSales").val(),
-                preview: true
+                preview: false
             };
              $("#blocker").show();
                  $.ajax({
                      type: "POST",
-                     url: '@Url.Action("ExportReportStoreMarketShareZone", "Reports")',
+                     url: '@Url.Action("GetReportStoreMarketShareZone", "Reports")',
                      contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
                      success: function (data) {
+                         $("#blocker").hide();
+                         if (data.success) {
+                             window.location = '/Reports/Download?fileName=' + data.fileName;
+                         }
+                         else {
+                             $('#warningModal').modal('show');
 
-                        $("#blocker").hide();
-                         var bytes = new Uint8Array(result.FileContents);
-                         var blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-                         var link = document.createElement('a');
-                         link.href = window.URL.createObjectURL(blob);
-                         link.download = "myFileName.xlsx";
-                         link.click();
+                             $('#myModalWarningResult').text(data.responseError);
+                         }
                     },
                     error: function () {
                         $("#blocker").hide();
