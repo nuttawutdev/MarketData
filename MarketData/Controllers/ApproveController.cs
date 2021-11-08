@@ -161,7 +161,7 @@ namespace MarketData.Controllers
             //    //endYear = "2021",
             //};
 
-            var file = process.report.GetReportStoreMarketShareZone(request);
+            var file = process.report.GetReportStoreMarketShareValue(request);
             return File(file.fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TestFile.xlsx");
         }
 
