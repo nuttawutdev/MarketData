@@ -139,11 +139,19 @@ namespace MarketData.Processes.Processes
             try
             {
                 (List<GroupBrandRanking> groupBrandStartYear, List<GroupBrandRanking> groupBrandCompareYear) = GetDataForReportSelectiveMarket(request);
-                (byte[] fileContent, string filePreview) = GenerateReportSelectiveMarket(request, groupBrandStartYear, groupBrandCompareYear);
+                if (groupBrandStartYear.Any() || groupBrandCompareYear.Any())
+                {
+                    (byte[] fileContent, string filePreview) = GenerateReportSelectiveMarket(request, groupBrandStartYear, groupBrandCompareYear);
 
-                response.fileContent = fileContent;
-                response.filePreview = filePreview;
-                response.success = true;
+                    response.fileContent = fileContent;
+                    response.filePreview = filePreview;
+                    response.success = true;
+                }
+                else
+                {
+                    response.success = false;
+                    response.responseError = "ไม่พบข้อมูล";
+                }
             }
             catch (Exception ex)
             {
@@ -442,7 +450,7 @@ namespace MarketData.Processes.Processes
                     || !request.departmentStoreList.Any()
                     || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
 
-                if (!request.lorealStore)
+                if (request.lorealStore)
                 {
                     brandRankingData = brandRankingData.Where(c => lorealStore.Contains(c.Store_Id)).ToList();
                 }
@@ -504,7 +512,7 @@ namespace MarketData.Processes.Processes
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
 
-                if (!request.lorealStore)
+                if (request.lorealStore)
                 {
                     brandRankingData = brandRankingData.Where(c => lorealStore.Contains(c.Store_Id)).ToList();
                 }

@@ -110,7 +110,40 @@ namespace MarketData.Controllers
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult SelectiveMarket()
         {
-            return View();
+            StoreMarketShareZoneViewModel dataModel = new StoreMarketShareZoneViewModel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionReport();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+
+                        dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel
+                        {
+                            brandTypeID = c.brandTypeID,
+                            brandTypeName = c.brandTypeName
+                        }).ToList();
+                    }
+
+                    dataModel.yearList = reportOption.year;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
@@ -161,6 +194,21 @@ namespace MarketData.Controllers
         {
             var reportData = process.report.GetReportStoreMarketShareValue(request);
             string fileName = $"StoreMarketShareValue_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
+
+            if (reportData.fileContent != null)
+            {
+                reportData.fileName = fileName;
+                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
+            }
+
+            return Json(reportData);
+        }
+
+        [HttpPost]
+        public IActionResult GetReportSelectvieMarket([FromBody] ReportSelectiveMarketRequest request)
+        {
+            var reportData = process.report.GetReportSelectiveMarket(request);
+            string fileName = $"SelectvieMarket_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
 
             if (reportData.fileContent != null)
             {
