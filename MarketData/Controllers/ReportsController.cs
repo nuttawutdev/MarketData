@@ -178,12 +178,18 @@ namespace MarketData.Controllers
         public IActionResult GetReportStoreMarketShareZone([FromBody] ReportStoreMarketShareRequest request)
         {
             var reportData = process.report.GetReportStoreMarketShareZone(request);
-            string fileName = $"StoreMarketShareZone_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
+            string fileName = "DEPARTMENT STORES PANEL";
 
+            if (request.storeRankEnd.HasValue)
+            {
+                fileName += $"-TOP_{request.storeRankEnd}";
+            }
+            
             if (reportData.fileContent != null)
             {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
                 reportData.fileName = fileName;
-                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
             }
 
             return Json(reportData);
@@ -193,12 +199,18 @@ namespace MarketData.Controllers
         public IActionResult GetReportStoreMarketShareValue([FromBody] ReportStoreMarketShareRequest request)
         {
             var reportData = process.report.GetReportStoreMarketShareValue(request);
-            string fileName = $"StoreMarketShareValue_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
+            string fileName = "Luxury Products";
+
+            if (request.storeRankEnd.HasValue)
+            {
+                fileName += $"-TOP {request.storeRankEnd}";
+            }
 
             if (reportData.fileContent != null)
             {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
                 reportData.fileName = fileName;
-                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
             }
 
             return Json(reportData);
@@ -208,12 +220,13 @@ namespace MarketData.Controllers
         public IActionResult GetReportSelectvieMarket([FromBody] ReportSelectiveMarketRequest request)
         {
             var reportData = process.report.GetReportSelectiveMarket(request);
-            string fileName = $"SelectvieMarket_{DateTime.Now.ToString("ddMMyyyyHHmm")}";
+            string fileName = "SELECTIVE MARKET THAILAND";
 
             if (reportData.fileContent != null)
             {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
                 reportData.fileName = fileName;
-                HttpContext.Session.SetString(reportData.fileName, Convert.ToBase64String(reportData.fileContent));
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
             }
 
             return Json(reportData);
@@ -221,13 +234,13 @@ namespace MarketData.Controllers
 
 
         [HttpGet]
-        public virtual ActionResult Download(string fileName)
+        public virtual ActionResult Download(string fileName,string referenceFileID)
         {
-            var fileBase64 = HttpContext.Session.GetString(fileName);
+            var fileBase64 = HttpContext.Session.GetString(referenceFileID);
 
             byte[] data = Convert.FromBase64String(fileBase64);
 
-            HttpContext.Session.Remove(fileName);
+            HttpContext.Session.Remove(referenceFileID);
             return File(
                     data,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

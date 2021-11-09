@@ -10,5 +10,6 @@ namespace MarketData.Model.Response.Report
         public byte[] fileContent { get; set; }
         public string filePreview { get; set; }
         public string fileName { get; set; }
+        public string referenceFileID { get; set; }
     }
 }

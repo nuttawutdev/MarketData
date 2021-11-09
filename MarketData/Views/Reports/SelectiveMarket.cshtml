@@ -129,7 +129,14 @@
                         @{
                             for (int i = 0; i < Model.yearList.Count; i++)
                             {
-                                <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                if (i == 1)
+                                {
+                                    <option selected value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                }
+                                else
+                                {
+                                    <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                }
                             }
                         }
                     </select>
@@ -439,7 +446,7 @@
                      success: function (data) {
                          $("#blocker").hide();
                          if (data.success) {
-                             window.location = '/Reports/Download?fileName=' + data.fileName;
+                             window.location = '/Reports/Download?fileName=' + data.fileName + '&referenceFileID=' + data.referenceFileID;
                          }
                          else {
                              $('#warningModal').modal('show');

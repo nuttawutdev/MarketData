@@ -469,6 +469,7 @@ namespace MarketData.Processes.Processes
                     {
                         brandID = e.Key.Brand_ID,
                         brandName = e.Key.Brand_Name,
+                        color = e.FirstOrDefault().Report_Color,
                         sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                               : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                               : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -489,6 +490,7 @@ namespace MarketData.Processes.Processes
                     {
                         brandID = e.Key.Brand_ID,
                         brandName = e.Key.Brand_Name,
+                        color = e.FirstOrDefault().Report_Color,
                         sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                               : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                               : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -527,6 +529,7 @@ namespace MarketData.Processes.Processes
                     {
                         brandID = e.Key.Brand_ID,
                         brandName = e.Key.Brand_Name,
+                        color = e.FirstOrDefault().Report_Color,
                         sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                               : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                               : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -561,6 +564,7 @@ namespace MarketData.Processes.Processes
                     {
                         brandID = e.Key.Brand_ID,
                         brandName = e.Key.Brand_Name,
+                        color = e.FirstOrDefault().Report_Color,
                         sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                               : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                               : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -2029,15 +2033,15 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandNotTopDetail.sumTotalBrand));
                             worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                            worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
-                            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
+                          
                             if (brandCompare != null)
                             {
                                 var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
                                 worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
+
+                                worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
+                                worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                                worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             }
                             else
                             {
@@ -2107,51 +2111,111 @@ namespace MarketData.Processes.Processes
             {
                 var brandFragrances = repository.report.GetBrandFragances();
                 Color yellowHead = Color.FromArgb(250, 250, 181);
+                Color yellowHead2 = Color.FromArgb(250, 243, 27);
+                Color whiteColor = Color.FromArgb(254, 254, 254);
+                Color blueColor = Color.FromArgb(109, 192, 218);
+                Color greenColor = Color.FromArgb(26, 244, 31);
+                Color browColor = Color.FromArgb(236, 204, 185);
+                Color redColor = Color.FromArgb(254, 89, 89);
+                Color blackColor = Color.FromArgb(0, 0, 0);
+
                 XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+                XLColor yellowXL2 = XLColor.FromArgb(yellowHead2.A, yellowHead2.R, yellowHead2.G, yellowHead2.B);
+                XLColor whiteXL = XLColor.FromArgb(whiteColor.A, whiteColor.R, whiteColor.G, whiteColor.B);
+                XLColor blueXL = XLColor.FromArgb(blueColor.A, blueColor.R, blueColor.G, blueColor.B);
+                XLColor greenXL = XLColor.FromArgb(greenColor.A, greenColor.R, greenColor.G, greenColor.B);
+                XLColor browXL = XLColor.FromArgb(browColor.A, browColor.R, browColor.G, browColor.B);
+                XLColor redXL = XLColor.FromArgb(redColor.A, redColor.R, redColor.G, redColor.B);
+                XLColor blackXL = XLColor.FromArgb(blackColor.A, blackColor.R, blackColor.G, blackColor.B);
 
                 #region Header
                 var worksheet = workbook.Worksheets.Add("Transaction");
-                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Merge();
-                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Value = $"SELECTIVE MARKET THAILAND";
-                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Merge();
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Value = $"SELECTIVE MARKET THAILAND";
+                worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
-                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Merge();
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 10)).Merge();
 
-                string dateQuery = string.Empty;
-                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).SetValue(Convert.ToString("July-21")); ///
-                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                string dateRepport = string.Empty;
+                int monthStart = int.Parse(request.startMonth);
+                dateRepport = $"{monthList[monthStart - 1]}/{request.startYear}";
+                dateRepport += request.endMonth != null ? $" - {monthList[int.Parse(request.endMonth) - 1]}/{request.endYear}" : "";
+
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 10)).SetValue(Convert.ToString(dateRepport)); ///
+                worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 worksheet.Column(1).Width = 3;
                 worksheet.Column(2).Width = 19;
 
                 worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Merge();
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(4, 2)).Style.Fill.BackgroundColor = whiteXL;
 
                 worksheet.Cell(5, 1).Value = "#";
+                worksheet.Cell(5, 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(5, 1).Style.Fill.BackgroundColor = blueXL;
+
                 worksheet.Cell(5, 2).Value = "Brand";
+                worksheet.Cell(5, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(5, 2).Style.Fill.BackgroundColor = blueXL;
                 worksheet.Row(5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 string typeReport = string.Empty;
+                string periodTimeCompare = $"w{request.startWeek},{request.startMonth}/{request.compareYear}";
+                periodTimeCompare += !string.IsNullOrWhiteSpace(request.endWeek) ? $" - w{request.endWeek},{request.endMonth}/{request.compareYear}" : "";
+
+                string periodTime = $"w{request.startWeek},{request.startMonth}/{request.startYear}";
+                periodTime += !string.IsNullOrWhiteSpace(request.endWeek) ? $" - w{request.endWeek},{request.endMonth}/{request.endYear}" : "";
+
+                int totalColumn = 1;
                 if (request.saleType == "Amount")
                 {
                     typeReport = "TOTAL MARKET";
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Merge();
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).SetValue(Convert.ToString("Jul-20"));
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).SetValue(Convert.ToString(periodTimeCompare));
 
                     worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Style.Fill.BackgroundColor = yellowXL2;
                     worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).SetValue(Convert.ToString("Jul-21"));
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 10)).SetValue(Convert.ToString(periodTime));
 
                     worksheet.Cell(5, 3).Value = "Value";
+                    worksheet.Cell(5, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 3).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 4).Value = "Market Share";
+                    worksheet.Cell(5, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 4).Style.Fill.BackgroundColor = browXL;
+
                     worksheet.Cell(5, 5).Value = "# POS";
+                    worksheet.Cell(5, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 5).Style.Fill.BackgroundColor = browXL;
 
                     worksheet.Cell(5, 6).Value = "Value";
+                    worksheet.Cell(5, 6).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 6).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 7).Value = "Market Share";
                     worksheet.Cell(5, 8).Value = "Growth";
                     worksheet.Cell(5, 9).Value = "MS Evol";
                     worksheet.Cell(5, 10).Value = "# POS";
+
+                    worksheet.Cell(5, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 7).Style.Fill.BackgroundColor = browXL;
+
+                    worksheet.Cell(5, 8).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 8).Style.Fill.BackgroundColor = browXL;
+
+                    worksheet.Cell(5, 9).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 9).Style.Fill.BackgroundColor = browXL;
+
+                    worksheet.Cell(5, 10).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 10).Style.Fill.BackgroundColor = browXL;
 
                     worksheet.Column(3).Width = 19;
                     worksheet.Column(6).Width = 19;
@@ -2159,26 +2223,51 @@ namespace MarketData.Processes.Processes
                     worksheet.Column(7).Width = 19;
                     worksheet.Column(8).Width = 10;
                     worksheet.Column(9).Width = 10;
+
+                    totalColumn = 10;
                 }
                 else if (request.saleType == "Whole")
                 {
                     typeReport = "TOTAL MARKET - BULK SALES";
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Merge();
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Value = "Jul-20"; ///
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 5)).SetValue(Convert.ToString(periodTimeCompare));
 
                     worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Style.Fill.BackgroundColor = yellowXL2;
                     worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).Value = "Jul-21"; ///
+                    worksheet.Range(worksheet.Cell(4, 6), worksheet.Cell(4, 9)).SetValue(Convert.ToString(periodTime));
 
                     worksheet.Cell(5, 3).Value = "Total Sale";
+                    worksheet.Cell(5, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 3).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 4).Value = "Bulk Sale";
+                    worksheet.Cell(5, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 4).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 5).Value = "Bulk Share";
+                    worksheet.Cell(5, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 5).Style.Fill.BackgroundColor = browXL;
 
                     worksheet.Cell(5, 6).Value = "Total Sale";
+                    worksheet.Cell(5, 6).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 6).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 7).Value = "Bulk Sale";
+                    worksheet.Cell(5, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 7).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 8).Value = "Bulk Share";
+                    worksheet.Cell(5, 8).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 8).Style.Fill.BackgroundColor = browXL;
+
                     worksheet.Cell(5, 9).Value = "Bulk Growth";
+                    worksheet.Cell(5, 9).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 9).Style.Fill.BackgroundColor = browXL;
 
                     worksheet.Column(3).Width = 19;
                     worksheet.Column(4).Width = 19;
@@ -2187,31 +2276,60 @@ namespace MarketData.Processes.Processes
                     worksheet.Column(7).Width = 19;
                     worksheet.Column(8).Width = 10;
                     worksheet.Column(9).Width = 10;
+
+                    totalColumn = 9;
                 }
                 else if (request.saleType == "Net")
                 {
                     typeReport = "TOTAL MARKET WO BULK";
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Merge();
                     worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Value = "Jul-20"; ///
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).Style.Fill.BackgroundColor = yellowXL;
+                    worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 4)).SetValue(Convert.ToString(periodTimeCompare));
 
                     worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Merge();
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Style.Fill.BackgroundColor = yellowXL2;
                     worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).Value = "Jul-21"; ///
+                    worksheet.Range(worksheet.Cell(4, 5), worksheet.Cell(4, 8)).SetValue(Convert.ToString(periodTime));
 
                     worksheet.Cell(5, 3).Value = "Value";
+                    worksheet.Cell(5, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 3).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 4).Value = "Market Share";
+                    worksheet.Cell(5, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 4).Style.Fill.BackgroundColor = browXL;
 
                     worksheet.Cell(5, 5).Value = "Value";
+                    worksheet.Cell(5, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 5).Style.Fill.BackgroundColor = greenXL;
+
                     worksheet.Cell(5, 6).Value = "Market Share";
+                    worksheet.Cell(5, 6).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 6).Style.Fill.BackgroundColor = browXL;
+
                     worksheet.Cell(5, 7).Value = "Growth";
+                    worksheet.Cell(5, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 7).Style.Fill.BackgroundColor = browXL;
+
                     worksheet.Cell(5, 8).Value = "MS Evol";
+                    worksheet.Cell(5, 8).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(5, 8).Style.Fill.BackgroundColor = browXL;
+
+                    totalColumn = 8;
+                    worksheet.Column(3).Width = 19;
+                    worksheet.Column(4).Width = 19;
+                    worksheet.Column(5).Width = 19;
+                    worksheet.Column(6).Width = 19;
+                    worksheet.Column(7).Width = 10;
+                    worksheet.Column(8).Width = 10;
                 }
 
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Merge();
-
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Value = typeReport;
-                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 15)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 10)).Merge();
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 10)).Value = typeReport;
+                worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 #endregion
 
@@ -2226,24 +2344,45 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemGroup in listGroup)
                 {
+                    try
+                    {
+                        Color colorBrand = System.Drawing.ColorTranslator.FromHtml(itemGroup.color);
+                        XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+
+                        worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, totalColumn)).Style.Fill.BackgroundColor = colorBrandXL;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
                     var brandCompare = listGroupCompare.FirstOrDefault(c => c.brandID == itemGroup.brandID);
 
                     worksheet.Row(rowData).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                     worksheet.Cell(rowData, 1).Value = countBrand;
+                    worksheet.Cell(rowData, 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
                     worksheet.Cell(rowData, 2).Value = itemGroup.brandName;
+                    worksheet.Cell(rowData, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+
+                    for (int i = 3; i <= totalColumn; i++)
+                    {
+                        worksheet.Cell(rowData, i).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    }
 
                     if (request.saleType != "Whole")
                     {
                         if (itemGroup.sumBrand > 0 || (brandCompare != null && brandCompare.sumBrand > 0))
                         {
+                            worksheet.Cell(rowData, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData, 3).SetValue(brandCompare != null ? string.Format("{0:#,0}", brandCompare.sumBrand) : "0");
 
-                            worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
-
                             var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 ? Math.Round((brandCompare.sumBrand / sumTotalCompare) * 100, 2) : 0;
                             worksheet.Cell(rowData, 4).SetValue($"{percentShareBrandCompare}%");
+                            worksheet.Cell(rowData, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
                             // Check Brand Fragance
                             if (brandCompare != null)
@@ -2262,18 +2401,29 @@ namespace MarketData.Processes.Processes
                                 }
                             }
 
+                            worksheet.Cell(rowData, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData, 5).SetValue(brandCompare != null ? $"{ brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count()}" : "0");
 
+                            worksheet.Cell(rowData, 6).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData, 6).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData, 6).SetValue(string.Format("{0:#,0}", itemGroup.sumBrand));
 
                             var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / sumTotalCurrent) * 100, 2) : 0;
                             worksheet.Cell(rowData, 7).SetValue($"{percentShareBrandCompare}%");
+                            worksheet.Cell(rowData, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
                             var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
                             worksheet.Cell(rowData, 8).SetValue($"{percentGrowthBrand}%");
-                            worksheet.Cell(rowData, 9).SetValue($"{percentShareBrand - percentShareBrandCompare}%");
-                            worksheet.Cell(rowData, 10).SetValue($"{itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count()}");
+                            worksheet.Cell(rowData, 8).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                            if (request.saleType == "Amount")
+                            {
+                                worksheet.Cell(rowData, 9).SetValue($"{percentShareBrand - percentShareBrandCompare}%");
+                                worksheet.Cell(rowData, 9).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                                worksheet.Cell(rowData, 10).SetValue($"{itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count()}");
+                                worksheet.Cell(rowData, 10).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                            } 
 
                             if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
                             {
@@ -2319,7 +2469,6 @@ namespace MarketData.Processes.Processes
                             var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
                             worksheet.Cell(rowData, 9).SetValue($"{percentGrowthBrand}%");
                         }
-
                     }
                     countBrand++;
                     rowData++;
@@ -2329,6 +2478,17 @@ namespace MarketData.Processes.Processes
                 worksheet.Row(rowData).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, 2)).Merge();
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, 2)).Value = "TOTAL";
+
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, 2)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, 2)).Style.Border.OutsideBorderColor = blackXL;
+                worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData, totalColumn)).Style.Fill.BackgroundColor = redXL;
+
+
+                for (int i = 3; i <= totalColumn; i++)
+                {
+                    worksheet.Cell(rowData, i).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(rowData, i).Style.Border.OutsideBorderColor = blackXL;
+                }
 
                 if (request.saleType != "Whole")
                 {
@@ -2343,8 +2503,12 @@ namespace MarketData.Processes.Processes
 
                     var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : -100, 2);
                     worksheet.Cell(rowData, 8).SetValue($"{percentGrowthTotal}%");
-                    worksheet.Cell(rowData, 9).SetValue($"0.00%");
-                    worksheet.Cell(rowData, 10).SetValue(string.Format("{0:#,0}", totalStore));
+
+                    if (request.saleType == "Amount")
+                    {
+                        worksheet.Cell(rowData, 9).SetValue($"0.00%");
+                        worksheet.Cell(rowData, 10).SetValue(string.Format("{0:#,0}", totalStore));
+                    }                  
                 }
                 else
                 {
@@ -2369,6 +2533,12 @@ namespace MarketData.Processes.Processes
                     var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : -100, 2);
                     worksheet.Cell(rowData, 9).SetValue($"{percentGrowthTotal}%");
                 }
+
+                if (!request.preview)
+                {
+                    worksheet.Row(rowData).Style.Font.SetFontColor(whiteXL);
+                }
+               
 
                 using (var stream = new MemoryStream())
                 {
