@@ -1,220 +1,443 @@
-﻿@{
+﻿@model MarketData.Models.StoreMarketShareZoneViewModel
+@{
     ViewData["Title"] = "Raw Data";
+    Html.RenderPartial("_WarningModal");
 }
 
 <style>
     .row-filter {
         padding-top: 20px;
     }
+
+    .row50 {
+        width: 70px !important
+    }
+
+    .flexCenter {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
 </style>
 <h3>
     @ViewData["Title"]
-
 </h3>
 <hr />
 <br />
 <br />
 <div class="row">
     <div class="table-filter" style="width: 100%; font-size: 13px;">
-
         <div class="row">
             <div class="col-sm-2 d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-group mb-3">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Rank<br></label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-1">Select Store<br></label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="checkRank"><label class="form-check-label">Rank<br></label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="checkSelectStore"><label class="form-check-label">Select Store<br></label></div>
                     <br />
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Top 5<br></label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Top 10<br></label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="top" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Top 15<br></label>
-                    </div>
                 </div>
             </div>
             <div class="col flex-wrap align-items-md-start" style="padding:0px;">
                 <div class="row d-flex">
-                    <div class="col d-flex flex-wrap">
+                    <div class="col d-flex flex-wrap" style="padding-bottom:10px">
                         <div class="col-md-4">
                             <label><b>Start <i class="ion-clock"></i></b>  Week</label>
-                            <select class="form-control col-sm-12 col-lg-4">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekStart">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Month</label>
-                            <select class="form-control col-sm-12 col-lg-8">
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthStart">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Year</label>
-                            <select class="form-control col-sm-12 col-lg-6">
-                                <option>2019</option>
-                                <option>2020</option>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlYearStart">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
                             </select>
                         </div>
 
                     </div>
                 </div>
-                <div class="row d-flex" style="padding-top: 10px;">
+                <div class="row d-flex" style="padding-top: 10px;display:none!important" id="divYearEnd">
                     <div class="col d-flex flex-wrap">
                         <div class="col-md-4">
                             <label><b>End &nbsp; <i class="ion-clock"></i></b>  Week</label>
-                            <select class="form-control col-sm-12 col-lg-4">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekEnd">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Month</label>
-                            <select class="form-control col-sm-12 col-lg-8">
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthEnd">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Year</label>
-                            <select class="form-control col-sm-12 col-lg-6">
-                                <option>2019</option>
-                                <option>2020</option>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlYearEnd">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
                             </select>
                         </div>
 
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3 d-flex align-items-md-start" style="padding:0px;">
-                <label class="form-label d-md-flex align-items-md-start">Compare with year</label>
+
+            <div class="col-sm-3 d-flex flex-wrap align-items-md-start" style="padding:0px;">
+                <label style="margin-top:6px" class="form-label d-md-flex align-items-md-start">Universe</label>
                 <div class="form-group mb-3">
-                    <select class="form-control" style="width:100px;">
-                        <option>2019</option>
-                        <option>2020</option>
+                    <select class="form-control" style="width:100px;" id="ddlUniverse">
+                        <option value="">All</option>
+                        <option value="LPD">LPD</option>
+                        <option value="CPD">CPD</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <div class="w-100">
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Central</label></div>
-                            </header>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Central Bangna</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Central Festival Chiangmai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Central Chidlom</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Central Eastville</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-6"><label class="form-check-label" for="formCheck-6">Central Rama II</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-7"><label class="form-check-label" for="formCheck-7">Central Rama III</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-8"><label class="form-check-label" for="formCheck-8">Central Phuket</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-9"><label class="form-check-label" for="formCheck-9">Central Westgate</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-10"><label class="form-check-label" for="formCheck-10">Central Ladprao</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-11"><label class="form-check-label" for="formCheck-11">Central Samui</label></div>
-                        </div>
-                    </div>
+        <div class="row" style="padding-top:10px">
+            <div class="d-flex align-items-md-start" style="padding-left: 30px;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="top" value="5"><label class="form-check-label">Top 5<br></label>
                 </div>
             </div>
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-12"><label class="form-check-label" for="formCheck-12">The Mall</label></div>
-                            </header>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-13"><label class="form-check-label" for="formCheck-13">Siam Paragon</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-14"><label class="form-check-label" for="formCheck-14">The Mall Bangkae</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-15"><label class="form-check-label" for="formCheck-15">The Mall Bangkapi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-16"><label class="form-check-label" for="formCheck-16">The Mall Blueport</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-17"><label class="form-check-label" for="formCheck-17">The Mall Emporium</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-18"><label class="form-check-label" for="formCheck-18">The Mall Emquartier</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-19"><label class="form-check-label" for="formCheck-19">The Mall Korat</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-20"><label class="form-check-label" for="formCheck-20">The Mall Ngam Wong Wan</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-21"><label class="form-check-label" for="formCheck-21">The Mall Ramkamhang</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-22"><label class="form-check-label" for="formCheck-22">The Mall Thonburi</label></div>
-                        </div>
-                    </div>
+            <div class="d-flex align-items-md-start" style="padding-left: 30px;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="top" value="10"><label class="form-check-label">Top 10<br></label>
                 </div>
             </div>
-            <div style="padding-top:20px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div>
-                            <header>
-                                <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-23"><label class="form-check-label" for="formCheck-23">Robinson</label></div>
-                            </header>
+            <div class="d-flex align-items-md-start" style="padding-left: 30px;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="top" value="15"><label class="form-check-label">Top 15<br></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-100" id="divSelectStore" style="display:none!important">
+
+        </div>
+        <div class="row">
+            <div class="col flex-wrap align-items-md-start" style="padding:20px;">
+                @*<div class="row d-flex">
+                        <div class="col d-flex flex-wrap" style="justify-content: space-evenly;">
+                            <div class="col-md-2">
+                                <label><b>Type </b> </label>
+
+                                @Html.DropDownList("ddlType", new SelectList(Model.brandTypeList, "brandTypeID", "brandTypeName"), "All", new { id = "ddlType", @class = "form-control " })
+
+                            </div>
+                            <div class="col-md-2">
+                                <label><b>Store </b> </label>
+                                <div class="row flexCenter">
+                                    <select class="form-control " id="ddlStore">
+                                        <option value="">All Store</option>
+                                        <option value="1">Loreal by Store</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label><b>Universe </b> </label>
+                                <div class="row flexCenter">
+                                    <select class="form-control " id="ddlUniverse">
+                                        <option value="">All</option>
+                                        <option value="LPD">LPD</option>
+                                        <option value="CPD">CPD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label><b>Sales </b> </label>
+                                <select class="form-control " id="ddlSales">
+                                    <option value="Amount">Amount</option>
+                                    <option value="Whole">Whole</option>
+                                    <option value="Net">Net</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
                         </div>
-                        <div class="d-flex flex-row flex-wrap justify-content-md-start">
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-24"><label class="form-check-label" for="formCheck-24">Robinson Ayudhaya</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-25"><label class="form-check-label" for="formCheck-25">Robinson Bangrak</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-26"><label class="form-check-label" for="formCheck-26">Robinson Chantaburi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-27"><label class="form-check-label" for="formCheck-27">Robinson Chiangmai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-28"><label class="form-check-label" for="formCheck-28">Robinson Chiangrai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-29"><label class="form-check-label" for="formCheck-29">Robinson Chonburi</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-30"><label class="form-check-label" for="formCheck-30">Robinson Fasion Island</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-31"><label class="form-check-label" for="formCheck-31">Robinson Hadyai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-32"><label class="form-check-label" for="formCheck-32">Robinson Mahachai</label></div>
-                            <div class="form-check" style="width: 25%;"><input class="form-check-input" type="checkbox" id="formCheck-33"><label class="form-check-label" for="formCheck-33">Robinson Phuket</label></div>
+                    </div>*@
+                <div class="row d-flex" style="display:none!important" id="divYearEnd">
+                    <div class="col d-flex flex-wrap">
+                        <div class="col-md-4">
+                            <label><b>End <i class="ion-clock"></i></b>  Week</label>
+                            <select class="form-control col-sm-12 col-lg-4" id="ddlWeekStart">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
                         </div>
+                        <div class="col-md-4">
+                            <label>Month</label>
+                            <select class="form-control col-sm-12 col-lg-8" id="ddlMonthEnd">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Year</label>
+                            <select class="form-control col-sm-12 col-lg-6" id="ddlEndYear">
+                                @{
+                                    for (int i = 0; i < Model.yearList.Count; i++)
+                                    {
+                                        <option value="@Model.yearList[i]">@Model.yearList[i]</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="table-filter" style="width: 100%; font-size: 13px;">
-
-
-            <div class="row row-filter" style=" justify-content: center;">
-
-
-                <div class="filter-group">
-                    <div class="custom-file-upload">
+        <div class="w-100 text-center" style="display:flex;justify-content:center">
+            <div class="filter-group">
+                <button type="button" class="btn btn-outline-primary" id="btnPreview"><i class="ion-search"></i> Preview</button>
+            </div>
+            <div class="filter-group">
+                @*<div class="custom-file-upload">
 
                         <label for="file-upload" class="custom-file-upload1">
                             <i class="ion-android-document"></i> Export to Excel
                         </label>
                         <input id="file-upload" type="file" />
-                    </div>
-
-                </div>
+                    </div>*@
+                <button type="button" class="btn btn-success" id="btnExport">   <i class="ion-android-document"></i> Export to Excel</button>
             </div>
+        </div>
+        <div class="container-xl">
+            <div id="divPreview">
+                <input type="hidden" id="txtFileName">
+                <iframe id="result" style="width: 100%; height: 90vh; margin-top: 30px;">
+                </iframe>
+            </div>
+
         </div>
     </div>
 </div>
-<div class="container-xl">
-    <img src="~/img/StoreMarketShareZone.PNG" style="width:100%" />
-</div>
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#divPreview").hide();
+
+        getDepartmentStore();
+        $("#checkRank").on('click', function (e) {
+            if ($("#checkRank:checked").is(":checked")) {
+                $("#divYearEnd").attr('style', 'display:block !important');
+            } else {
+                $("#divYearEnd").attr('style', 'display:none !important');
+            }
+
+
+        });
+        $("#checkSelectStore").on('click', function (e) {
+            if ($("#checkSelectStore:checked").is(":checked")) {
+                $("#divSelectStore").attr('style', 'padding-top: 10px;display:block !important');
+
+            } else {
+                $("#divSelectStore").attr('style', 'display:none !important');
+            }
+
+        });
+
+        $(document).on('click', '.headerChecked', function () {
+            var checked = $(this).prop('checked');
+            var id = $(this).attr('id');
+            $("input:checkbox[name="+id+"]").each(function () {
+                $(this).prop("checked", checked);
+            });
+
+        });
+
+
+        function getDepartmentStore() {
+            var model = @Html.Raw(Json.Serialize(Model));
+
+            if (model.departmentStoreList.length > 0) {
+                var group = "";
+                var groupId = 0;
+                var htmlStoreinside = "";
+                var html = "";
+                var storeId = "";
+                for (var i = 0; i < model.departmentStoreList.length; i++) {
+                    if (group != model.departmentStoreList[i].retailerGroupName) {
+                        html = html.replace("storeinside", htmlStoreinside);
+                        htmlStoreinside = "";
+                        groupId += 1;
+                        storeId = "store_" + groupId;
+                        group = model.departmentStoreList[i].retailerGroupName;
+
+                        html += "<div style='padding-top: 20px;'>";
+                        html += "<div class='card'>";
+                        html += "<div class='card-body'>";
+                        html += " <div>";
+                        html += "     <header>";
+                        html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' type='checkbox' id='" + storeId + "'><label class='form-check-label' >" + model.departmentStoreList[i].retailerGroupName + "</label></div>";
+                        html += "     </header>";
+                        html += " </div>";
+                        html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
+                        html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"' ><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
+                        html += " storeinside";
+                        html += "  </div> </div > </div > </div > ";
+
+                    }else {
+                        htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"'><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
+                    }
+
+                }
+
+                html = html.replace("storeinside", htmlStoreinside);
+                $("#divSelectStore").append(html.replace("storeinside", ""));
+            }
+
+        }
+
+        $("#btnPreview").on('click', function (e) {
+            var checkRank = $("#checkRank").prop("checked");
+            var checkSelectStore = $("#checkSelectStore").prop("checked");
+            var universe = $("#ddlUniverse").val();
+            var departmentStoreList = [];
+
+            $('.departmentStore:checkbox:checked').each(function () {
+                departmentStoreList.push($(this).data('value'))
+            });
+
+            var frmdata = {
+                startWeek: $("#ddlWeekStart").val(),
+                endWeek: checkRank ? $("#ddlWeekEnd").val() : null,
+                startMonth: $("#ddlMonthStart").val(),
+                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                startYear: $("#ddlYearStart").val(),
+                endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                universe: universe != "" ? universe : null,
+                preview: true
+            };
+
+           $("#blocker").show();
+           $.ajax({
+               type: "POST",
+               url: '@Url.Action("GetReportRawData", "Reports")',
+               contentType: "application/json; charset=utf-8",
+               data: JSON.stringify(frmdata),
+               datatype: "json",
+               success: function (data) {
+                   $("#blocker").hide();
+                   if (data.success) {
+                       $("#txtFileName").val(data.fileName);
+                       $("#result").attr("srcdoc", data.filePreview);
+                       $("#divPreview").show();
+                   }
+                   else {
+                       $('#warningModal').modal('show');
+
+                       $('#myModalWarningResult').text(data.responseError);
+                   }
+               },
+               error: function () {
+                   $("#blocker").hide();
+               }
+           });
+
+        });
+
+        $("#btnExport").on('click', function (e) {
+            var checkRank = $("#checkRank").prop("checked");
+            var checkSelectStore = $("#checkSelectStore").prop("checked");
+            var universe = $("#ddlUniverse").val();
+            var departmentStoreList = [];
+
+            $('.departmentStore:checkbox:checked').each(function () {
+                departmentStoreList.push($(this).data('value'))
+            });
+
+            var frmdata = {
+                startWeek: $("#ddlWeekStart").val(),
+                endWeek: checkRank ? $("#ddlWeekEnd").val() : null,
+                startMonth: $("#ddlMonthStart").val(),
+                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                startYear: $("#ddlYearStart").val(),
+                endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                universe: universe != "" ? universe : null,
+                preview: false
+            };
+
+             $("#blocker").show();
+                 $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("GetReportRawData", "Reports")',
+                     contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                     success: function (data) {
+                         $("#blocker").hide();
+                         if (data.success) {
+                             window.location = '/Reports/Download?fileName=' + data.fileName + '&referenceFileID=' + data.referenceFileID;
+                         }
+                         else {
+                             $('#warningModal').modal('show');
+
+                             $('#myModalWarningResult').text(data.responseError);
+                         }
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+            
+
+        });
+    });
+</script>

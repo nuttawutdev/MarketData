@@ -150,14 +150,75 @@ namespace MarketData.Controllers
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult DetailsSales()
         {
-            return View();
+            DetailSaleByBrandViewmodel dataModel = new DetailSaleByBrandViewmodel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionReportDetailSaleBrand();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+
+                        dataModel.brandList = reportOption.brandList.Select(c => new BrandViewModel
+                        {
+                            brandID = c.brandID,
+                            brandName = c.brandName
+                        }).ToList();
+
+                    }
+
+                    dataModel.yearList = reportOption.year;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult RawData()
         {
-            return View();
+            StoreMarketShareZoneViewModel dataModel = new StoreMarketShareZoneViewModel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionReport();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+                    }
+
+                    dataModel.yearList = reportOption.year;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
@@ -184,7 +245,7 @@ namespace MarketData.Controllers
             {
                 fileName += $"-TOP_{request.storeRankEnd}";
             }
-            
+
             if (reportData.fileContent != null)
             {
                 reportData.referenceFileID = Guid.NewGuid().ToString();
@@ -232,9 +293,40 @@ namespace MarketData.Controllers
             return Json(reportData);
         }
 
+        [HttpPost]
+        public IActionResult GetReportDetailSaleByBrand([FromBody] ReportDetailSaleByBrandRequest request)
+        {
+            var reportData = process.report.GetReportDetailSaleByBrand(request);
+            string fileName = $"Details Sales by Brand {request.brandName}";
+
+            if (reportData.fileContent != null)
+            {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
+                reportData.fileName = fileName;
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
+            }
+
+            return Json(reportData);
+        }
+
+        [HttpPost]
+        public IActionResult GetReportRawData([FromBody] ReportExcelDataExportRequest request)
+        {
+            var reportData = process.report.GetReportExcelDataExporting(request);
+            string fileName = "Excel Data Exporting File";
+
+            if (reportData.fileContent != null)
+            {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
+                reportData.fileName = fileName;
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
+            }
+
+            return Json(reportData);
+        }
 
         [HttpGet]
-        public virtual ActionResult Download(string fileName,string referenceFileID)
+        public virtual ActionResult Download(string fileName, string referenceFileID)
         {
             var fileBase64 = HttpContext.Session.GetString(referenceFileID);
 
