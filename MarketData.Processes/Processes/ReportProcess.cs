@@ -37,11 +37,13 @@ namespace MarketData.Processes.Processes
             {
                 var allDepartmentStore = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
                 var brandTypeList = repository.masterData.GetBrandTypeList().Where(c => c.Active_Flag);
+                var topStoreList = repository.masterData.GetTopDepartmentStoreList();
 
                 response.departmentStore = allDepartmentStore.Select(c => new Model.Data.DepartmentStoreData
                 {
                     departmentStoreID = c.departmentStoreID,
                     departmentStoreName = c.departmentStoreName,
+                    topNumber = topStoreList.FirstOrDefault(e => e.DepartmentStore_ID == c.departmentStoreID)?.TopNumber,
                     retailerGroupName = c.retailerGroupName
                 }).ToList();
 
@@ -129,7 +131,7 @@ namespace MarketData.Processes.Processes
                     departmentStoreName = c.departmentStoreName,
                     retailerGroupName = c.retailerGroupName
                 }).ToList();
-       
+
             }
             catch (Exception ex)
             {
@@ -2711,7 +2713,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(5, 2)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                 worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(5, 2)).Style.Fill.BackgroundColor = yellowXL2;
 
-             
+
 
                 worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 2 + periodTime.Count())).Merge();
                 worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, 2 + periodTime.Count())).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;

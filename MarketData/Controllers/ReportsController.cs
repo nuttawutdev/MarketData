@@ -45,7 +45,8 @@ namespace MarketData.Controllers
                         {
                             departmentStoreID = c.departmentStoreID,
                             departmentStoreName = c.departmentStoreName,
-                            retailerGroupName = c.retailerGroupName
+                            retailerGroupName = c.retailerGroupName,
+                            topNumber = c.topNumber
                         }).OrderBy(a => a.retailerGroupName).ToList();
 
                         dataModel.brandTypeList = reportOption.brandType.Select(c => new BrandTypeViewModel

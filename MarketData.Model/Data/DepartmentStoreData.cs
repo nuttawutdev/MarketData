@@ -15,6 +15,7 @@ namespace MarketData.Model.Data
         public Guid regionID { get; set; }
         public string region { get; set; }
         public int? rank { get; set; }
+        public int? topNumber { get; set; }
         public bool active { get; set; }
         public DateTime? createdDate { get; set; }
     }
