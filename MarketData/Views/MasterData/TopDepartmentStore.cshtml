@@ -1,0 +1,175 @@
+﻿@model MarketData.Models.TopDepartmentStoreViewModel
+@{
+    ViewData["Title"] = "Top Department Store";
+    Html.RenderPartial("_SuccessModal");
+    Html.RenderPartial("_FailedModal");
+}
+
+<style>
+    .row-filter {
+        padding-top: 20px;
+    }
+
+    .row50 {
+        width: 70px !important
+    }
+
+    .flexCenter {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+</style>
+<h3>
+    @ViewData["Title"]
+</h3>
+<hr />
+
+<div class="row">
+    <div class="container" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
+        <div class="table-responsive table-sm">
+            <div class="table-wrapper">
+                <div style=" overflow-x: auto;">
+                    <table class="table table-hover " id="tblDetails">
+                        <thead class="table-secondary">
+                            <tr class="row m-0">
+                                <th style="text-align:center" class="col-3">Top</th>
+                                <th style="text-align:center" class="col-9">Department Store</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                for (int i = 1; i <= 15; i++)
+                                {
+                                    string id = "departmentTop" + i.ToString();
+                                    var topSelectItem = Model.data.FirstOrDefault(c => c.topNumber == i);
+
+                                    <tr class="row m-0" style="color: black;">
+                                        <td style="text-align:center" class="col-3 ID">@i</td>
+
+
+                                        <td class="col-9" style="text-align:center">
+                                            @if (topSelectItem.departmentStoreID.HasValue)
+                                            {
+                                                @Html.DropDownListFor(c => topSelectItem.departmentStoreID, new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Select Store", new { id = id, @class = "form-control" })
+                                            }
+                                            else
+                                            {
+                                                @Html.DropDownList("departmentStoreList", new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Select Store", new { id = id, @class = "form-control " })
+                                            }
+
+
+                                        </td>
+                                    </tr>
+                                }
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button id="btnSave" class="btn btn-primary text-white" type="button">Save</button>
+            <a href="../Home/MasterData" class="btn btn-outline-danger">Cancel</a>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#btnSave").on('click', function (e) {
+            var topStoreList = [];
+            for (var i = 1; i <= 15; i++)           {
+                var valueSelect = $("#departmentTop" + i).val();
+                var storeSetTop = {
+                    topNumber : i,
+                    departmentStoreID: valueSelect == '' ? null : valueSelect
+                }
+
+                topStoreList.push(storeSetTop);
+            }
+
+            var frmdata = {
+                departmentStoreList : topStoreList
+            }
+
+            $("#blocker").show();
+                $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("SaveTopDepartmentStore", "MasterData")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                    success: function (data) {
+                        $("#blocker").hide();
+                        if (data.isSuccess) {
+                            $('#successModalHref').attr("href", "TopDepartmentStore");
+                            $('#successModal').modal('show');
+                        }
+                        else {
+                            $('#failedModal').modal('show');
+                            $('#myModalFailedResult').text(data.responseError != ""
+                                && data.responseError != null ? data.responseError : 'Save data failed');
+                         }
+                        $('#confirmID').val('');
+                        $('#myModalFailedResult').val('');
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+
+
+        });
+
+        $("#btnExport").on('click', function (e) {
+            var checkRank = $("#checkRank").prop("checked");
+            var checkSelectStore = $("#checkSelectStore").prop("checked");
+            var universe = $("#ddlUniverse").val();
+            var departmentStoreList = [];
+
+            $('.departmentStore:checkbox:checked').each(function () {
+                departmentStoreList.push($(this).data('value'))
+            });
+
+            var frmdata = {
+                startWeek: $("#ddlWeekStart").val(),
+                endWeek: checkRank ? $("#ddlWeekEnd").val() : null,
+                startMonth: $("#ddlMonthStart").val(),
+                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                startYear: $("#ddlYearStart").val(),
+                endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                universe: universe != "" ? universe : null,
+                preview: false
+            };
+
+             $("#blocker").show();
+                 $.ajax({
+                     type: "POST",
+                     url: '@Url.Action("GetReportRawData", "Reports")',
+                     contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(frmdata),
+                    datatype: "json",
+                     success: function (data) {
+                         $("#blocker").hide();
+                         if (data.success) {
+                             window.location = '/Reports/Download?fileName=' + data.fileName + '&referenceFileID=' + data.referenceFileID;
+                         }
+                         else {
+                             $('#warningModal').modal('show');
+
+                             $('#myModalWarningResult').text(data.responseError);
+                         }
+                    },
+                    error: function () {
+                        $("#blocker").hide();
+                    }
+                });
+
+
+        });
+    });
+</script>

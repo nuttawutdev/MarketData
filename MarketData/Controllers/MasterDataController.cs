@@ -130,6 +130,45 @@ namespace MarketData.Controllers
 
         [ServiceFilter(typeof(AuthorizeFilter))]
         [ServiceFilter(typeof(PermissionFilter))]
+        public ActionResult TopDepartmentStore()
+        {
+            TopDepartmentStoreViewModel dataModel = new TopDepartmentStoreViewModel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionTopDepartmentStore();
+                var topStoreData = process.masterData.GetTopDepartmentStore();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+
+                    }
+                }
+
+                dataModel.data = topStoreData.data.Select(c => new Models.TopDepartmentStoreData
+                {
+                    departmentStoreID = c.departmentStoreID,
+                    topNumber = c.topNumber
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
+        }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult BrandSegment_Edit(Guid brandSegmentID)
         {
             var response = process.masterData.GetBrandSegmentDetail(brandSegmentID);
@@ -990,6 +1029,13 @@ namespace MarketData.Controllers
                 response = await process.masterData.ImportCounterData(request);
             }
 
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveTopDepartmentStore([FromBody] SaveTopDepartmentRequest request)
+        {
+            var response = await process.masterData.SaveTopSepartmentStore(request);
             return Json(response);
         }
     }

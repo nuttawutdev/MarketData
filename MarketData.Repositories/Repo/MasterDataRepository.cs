@@ -1316,5 +1316,48 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> DeleteOldTopDepartmentStore()
+        {
+            try
+            {
+                var oldTopDepartmentStore = _dbContext.TMTopDepartmentStore;
+                _dbContext.TMTopDepartmentStore.RemoveRange(oldTopDepartmentStore);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> SaveTopDepartmentStore(List<TMTopDepartmentStore> request)
+        {
+            try
+            {
+                _dbContext.TMTopDepartmentStore.AddRange(request);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMTopDepartmentStore> GetTopDepartmentStoreList()
+        {
+            try
+            {
+                var searchData = _dbContext.TMTopDepartmentStore.AsNoTracking();
+                searchData = searchData.OrderBy(x => x.TopNumber);
+                return searchData.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

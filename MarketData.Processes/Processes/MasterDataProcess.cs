@@ -1970,5 +1970,61 @@ namespace MarketData.Processes.Processes
 
             return response;
         }
+
+        public async Task<SaveDataResponse> SaveTopSepartmentStore(SaveTopDepartmentRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var storeSelectList = request.departmentStoreList.Where(s => s.departmentStoreID.HasValue).Select(d => d.departmentStoreID.GetValueOrDefault());
+                foreach (var itemStore in storeSelectList.OrderBy(d => d))
+                {
+                    if (storeSelectList.Count(d => d == itemStore) > 1)
+                    {
+                        response.responseError = "Duplicated Department Store!";
+                        return response;
+                    }
+                }
+                await repository.masterData.DeleteOldTopDepartmentStore();
+
+                List<TMTopDepartmentStore> listTopStore = request.departmentStoreList.Select(c => new TMTopDepartmentStore
+                {
+                    ID = Guid.NewGuid(),
+                    TopNumber = c.topNumber,
+                    DepartmentStore_ID = c.departmentStoreID
+                }).ToList();
+
+                response.isSuccess = await repository.masterData.SaveTopDepartmentStore(listTopStore);
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public GetTopDepartmentStoreResponse GetTopDepartmentStore()
+        {
+            GetTopDepartmentStoreResponse response = new GetTopDepartmentStoreResponse();
+
+            try
+            {
+                var searchData = repository.masterData.GetTopDepartmentStoreList();
+                response.data = searchData.Select(c => new TopDepartmentStoreData
+                {
+                    topNumber = c.TopNumber,
+                    departmentStoreID = c.DepartmentStore_ID
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
     }
 }

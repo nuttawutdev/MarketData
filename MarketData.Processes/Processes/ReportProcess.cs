@@ -115,6 +115,30 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public GetOptionReportResponse GetOptionTopDepartmentStore()
+        {
+            GetOptionReportResponse response = new GetOptionReportResponse();
+
+            try
+            {
+                var allDepartmentStore = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
+
+                response.departmentStore = allDepartmentStore.Select(c => new Model.Data.DepartmentStoreData
+                {
+                    departmentStoreID = c.departmentStoreID,
+                    departmentStoreName = c.departmentStoreName,
+                    retailerGroupName = c.retailerGroupName
+                }).ToList();
+       
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return response;
+        }
+
         public GenerateReportResponse GetReportStoreMarketShareZone(ReportStoreMarketShareRequest request)
         {
             GenerateReportResponse response = new GenerateReportResponse();
