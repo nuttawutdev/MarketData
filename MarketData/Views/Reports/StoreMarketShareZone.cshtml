@@ -296,6 +296,22 @@
 
 
     $(document).ready(function () {
+
+        var d = new Date();
+        var month = d.getMonth();
+        var currentMonth = month;
+        var monthCurrrentSelect = "";
+
+        if (currentMonth.length == 1) {
+            monthCurrrentSelect = "0" + currentMonth;
+        }
+        else {
+            monthCurrrentSelect = currentMonth;
+        }
+
+        $('#ddlMonthStart option:eq(' + monthCurrrentSelect + ')').prop('selected', true)
+        $('#ddlMonthEnd option:eq(' + monthCurrrentSelect + ')').prop('selected', true)
+
         $("#divPreview").hide();
         getDepartmentStore();
         $("#checkRank").on('click', function (e) {

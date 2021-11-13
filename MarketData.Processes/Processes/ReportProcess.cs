@@ -995,6 +995,7 @@ namespace MarketData.Processes.Processes
                          storeDetail = e.ToList()
                      }).OrderByDescending(s => s.sumBrand).ToList();
 
+
                     for (int i = request.brandRankStart.GetValueOrDefault() - 1; i <= request.brandRankEnd.GetValueOrDefault() - 1; i++)
                     {
                         if (groupBrandData.ElementAtOrDefault(i) != null)
