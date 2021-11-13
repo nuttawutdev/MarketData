@@ -790,7 +790,7 @@ namespace MarketData.Processes.Processes
                 XLColor blackXL = XLColor.FromArgb(black.A, black.R, black.G, black.B);
                 XLColor lorealXL = XLColor.FromArgb(lorealHead.A, lorealHead.R, lorealHead.G, lorealHead.B);
 
-                var worksheet = workbook.Worksheets.Add("Transaction");
+                var worksheet = workbook.Worksheets.Add("StoreMarketShareZone");
 
                 int columnBrand = 6;
                 for (int i = 1; i <= request.brandRankEnd; i++)
@@ -1581,7 +1581,7 @@ namespace MarketData.Processes.Processes
                 XLColor percentTotalColorXL = XLColor.FromArgb(percentTotalColor.A, percentTotalColor.R, percentTotalColor.G, percentTotalColor.B);
 
                 #region Header
-                var worksheet = workbook.Worksheets.Add("Transaction");
+                var worksheet = workbook.Worksheets.Add("StoreMarketShareValue");
                 int columnBrand = 3;
                 for (int i = 1; i <= request.brandRankEnd; i++)
                 {
@@ -2219,7 +2219,7 @@ namespace MarketData.Processes.Processes
                 XLColor blackXL = XLColor.FromArgb(blackColor.A, blackColor.R, blackColor.G, blackColor.B);
 
                 #region Header
-                var worksheet = workbook.Worksheets.Add("Transaction");
+                var worksheet = workbook.Worksheets.Add("SelectiveMarket");
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Merge();
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Value = $"SELECTIVE MARKET THAILAND";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 10)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -2685,7 +2685,7 @@ namespace MarketData.Processes.Processes
                 #region Header
                 var periodTime = GetPeriodTime(request.startMonth, request.startYear, request.endMonth, request.endYear);
                 int counHead = 3 + periodTime.Count();
-                var worksheet = workbook.Worksheets.Add("Transaction");
+                var worksheet = workbook.Worksheets.Add("DetailSaleByBrand");
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, counHead)).Merge();
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, counHead)).Value = $"Details Sales by Brand {request.brandName}";
                 worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, counHead)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -2859,7 +2859,7 @@ namespace MarketData.Processes.Processes
                 XLColor headXL = XLColor.FromArgb(colorHead.A, colorHead.R, colorHead.G, colorHead.B);
 
                 #region Header
-                var worksheet = workbook.Worksheets.Add("Transaction");
+                var worksheet = workbook.Worksheets.Add("ExcelDataExporting");
 
                 worksheet.Row(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 string dateRepport = string.Empty;

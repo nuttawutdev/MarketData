@@ -48,7 +48,7 @@
 
 
                                         <td class="col-9" style="text-align:center">
-                                            @if (topSelectItem.departmentStoreID.HasValue)
+                                            @if (topSelectItem != null && topSelectItem.departmentStoreID.HasValue)
                                             {
                                                 @Html.DropDownListFor(c => topSelectItem.departmentStoreID, new SelectList(Model.departmentStoreList, "departmentStoreID", "departmentStoreName"), "Select Store", new { id = id, @class = "form-control" })
                                             }
