@@ -156,17 +156,17 @@
         <div class="row" style="padding-top:10px">
             <div class="d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-check">
-                    <input id="checkTop5" class="form-check-input" type="radio" name="top" value="5"><label class="form-check-label">Top 5<br></label>
+                    <input id="checkTop5" disabled class="form-check-input" type="radio" name="top" value="5"><label class="form-check-label">Top 5<br></label>
                 </div>
             </div>
             <div class="d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-check">
-                    <input id="checkTop10" class="form-check-input" type="radio" name="top" value="10"><label class="form-check-label">Top 10<br></label>
+                    <input id="checkTop10" disabled class="form-check-input" type="radio" name="top" value="10"><label class="form-check-label">Top 10<br></label>
                 </div>
             </div>
             <div class="d-flex align-items-md-start" style="padding-left: 30px;">
                 <div class="form-check">
-                    <input id="checkTop15" class="form-check-input" type="radio" name="top" value="15"><label class="form-check-label">Top 15<br></label>
+                    <input id="checkTop15" disabled class="form-check-input" type="radio" name="top" value="15"><label class="form-check-label">Top 15<br></label>
                 </div>
             </div>
         </div>
@@ -309,14 +309,24 @@
         $("#checkSelectStore").on('click', function (e) {
             if ($("#checkSelectStore:checked").is(":checked")) {
                 $("#divSelectStore").attr('style', 'padding-top: 10px;display:block !important');
-
+                $("#checkTop5").attr("disabled", false);
+                $("#checkTop10").attr("disabled", false);
+                $("#checkTop15").attr("disabled", false);
             } else {
+                clearSelect();
                 $("#divSelectStore").attr('style', 'display:none !important');
+                $("#checkTop5").attr("disabled", true);
+                $("#checkTop10").attr("disabled", true);
+                $("#checkTop15").attr("disabled", true);
+
+                $("#checkTop5").prop("checked", false);
+                $("#checkTop10").prop("checked", false);
+                $("#checkTop15").prop("checked", false);
             }
         });
 
         function clearSelect() {
-            $("input:checkbox").each(function () {
+            $("input:checkbox[checktype='store']").each(function () {
                 $(this).prop("checked", false);
             });
         }
@@ -382,16 +392,16 @@
                         html += "<div class='card-body'>";
                         html += " <div>";
                         html += "     <header>";
-                        html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' type='checkbox' id='" + storeId + "'><label class='form-check-label' >" + model.departmentStoreList[i].retailerGroupName + "</label></div>";
+                        html += "         <div class='form-check' style='width: 25%;'><input class='form-check-input headerChecked' checktype='store' type='checkbox' id='" + storeId + "'><label class='form-check-label' >" + model.departmentStoreList[i].retailerGroupName + "</label></div>";
                         html += "     </header>";
                         html += " </div>";
                         html += "<div class='d-flex flex-row flex-wrap justify-content-md-start'>";
-                        html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' topNumber='" + model.departmentStoreList[i].topNumber +"' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"' ><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
+                        html += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' checktype='store' type='checkbox' topNumber='" + model.departmentStoreList[i].topNumber + "' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID + "' ><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
                         html += " storeinside";
                         html += "  </div> </div > </div > </div > ";
 
-                    }else {
-                        htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' type='checkbox' topNumber='" + model.departmentStoreList[i].topNumber+"' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID +"'><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
+                    } else {
+                        htmlStoreinside += "     <div class='form-check' style='width: 25%;' > <input class='form-check-input departmentStore' checktype='store' type='checkbox' topNumber='" + model.departmentStoreList[i].topNumber + "' name='" + storeId + "' id='formCheck-" + i + "' data-value='" + model.departmentStoreList[i].departmentStoreID + "'><label class='form-check-label' >" + model.departmentStoreList[i].departmentStoreName + "</label></div>";
                     }
 
                 }

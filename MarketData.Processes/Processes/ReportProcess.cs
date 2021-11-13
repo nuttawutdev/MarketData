@@ -82,12 +82,14 @@ namespace MarketData.Processes.Processes
             {
                 var allDepartmentStore = repository.masterData.GetDepartmentStoreList().Where(c => c.active);
                 var brandList = repository.masterData.GetBrandListBy(c => c.Active_Flag);
+                var topStoreList = repository.masterData.GetTopDepartmentStoreList();
 
                 response.departmentStore = allDepartmentStore.Select(c => new Model.Data.DepartmentStoreData
                 {
                     departmentStoreID = c.departmentStoreID,
                     departmentStoreName = c.departmentStoreName,
-                    retailerGroupName = c.retailerGroupName
+                    retailerGroupName = c.retailerGroupName,
+                    topNumber = topStoreList.FirstOrDefault(e => e.DepartmentStore_ID == c.departmentStoreID)?.TopNumber,
                 }).ToList();
 
                 response.brandList = brandList.Select(c => new Model.Data.BrandData
