@@ -1599,6 +1599,13 @@ namespace MarketData.Processes.Processes
                 #region Header
                 var worksheet = workbook.Worksheets.Add("StoreMarketShareValue");
                 int columnBrand = 3;
+
+                if (!request.brandRankEnd.HasValue)
+                {
+                    var allBrandActive = repository.masterData.GetBrandListBy(c => c.Brand_ID != null);
+                    request.brandRankEnd = allBrandActive.Count();
+                }
+
                 for (int i = 1; i <= request.brandRankEnd; i++)
                 {
                     worksheet.Column(columnBrand).Width = 19;
@@ -2080,12 +2087,12 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                         worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                        worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
-                        worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                        worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
                         if (brandCompare != null)
                         {
+                            worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
+                            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
                             var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
                             worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
                         }
