@@ -774,6 +774,7 @@ namespace MarketData.Processes.Processes
 
         private (byte[], string) GenerateReportStoreMarketShareZone(ReportStoreMarketShareRequest request, List<GroupStoreRanking> listGroup, List<GroupStoreRanking> listGroupCompare, List<GroupStoreRanking> listGroupOldCompare)
         {
+
             using (var workbook = new XLWorkbook())
             {
                 Color yellowHead = Color.FromArgb(250, 250, 181);
@@ -791,6 +792,11 @@ namespace MarketData.Processes.Processes
                 XLColor lorealXL = XLColor.FromArgb(lorealHead.A, lorealHead.R, lorealHead.G, lorealHead.B);
 
                 var worksheet = workbook.Worksheets.Add("StoreMarketShareZone");
+                if (!request.brandRankEnd.HasValue)
+                {
+                    var allBrandActive = repository.masterData.GetBrandListBy(c => c.Brand_ID != null);      
+                    request.brandRankEnd = allBrandActive.Count();
+                }
 
                 int columnBrand = 6;
                 for (int i = 1; i <= request.brandRankEnd; i++)
@@ -1420,43 +1426,53 @@ namespace MarketData.Processes.Processes
 
                 for (int i = 0; i < request.brandRankEnd; i++)
                 {
-                    var brandDetail = groupBrandDetailCompare[i];
-                    try
+                    if (i < groupBrandDetailCompare.Count())
                     {
-                        Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandDetail.Report_Color);
-                        XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
-                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Fill.BackgroundColor = colorBrandXL;
-                    }
-                    catch (Exception ex)
-                    {
+                        var brandDetail = groupBrandDetailCompare.ElementAtOrDefault(i);
 
-                    }
+                        try
+                        {
+                            Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandDetail.Report_Color);
+                            XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                            worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Fill.BackgroundColor = colorBrandXL;
+                        }
+                        catch (Exception ex)
+                        {
 
-                    var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
+                        }
 
-                    var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
-                    worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue($"{percentShareBrand}%");
+                        var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
-                    worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                    worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue($"{percentShareBrand}%");
 
-                    if (brandCompare != null)
-                    {
-                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"{percentGrowthBrand}%");
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+
+                        if (brandCompare != null)
+                        {
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"{percentGrowthBrand}%");
+                        }
+                        else
+                        {
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"-100%");
+                        }
+
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Merge();
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).SetValue(brandDetail.brandName);
+                        columnBrandTotalCompare = columnBrandTotalCompare + 2;
                     }
                     else
                     {
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue($"-100%");
+                        worksheet.Range(worksheet.Cell(rowData+2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        worksheet.Range(worksheet.Cell(rowData+2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotal + 1)).Merge();
+                        columnBrandTotalCompare = columnBrandTotalCompare + 2;
                     }
-
-                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Merge();
-                    worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).SetValue(brandDetail.brandName);
-                    columnBrandTotalCompare = columnBrandTotalCompare + 2;
                 }
 
                 columnBrandTotalCompare++;
