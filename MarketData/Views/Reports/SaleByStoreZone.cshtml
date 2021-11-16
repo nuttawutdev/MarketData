@@ -419,30 +419,36 @@
             var universe = $("#ddlUniverse").val();
             var departmentStoreList = [];
 
-            $('.departmentStore:checkbox:checked').each(function () {
-                departmentStoreList.push($(this).data('value'))
-            });
+            if (checkSelectStore) {
+                $('.departmentStore:checkbox:checked').each(function () {
+                    departmentStoreList.push($(this).data('value'))
+                });
+            }
+            else {
+                departmentStoreList = null;
+            }
 
-            var frmdata = {
-                startWeek: $("#ddlWeekStart").val(),
-                endWeek: checkRank? $("#ddlWeekEnd").val():null,
-                startMonth: $("#ddlMonthStart").val(),
-                endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
-                startYear: $("#ddlYearStart").val(),
-                endYear: checkRank ? $("#ddlYearEnd").val() : null,
-                compareYear: $("#ddlCompareYear").val(),
-                departmentStoreList: checkSelectStore ? departmentStoreList : null,
-                brandRankStart: parseInt($("#txtBrandRankStart").val()),
-                brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
-                universe: universe != "" ? universe : null,
-                saleType: $("#ddlSales").val(),
-                preview: true
-            };
-             $("#blocker").show();
-                 $.ajax({
-                     type: "POST",
-                     url: '@Url.Action("GetReportSaleByStoreZone", "Reports")',
-                     contentType: "application/json; charset=utf-8",
+            if (departmentStoreList != null &&  departmentStoreList.length > 0) {
+                var frmdata = {
+                    startWeek: $("#ddlWeekStart").val(),
+                    endWeek: checkRank ? $("#ddlWeekEnd").val() : null,
+                    startMonth: $("#ddlMonthStart").val(),
+                    endMonth: checkRank ? $("#ddlMonthEnd").val() : null,
+                    startYear: $("#ddlYearStart").val(),
+                    endYear: checkRank ? $("#ddlYearEnd").val() : null,
+                    compareYear: $("#ddlCompareYear").val(),
+                    departmentStoreList: departmentStoreList,
+                    brandRankStart: parseInt($("#txtBrandRankStart").val()),
+                    brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
+                    universe: universe != "" ? universe : null,
+                    saleType: $("#ddlSales").val(),
+                    preview: true
+                };
+                $("#blocker").show();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetReportSaleByStoreZone", "Reports")',
+                    contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
                     success: function (data) {
@@ -462,7 +468,12 @@
                         $("#blocker").hide();
                     }
                 });
+            }
+            else {
+                $('#warningModal').modal('show');
 
+                $('#myModalWarningResult').text("Please Select Store!");
+            }
         });
 
         $("#btnExport").on('click', function (e) {
@@ -471,11 +482,17 @@
             var universe = $("#ddlUniverse").val();
             var departmentStoreList = [];
 
-            $('.departmentStore:checkbox:checked').each(function () {
-                departmentStoreList.push($(this).data('value'))
-            });
+            if (checkSelectStore) {
+                $('.departmentStore:checkbox:checked').each(function () {
+                    departmentStoreList.push($(this).data('value'))
+                });
+            }
+            else {
+                departmentStoreList = null;
+            }
 
-            var frmdata = {
+            if (departmentStoreList != null && departmentStoreList.length > 0) {
+                            var frmdata = {
                 startWeek: $("#ddlWeekStart").val(),
                 endWeek: checkRank ? $("#ddlWeekEnd").val() : null,
                 startMonth: $("#ddlMonthStart").val(),
@@ -483,7 +500,7 @@
                 startYear: $("#ddlYearStart").val(),
                 endYear: checkRank ? $("#ddlYearEnd").val() : null,
                 compareYear: $("#ddlCompareYear").val(),
-                departmentStoreList: checkSelectStore ? departmentStoreList : null,
+                departmentStoreList: departmentStoreList,
                 brandRankStart: parseInt($("#txtBrandRankStart").val()),
                 brandRankEnd: parseInt($("#txtBrandRankEnd").val()),
                 universe: universe != "" ? universe : null,
@@ -513,6 +530,13 @@
                         $("#blocker").hide();
                     }
                 });
+            }
+            else {
+                $('#warningModal').modal('show');
+
+                $('#myModalWarningResult').text("Please Select Store!");
+            }
+
         });
     });
 </script>
