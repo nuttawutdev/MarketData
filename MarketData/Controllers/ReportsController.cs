@@ -230,7 +230,35 @@ namespace MarketData.Controllers
         [ServiceFilter(typeof(PermissionFilter))]
         public IActionResult SaleByStoreZone()
         {
-            return View();
+            StoreMarketShareZoneViewModel dataModel = new StoreMarketShareZoneViewModel();
+
+            try
+            {
+                var reportOption = process.report.GetOptionTopDepartmentStore();
+
+                if (reportOption != null)
+                {
+                    if (reportOption.departmentStore != null && reportOption.departmentStore.Any())
+                    {
+                        var groupStore = reportOption.departmentStore.GroupBy(c => c.retailerGroupName);
+                        dataModel.departmentStoreList = reportOption.departmentStore.Select(c => new DepartmentStoreViewModel
+                        {
+                            departmentStoreID = c.departmentStoreID,
+                            departmentStoreName = c.departmentStoreName,
+                            retailerGroupName = c.retailerGroupName,
+                            topNumber = c.topNumber
+                        }).OrderBy(a => a.retailerGroupName).ToList();
+                    }
+
+                    dataModel.yearList = reportOption.year;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(dataModel);
         }
 
         [ServiceFilter(typeof(AuthorizeFilter))]
@@ -319,6 +347,22 @@ namespace MarketData.Controllers
         {
             var reportData = process.report.GetReportExcelDataExporting(request);
             string fileName = "Excel Data Exporting File";
+
+            if (reportData.fileContent != null)
+            {
+                reportData.referenceFileID = Guid.NewGuid().ToString();
+                reportData.fileName = fileName;
+                HttpContext.Session.SetString(reportData.referenceFileID, Convert.ToBase64String(reportData.fileContent));
+            }
+
+            return Json(reportData);
+        }
+
+        [HttpPost]
+        public IActionResult GetReportSaleByStoreZone([FromBody] ReportSaleByStoreRequest request)
+        {
+            var reportData = process.report.GetReportSaleByStoreZone(request);
+            string fileName = "Sales by Store (Zone)";
 
             if (reportData.fileContent != null)
             {
