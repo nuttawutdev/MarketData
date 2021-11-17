@@ -2009,6 +2009,7 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                         worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                         worksheet.Cell(rowData, columnBrandDetail).SetValue(itemBrand.brandName);
+                        worksheet.Cell(rowData, columnBrandDetail).Style.Font.Bold = true;
 
                         worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                         worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -2111,6 +2112,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
 
+                                worksheet.Cell(rowData, columnBrandDetail).Style.Font.Bold = true;
                                 worksheet.Cell(rowData, columnBrandDetail).SetValue($"{itemBrandLoreal} [#{i + 1}]");
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -2260,6 +2262,7 @@ namespace MarketData.Processes.Processes
                         var brandDetail = groupBrandDetail[i];
                         brandTotalSelect.Add(brandDetail.brandName);
 
+                        worksheet.Cell(rowData, columnBrandTotal).Style.Font.Bold = true;
                         worksheet.Cell(rowData, columnBrandTotal).Value = brandDetail.brandName;
                         worksheet.Cell(rowData, columnBrandTotal).Style.Fill.BackgroundColor = storeXL;
 
@@ -2322,6 +2325,7 @@ namespace MarketData.Processes.Processes
                         {
                             haveData = true;
 
+                            worksheet.Cell(rowData, columnBrandTotal).Style.Font.Bold = true;
                             worksheet.Cell(rowData, columnBrandTotal).Value = $"{itemBrandLoreal} [#{i + 1}]";
                             worksheet.Cell(rowData, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                             worksheet.Cell(rowData, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -4368,6 +4372,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
 
+                                worksheet.Cell(rowData, columnBrandDetail).Style.Font.Bold = true;
                                 worksheet.Cell(rowData, columnBrandDetail).SetValue($"{itemBrandLoreal} [#{i + 1}]");
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -4447,6 +4452,7 @@ namespace MarketData.Processes.Processes
                        {
                            brandID = e.Key.Brand_ID,
                            brandName = e.Key.Brand_Name,
+                           color = e.FirstOrDefault().Report_Color,
                            sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                         : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                         : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
@@ -4463,27 +4469,12 @@ namespace MarketData.Processes.Processes
                      {
                          brandID = e.Key.Brand_ID,
                          brandName = e.Key.Brand_Name,
+                         color = e.FirstOrDefault().Report_Color,
                          sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
                         : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
                         : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
                          detail = e.ToList()
                      }).OrderByDescending(s => s.sumTotalBrand).ToList();
-
-                var groupBrandDetailOldCompare = allBrandDetailOldCompare.GroupBy(
-                    x => new
-                    {
-                        x.Brand_ID,
-                        x.Brand_Name
-                    })
-                    .Select(e => new
-                    {
-                        brandID = e.Key.Brand_ID,
-                        brandName = e.Key.Brand_Name,
-                        sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
-                        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
-                        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
-                        detail = e.ToList()
-                    }).OrderByDescending(s => s.sumTotalBrand).ToList();
 
 
                 worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Merge();
@@ -4524,6 +4515,18 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrand in listBrandSelectTotal)
                 {
+                    try
+                    {
+                        Color colorBrand = System.Drawing.ColorTranslator.FromHtml(itemBrand.color);
+                        XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+
+                        worksheet.Cell(rowData, columnBrandDetailTotal).Style.Fill.BackgroundColor = colorBrandXL;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
                     worksheet.Cell(rowData, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                     worksheet.Cell(rowData, columnBrandDetailTotal).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                     worksheet.Cell(rowData, columnBrandDetailTotal).Style.Border.TopBorder = XLBorderStyleValues.Thin;
@@ -4610,6 +4613,18 @@ namespace MarketData.Processes.Processes
                         if (brandNotTopDetail.brandName == itemBrandLoreal
                             && !listBrandTopSelectTotalName.Contains(brandNotTopDetail.brandName))
                         {
+                            try
+                            {
+                                Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandNotTopDetail.color);
+                                XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+
+                                worksheet.Cell(rowData, columnBrandDetailTotal).Style.Fill.BackgroundColor = colorBrandXL;
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+
                             worksheet.Range(worksheet.Cell(rowData, columnBrandDetailTotal), worksheet.Cell(rowData + 2, columnBrandDetailTotal)).Style.Fill.BackgroundColor = whiteXL;
 
                             try
@@ -4629,6 +4644,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData, columnBrandDetailTotal).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 1, columnBrandDetailTotal).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
 
+                            worksheet.Cell(rowData, columnBrandDetailTotal).Style.Font.Bold = true;
                             worksheet.Cell(rowData, columnBrandDetailTotal).SetValue($"{itemBrandLoreal} [#{i + 1}]");
                             worksheet.Cell(rowData, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                             worksheet.Cell(rowData + 1, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
