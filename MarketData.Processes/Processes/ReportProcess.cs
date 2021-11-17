@@ -3831,8 +3831,8 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotal + 1)).Merge();
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1)).Merge();
                         columnBrandTotalCompare = columnBrandTotalCompare + 2;
                     }
                 }
@@ -3890,6 +3890,7 @@ namespace MarketData.Processes.Processes
                             break;
                         }
                     }
+
 
                     if (!haveData)
                     {

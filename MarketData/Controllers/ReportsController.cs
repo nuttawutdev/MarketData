@@ -234,7 +234,7 @@ namespace MarketData.Controllers
 
             try
             {
-                var reportOption = process.report.GetOptionTopDepartmentStore();
+                var reportOption = process.report.GetOptionReport();
 
                 if (reportOption != null)
                 {
