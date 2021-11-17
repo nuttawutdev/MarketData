@@ -335,6 +335,36 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public GenerateReportResponse GetReportSaleByStoreValue(ReportSaleByStoreRequest request)
+        {
+            GenerateReportResponse response = new GenerateReportResponse();
+
+            try
+            {
+                (List<GroupMonthRanking> groupMonthStartYear, List<GroupMonthRanking> grouMonthCompareYear, List<GroupMonthRanking> groupMonthCompareOldYear) = GetDataForReportSaleByStore(request);
+
+                if (groupMonthStartYear.Any() || grouMonthCompareYear.Any() || groupMonthCompareOldYear.Any())
+                {
+                    (byte[] fileContent, string filePreview) = GenerateReportSaleByStoreValue(request, groupMonthStartYear, grouMonthCompareYear, groupMonthCompareOldYear);
+
+                    response.fileContent = fileContent;
+                    response.filePreview = filePreview;
+                    response.success = true;
+                }
+                else
+                {
+                    response.success = false;
+                    response.responseError = "ไม่พบข้อมูล";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
         private (List<GroupStoreRanking>, List<GroupStoreRanking>, List<GroupStoreRanking>) GetDataForReportStoreMarketShare(ReportStoreMarketShareRequest request)
         {
             var jsonRequest = JsonConvert.SerializeObject(request);
@@ -3915,6 +3945,621 @@ namespace MarketData.Processes.Processes
                         Worksheet sheet = workbookC.Worksheets[0];
 
                         string fileSave = $"Report6{Guid.NewGuid()}";
+
+                        sheet.SaveToHtml(fileSave);
+
+                        string excelHtmlPath = Path.GetFullPath(Path.Combine(fileSave));
+                        using (StreamReader reader = File.OpenText(excelHtmlPath))
+                        {
+                            htmlBody = reader.ReadToEnd();
+                        }
+
+                        var regex = new Regex(@"<[hH][2][^>]*>[^<]*</[hH][2]\s*>", RegexOptions.Compiled | RegexOptions.Multiline);
+                        htmlBody = regex.Replace(htmlBody, "");
+
+                        File.Delete(excelHtmlPath);
+                    }
+
+                    return (content, htmlBody);
+                }
+            }
+        }
+
+        private (byte[], string) GenerateReportSaleByStoreValue(ReportSaleByStoreRequest request, List<GroupMonthRanking> listGroup, List<GroupMonthRanking> listGroupCompare, List<GroupMonthRanking> listGroupOldCompare)
+        {
+
+            using (var workbook = new XLWorkbook())
+            {
+                Color yellowHead = Color.FromArgb(250, 250, 181);
+                Color greenHead = Color.FromArgb(184, 246, 184);
+                Color storeHead = Color.FromArgb(199, 188, 222);
+                Color countStoreColor = Color.FromArgb(250, 216, 213);
+                Color totalHead = Color.FromArgb(239, 82, 227);
+                Color black = Color.FromArgb(0, 0, 0);
+                Color lorealHead = Color.FromArgb(229, 132, 121);
+                Color whiteColor = Color.FromArgb(254, 254, 254);
+                Color percentTotalColor = Color.FromArgb(200, 213, 119);
+
+                XLColor yellowXL = XLColor.FromArgb(yellowHead.A, yellowHead.R, yellowHead.G, yellowHead.B);
+                XLColor greenXL = XLColor.FromArgb(greenHead.A, greenHead.R, greenHead.G, greenHead.B);
+                XLColor storeXL = XLColor.FromArgb(storeHead.A, storeHead.R, storeHead.G, storeHead.B);
+                XLColor totalXL = XLColor.FromArgb(totalHead.A, totalHead.R, totalHead.G, totalHead.B);
+                XLColor blackXL = XLColor.FromArgb(black.A, black.R, black.G, black.B);
+                XLColor lorealXL = XLColor.FromArgb(lorealHead.A, lorealHead.R, lorealHead.G, lorealHead.B);
+                XLColor countStorelXL = XLColor.FromArgb(countStoreColor.A, countStoreColor.R, countStoreColor.G, countStoreColor.B);
+                XLColor whiteXL = XLColor.FromArgb(whiteColor.A, whiteColor.R, whiteColor.G, whiteColor.B);
+                XLColor percentTotalColorXL = XLColor.FromArgb(percentTotalColor.A, percentTotalColor.R, percentTotalColor.G, percentTotalColor.B);
+
+                //#region Header
+                //var worksheet = workbook.Worksheets.Add("StoreMarketShareValue");
+                //int columnBrand = 3;
+
+                //if (!request.brandRankEnd.HasValue)
+                //{
+                //    var allBrandActive = repository.masterData.GetBrandListBy(c => c.Brand_ID != null);
+                //    request.brandRankEnd = allBrandActive.Count();
+                //}
+
+                //for (int i = 1; i <= request.brandRankEnd; i++)
+                //{
+                //    worksheet.Column(columnBrand).Width = 19;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue($"#{i}");
+                //    columnBrand++;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue("%");
+                //    columnBrand++;
+                //}
+
+                //columnBrand++;
+
+                //// Loreal Brand
+                //List<string> brandLorealList = new List<string>();
+                //var brandLorealListCurrent = listGroup.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+                //var brandLorealListCompare = listGroupCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+                //var brandLorealListOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail.Where(e => e.Is_Loreal_Brand)).GroupBy(d => d.Brand_Name).Select(x => x.Key).OrderBy(d => d).ToList();
+
+                //brandLorealList.AddRange(brandLorealListCurrent);
+                //brandLorealList.AddRange(brandLorealListCompare);
+                //brandLorealList.AddRange(brandLorealListOldCompare);
+
+                //brandLorealList = brandLorealList.GroupBy(d => d).Select(x => x.Key).OrderBy(d => d).ToList();
+
+                //for (int i = 0; i < brandLorealList.Count(); i++)
+                //{
+                //    worksheet.Column(columnBrand).Width = 25;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Fill.BackgroundColor = lorealXL;
+
+                //    worksheet.Cell(5, columnBrand).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(5, columnBrand).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+
+                //    worksheet.Cell(6, columnBrand).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(6, columnBrand).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(6, columnBrand).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+
+                //    worksheet.Cell(5, columnBrand).Value = $"{brandLorealList[i]}";
+                //    worksheet.Cell(6, columnBrand).Value = $"If Not In Top {request.brandRankEnd}";
+                //    worksheet.Cell(5, columnBrand).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //    worksheet.Cell(6, columnBrand).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                //    columnBrand++;
+
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).Merge();
+                //    worksheet.Range(worksheet.Cell(5, columnBrand), worksheet.Cell(6, columnBrand)).SetValue("%");
+                //    columnBrand++;
+                //}
+
+                //worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, columnBrand - 1)).Merge();
+                //worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, columnBrand - 1)).Value = $"Luxury Products - TOP {request.brandRankEnd}";
+                //worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, columnBrand - 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                //worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, columnBrand - 1)).Merge();
+                //worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, columnBrand - 1)).Value = "Brand Ranking Perfomance Key Counters";
+                //worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, columnBrand - 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                //worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, columnBrand - 1)).Merge();
+
+                //string dateRepport = string.Empty;
+                //int monthStart = int.Parse(request.startMonth);
+
+                //dateRepport = $"{monthList[monthStart - 1]}/{request.startYear}";
+                //dateRepport += request.endMonth != null ? $" - {monthList[int.Parse(request.endMonth) - 1]}/{request.endYear}" : "";
+
+                //worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, columnBrand - 1)).SetValue(Convert.ToString(dateRepport));
+                //worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, columnBrand - 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                //worksheet.Column(1).Width = 3;
+                //worksheet.Column(2).Width = 30;
+
+                //worksheet.Column(1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Merge();
+                //worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Style.Fill.BackgroundColor = yellowXL;
+                //worksheet.Range(worksheet.Cell(4, 1), worksheet.Cell(6, 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Merge();
+                //worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Value = "DEPARTMENT STORES";
+
+                //worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Style.Fill.BackgroundColor = yellowXL;
+                //worksheet.Range(worksheet.Cell(4, 2), worksheet.Cell(6, 2)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, columnBrand - 1)).Merge();
+                //worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, columnBrand - 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //worksheet.Range(worksheet.Cell(4, 3), worksheet.Cell(4, columnBrand - 1)).Style.Fill.BackgroundColor = greenXL;
+                //#endregion
+
+                //int rowData = 7;
+                //int countStore = 1;
+                //decimal sumAllStore = listGroup.Sum(c => c.sumStore);
+                //decimal sumAllStoreCompare = listGroupCompare.Sum(c => c.sumStore);
+
+                //foreach (var itemGroup in listGroup)
+                //{
+                //    var storeCompare = listGroupCompare.FirstOrDefault(c => c.storeID == itemGroup.storeID);
+
+                //    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Merge();
+                //    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Value = countStore;
+                //    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Range(worksheet.Cell(rowData, 1), worksheet.Cell(rowData + 2, 1)).Style.Fill.BackgroundColor = countStorelXL;
+
+                //    countStore++;
+
+                //    worksheet.Range(worksheet.Cell(rowData, 2), worksheet.Cell(rowData + 2, 2)).Style.Fill.BackgroundColor = storeXL;
+
+                //    worksheet.Cell(rowData, 2).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(rowData, 2).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(rowData + 1, 2).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(rowData + 2, 2).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(rowData + 2, 2).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                //    worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //    worksheet.Cell(rowData, 2).SetValue(itemGroup.storeName);
+
+                //    worksheet.Cell(rowData + 1, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //    worksheet.Cell(rowData + 1, 2).SetValue(string.Format("{0:#,0}", itemGroup.sumStore));
+
+                //    int columnBrandDetail = 3;
+                //    List<GroupBrandRanking> listBrandSelect = new List<GroupBrandRanking>();
+                //    List<GroupBrandRanking> listBrandSelectCompare = new List<GroupBrandRanking>();
+
+                //    if (!request.brandRankStart.HasValue)
+                //    {
+                //        request.brandRankStart = 1;
+                //    }
+
+                //    var groupBrandData = itemGroup.brandDetail.GroupBy(
+                //       x => new
+                //       {
+                //           x.Brand_ID,
+                //           x.Brand_Name
+                //       })
+                //       .Select(e => new GroupBrandRanking
+                //       {
+                //           brandID = e.Key.Brand_ID,
+                //           brandName = e.Key.Brand_Name,
+                //           color = e.FirstOrDefault().Report_Color,
+                //           sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                //        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                //        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                //           storeDetail = e.ToList()
+                //       }).OrderByDescending(s => s.sumBrand).ToList();
+
+                //    if (storeCompare != null)
+                //    {
+                //        listBrandSelectCompare = storeCompare.brandDetail.GroupBy(
+                //           x => new
+                //           {
+                //               x.Brand_ID,
+                //               x.Brand_Name
+                //           })
+                //           .Select(e => new GroupBrandRanking
+                //           {
+                //               brandID = e.Key.Brand_ID,
+                //               brandName = e.Key.Brand_Name,
+                //               color = e.FirstOrDefault().Report_Color,
+                //               sumBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                //            : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                //            : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                //               storeDetail = e.ToList()
+                //           }).OrderByDescending(s => s.sumBrand).ToList();
+                //    }
+
+                //    for (int i = request.brandRankStart.GetValueOrDefault() - 1; i <= request.brandRankEnd.GetValueOrDefault() - 1; i++)
+                //    {
+                //        if (groupBrandData.ElementAtOrDefault(i) != null)
+                //        {
+                //            listBrandSelect.Add(groupBrandData.ElementAtOrDefault(i));
+                //        }
+                //    }
+
+                //    int countBrandRender = 0;
+                //    foreach (var itemBrand in listBrandSelect)
+                //    {
+                //        worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //        worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData, columnBrandDetail).SetValue(itemBrand.brandName);
+
+                //        worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //        worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+
+                //        decimal percentShareBrand = 0;
+                //        worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", itemBrand.sumBrand));
+                //        percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).SetValue($"{percentShareBrand}%");
+
+                //        worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
+
+                //        try
+                //        {
+                //            Color colorBrand = System.Drawing.ColorTranslator.FromHtml(itemBrand.color);
+                //            XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+
+                //            worksheet.Cell(rowData, columnBrandDetail).Style.Fill.BackgroundColor = colorBrandXL;
+                //        }
+                //        catch (Exception ex)
+                //        {
+
+                //        }
+
+                //        columnBrandDetail++;
+
+                //        if (storeCompare != null)
+                //        {
+                //            var brandCompare = listBrandSelectCompare.FirstOrDefault(c => c.brandID == itemBrand.brandID);
+                //            decimal percentGrowthBrand = -100;
+
+                //            percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0
+                //                   ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+
+
+                //            worksheet.Cell(rowData, columnBrandDetail).SetValue($"{percentGrowthBrand}%");
+                //        }
+                //        else
+                //        {
+                //            worksheet.Cell(rowData, columnBrandDetail).SetValue($"-100%");
+                //        }
+
+                //        worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //        worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
+                //        countBrandRender++;
+                //        columnBrandDetail++;
+                //    }
+
+                //    if (countBrandRender < request.brandRankEnd.GetValueOrDefault())
+                //    {
+                //        for (int i = countBrandRender; i < request.brandRankEnd.GetValueOrDefault(); i++)
+                //        {
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Merge();
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            columnBrandDetail++;
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Merge();
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            columnBrandDetail++;
+                //            countBrandRender++;
+                //        }
+                //    }
+
+                //    var listBrandTopSelectName = listBrandSelect.Select(c => c.brandName);
+                //    columnBrandDetail++;
+
+                //    foreach (var itemBrandLoreal in brandLorealList)
+                //    {
+                //        bool haveData = false;
+                //        for (int i = 0; i < groupBrandData.Count(); i++)
+                //        {
+                //            var brandNotTopDetail = groupBrandData[i];
+                //            if (brandNotTopDetail.brandName == itemBrandLoreal
+                //                && !listBrandTopSelectName.Contains(brandNotTopDetail.brandName))
+                //            {
+                //                worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
+
+                //                try
+                //                {
+                //                    Color colorBrand = System.Drawing.ColorTranslator.FromHtml(brandNotTopDetail.color);
+                //                    XLColor colorBrandXL = XLColor.FromArgb(colorBrand.A, colorBrand.R, colorBrand.G, colorBrand.B);
+                //                    worksheet.Cell(rowData, columnBrandDetail).Style.Fill.BackgroundColor = colorBrandXL;
+                //                }
+                //                catch (Exception ex)
+                //                {
+
+                //                }
+
+                //                haveData = true;
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+
+                //                worksheet.Cell(rowData, columnBrandDetail).SetValue($"{itemBrandLoreal} [#{i + 1}]");
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //                worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+
+                //                decimal percentShareBrand = 0;
+
+                //                worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(string.Format("{0:#,0}", brandNotTopDetail.sumBrand));
+                //                percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).SetValue($"{percentShareBrand}%");
+
+                //                columnBrandDetail++;
+
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+
+                //                if (listBrandSelectCompare.Any())
+                //                {
+                //                    var brandCompare = listBrandSelectCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
+                //                    decimal percentGrowthBrand = Math.Round(-100M, 2);
+
+                //                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+
+                //                    worksheet.Cell(rowData, columnBrandDetail).SetValue($"{percentGrowthBrand}%");
+                //                }
+                //                else
+                //                {
+                //                    worksheet.Cell(rowData, columnBrandDetail).SetValue($"-100%");
+                //                }
+
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //                worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                //                worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
+
+                //                columnBrandDetail++;
+                //                break;
+                //            }
+                //        }
+
+                //        if (!haveData)
+                //        {
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Merge();
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            columnBrandDetail++;
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Merge();
+                //            worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            columnBrandDetail++;
+                //        }
+
+                //    }
+
+                //    rowData = rowData + 3;
+                //}
+
+                //var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100, 2);
+                //var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
+                //var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
+                //var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
+
+                //#region Group Total
+                //var groupBrandDetail = allBrandDetail.GroupBy(
+                //       x => new
+                //       {
+                //           x.Brand_ID,
+                //           x.Brand_Name
+                //       })
+                //       .Select(e => new
+                //       {
+                //           brandID = e.Key.Brand_ID,
+                //           brandName = e.Key.Brand_Name,
+                //           sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                //        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                //        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                //           detail = e.ToList()
+                //       }).OrderByDescending(s => s.sumTotalBrand).ToList();
+
+                //var groupBrandDetailCompare = allBrandDetailCompare.GroupBy(
+                //     x => new
+                //     {
+                //         x.Brand_ID,
+                //         x.Brand_Name
+                //     })
+                //     .Select(e => new
+                //     {
+                //         brandID = e.Key.Brand_ID,
+                //         brandName = e.Key.Brand_Name,
+                //         sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                //        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                //        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                //         detail = e.ToList()
+                //     }).OrderByDescending(s => s.sumTotalBrand).ToList();
+
+                //var groupBrandDetailOldCompare = allBrandDetailOldCompare.GroupBy(
+                //    x => new
+                //    {
+                //        x.Brand_ID,
+                //        x.Brand_Name
+                //    })
+                //    .Select(e => new
+                //    {
+                //        brandID = e.Key.Brand_ID,
+                //        brandName = e.Key.Brand_Name,
+                //        sumTotalBrand = request.saleType == "Amount" ? e.Sum(d => d.Amount_Sales.GetValueOrDefault())
+                //        : request.saleType == "Whole" ? e.Sum(d => d.Whole_Sales.GetValueOrDefault())
+                //        : request.saleType == "Net" ? e.Sum(d => d.Net_Sales.GetValueOrDefault()) : 0,
+                //        detail = e.ToList()
+                //    }).OrderByDescending(s => s.sumTotalBrand).ToList();
+
+
+                //rowData++;
+                //#endregion
+
+                //#region Total 1
+                //worksheet.Cell(rowData, 2).Value = "Year";
+                //worksheet.Cell(rowData, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Cell(rowData, 2).Style.Fill.BackgroundColor = storeXL;
+                //worksheet.Cell(rowData, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //worksheet.Cell(rowData, 1).Style.Fill.BackgroundColor = storeXL;
+                //worksheet.Cell(rowData, 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //worksheet.Cell(rowData + 1, 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //worksheet.Cell(rowData + 2, 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //worksheet.Cell(rowData + 1, 2).Value = $"TOTAL {request.startYear}";
+                //worksheet.Cell(rowData + 1, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Cell(rowData + 1, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //worksheet.Cell(rowData + 2, 2).Value = $"TOTAL {request.compareYear}";
+                //worksheet.Cell(rowData + 2, 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //worksheet.Cell(rowData + 2, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //int columnBrandTotal = 3;
+                //List<string> brandTotalSelect = new List<string>();
+
+                //for (int i = 0; i < request.brandRankEnd; i++)
+                //{
+                //    if (i < groupBrandDetail.Count())
+                //    {
+                //        var brandDetail = groupBrandDetail[i];
+                //        brandTotalSelect.Add(brandDetail.brandName);
+
+                //        worksheet.Cell(rowData, columnBrandTotal).Value = brandDetail.brandName;
+                //        worksheet.Cell(rowData, columnBrandTotal).Style.Fill.BackgroundColor = storeXL;
+
+                //        worksheet.Cell(rowData, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //        var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
+
+                //        worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandDetail.sumTotalBrand));
+                //        worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //        worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //        if (brandCompare != null)
+                //        {
+                //            worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
+                //            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //            worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                //            worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
+                //        }
+                //        else
+                //        {
+                //            worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"-100%");
+                //        }
+
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Fill.BackgroundColor = percentTotalColorXL;
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        columnBrandTotal = columnBrandTotal + 2;
+                //    }
+                //    else
+                //    {
+                //        worksheet.Cell(rowData, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //        columnBrandTotal = columnBrandTotal + 2;
+                //    }
+
+                //}
+
+                //columnBrandTotal++;
+
+                //foreach (var itemBrandLoreal in brandLorealList)
+                //{
+                //    bool haveData = false;
+
+                //    for (int i = 0; i < groupBrandDetail.Count(); i++)
+                //    {
+                //        var brandNotTopDetail = groupBrandDetail[i];
+                //        if (brandNotTopDetail.brandName == itemBrandLoreal
+                //            && !brandTotalSelect.Contains(brandNotTopDetail.brandName))
+                //        {
+                //            haveData = true;
+
+                //            worksheet.Cell(rowData, columnBrandTotal).Value = $"{itemBrandLoreal} [#{i + 1}]";
+                //            worksheet.Cell(rowData, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //            worksheet.Cell(rowData, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                //            worksheet.Cell(rowData, columnBrandTotal).Style.Fill.BackgroundColor = storeXL;
+                //            worksheet.Cell(rowData, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
+
+                //            worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandNotTopDetail.sumTotalBrand));
+                //            worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //            worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            if (brandCompare != null)
+                //            {
+                //                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                //                worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"{percentGrowthBrand}%");
+
+                //                worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(string.Format("{0:#,0}", brandCompare.sumTotalBrand));
+                //                worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
+                //                worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //            }
+                //            else
+                //            {
+                //                worksheet.Cell(rowData, columnBrandTotal + 1).SetValue($"-100%");
+                //            }
+
+                //            worksheet.Cell(rowData, columnBrandTotal + 1).Style.Fill.BackgroundColor = percentTotalColorXL;
+                //            worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //            worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //            worksheet.Cell(rowData + 2, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //            break;
+                //        }
+                //    }
+
+                //    if (!haveData)
+                //    {
+                //        worksheet.Cell(rowData, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                //        worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //        worksheet.Cell(rowData + 2, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                //    }
+
+                //    columnBrandTotal = columnBrandTotal + 2;
+                //}
+                //#endregion
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string htmlBody = string.Empty;
+
+                    if (request.preview)
+                    {
+                        Workbook workbookC = new Workbook();
+                        workbookC.LoadFromStream(stream);
+                        Worksheet sheet = workbookC.Worksheets[0];
+
+                        string fileSave = $"Report7{Guid.NewGuid()}";
 
                         sheet.SaveToHtml(fileSave);
 
