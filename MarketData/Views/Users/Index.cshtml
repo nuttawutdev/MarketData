@@ -107,7 +107,7 @@
                             $('#importSuccess').text("Import Success : " + data.countImportSuccess);
                             $('#importFailed').text("Import Failed : " + data.countImportFailed);
 
-                            if (data.importResult.length > 0) {
+                            if (data.importResult != null && data.importResult.length > 0) {
 
                                 for (var i = 0; i < data.importResult.length; i++) {
                                     $('#result-import').append("<p id='txtResult' class='text-center'>" + data.importResult[i].result+"</p>");
