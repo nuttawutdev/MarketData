@@ -2742,6 +2742,37 @@ namespace MarketData.Processes.Processes
                 bool addFranganceCompare = false;
                 bool addFrangance = false;
 
+                var brandInYear = listGroup.Select(c => c.brandID);
+                var brandNotExisInYear = listGroupCompare.Where(c => !brandInYear.Contains(c.brandID));
+
+                var listNotExistInYear = brandNotExisInYear.Select(c => new GroupBrandRanking
+                {
+                    brandID = c.brandID,
+                    brandName = c.brandName,
+                    color = c.color,
+                    sumBrand = 0,
+                    storeDetail = new List<Brand_Ranking>()
+                    //storeDetail = c.storeDetail.Select(d=>new Brand_Ranking
+                    //{
+                    //    BrandG_Id = d.BrandG_Id,
+                    //    Store_Id = d.Store_Id,
+                    //    Amount_Sales = 0,
+                    //    Brand_ID = d.Brand_ID,
+                    //    Brand_Name = d.Brand_Name,
+                    //    Brand_Type_ID = d.Brand_Type_ID,
+                    //    Department_Store_Name = d.Department_Store_Name,
+                    //    ID = d.ID,
+                    //    Is_Loreal_Brand = d.Is_Loreal_Brand,
+                    //    Report_Color = d.Report_Color,
+                    //    Sales_Month = d.Sales_Month,
+                    //    Sales_Week = d.Sales_Week,
+                    //    Sales_Year = d.Sales_Year,
+                    //    Universe = d.Universe,
+                    //}).ToList()
+                }).ToList();
+
+                listGroup.AddRange(listNotExistInYear);
+
                 foreach (var itemGroup in listGroup)
                 {
                     try
@@ -2774,7 +2805,7 @@ namespace MarketData.Processes.Processes
 
                     if (request.saleType != "Whole")
                     {
-                        if (itemGroup.sumBrand > 0 || (brandCompare != null && brandCompare.sumBrand > 0))
+                        if ((brandCompare != null && brandCompare.sumBrand > 0))
                         {
                             worksheet.Cell(rowData, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -2861,8 +2892,7 @@ namespace MarketData.Processes.Processes
                     }
                     else
                     {
-                        if (itemGroup.sumBrand > 0 || itemGroup.storeDetail.Sum(c => c.Amount_Sales) > 0
-                            || (brandCompare != null && (brandCompare.sumBrand > 0 || brandCompare.storeDetail.Sum(c => c.Amount_Sales) > 0)))
+                        if ((brandCompare != null && (brandCompare.sumBrand > 0 || brandCompare.storeDetail.Sum(c => c.Amount_Sales) > 0)))
                         {
 
                             var totalCompareBrandAmount = brandCompare != null ? brandCompare.storeDetail.Sum(c => c.Amount_Sales.GetValueOrDefault()) : 0;
@@ -2960,7 +2990,7 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 9).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 10).SetValue(totalStore);
-                        worksheet.Cell(rowData, 10).Style.NumberFormat.Format = percentFormat;
+                        worksheet.Cell(rowData, 10).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 10).DataType = XLDataType.Number;
                     }
                 }

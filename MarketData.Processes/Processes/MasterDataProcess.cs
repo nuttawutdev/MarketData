@@ -1129,7 +1129,7 @@ namespace MarketData.Processes.Processes
                     && c.Delete_Flag != true);
 
                 // Department Store name not exist Or Update old Department Store
-                if (departmentStoreByName == null ||
+                if (!departmentStoreByName.Any() ||
                     (departmentStoreByName.Any() && departmentStoreByName.Select(c => c.Department_Store_ID).Contains(request.departmentStoreID.GetValueOrDefault())))
                 {
                     response.isSuccess = await repository.masterData.SaveDepartmentStore(request);

@@ -201,6 +201,8 @@
 
                             $('#tblDetails').empty();
                             var rowTable = ' <tbody>';
+                            var totalAmountSale = 0;
+                            var totalWholeSale = 0;
                             for (var i = 0; i < data.data.length; i++) {
 
                                 var amountSalePreviousYear = data.data[i].amountSalePreviousYear ? data.data[i].amountSalePreviousYear : "";
@@ -211,8 +213,15 @@
                                 var mu = data.data[i].mu ? data.data[i].mu : "";
                                 var fg = data.data[i].fg ? data.data[i].fg : "";
                                 var ot = data.data[i].ot ? data.data[i].ot : "";
-                                var totalAmountSale = totalAmountSale+ data.data[i].amountSale ? data.data[i].amountSale : 0;
-                                var totalWholeSale = totalWholeSale + data.data[i].wholeSale ? data.data[i].wholeSale : 0;
+
+                                var amountSale = isNaN(parseFloat(data.data[i].amountSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.data[i].amountSale.replace(/\,/g, ""));
+                                totalAmountSale += amountSale;
+
+                                var wholeSale = isNaN(parseFloat(data.data[i].wholeSale.replace(/\,/g, ""))) ? 0 : parseFloat(data.data[i].wholeSale.replace(/\,/g, ""));
+                                totalWholeSale += wholeSale;
+
+                                //var totalAmountSale = totalAmountSale+ data.data[i].amountSale ? data.data[i].amountSale : 0;
+                                //var totalWholeSale = totalWholeSale + data.data[i].wholeSale ? data.data[i].wholeSale : 0;
 
                                 var option = '';
                                 option += '<option value=""></option>';
@@ -241,8 +250,8 @@
                                     '<td class="col-1">' + data.data[i].departmentStoreName + '</td>' +
                                     '<td class="col-2">' + amountSalePreviousYear + '</td>' +
                                     '<td class="col-1" style="align-items:center"><input  type="number" class="form-control input-sm rank" value=' + rank + '></td>' +
-                                    '<td class="col-1" style="align-items:center"><input  type="text" data-type="currency" class="form-control input-sm amountSale currency checkInput" value=' + amountSale + '></td>' +
-                                    '<td class="col-1" style="align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale checkInput" value=' + wholeSale + '></td>' +
+                                '<td class="col-1" style="align-items:center"><input  type="text" data-type="currency" class="form-control input-sm amountSale currency checkInput" value=' + formatCurrencyText(amountSale.toString()) + '></td>' +
+                                '<td class="col-1" style="align-items:center"><input data-type="currency" type="text" class="form-control input-sm wholeSale checkInput" value=' + formatCurrencyText(wholeSale.toString()) + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm sk" value=' + sk + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm mu" value=' + mu + '></td>' +
                                     '<td class="col-1" style="align-items:center;"><input data-type="currency" type="text" class="form-control input-sm fg" value=' + fg + '></td>' +
@@ -260,8 +269,8 @@
                                 '<td class="col-1"></td>' +
                                 '<td class="col-2">' + formatCurrencyText(data.totalAmountPreviosYear) +'</td>' +
                                 '<td class="col-1" style=" align-items:center"></td>' +
-                                '<td class="col-1 totalAmountSale" style=" align-items:center; padding-left:18px">' + totalAmountSale +'</td>' +
-                                '<td class="col-1 totalWholeSale" style=" align-items:center; padding-left:18px">' + totalWholeSale +'</td>' +
+                                '<td class="col-1 totalAmountSale" style=" align-items:center; padding-left:18px">' + formatCurrencyText(totalAmountSale.toString()) +'</td>' +
+                                '<td class="col-1 totalWholeSale" style=" align-items:center; padding-left:18px">' + formatCurrencyText(totalWholeSale.toString()) +'</td>' +
                                 '<td class="col-1" style=" align-items:center;"></td>' +
                                 '<td class="col-1" style=" align-items:center;"></td>' +
                                 '<td class="col-1" style=" align-items:center;"></td>' +
@@ -278,6 +287,7 @@
                     }
                 });
             }
+
         })
 
         //$("input[data-type='currency']").keyup(function (e) {
