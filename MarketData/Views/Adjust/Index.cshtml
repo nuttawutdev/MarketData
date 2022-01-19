@@ -8,6 +8,42 @@
     Html.RenderPartial("_WarningModal");
 }
 
+<style>
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+        margin: auto;
+    }
+        table th {
+            border:none
+        }
+    th, td {
+        padding: 5px 10px;
+        border: 1px solid #000;
+    }
+
+    thead, tfoot {
+        background: #f9f9f9;
+        display: table;
+        width: 100%;
+        width: calc(100% - 18px);
+    }
+
+    tbody {
+        height: 400px;
+        overflow: auto;
+        overflow-x: hidden;
+        display: block;
+        width: 100%;
+    }
+
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+</style>
 <div class="container">
     <h3>
         @ViewData["Title"]
@@ -208,18 +244,21 @@
                         if (data.data.length > 0) {
 
                             var titleTable = '<thead class="table-secondary">' +
-                                '    <th >Year</th>' +
-                                '    <th >Month</th>' +
-                                '    <th >Week</th>' +
-                                '    <th >Distribution Chanel</th>' +
-                                '    <th >Retailer Group</th>' +
-                                '    <th >Department Store</th>';
+                                '    <th style="width:5%">Year</th>' +
+                                '    <th style="width:5%">Month</th>' +
+                                '    <th style="width:5%">Week</th>' +
+                                '    <th style="width:5%"hidden></th>' +
+                                '    <th style="width:5%">Distribution Chanel</th>' +
+                                '    <th style="width:5%"hidden></th>' +
+                                '    <th style="width:5%">Retailer Group</th>' +
+                                '    <th style="width:5%"hidden></th>' +
+                                '    <th style="width:5%">Department Store</th>';
 
                             for (var i = 0; i < data.columnList.length; i++) {
-                                titleTable += '    <th >' + data.columnList[i] + '</th>';
+                                titleTable += '    <th style="width:5%">' + data.columnList[i] + '</th>';
                             }
 
-                            titleTable += '<th >Action</th>';
+                            titleTable += '<th style="width:5%">Action</th>';
                             titleTable += '</tr></thead>';
 
 
@@ -228,37 +267,37 @@
                             for (var i = 0; i < data.data.length; i++) {
 
                                 rowTable += '<tr >' +
-                                    '<td >' + data.data[i].year + '</td>' +
-                                    '<td >' + data.data[i].month + '</td>' +
-                                    '<td >' + data.data[i].week + '</td>' +
-                                    '<td class="distributionChannelID" hidden>' + data.data[i].distributionChannelID + '</td>' +
-                                    '<td >' + data.data[i].distributionChannelName + '</td>' +
-                                    '<td class="retailerGroupID" hidden>' + data.data[i].retailerGroupID + '</td>' +
-                                    '<td >' + data.data[i].retailerGroupName + '</td>' +
-                                    '<td class="departmentStoreID" hidden>' + data.data[i].departmentStoreID + '</td>' +
-                                    '<td >' + data.data[i].departmentStoreName + '</td>';
+                                    '<td style="width:5%">' + data.data[i].year + '</td>' +
+                                    '<td style="width:5%">' + data.data[i].month + '</td>' +
+                                    '<td style="width:5%">' + data.data[i].week + '</td>' +
+                                    '<td style="width:5%" class="distributionChannelID" hidden>' + data.data[i].distributionChannelID + '</td>' +
+                                    '<td style="width:5%">' + data.data[i].distributionChannelName + '</td>' +
+                                    '<td style="width:5%" class="retailerGroupID" hidden>' + data.data[i].retailerGroupID + '</td>' +
+                                    '<td style="width:5%">' + data.data[i].retailerGroupName + '</td>' +
+                                    '<td style="width:5%"class="departmentStoreID" hidden>' + data.data[i].departmentStoreID + '</td>' +
+                                    '<td style="width:5%">' + data.data[i].departmentStoreName + '</td>';
 
 
                                 var jsonData = data.data[i].brandStatus;
                                 Object.keys(jsonData).forEach(function (key) {
                                     var value = jsonData[key] == null ? "" : jsonData[key];
                                     if (value != "none") {
-                                        rowTable += '<td data-id=' + key + '>' + value + '</td>';
+                                        rowTable += '<td style="width:5%"data-id=' + key + '>' + value + '</td>';
                                     }
                                     else {
-                                        rowTable += '<td style="background-color: black;border:solid;border-color: white;" data-id=' + key + '></td>';
+                                        rowTable += '<td style="width:5%;background-color: black;border:solid;border-color: white;" data-id=' + key + '></td>';
                                     }
 
 
                                 });
 
                                 if (approveDataPermission == 'True') {
-                                    rowTable += '<td > <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
+                                    rowTable += '<td style="width:5%"> <button type="button" class="buttonIcon btn btn-warning btn-sm btnAdjustEdit"><i class="ion-edit text-white"></i></button></td >';
                                 }
                                 else if (viewDataPermission == 'True') {
-                                    rowTable += '<td > <button type="button" class="buttonIcon btn btn-primary btn-sm btnAdjustEdit"><i class="ion-eye text-white"></i></button></td >';
+                                    rowTable += '<td style="width:5%"> <button type="button" class="buttonIcon btn btn-primary btn-sm btnAdjustEdit"><i class="ion-eye text-white"></i></button></td >';
                                 }
-                                                           
+
                                 rowTable += '</tr>';
                             }
 
@@ -267,15 +306,15 @@
                         }
                         else {
                             var titleTable = '<thead class="table-secondary">' +
-                                '    <th >Year</th>' +
-                                '    <th >Month</th>' +
-                                '    <th >Week</th>' +
-                                '    <th >Distribution Chanel</th>' +
-                                '    <th >Retailer Group</th>' +
-                                '    <th >Department Store</th>';
+                                '    <th style="width:5%">Year</th>' +
+                                '    <th style="width:5%">Month</th>' +
+                                '    <th style="width:5%">Week</th>' +
+                                '    <th style="width:5%">Distribution Chanel</th>' +
+                                '    <th style="width:5%">Retailer Group</th>' +
+                                '    <th style="width:5%">Department Store</th>';
 
 
-                            titleTable += '<th >Action</th>';
+                            titleTable += '<th style="width:5%">Action</th>';
                             titleTable += '</tr></thead>';
                             $('#tblDetails').append(titleTable);
                         }
