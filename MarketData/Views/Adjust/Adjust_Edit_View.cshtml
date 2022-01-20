@@ -6,9 +6,43 @@
 }
 
 <style>
-    .width70 {
+    /* .width70 {
         width: 70px !important
+    }*/
+    table {
+        width: 100%;
+        table-layout: fixed;
+        margin: auto;
     }
+
+    .table thead th {
+        width: 100px !important;
+    }
+
+    .table td {
+        width: 100px !important;
+    }
+
+    thead, tfoot {
+        background: #f9f9f9;
+        display: table;
+        width: 100%;
+        width: calc(100% - 18px);
+    }
+
+    tbody {
+        height: 400px;
+        overflow: auto;
+        overflow-x: hidden;
+        display: block;
+        width: 100%;
+    }
+
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
 </style>
 <h3 style="padding-left:20px;padding-right:20px">
     @ViewData["Title"]
@@ -139,7 +173,7 @@
         titleTable += '    <th >Admin-Amt.Sales</th>' +
             '    <th >Adj.Amt.Sales</th>' +
             '    <th >Adj.Whole Sales</th>' +
-            '    <th >Rank</th>' +
+            '    <th class="text-center">Rank</th>' +
             '    <th class="width70">SK (%)</th>' +
             '    <th class="width70">MU (%)</th>' +
             '    <th class="width70">FG (%)</th>' +
@@ -182,7 +216,7 @@
                 keyBrandKeyInRank = keyBrandKeyInRank.replace(/[&\/\\#,;+()$~%.'":*?<>{}]/g, '');
 
                 if (keyBrandKeyInRank == keyBrandKeyInAmount) {
-                    rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank" >' + valueBrandKeyInRank + '</td>';
+                    rowTable += '<td data-id=' + keyBrandKeyInRank + ' class="brandKeyInRank text-center" >' + valueBrandKeyInRank + '</td>';
 
                     rowTotal += i != 0 ? "" : '<td></td>';
 
@@ -206,7 +240,7 @@
                 rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
                 '  <td class="adjustAmountSale"> ' + adjustAmountSale + '</td>' +
                 '  <td class="adjustWholeSale">  ' + adjustWholeSale + '</td>' +
-                '  <td class="rank" >' + rank + '</td>' +
+                '  <td class="rank text-center" >' + rank + '</td>' +
                     '  <td class="sk width70">' + sk + '</td>' +
                     '  <td class="mu width70">' + mu + '</td>' +
                     '  <td class="fg width70">' + fg + '</td>' +
