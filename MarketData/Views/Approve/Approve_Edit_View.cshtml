@@ -44,7 +44,7 @@
         background: #f9f9f9;
         display: table;
         width: 100%;
-        width: calc(100% - 18px);
+        /*width: calc(100% - 18px);*/
     }
 
     tbody {
@@ -154,7 +154,7 @@
                                 var titelPrevYear = "Amount Sales (" + (Convert.ToInt32(Model.year) - 1) + " " + Model.month + " week 4)";
                             }
                             <th class="col-2">Brand</th>
-                            <th class="col-2">@titelPrevYear</th>
+                            <th style="margin-left: -15px;"class="col-2">@titelPrevYear</th>
                             <th class="col-1">Rank</th>
                             <th class="col-1">Amount Sales</th>
                             <th class="col-1">Whole Sales</th>
