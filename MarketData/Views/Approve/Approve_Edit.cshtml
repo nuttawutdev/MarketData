@@ -13,7 +13,7 @@
         display: inline-flex !important;
         width: 70px;
     }
-
+/*
     table {
         border-collapse: collapse;
         border-spacing: 0;
@@ -29,7 +29,41 @@
     .tdFlex {
         width: 250px;
         align-items: center;
+    }*/
+    table {
+        width: 100%;
+        table-layout: fixed;
+        margin: auto;
     }
+
+    .table thead th {
+        width: 100px !important;
+    }
+
+    .table td {
+        width: 100px !important;
+    }
+
+    thead, tfoot {
+        background: #f9f9f9;
+        display: table;
+        width: 100%;
+        width: calc(100% - 18px);
+    }
+
+    tbody {
+        height: 400px;
+        overflow: auto;
+        overflow-x: hidden;
+        display: block;
+        width: 100%;
+    }
+
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
 </style>
 
 
