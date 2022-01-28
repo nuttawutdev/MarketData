@@ -193,7 +193,8 @@ namespace MarketData.Controllers
                         statusID = c.statusID,
                         statusName = c.statusName,
                         week = c.week,
-                        year = c.year
+                        year = c.year,
+                        universe = c.universe
                     }).ToList();
                 }
 

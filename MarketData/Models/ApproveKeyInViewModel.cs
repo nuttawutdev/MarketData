@@ -35,5 +35,6 @@ namespace MarketData.Models
         public string statusName { get; set; }
         public string approver { get; set; }
         public string approveDate { get; set; }
+        public string universe { get; set; }
     }
 }

@@ -174,9 +174,21 @@
 
 
     $(document).ready(function () {
+
+        $("#channelList").val(localStorage.getItem('apprvSelectChannel'));
+        $("#retailerGroupList").val(localStorage.getItem('apprvSelectRetail'));
+        $("#departmentStoreList").val(localStorage.getItem('apprvSelectDepartment'));
+        $("#brandList").val(localStorage.getItem('apprvSelectBrand'));
+        $("#ddlWeek").val(localStorage.getItem('apprvSelectWeek'));
+        $("#ddlMonth").val(localStorage.getItem('apprvSelectMonth'));
+        $("#yearList").val(localStorage.getItem('apprvSelectYear'));
+        $("#iduniverseList").val(localStorage.getItem('apprvSelectUniverse'));
+        $("#statusList").val(localStorage.getItem('apprvSelectStatus'));
+
         var viewDataPermission = $('#viewDataPermission').val();
         var approveDataPermission = $('#approveDataPermission').val();
 
+           
         $("#tableData").one("preInit.dt", function () {
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
             $("#tableData_filter label").append($button);
@@ -190,7 +202,17 @@
                 url: '@Url.Action("GetApproveKeyInList", "Approve")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
+                    $("#channelList").change();
+                    $("#retailerGroupList").change();
+                    $("#departmentStoreList").change();
+                    $("#brandList").change();
+                    $("#ddlWeek").change();
+                    $("#ddlMonth").change();
+                    $("#yearList").change();
+                    $("#iduniverseList").change();
+                    $("#statusList").change();
                     return result.data;
+
                 }
             },
             "order": [],
@@ -211,6 +233,7 @@
                 { data: "statusName", title: "Status" },
                 { data: "approver", title: "Action By" },
                 { data: "approveDate", title: "Action Date" },
+                { data: "universe", title: "universe", visible: false },
                 {
                     orderable: false,
                     title: "Action",
@@ -233,8 +256,6 @@
 
                       }
                 }
-
-
             ]
         });
 
@@ -249,6 +270,7 @@
 
         $('#channelList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectChannel', status);
             $('#channelList').val(status);
             dataTable.column(10).search(status).draw();
             getDepartmentStoreList()
@@ -256,6 +278,7 @@
 
         $('#retailerGroupList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectRetail', status);
             $('#retailerGroupList').val(status);
             dataTable.column(9).search(status).draw();
             getDepartmentStoreList()
@@ -263,12 +286,14 @@
 
         $('#departmentStoreList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectDepartment', status);
             $('#departmentStoreList').val(status);
             dataTable.column(5).search(status).draw();
         });
 
         $('#brandList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectBrand', status);
             $('#brandList').val(status);
             dataTable.column(7).search(status).draw();
         });
@@ -276,6 +301,7 @@
 
         $('#ddlWeek').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectWeek', status);
             $('#ddlWeek').val(status);
             dataTable.column(4).search(status).draw();
         });
@@ -283,6 +309,7 @@
 
         $('#ddlMonth').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectMonth', status);
             $('#ddlMonth').val(status);
             dataTable.column(3).search(status).draw();
         });
@@ -290,14 +317,23 @@
 
         $('#yearList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectYear', status);
             $('#yearList').val(status);
             dataTable.column(2).search(status).draw();
         });
 
         $('#statusList').on('change', function (e) {
             var status = $(this).val();
+            localStorage.setItem('apprvSelectStatus', status);
             $('#statusList').val(status);
             dataTable.column(12).search(status).draw();
+        });
+
+        $('#iduniverseList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('apprvSelectUniverse', status);
+            $('#iduniverseList').val(status);
+            dataTable.column(16).search(status).draw();
         });
 
          function getDepartmentStoreList() {

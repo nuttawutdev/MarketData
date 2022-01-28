@@ -156,7 +156,7 @@
                         <li>
                             @using (Html.BeginForm("Logout", "Home", FormMethod.Post, new { @class = "ui large form" }))
                             {
-                                <a asp-controller="Home" asp-action="Logout" class="btn btn-light text-danger">
+                                <a asp-controller="Home" id="btnLogout" asp-action="Logout" class="btn btn-light text-danger">
                                     Logout   <span class="ion-android-exit"></span>
                                 </a>
                             }

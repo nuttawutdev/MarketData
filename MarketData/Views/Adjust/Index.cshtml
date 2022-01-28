@@ -13,7 +13,6 @@
         @ViewData["Title"]
     </h3>
 
-
     <hr />
     <br />
     <br />
@@ -169,6 +168,34 @@
         var viewDataPermission = $('#viewDataPermission').val();
         var approveDataPermission = $('#approveDataPermission').val();
 
+        $("#channelList").val(localStorage.getItem('adjSelectChannel'));
+        $("#retailerGroupList").val(localStorage.getItem('adjSelectRetail'));
+
+        setTimeout(function () {
+            $("#channelList").change();
+            $("#retailerGroupList").change();
+        }, 100)
+
+        setTimeout(function () {
+            $("#departmentStoreList").val(localStorage.getItem('adjSelectDepartment'));
+            $("#statusList").val(localStorage.getItem('adjSelectStatus'));
+            $("#ddlWeek").val(localStorage.getItem('adjSelectWeek'));
+            $("#ddlMonth").val(localStorage.getItem('adjSelectMonth'));
+            $("#yearList").val(localStorage.getItem('adjSelectYear'));
+            $("#iduniverseList").val(localStorage.getItem('adjSelectUniverse'));
+        }, 200)
+
+        setTimeout(function () {
+            if ($("#ddlWeek").val() != ""
+                && $("#ddlMonth").val() != ""
+                && $("#yearList").val() != ""
+                && $("#iduniverseList").val() != "") {
+                $('#btnShow').click();
+            }
+          
+        }, 300)
+
+
         $("#container").removeClass("container");
 
         $('#btnShow').on('click', function (e) {
@@ -287,14 +314,47 @@
             }
         })
 
-          $('#channelList').on('change', function (e) {
+        $('#channelList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectChannel', status);
             getDepartmentStoreList()
         });
 
         $('#retailerGroupList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectRetail', status);
             getDepartmentStoreList()
         });
 
+        $('#departmentStoreList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectDepartment', status);
+        });
+
+        $('#statusList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectStatus', status);
+        });
+
+        $('#ddlWeek').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectWeek', status);
+        });
+
+        $('#ddlMonth').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectMonth', status);
+        });
+
+        $('#yearList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectYear', status);
+        });
+
+        $('#iduniverseList').on('change', function (e) {
+            var status = $(this).val();
+            localStorage.setItem('adjSelectUniverse', status);
+        });
 
         $(document).on('click', '.btnAdjustEdit', function () {
             var departmentStoreID = $(this).closest("tr").find(".departmentStoreID").text();
