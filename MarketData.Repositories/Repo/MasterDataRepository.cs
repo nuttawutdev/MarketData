@@ -1093,7 +1093,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<bool> SaveCounter(SaveCounterRequest request)
+        public async Task<bool> SaveCounter(SaveCounterRequest request,Guid BrandID)
         {
             try
             {
@@ -1102,7 +1102,7 @@ namespace MarketData.Repositories.Repo
                     TMCounter insertCounter = new TMCounter
                     {
                         Counter_ID = Guid.NewGuid(),
-                        Brand_ID = request.brandID,
+                        Brand_ID = BrandID,
                         Distribution_Channel_ID = request.distributionChannelID,
                         Department_Store_ID = request.departmentStoreID,
                         Delete_Flag = false,
@@ -1120,7 +1120,7 @@ namespace MarketData.Repositories.Repo
 
                     if (counterUpdate != null)
                     {
-                        counterUpdate.Brand_ID = request.brandID;
+                        counterUpdate.Brand_ID = BrandID;
                         counterUpdate.Distribution_Channel_ID = request.distributionChannelID;
                         counterUpdate.Department_Store_ID = request.departmentStoreID;
                         counterUpdate.Active_Flag = request.active;

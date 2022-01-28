@@ -12,7 +12,7 @@ namespace MarketData.Model.Request.MasterData
         public string distributionChannelName { get; set; }
         public Guid departmentStoreID { get; set; }
         public string departmentStoreName { get; set; }
-        public Guid brandID { get; set; }
+        public List<Guid> brandID { get; set; }
         public string brandName { get; set; }
         public string userID { get; set; }
         public bool active { get; set; }

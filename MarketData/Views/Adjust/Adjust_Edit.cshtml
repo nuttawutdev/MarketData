@@ -322,8 +322,9 @@
             console.log(frmdata,'Save')
             if (validate_Sum_Percent(frmdata) &&
                 validate_WholeSales(frmdata) &&
-                validate_WholeSales_AmountSales(frmdata) &&
-                validate_AmountSales_Lessthan_Previouse(frmdata)) {
+                validate_WholeSales_AmountSales(frmdata)
+                //&& validate_AmountSales_Lessthan_Previouse(frmdata)
+                ) {
                 var urlAction = '';
                 if (type == 'btnAdjust') {
                      urlAction = '@Url.Action("SubmitAdjustDataDetail", "Adjust")';

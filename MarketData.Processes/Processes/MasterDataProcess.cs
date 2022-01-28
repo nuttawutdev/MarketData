@@ -1538,24 +1538,30 @@ namespace MarketData.Processes.Processes
         public async Task<SaveDataResponse> SaveCounter(SaveCounterRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
+            response.responseError = string.Empty;
 
             try
             {
-                var counterExist = repository.masterData.FindCounterBy(
-                    c => c.Brand_ID == request.brandID
-                    && c.Department_Store_ID == request.departmentStoreID
-                    && c.Distribution_Channel_ID == request.distributionChannelID
-                    && c.Delete_Flag != true);
+                var brandDataSelect = repository.masterData.GetBrandListBy(c => request.brandID.Contains(c.Brand_ID));
+                
+                foreach (var brandIDSave in request.brandID)
+                {
+                    var counterExist = repository.masterData.FindCounterBy(
+                      c => c.Brand_ID == brandIDSave
+                      && c.Department_Store_ID == request.departmentStoreID
+                      && c.Distribution_Channel_ID == request.distributionChannelID
+                      && c.Delete_Flag != true);
 
-                // Counter not exist Or Update old Counter
-                if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
-                {
-                    response.isSuccess = await repository.masterData.SaveCounter(request);
-                }
-                else
-                {
-                    response.isSuccess = false;
-                    response.responseError = "Counter ซ้ำกับที่มีอยู่ในระบบ";
+                    // Counter not exist Or Update old Counter
+                    if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
+                    {
+                        response.isSuccess = await repository.masterData.SaveCounter(request, brandIDSave);
+                    }
+                    else
+                    {
+                        var brandData = brandDataSelect.FirstOrDefault(c => c.Brand_ID == brandIDSave);
+                        response.responseError += $"Counter {request.departmentStoreName} {brandData.Brand_Name} ซ้ำกับที่มีอยู่ในระบบ <br>";
+                    }
                 }
             }
             catch (Exception ex)
@@ -1729,7 +1735,7 @@ namespace MarketData.Processes.Processes
 
                         if (brandData.Value != Guid.Empty && departmentStore.Value != Guid.Empty && channel.Value != Guid.Empty)
                         {
-                            saveCounterRequest.brandID = brandData.Value;
+                            saveCounterRequest.brandID.Add(brandData.Value);
                             saveCounterRequest.departmentStoreID = departmentStore.Value;
                             saveCounterRequest.distributionChannelID = channel.Value;
                             saveCounterRequest.active = true;
@@ -1778,7 +1784,7 @@ namespace MarketData.Processes.Processes
                                 resultImport.result += "Department Store, ";
                             }
 
-                            if (saveCounterRequest.brandID == Guid.Empty)
+                            if (saveCounterRequest.brandID != null && saveCounterRequest.brandID.Any())
                             {
                                 resultImport.result += "Brand, ";
                             }
