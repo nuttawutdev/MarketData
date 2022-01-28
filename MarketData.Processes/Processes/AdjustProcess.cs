@@ -8,6 +8,7 @@ using MarketData.Repositories;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -561,8 +562,19 @@ namespace MarketData.Processes.Processes
                     if (itemAdjustData.amountPreviousYearWeek.HasValue && itemAdjustData.adjustAmountSale.HasValue)
                     {
                         // ((adjustAmountSale - amountPreviousYearWeek) / amountPreviousYearWeek) X 100
-                        itemAdjustData.percentGrowth = ((itemAdjustData.adjustAmountSale.GetValueOrDefault() - itemAdjustData.amountPreviousYearWeek.GetValueOrDefault()) / itemAdjustData.amountPreviousYearWeek.GetValueOrDefault()) * 100;
-                        itemAdjustData.percentGrowth = Math.Round(itemAdjustData.percentGrowth.Value, 2);
+                        var adjustAmountSale = itemAdjustData.adjustAmountSale.GetValueOrDefault();
+                        var amountPreviousYearWeek = itemAdjustData.amountPreviousYearWeek.GetValueOrDefault();
+
+                        if(amountPreviousYearWeek > 0)
+                        {
+                            itemAdjustData.percentGrowth = ((adjustAmountSale - amountPreviousYearWeek) / amountPreviousYearWeek) * 100;
+                            itemAdjustData.percentGrowth = Math.Round(itemAdjustData.percentGrowth.Value, 2);
+                        }
+                        else
+                        {
+                            itemAdjustData.percentGrowth = 0;
+                        }
+
                     }
 
                     rankAdjust += 1;
@@ -616,6 +628,15 @@ namespace MarketData.Processes.Processes
             catch (Exception ex)
             {
                 response.responseError = ex.InnerException?.Message ?? ex.Message;
+                string fullPath = "C:\\ERRORLOG";
+
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath); //Create directory if it doesn't exist
+                }
+
+                File.AppendAllText($"{fullPath}\\ERROR.txt",
+               $"{ex.InnerException?.Message + "," + ex.Message} {DateTime.Now.ToString()} {Environment.NewLine}");
             }
 
             return response;
