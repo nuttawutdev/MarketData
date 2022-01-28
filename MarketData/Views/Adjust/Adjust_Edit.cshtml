@@ -14,7 +14,7 @@
     }*/
     table {
         width: 100%;
-        table-layout: fixed;
+        /*table-layout: fixed;*/
         margin: auto;
     }
     .table thead th {
@@ -165,7 +165,7 @@
         console.log(model)
         var lastYear = parseInt(model.year) - 1 + ' ' + model.month + ' week 4';
 
-        var titleTable = '<thead class="table-secondary">' +
+            var titleTable = '<thead style="width:100%" class="table-secondary">' +
             '    <th >Brand</th>' +
             '    <th >Amt. (' + lastYear +')</th>';
 
@@ -243,8 +243,8 @@
                 var percentGrowth = model.data[i].percentGrowth == null ? "" : formatCurrencyText(model.data[i].percentGrowth.toString());
 
                 rowTable += '  <td class="adminAmountSale" >' + adminAmountSale + '</td>' +
-                '<td > <input style="width:105px" data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
-                '  <td > <input style="width:105px" data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
+                '<td > <input style="width:92px" data-index=' + i +' data-type="currency" data-id="adjustAmountSale" type="text" class="form-control input-sm checkInput adjustAmountSale " value=' + adjustAmountSale + '></td>' +
+                '  <td > <input style="width:92px" data-index=' + i +' data-type="currency"  data-id="adjustWholeSale" type="text" class="form-control input-sm checkInput adjustWholeSale " value=' + adjustWholeSale + '></td>' +
                 '  <td class="rank text-center" >' + rank + '</td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="sk" type="text" class="form-control input-sm checkInput sk width70" value=' + sk + '></td>' +
                 '  <td > <input data-index=' + i +'  data-type="currency" data-id="mu" type="text" class="form-control input-sm checkInput mu width70" value=' + mu + '></td>' +
