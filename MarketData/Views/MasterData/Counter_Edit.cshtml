@@ -7,6 +7,7 @@
     ViewData["Title"] = Model.departmentStoreID == Guid.Empty ? "Add Counter" : "Edit Counter";
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_WarningModal");
 }
 
 
@@ -89,6 +90,7 @@
     $(document).ready(function () {
 
         $("#save").click(function () {
+            $('#myModalWarningMessage').text("");
             var model = @Html.Raw(Json.Serialize(Model));
              var frmdata = {
                  counterID: model.counterID,
@@ -117,9 +119,14 @@
                     success: function (data) {
                         $("#blocker").hide();
                         if (data.isSuccess) {
-                            if (data.responseError != "") {
-                                $('#failedModal').modal('show');
-                                $('#myModalFailedResult').text(Encoder.htmlDecode(data.responseError));
+                            if (data.result.length > 0) {
+                                $('#myModalWarningResult').text("Counter ซ้ำกับที่มีในระบบ");
+                                
+                                for (var i = 0; i < data.result.length; i++) {
+                                    $('#myModalWarningMessage').append("<p id='txtResult' class='text-center'>" + data.result[i] + "</p>");
+                                }
+
+                                $('#warningModal').modal('show');
                             }
                             else {
                                 $('#successModalHref').attr("href", "Counter");

@@ -1535,10 +1535,11 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
-        public async Task<SaveDataResponse> SaveCounter(SaveCounterRequest request)
+        public async Task<SaveCounterResponse> SaveCounter(SaveCounterRequest request)
         {
-            SaveDataResponse response = new SaveDataResponse();
+            SaveCounterResponse response = new SaveCounterResponse();
             response.responseError = string.Empty;
+            response.result = new List<string>();
 
             try
             {
@@ -1555,14 +1556,17 @@ namespace MarketData.Processes.Processes
                     // Counter not exist Or Update old Counter
                     if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
                     {
-                        response.isSuccess = await repository.masterData.SaveCounter(request, brandIDSave);
+                        await repository.masterData.SaveCounter(request, brandIDSave);
                     }
                     else
                     {
                         var brandData = brandDataSelect.FirstOrDefault(c => c.Brand_ID == brandIDSave);
-                        response.responseError += $"Counter {request.departmentStoreName} {brandData.Brand_Name} ซ้ำกับที่มีอยู่ในระบบ <br>";
+                        response.isDuplicated = true;
+                        response.result.Add(brandData.Brand_Name);
                     }
                 }
+
+                response.isSuccess = true;
             }
             catch (Exception ex)
             {
@@ -1742,7 +1746,7 @@ namespace MarketData.Processes.Processes
                             saveCounterRequest.userID = request.userID;
 
                             var result = await SaveCounter(saveCounterRequest);
-                            if (result.isSuccess)
+                            if (result.result.Count() == 0)
                             {
                                 response.countImportSuccess = response.countImportSuccess + 1;
                             }
