@@ -1698,6 +1698,7 @@ namespace MarketData.Processes.Processes
                                     distributionChannelName = distributionChannelName,
                                     departmentStoreName = departmentStoreName,
                                     brandName = brandName,
+                                    alwayShow = true,
                                     row = reader.Depth + 1
                                 });
                             }
