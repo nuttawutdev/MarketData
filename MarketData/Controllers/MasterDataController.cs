@@ -312,6 +312,14 @@ namespace MarketData.Controllers
 
         [ServiceFilter(typeof(AuthorizeFilter))]
         [ServiceFilter(typeof(PermissionFilter))]
+        public ActionResult Counter_Add(Guid counterID)
+        {
+            var viewData = GetCounterDetail(counterID);
+            return View(viewData);
+        }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Counter_Edit(Guid counterID)
         {
             var viewData = GetCounterDetail(counterID);
@@ -935,6 +943,14 @@ namespace MarketData.Controllers
         {
             request.counterID = request.counterID == Guid.Empty ? null : request.counterID;
             var response = await process.masterData.SaveCounter(request);
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCounter([FromBody] EditCounterRequest request)
+        {
+            request.counterID = request.counterID == Guid.Empty ? null : request.counterID;
+            var response = await process.masterData.EditCounter(request);
             return Json(response);
         }
 

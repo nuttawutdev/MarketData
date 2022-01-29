@@ -42,7 +42,7 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>Brand</label><label style="font-size:14px;color:red">*</label>
-            @Html.DropDownListFor(n => n.brandID, new SelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control " })
+            @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control " , multiple = "multiple", style = "height: 200px;" })
 
         </div>
 
@@ -105,24 +105,37 @@
                  userID: $('#iduserID').val()
             };
 
+            console.log(frmdata,'frmdata')
             if (frmdata.distributionChannelID != "" && frmdata.distributionChannelID != "Please select"
                 && frmdata.departmentStoreID != "" && frmdata.departmentStoreID != "Please select"
                 && frmdata.brandID != "") {
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",
-                    url: '@Url.Action("EditCounter", "MasterData")',
+                    url: '@Url.Action("SaveCounter", "MasterData")',
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",
                     success: function (data) {
                         $("#blocker").hide();
                         if (data.isSuccess) {
-                            $('#successModalHref').attr("href", "Counter");
-                            $('#successModal').modal('show');
+                            if (data.result.length > 0) {
+                                $('#titlePopup').text("Add Counter Result!");
+                                //$('#myModalWarningResult').text("Add Counter Result");
+                                
+                                for (var i = 0; i < data.result.length; i++) {
+                                    $('#myModalWarningMessage').append("<p id='txtResult' class='text-center'>" + data.result[i] + "</p>");
+                                }
+
+                                $('#warningModal').modal('show');
+                            }
+                            else {
+                                $('#successModalHref').attr("href", "Counter");
+                                $('#successModal').modal('show');
+                            }     
                         } else if (data.isDuplicated) {
                             $('#failedModal').modal('show');
-                            $('#myModalFailedResult').text('Counter ซ้ำกับที่มีอยู่ในระบบ!');
+                            $('#myModalFailedResult').text('Duplicate data!');
                         } else {
                             $('#failedModal').modal('show');
                             $('#myModalFailedResult').text(data.responseError != ""

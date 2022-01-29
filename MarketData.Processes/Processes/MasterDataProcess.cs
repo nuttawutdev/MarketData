@@ -1544,7 +1544,7 @@ namespace MarketData.Processes.Processes
             try
             {
                 var brandDataSelect = repository.masterData.GetBrandListBy(c => request.brandID.Contains(c.Brand_ID));
-                
+
                 foreach (var brandIDSave in request.brandID)
                 {
                     var counterExist = repository.masterData.FindCounterBy(
@@ -1553,20 +1553,77 @@ namespace MarketData.Processes.Processes
                       && c.Distribution_Channel_ID == request.distributionChannelID
                       && c.Delete_Flag != true);
 
+                    var brandData = brandDataSelect.FirstOrDefault(c => c.Brand_ID == brandIDSave);
+
                     // Counter not exist Or Update old Counter
                     if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
                     {
-                        await repository.masterData.SaveCounter(request, brandIDSave);
+                        var result = await repository.masterData.SaveCounter(request, brandIDSave);
+
+                        string textResult = string.Empty;
+                        if (result)
+                        {
+                            textResult = $"Add {request.distributionChannelName} {request.departmentStoreName}-{brandData.Brand_Name} Success";
+                        }
+                        else
+                        {
+                            textResult = $"Add {request.distributionChannelName} {request.departmentStoreName}-{brandData.Brand_Name} Failed";
+                        }
+
+                        response.result.Add(textResult);
                     }
                     else
                     {
-                        var brandData = brandDataSelect.FirstOrDefault(c => c.Brand_ID == brandIDSave);
                         response.isDuplicated = true;
-                        response.result.Add(brandData.Brand_Name);
+                        response.result.Add($"{request.distributionChannelName} {request.departmentStoreName}-{brandData.Brand_Name} ซ้ำกับที่มีอยู่ในระบบ");
                     }
                 }
 
                 response.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<SaveCounterResponse> EditCounter(EditCounterRequest request)
+        {
+            SaveCounterResponse response = new SaveCounterResponse();
+
+            try
+            {
+                var counterExist = repository.masterData.FindCounterBy(
+                  c => c.Brand_ID == request.brandID
+                  && c.Department_Store_ID == request.departmentStoreID
+                  && c.Distribution_Channel_ID == request.distributionChannelID
+                  && c.Delete_Flag != true);
+
+                // Counter not exist Or Update old Counter
+                if (counterExist == null || (counterExist != null && counterExist.Counter_ID == request.counterID))
+                {
+                    SaveCounterRequest saveRequest = new SaveCounterRequest
+                    {
+                        counterID = request.counterID,
+                        active = request.active,
+                        alwayShow = request.alwayShow,
+                        brandName = request.brandName,
+                        departmentStoreID = request.departmentStoreID,
+                        departmentStoreName = request.departmentStoreName,
+                        distributionChannelID = request.distributionChannelID,
+                        distributionChannelName = request.distributionChannelName,
+                        userID = request.userID
+                    };
+
+                    response.isSuccess = await repository.masterData.SaveCounter(saveRequest, request.brandID);
+                }
+                else
+                {
+                    response.isDuplicated = true;
+                }
             }
             catch (Exception ex)
             {

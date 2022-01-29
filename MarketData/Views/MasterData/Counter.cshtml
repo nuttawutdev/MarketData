@@ -23,7 +23,7 @@
 
         @if(editMaster)
         {
-            <a href="Counter_Edit" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
+            <a href="Counter_Add" class="add-click"><i class="ion-ios-plus text-danger"></i></a>
         }
 
     </h3>
@@ -305,10 +305,10 @@
         $('#brandList').on('change', function (e) {
             var txtSearch = $('#brandList option:selected').text();
             if (txtSearch != 'All') {
-                dataTable.column(4).search(txtSearch).draw();
+                dataTable.column(7).search(txtSearch).draw();
             }
             else {
-                dataTable.column(4).search('').draw();
+                dataTable.column(7).search('').draw();
             }
         });
 
