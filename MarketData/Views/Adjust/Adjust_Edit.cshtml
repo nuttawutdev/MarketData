@@ -9,7 +9,7 @@
 }
 
 <style>
-   /* .width70 {
+    /* .width70 {
         width: 70px !important
     }*/
     table {
@@ -17,12 +17,15 @@
         /*table-layout: fixed;*/
         margin: auto;
     }
+
     .table thead th {
         width: 100px !important;
     }
+
     .table td {
         width: 100px !important;
     }
+
     thead, tfoot {
         background: #f9f9f9;
         display: table;
@@ -346,16 +349,10 @@
                     datatype: "json",
                         success: function (data) {
                             $("#blocker").hide();
-
                             if (data.isSuccess) {
-                                if (type == 'btnAdjust') {
-                                    $('#successModalHref').attr("href", "Index");
-                                }
-                                else {
-                                    $('#successModalHref').attr("data-dismiss", "modal");
-                                }
+                                $('#successModalHref').attr("data-dismiss", "modal");
                                 $('#successModal').modal('show');
-                                                         
+
                             } else if (data.isDuplicated) {
                                 $('#failedModal').modal('show');
                                 $('#myModalFailedResult').text('Duplicate data!');
@@ -364,16 +361,15 @@
                                 $('#myModalFailedResult').text(data.responseError != ""
                                     && data.responseError != null ? data.responseError : 'Save data failed');
                             }
-                            $('#confirmID').val('');
+
+                        $('#confirmID').val('');
                         $('#myModalFailedResult').val('');
                     },
                     error: function () {
                         $("#blocker").hide();
                     }
                 });
-    }
-
-
+            }
         }
 
         function getDataFromTable() {

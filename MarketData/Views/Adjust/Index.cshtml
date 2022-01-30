@@ -214,7 +214,14 @@
                 $('#myModalWarningResult').text('กรุณาเลือกข้อมูลให้ครบ');
                 $("#blocker").hide();
             } else {
-
+                localStorage.setItem('adjSelectChannel', $('#channelList').val());
+                localStorage.setItem('adjSelectRetail', $('#retailerGroupList').val());
+                localStorage.setItem('adjSelectDepartment', $('#departmentStoreList').val());
+                localStorage.setItem('adjSelectStatus', $('#statusList').val());
+                localStorage.setItem('adjSelectWeek', $('#ddlWeek').val());
+                localStorage.setItem('adjSelectMonth', $('#ddlMonth').val());
+                localStorage.setItem('adjSelectYear', $("#yearList").val());
+                localStorage.setItem('adjSelectUniverse', $('#iduniverseList').val());
 
                 var model = @Html.Raw(Json.Serialize(Model));
                 var frmdata = {
@@ -319,46 +326,42 @@
         })
 
         $('#channelList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectChannel', status);
             getDepartmentStoreList()
         });
 
         $('#retailerGroupList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectRetail', status);
             getDepartmentStoreList()
         });
 
-        $('#departmentStoreList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectDepartment', status);
-        });
+        //$('#departmentStoreList').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectDepartment', status);
+        //});
 
-        $('#statusList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectStatus', status);
-        });
+        //$('#statusList').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectStatus', status);
+        //});
 
-        $('#ddlWeek').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectWeek', status);
-        });
+        //$('#ddlWeek').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectWeek', status);
+        //});
 
-        $('#ddlMonth').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectMonth', status);
-        });
+        //$('#ddlMonth').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectMonth', status);
+        //});
 
-        $('#yearList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectYear', status);
-        });
+        //$('#yearList').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectYear', status);
+        //});
 
-        $('#iduniverseList').on('change', function (e) {
-            var status = $(this).val();
-            localStorage.setItem('adjSelectUniverse', status);
-        });
+        //$('#iduniverseList').on('change', function (e) {
+        //    var status = $(this).val();
+        //    localStorage.setItem('adjSelectUniverse', status);
+        //});
 
         $(document).on('click', '.btnAdjustEdit', function () {
             var departmentStoreID = $(this).closest("tr").find(".departmentStoreID").text();
