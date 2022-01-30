@@ -182,7 +182,11 @@
             $("#ddlWeek").val(localStorage.getItem('adjSelectWeek'));
             $("#ddlMonth").val(localStorage.getItem('adjSelectMonth'));
             $("#yearList").val(localStorage.getItem('adjSelectYear'));
-            $("#iduniverseList").val(localStorage.getItem('adjSelectUniverse'));
+
+            if (localStorage.getItem('adjSelectUniverse') != '') {
+                $("#iduniverseList").val(localStorage.getItem('adjSelectUniverse'));
+            }
+           
         }, 200)
 
         setTimeout(function () {

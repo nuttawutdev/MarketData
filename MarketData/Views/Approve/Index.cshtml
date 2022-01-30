@@ -175,14 +175,14 @@
 
     $(document).ready(function () {
 
-        $("#channelList").val(localStorage.getItem('apprvSelectChannel'));
-        $("#retailerGroupList").val(localStorage.getItem('apprvSelectRetail'));
-        $("#departmentStoreList").val(localStorage.getItem('apprvSelectDepartment'));
         $("#brandList").val(localStorage.getItem('apprvSelectBrand'));
         $("#ddlWeek").val(localStorage.getItem('apprvSelectWeek'));
         $("#ddlMonth").val(localStorage.getItem('apprvSelectMonth'));
         $("#yearList").val(localStorage.getItem('apprvSelectYear'));
-        $("#iduniverseList").val(localStorage.getItem('apprvSelectUniverse'));
+        if (localStorage.getItem('apprvSelectUniverse') != '') {
+            $("#iduniverseList").val(localStorage.getItem('apprvSelectUniverse'));
+        }
+       
         $("#statusList").val(localStorage.getItem('apprvSelectStatus'));
 
         var viewDataPermission = $('#viewDataPermission').val();
@@ -202,9 +202,19 @@
                 url: '@Url.Action("GetApproveKeyInList", "Approve")',
                 contentType: "application/json; charset=utf-8",
                 dataSrc: function (result) {
-                    $("#channelList").change();
-                    $("#retailerGroupList").change();
-                    $("#departmentStoreList").change();
+                    setTimeout(function () {
+                        $("#channelList").val(localStorage.getItem('apprvSelectChannel'));
+                        $("#retailerGroupList").val(localStorage.getItem('apprvSelectRetail'));
+
+                        $("#channelList").change();
+                        $("#retailerGroupList").change();
+                    }, 100)
+
+                    setTimeout(function () {
+                        $("#departmentStoreList").val(localStorage.getItem('apprvSelectDepartment'));
+                        $("#departmentStoreList").change();
+                    }, 200);
+
                     $("#brandList").change();
                     $("#ddlWeek").change();
                     $("#ddlMonth").change();

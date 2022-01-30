@@ -42,7 +42,7 @@
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>Brand</label><label style="font-size:14px;color:red">*</label>
-            @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control " , multiple = "multiple", style = "height: 200px;" })
+            @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control " , multiple = "multiple", style = "height: 200px;" })
 
         </div>
 

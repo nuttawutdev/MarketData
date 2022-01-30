@@ -300,6 +300,10 @@
             save('btnSave');
         });
 
+        $('#successModalHref').on('click', function (e) {
+            location.reload();
+        });
+
         $('#btnAdjust').on('click', function (e) {
             save('btnAdjust');
         });
@@ -344,8 +348,14 @@
                             $("#blocker").hide();
 
                             if (data.isSuccess) {
-                               $('#successModalHref').attr("data-dismiss", "modal");
-                               $('#successModal').modal('show');
+                                if (type == 'btnAdjust') {
+                                    $('#successModalHref').attr("href", "Index");
+                                }
+                                else {
+                                    $('#successModalHref').attr("data-dismiss", "modal");
+                                }
+                                $('#successModal').modal('show');
+                                                         
                             } else if (data.isDuplicated) {
                                 $('#failedModal').modal('show');
                                 $('#myModalFailedResult').text('Duplicate data!');
