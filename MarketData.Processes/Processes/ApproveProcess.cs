@@ -134,10 +134,12 @@ namespace MarketData.Processes.Processes
                        && c.Universe == BAKeyInData.Universe
                        && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
 
-                var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
+               
 
                 if (adjustDataPreviousYearWeek4 != null)
                 {
+                    var adjustDetailPreviousYearList = repository.adjust.GetAdjustDataDetaillBy(c => c.AdjustData_ID == adjustDataPreviousYearWeek4.ID);
+
                     foreach (var itemBADetail in baKeyInList)
                     {
                         var adjustDataPreviousYear = adjustDetailPreviousYearList
