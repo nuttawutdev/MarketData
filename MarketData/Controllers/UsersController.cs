@@ -203,6 +203,8 @@ namespace MarketData.Controllers
                     data.keyInData = response.keyInData;
                     data.approveData = response.approveData;
                     data.viewReport = response.viewReport;
+                    data.officeUser = response.officeUser;
+                    data.brandOfficeID = response.brandOfficeID;
                 }
 
                 if (response.departmentStore != null && response.departmentStore.Any())

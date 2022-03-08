@@ -21,6 +21,8 @@ namespace MarketData.Models
         public bool keyInData { get; set; }
         public bool approveData { get; set; }
         public bool viewReport { get; set; }
+        public bool officeUser { get; set; }
+        public Guid? brandOfficeID { get; set; }
         public List<UserCounterViewModel> userCounter { get; set; } = new List<UserCounterViewModel>();
         public List<ChannelKeyInViewModel> channelList { get; set; } = new List<ChannelKeyInViewModel>();
         public List<DepartmentStoreKeyInViewModel> departmentStoreList { get; set; } = new List<DepartmentStoreKeyInViewModel>();

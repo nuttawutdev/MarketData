@@ -35,7 +35,7 @@ namespace MarketData.Controllers
             var userDetailSession = HttpContext.Session.GetString("userDetail");
             var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
 
-            if (userPermission.approveData)
+            if (userPermission.approveData || userPermission.officeUser)
             {
                 AdminKeyInViewModel dataModel = new AdminKeyInViewModel();
 
@@ -82,6 +82,11 @@ namespace MarketData.Controllers
                                 brandID = c.brandID,
                                 brandName = c.brandName,
                             }).ToList();
+
+                            if (userPermission.brandOfficeID.HasValue && userPermission.officeUser)
+                            {
+                                dataModel.brandList = dataModel.brandList.Where(c => c.brandID == userPermission.brandOfficeID).ToList();
+                            }
                         }
 
                         dataModel.remarkList = keyInRemark.Select(c => new AdminKeyInRemark

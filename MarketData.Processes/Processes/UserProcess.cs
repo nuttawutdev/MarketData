@@ -231,6 +231,8 @@ namespace MarketData.Processes.Processes
                     response.keyInData = userData.KeyInDataPermission;
                     response.approveData = userData.ApprovePermission;
                     response.viewReport = userData.ViewReportPermission;
+                    response.officeUser = userData.OfficeUser.GetValueOrDefault();
+                    response.brandOfficeID = userData.BrandOfficeID;
 
                     var userCounterData = repository.user.GetUserCounterBy(e => e.User_ID == userID);
 
@@ -301,6 +303,8 @@ namespace MarketData.Processes.Processes
                     response.keyInData = userData.KeyInDataPermission;
                     response.approveData = userData.ApprovePermission;
                     response.viewReport = userData.ViewReportPermission;
+                    response.officeUser = userData.OfficeUser.GetValueOrDefault();
+                    response.brandOfficeID = userData.BrandOfficeID;
                 }
             }
             catch (Exception ex)

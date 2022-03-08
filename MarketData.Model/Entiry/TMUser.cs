@@ -24,6 +24,8 @@ namespace MarketData.Model.Entiry
         public bool ActiveFlag { get; set; }
         public bool ValidateEmailFlag { get; set; }
         public bool OnlineFlag { get; set; }
+        public bool? OfficeUser { get; set; }
+        public Guid? BrandOfficeID { get; set; }
         public int? WrongPasswordCount { get; set; }
         public DateTime? Last_Login { get; set; }
         public Guid Create_By { get; set; }

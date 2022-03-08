@@ -74,7 +74,9 @@ namespace MarketData.Repositories.Repo
                     ViewDataPermission = request.viewData,
                     KeyInDataPermission = request.keyInData,
                     ApprovePermission = request.approveData,
+                    OfficeUser = request.officeUser,
                     ViewReportPermission = request.viewReport,
+                    BrandOfficeID = request.brandOfficeID,
                     Create_By = request.actionBy.GetValueOrDefault(),
                     Create_Date = Utility.GetDateNowThai()
                 };
@@ -113,9 +115,11 @@ namespace MarketData.Repositories.Repo
                 userData.ViewDataPermission = request.viewData;
                 userData.KeyInDataPermission = request.keyInData;
                 userData.ApprovePermission = request.approveData;
+                userData.OfficeUser = request.officeUser;
                 userData.ViewReportPermission = request.viewReport;
                 userData.Update_By = request.actionBy;
                 userData.Update_Date = Utility.GetDateNowThai();
+                userData.BrandOfficeID = request.brandOfficeID;
 
                 _dbContext.TMUser.Update(userData);
 

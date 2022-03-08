@@ -187,7 +187,7 @@
 
         var viewDataPermission = $('#viewDataPermission').val();
         var approveDataPermission = $('#approveDataPermission').val();
-
+        var page = 25;
            
         $("#tableData").one("preInit.dt", function () {
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
@@ -226,6 +226,7 @@
                 }
             },
             "order": [],
+            "iDisplayLength": page,
             "columns": [
                 { data: "approveKeyInID", title: "approveKeyInID", visible: false },
                 { data: "baKeyInID", title: "baKeyInID", visible: false },
@@ -269,6 +270,9 @@
             ]
         });
 
+        setTimeout(function () {
+            dataTable.page(1).draw('page');
+        }, 1000)
 
         $('.btnReresh').on('click', function (e) {
             $("#blocker").show();

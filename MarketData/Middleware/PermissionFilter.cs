@@ -40,9 +40,9 @@ namespace MarketData.Middleware
                 {
                     GoToHome(filterContext);
                 }
-                else if (userData.approveData && userData.keyInData)
+                else if ((userData.approveData && userData.keyInData) || userData.officeUser)
                 {
-                    if (actionName == ViewPermission.KeyinByStore.ToString() && userData.approveData)
+                    if (actionName == ViewPermission.KeyinByStore.ToString() && (userData.approveData || userData.officeUser))
                     {
                         var values = new RouteValueDictionary(new
                         {
@@ -54,7 +54,7 @@ namespace MarketData.Middleware
                     }
                 }
                 // ไม่มิสิทธิ์ Key-in by brand
-                else if (actionName == ViewPermission.KeyinByBrand.ToString() && !userData.approveData)
+                else if (actionName == ViewPermission.KeyinByBrand.ToString() && (!userData.approveData || !userData.officeUser))
                 {
                     GoToHome(filterContext);
                 }

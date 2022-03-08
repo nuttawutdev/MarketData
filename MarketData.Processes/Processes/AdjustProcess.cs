@@ -99,6 +99,8 @@ namespace MarketData.Processes.Processes
                         brandStatus = new Dictionary<string, string>()
                     };
 
+                    onlyBrandLorel = onlyBrandLorel.Where(c => c.brandTypeName != "Fragrances");
+
                     foreach (var itemBrandLoreal in onlyBrandLorel)
                     {
                         var brandShortName = !string.IsNullOrWhiteSpace(itemBrandLoreal.brandShortName) ? itemBrandLoreal.brandShortName : itemBrandLoreal.brandName;
@@ -125,7 +127,7 @@ namespace MarketData.Processes.Processes
                         {
                             statusBrand = "none";
                         }
-                                  
+
                         adjustData.brandStatus.Add(brandShortName, statusBrand);
                     }
 
@@ -196,7 +198,7 @@ namespace MarketData.Processes.Processes
                 var oldYearListAdjust = allAdjustData.Where(e => e.Year != currentYear).GroupBy(c => c.Year).Select(s => s.Key).ToList();
                 olldYearListApprove.AddRange(oldYearListAdjust);
 
-                var olldYearList = olldYearListApprove.GroupBy(c => c).SelectMany(e => e).OrderByDescending(t=>t);
+                var olldYearList = olldYearListApprove.GroupBy(c => c).SelectMany(e => e).OrderByDescending(t => t);
                 if (olldYearList.Any())
                 {
                     yearList.AddRange(olldYearList);
@@ -244,14 +246,14 @@ namespace MarketData.Processes.Processes
                     List<TMCounter> listCounterFilterFragrances = new List<TMCounter>();
 
                     var brandIDCounter = counterList.GroupBy(c => c.Brand_ID).Select(e => e.Key);
-                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID)  && c.Universe == adjustData.Universe);
+                    var brandDataList = repository.masterData.GetBrandListBy(c => brandIDCounter.Contains(c.Brand_ID) && c.Universe == adjustData.Universe);
                     var brandTypeList = repository.masterData.GetBrandTypeList().Where(e => e.Active_Flag);
 
                     foreach (var itemCounter in counterList)
                     {
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
-                       
-                        if(brandData != null)
+
+                        if (brandData != null)
                         {
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
@@ -259,7 +261,7 @@ namespace MarketData.Processes.Processes
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }
-                        }                      
+                        }
                     }
 
                     counterList = listCounterFilterFragrances;
@@ -269,7 +271,7 @@ namespace MarketData.Processes.Processes
 
                 var allBrandByCounter = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
                 var allBrandByCounterListData = repository.masterData.GetBrandListBy(c => allBrandByCounter.Contains(c.Brand_ID) && c.Universe == adjustData.Universe);
-               
+
                 #endregion
 
                 #region Get BAKeyIn Data
@@ -556,7 +558,7 @@ namespace MarketData.Processes.Processes
 
                 int rankAdjust = 1;
 
-                foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale).ThenByDescending(c=>c.amountPreviousYear))
+                foreach (var itemAdjustData in listAdjustDetailData.OrderByDescending(e => e.adjustAmountSale).ThenByDescending(c => c.amountPreviousYear))
                 {
                     itemAdjustData.rank = rankAdjust;
                     if (itemAdjustData.amountPreviousYearWeek.HasValue && itemAdjustData.adjustAmountSale.HasValue)
@@ -565,7 +567,7 @@ namespace MarketData.Processes.Processes
                         var adjustAmountSale = itemAdjustData.adjustAmountSale.GetValueOrDefault();
                         var amountPreviousYearWeek = itemAdjustData.amountPreviousYearWeek.GetValueOrDefault();
 
-                        if(amountPreviousYearWeek > 0)
+                        if (amountPreviousYearWeek > 0)
                         {
                             itemAdjustData.percentGrowth = ((adjustAmountSale - amountPreviousYearWeek) / amountPreviousYearWeek) * 100;
                             itemAdjustData.percentGrowth = Math.Round(itemAdjustData.percentGrowth.Value, 2);
@@ -580,20 +582,20 @@ namespace MarketData.Processes.Processes
                     rankAdjust += 1;
                 }
 
-                var brandAmountSale = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).GroupBy(e=>e.Key);
+                var brandAmountSale = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).GroupBy(e => e.Key);
                 Dictionary<string, decimal?> summaryBrandAmount = new Dictionary<string, decimal?>();
 
-                var listBrandCounterHaveValue = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).Where(e => e.Value.HasValue).GroupBy(k=>k.Key).Select(d=>d.Key);
-                
+                var listBrandCounterHaveValue = listAdjustDetailData.SelectMany(c => c.brandKeyInAmount).Where(e => e.Value.HasValue).GroupBy(k => k.Key).Select(d => d.Key);
+
                 foreach (var itemAdjustList in listAdjustDetailData)
                 {
-                    itemAdjustList.brandKeyInAmount = itemAdjustList.brandKeyInAmount.Where(c => listBrandCounterHaveValue.Contains(c.Key)).ToDictionary(c => c.Key,c=>c.Value) ;
+                    itemAdjustList.brandKeyInAmount = itemAdjustList.brandKeyInAmount.Where(c => listBrandCounterHaveValue.Contains(c.Key)).ToDictionary(c => c.Key, c => c.Value);
                 }
 
-                foreach(var itemGroupBrand in brandAmountSale)
+                foreach (var itemGroupBrand in brandAmountSale)
                 {
                     var summaryAmount = itemGroupBrand.Sum(c => c.Value.GetValueOrDefault());
-                    summaryBrandAmount.Add(itemGroupBrand.Key, summaryAmount);               
+                    summaryBrandAmount.Add(itemGroupBrand.Key, summaryAmount);
                 }
 
                 var departmentData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == adjustData.DepartmentStore_ID);
@@ -787,12 +789,12 @@ namespace MarketData.Processes.Processes
                         decimal? amountSaleValue = null;
                         int? rankValue = null;
 
-                        if(amountSale.Value != null)
+                        if (amountSale.Value != null)
                         {
                             amountSaleValue = amountSale.Value;
                         }
 
-                        if(rank.Value != null)
+                        if (rank.Value != null)
                         {
                             rankValue = int.Parse(rank.Value);
                         }

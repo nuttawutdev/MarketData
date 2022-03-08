@@ -469,18 +469,24 @@ namespace MarketData.Repositories.Repo
                    join g in _dbContext.TMBrandGroup
                        on e.Brand_Group_ID equals g.Brand_Group_ID
                        into joinGroup
-                   from groups in joinGroup.DefaultIfEmpty()
+                   from groupsD in joinGroup.DefaultIfEmpty()
+                   join s in _dbContext.TMBrandType
+                      on e.Brand_Type_ID equals s.Brand_Type_ID
+                      into joinBrandType
+                   from groups in joinBrandType.DefaultIfEmpty()
                    select new BrandData
                    {
+                       brandTypeID = e.Brand_Type_ID,
+                       brandTypeName = groups != null ? groups.Brand_Type_Name : "",
                        brandID = e.Brand_ID,
                        brandName = e.Brand_Name,
                        brandShortName = e.Brand_Short_Name,
-                       brandGroupName = groups != null ? groups.Brand_Group_Name : "",
+                       brandGroupName = groups != null ? groupsD.Brand_Group_Name : "",
                        universe = e.Universe,
                        active = e.Active_Flag,
                        color = e.Brand_Color,
                        lorealBrandRank = e.Loreal_Brand_Rank,
-                       isLorealBrand = groups != null ? groups.Is_Loreal_Brand : false
+                       isLorealBrand = groups != null ? groupsD.Is_Loreal_Brand : false
                    });
 
                 brandList = brandList.OrderBy(x => x.brandName).Where(c => c.isLorealBrand);
@@ -1093,7 +1099,7 @@ namespace MarketData.Repositories.Repo
             }
         }
 
-        public async Task<bool> SaveCounter(SaveCounterRequest request,Guid BrandID)
+        public async Task<bool> SaveCounter(SaveCounterRequest request, Guid BrandID)
         {
             try
             {

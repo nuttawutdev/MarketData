@@ -60,11 +60,11 @@ namespace MarketData.Controllers
             var userDetailSession = HttpContext.Session.GetString("userDetail");
             var userPermission = JsonSerializer.Deserialize<MarketData.Model.Response.User.GetUserDetailResponse>(userDetailSession);
 
-            if (userPermission.keyInData && !userPermission.approveData)
+            if (userPermission.keyInData && !userPermission.approveData && !userPermission.officeUser)
             {
                 return RedirectToAction("KeyinByStore", "KeyIn");
             }
-            else if(userPermission.approveData)
+            else if(userPermission.approveData || userPermission.officeUser)
             {
                 return RedirectToAction("KeyinByBrand", "KeyIn");
             }

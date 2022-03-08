@@ -592,7 +592,9 @@ namespace MarketData.Processes.Processes
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.brandID);
                         var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                        if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.alwayShow)
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                           // || itemCounter.alwayShow
+                            )
                         {
                             AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);

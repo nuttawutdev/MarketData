@@ -21,6 +21,8 @@ namespace MarketData.Model.Response.User
         public bool keyInData { get; set; }
         public bool approveData { get; set; }
         public bool viewReport { get; set; }
+        public bool officeUser { get; set; }
+        public Guid? brandOfficeID { get; set; }
         public List<UserCounterData> userCounter { get; set; }
         public List<DepartmentStoreData> departmentStore { get; set; }
         public List<BrandData> brand { get; set; }
