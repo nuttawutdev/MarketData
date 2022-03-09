@@ -401,6 +401,7 @@ namespace MarketData.Processes.Processes
                         brandSegmentID = brandData.Brand_Segment_ID,
                         color = brandData.Brand_Color,
                         active = brandData.Active_Flag,
+                        showInAdjust = brandData.FlagShowInAdjust.GetValueOrDefault(),
                         brandTypeID = brandData.Brand_Type_ID,
                         lorealBrandRank = brandData.Loreal_Brand_Rank,
                         universe = brandData.Universe

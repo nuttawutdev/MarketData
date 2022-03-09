@@ -21,5 +21,6 @@ namespace MarketData.Model.Data
         public bool isLorealBrand { get; set; }
         public int? lorealBrandRank { get; set; }
         public bool active { get; set; }
+        public bool showInAdjust { get; set; }
     }
 }

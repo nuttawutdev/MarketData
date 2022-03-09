@@ -416,6 +416,7 @@ namespace MarketData.Controllers
                 data.lorealBrandRank = response.lorealBrandRank;
                 data.universe = response.universe;
                 data.active = response.active;
+                data.showInAdjust = response.showInAdjust;
 
             }
 

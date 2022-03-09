@@ -99,7 +99,7 @@ namespace MarketData.Processes.Processes
                         brandStatus = new Dictionary<string, string>()
                     };
 
-                    onlyBrandLorel = onlyBrandLorel.Where(c => c.brandTypeName != "Fragrances");
+                    onlyBrandLorel = onlyBrandLorel.Where(c => c.showInAdjust == true);
 
                     foreach (var itemBrandLoreal in onlyBrandLorel)
                     {

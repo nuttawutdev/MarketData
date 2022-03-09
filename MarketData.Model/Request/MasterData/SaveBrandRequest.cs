@@ -20,6 +20,7 @@ namespace MarketData.Model.Request.MasterData
         public int? lorealBrandRank { get; set; }
         public string universe { get; set; }
         public bool active { get; set; }
+        public bool showInAdjust { get; set; }
         public string userID { get; set; }
         public int row { get; set; }
     }

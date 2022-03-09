@@ -307,7 +307,7 @@
             $("#blocker").show();
             var frmdata = getDataFromTable();
 
-            if (validate_Email_Display() && validate_Duplicate_Store(frmdata)) {
+            if (validate_Email_Display() && validate_Duplicate_Store(frmdata) && validate_OfficeUser()) {
 
                 $.ajax({
                     type: "POST",
@@ -554,6 +554,22 @@
             } else return 1;
         }
 
+        function validate_OfficeUser() {
+            console.log($('#brandOfficeList').val(), 'dd');
+            if ($("#flagOfficeUser").prop("checked")) {
+                if ($('#brandOfficeList').val() == "") {
+                    showWarningAlert('SelectBrand_Office');
+                    return 0;
+                }
+                else {
+                    return 1;
+                }
+            }
+            else {
+                return 1;
+            }
+        }
+
         function showWarningAlert(typeWarning) {
             var msg = '';
             switch (typeWarning) {
@@ -562,6 +578,9 @@
                     break;
                 case 'DuplicateStore':
                     msg = 'กรุณาตรวจสอบข้อมูล Department Store, Brand, Distribution Chanels ';
+                    break;
+                case 'SelectBrand_Office':
+                    msg = 'กรุณาเลือก Brand สำหรับ Office User';
                     break;
                 default:
             }

@@ -95,6 +95,19 @@
                 Active
             </label>
         </div>
+        <div class="form-group col-md-6 col-sm-6">
+            <label>
+                @if (Model.showInAdjust)
+                {
+                    <input value="" id="flagShowInAdjust" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagShowInAdjust" type="checkbox" data-toggle="toggle">
+                }
+                Show in adjust
+            </label>
+        </div>
 
     </div>
     <div class="modal-footer">

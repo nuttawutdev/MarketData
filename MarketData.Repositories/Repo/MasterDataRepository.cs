@@ -486,10 +486,11 @@ namespace MarketData.Repositories.Repo
                        active = e.Active_Flag,
                        color = e.Brand_Color,
                        lorealBrandRank = e.Loreal_Brand_Rank,
+                       showInAdjust = e.FlagShowInAdjust.GetValueOrDefault(),
                        isLorealBrand = groups != null ? groupsD.Is_Loreal_Brand : false
                    });
 
-                brandList = brandList.OrderBy(x => x.brandName).Where(c => c.isLorealBrand);
+                brandList = brandList.OrderBy(x => x.brandName);
                 return brandList.ToList();
 
             }
@@ -546,6 +547,7 @@ namespace MarketData.Repositories.Repo
                         Universe = request.universe,
                         Brand_Group_ID = request.brandGroupID,
                         Active_Flag = request.active,
+                        FlagShowInAdjust = request.showInAdjust,
                         Created_By = request.userID,
                         Created_Date = dateNow
                     };
@@ -567,6 +569,7 @@ namespace MarketData.Repositories.Repo
                         brandUpdate.Loreal_Brand_Rank = request.lorealBrandRank;
                         brandUpdate.Universe = request.universe;
                         brandUpdate.Active_Flag = request.active;
+                        brandUpdate.FlagShowInAdjust = request.showInAdjust;
                         brandUpdate.Updated_By = request.userID;
                         brandUpdate.Updated_Date = Utility.GetDateNowThai();
 
