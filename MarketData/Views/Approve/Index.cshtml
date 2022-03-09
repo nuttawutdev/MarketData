@@ -182,13 +182,29 @@
         if (localStorage.getItem('apprvSelectUniverse') != '') {
             $("#iduniverseList").val(localStorage.getItem('apprvSelectUniverse'));
         }
-       
+
         $("#statusList").val(localStorage.getItem('apprvSelectStatus'));
 
         var viewDataPermission = $('#viewDataPermission').val();
         var approveDataPermission = $('#approveDataPermission').val();
-        var page = 25;
-           
+        var lengthSelectCount = localStorage.getItem('apprvSelectShow');
+        var pageSelect = localStorage.getItem('apprvSelectPage');
+
+
+        if (localStorage.getItem('apprvSelectShow') == null) {
+            lengthSelectCount = 10;
+        }
+        else {
+            lengthSelectCount = parseInt(localStorage.getItem('apprvSelectShow'));
+        }
+
+        if (localStorage.getItem('apprvSelectPage') == null) {
+            pageSelect = 0;
+        }
+        else {
+            pageSelect = parseInt(localStorage.getItem('apprvSelectPage'));
+        }
+
         $("#tableData").one("preInit.dt", function () {
             $button = $('<button class="btn btn-primary btn-sm btnReresh" type="button" style="width: 100px!important;margin-top: -5px;margin-left: 5px;"><i class="ion-refresh text-white"></i> Refresh</button>');
             $("#tableData_filter label").append($button);
@@ -221,12 +237,17 @@
                     $("#yearList").change();
                     $("#iduniverseList").change();
                     $("#statusList").change();
+
                     return result.data;
 
                 }
             },
             "order": [],
-            "iDisplayLength": page,
+            "pageLength": lengthSelectCount,
+            "fnDrawCallback": function (oSettings) {
+                localStorage.setItem('apprvSelectPage', this.api().page.info().page);
+                localStorage.setItem('apprvSelectShow', this.api().page.info().length);
+            },
             "columns": [
                 { data: "approveKeyInID", title: "approveKeyInID", visible: false },
                 { data: "baKeyInID", title: "baKeyInID", visible: false },
@@ -270,9 +291,9 @@
             ]
         });
 
-        setTimeout(function () {
-            dataTable.page(1).draw('page');
-        }, 1000)
+            setTimeout(function () {
+                dataTable.page(pageSelect).draw(false);
+            }, 500)
 
         $('.btnReresh').on('click', function (e) {
             $("#blocker").show();
