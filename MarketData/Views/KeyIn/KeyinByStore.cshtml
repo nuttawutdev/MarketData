@@ -4,6 +4,41 @@
     Html.RenderPartial("_WarningModal");
 }
 
+<style>
+    table {
+        width: 100%;
+        table-layout: fixed;
+        margin: auto;
+    }
+
+    .table thead th {
+        width: 100px !important;
+    }
+
+    .table td {
+    }
+
+    thead, tfoot {
+        background: #f9f9f9;
+        display: table;
+        width: 100%;
+        /*width: calc(100% - 18px);*/
+    }
+
+    tbody {
+        height: 400px;
+        overflow: auto;
+        overflow-x: hidden;
+        display: block;
+        width: 100%;
+    }
+
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+</style>
 
 <h3>
     @ViewData["Title"]
@@ -158,7 +193,7 @@
 </div>
 
 <div class="container-xl">
-    <table id="tableData" class="display" width="100%"></table>
+    <table id="tableData" class="table  table-hover display" width="100%"></table>
 </div>
 
 <script type="text/javascript">
@@ -172,6 +207,24 @@
 
         });
 
+        var lengthSelectCount = localStorage.getItem('keyinSelectShow');
+        var pageSelect = localStorage.getItem('keyinSelectPage');
+
+
+        if (localStorage.getItem('keyinSelectShow') == null) {
+            lengthSelectCount = 10;
+        }
+        else {
+            lengthSelectCount = parseInt(localStorage.getItem('keyinSelectShow'));
+        }
+
+        if (localStorage.getItem('keyinSelectPage') == null) {
+            pageSelect = 0;
+        }
+        else {
+            pageSelect = parseInt(localStorage.getItem('keyinSelectPage'));
+        }
+
         var dataTable=  $('#tableData').DataTable({
             "ajax": {
                 type: "POST",
@@ -182,6 +235,11 @@
                 }
             },
             "order": [],
+            "pageLength": lengthSelectCount,
+            "fnDrawCallback": function (oSettings) {
+                localStorage.setItem('keyinSelectPage', this.api().page.info().page);
+                localStorage.setItem('keyinSelectShow', this.api().page.info().length);
+            },
             "columns": [
 
                 { data: "keyInID", title: "keyInID", visible: false },
@@ -218,6 +276,9 @@
             ]
         });
 
+        setTimeout(function () {
+            dataTable.page(pageSelect).draw(false);
+        }, 500)
 
         $('.btnReresh').on('click', function (e) {
             $("#blocker").show();
