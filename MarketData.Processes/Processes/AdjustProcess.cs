@@ -237,7 +237,7 @@ namespace MarketData.Processes.Processes
                        && e.Active_Flag && e.Delete_Flag != true);
 
                 var allBrandByCounterData = counterList.GroupBy(e => e.Brand_ID).Select(c => c.Key);
-                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounterData.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe && e.active);
+                var onlyBrandLorel = repository.masterData.GetBrandListLoreal(c => allBrandByCounterData.Contains(c.Brand_ID)).Where(e => e.universe == adjustData.Universe && e.active && e.showInAdjust);
                 var onlyBrandLorealID = onlyBrandLorel.Select(e => e.brandID);
 
                 if (adjustData.Week != "4")
@@ -257,7 +257,9 @@ namespace MarketData.Processes.Processes
                         {
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                                //|| itemCounter.Alway_Show_Current_Year == true
+                                )
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }

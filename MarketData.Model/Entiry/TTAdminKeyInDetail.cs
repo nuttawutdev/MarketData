@@ -9,7 +9,7 @@ namespace MarketData.Model.Entiry
     {
         [Key]
         public Guid ID { get; set; }
-        public Guid Counter_ID { get; set; }
+        public Guid? Counter_ID { get; set; }
         public Guid DistributionChannel_ID { get; set; }
         public Guid RetailerGroup_ID { get; set; }
         public Guid DepartmentStore_ID { get; set; }

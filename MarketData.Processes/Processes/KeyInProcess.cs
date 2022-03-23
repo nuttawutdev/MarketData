@@ -264,7 +264,9 @@ namespace MarketData.Processes.Processes
                                             var brandData = repository.masterData.FindBrandBy(c => c.Brand_ID == itemCounter.Brand_ID);
                                             var brandTypeData = repository.masterData.FindBrandTypeBy(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
+                                            if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                                                //|| itemCounter.Alway_Show_Current_Year == true
+                                                )
                                             {
                                                 listCounterFilterFragrances.Add(itemCounter);
                                             }
@@ -352,7 +354,9 @@ namespace MarketData.Processes.Processes
                             var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                                //|| itemCounter.Alway_Show_Current_Year == true
+                                )
                             {
                                 listCounterFilterFragrances.Add(itemCounter);
                             }
@@ -882,7 +886,9 @@ namespace MarketData.Processes.Processes
                         var brandData = brandDataList.FirstOrDefault(c => c.Brand_ID == itemCounter.Brand_ID);
                         var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                        if (brandTypeData?.Brand_Type_Name != "Fragrances" || itemCounter.Alway_Show_Current_Year == true)
+                        if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                            //|| itemCounter.Alway_Show_Current_Year == true
+                            )
                         {
                             listCounterFilterFragrances.Add(itemCounter);
                         }

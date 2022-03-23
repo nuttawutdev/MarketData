@@ -499,6 +499,7 @@
 
                 })
 
+            var brandOfficeID = $('#brandOfficeList').val();
             var frmdata = {
                 userID: model.userID,
                 email: $('#Email').val(),
@@ -516,7 +517,7 @@
                 approveData: $("#flagApproveData").prop("checked"),
                 viewReport: $("#flagViewReport").prop("checked"),
                 actionBy: null,
-                brandOfficeID: $('#brandOfficeList').val(),
+                brandOfficeID: brandOfficeID != "" ? brandOfficeID : null,
                 userCounter: memberDetails
 
             };
