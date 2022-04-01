@@ -390,6 +390,11 @@ namespace MarketData.Processes.Processes
 
                 if (brandRankingData.Any())
                 {
+                    if (request.startWeek != "4")
+                    {
+                        brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                    }
+
                     var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
 
                     groupStoreStartYear = brandRankingStartYear.GroupBy(
@@ -462,6 +467,12 @@ namespace MarketData.Processes.Processes
                        || !request.departmentStoreList.Any()
                        || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
 
+                    if (request.startWeek != "4")
+                    {
+                        brandRankingDataOlpCompare = brandRankingDataOlpCompare.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                    }
+
+
                     groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
                     x => new
                     {
@@ -496,6 +507,11 @@ namespace MarketData.Processes.Processes
                    || !request.departmentStoreList.Any()
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 groupStoreStartYear = brandRankingData.GroupBy(
                     x => new
@@ -544,6 +560,11 @@ namespace MarketData.Processes.Processes
                    && storeFilter.Contains(c.Store_Id)
                    && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
 
+                if (request.startWeek != "4")
+                {
+                    brandRankingCompareData = brandRankingCompareData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
+
                 groupStoreCompareYear = brandRankingCompareData.GroupBy(
                    x => new
                    {
@@ -572,6 +593,11 @@ namespace MarketData.Processes.Processes
                    && (request.universe == null || c.Universe == request.universe)
                    && storeFilter.Contains(c.Store_Id)
                    && (c.Time_Keyin >= timeFilterOldCompareStart && c.Time_Keyin <= timeFilterOldCompareEnd));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingDataOlpCompare = brandRankingDataOlpCompare.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 groupStoreCompareOldYear = brandRankingDataOlpCompare.Where(c => storeFilter.Contains(c.Store_Id)).GroupBy(
                   x => new
@@ -615,6 +641,11 @@ namespace MarketData.Processes.Processes
                     && (request.departmentStoreList == null
                     || !request.departmentStoreList.Any()
                     || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 if (request.lorealStore)
                 {
@@ -681,6 +712,11 @@ namespace MarketData.Processes.Processes
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
 
+                if (request.startWeek != "4")
+                {
+                    brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
+
                 if (request.lorealStore)
                 {
                     brandRankingData = brandRankingData.Where(c => lorealStore.Contains(c.Store_Id)).ToList();
@@ -716,6 +752,11 @@ namespace MarketData.Processes.Processes
                    || !request.departmentStoreList.Any()
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingCompareData = brandRankingCompareData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 if (!request.lorealStore)
                 {
@@ -764,6 +805,11 @@ namespace MarketData.Processes.Processes
 
                 if (brandRankingData.Any())
                 {
+                    if (request.startWeek != "4")
+                    {
+                        brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                    }
+
                     groupStoreStartYear = brandRankingData.GroupBy(
                         x => new
                         {
@@ -796,6 +842,11 @@ namespace MarketData.Processes.Processes
                    && c.Brand_ID == request.brandID
                    && c.Sales_Week == request.startWeek
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 groupStoreStartYear = brandRankingData.GroupBy(
                          x => new
@@ -833,6 +884,11 @@ namespace MarketData.Processes.Processes
                     && (request.departmentStoreList == null
                     || !request.departmentStoreList.Any()
                     || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))).OrderBy(s => s.Store_Name).ToList();
+
+                if (request.startWeek != "4")
+                {
+                    data = data.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
             }
             // YTD
             else
@@ -848,6 +904,11 @@ namespace MarketData.Processes.Processes
                    && (request.universe == null || c.Universe == request.universe)
                    && c.Sales_Week == request.startWeek
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd)).OrderBy(s => s.Store_Name).ToList();
+
+                if (request.startWeek != "4")
+                {
+                    data = data.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
             }
 
             return data;
@@ -876,6 +937,11 @@ namespace MarketData.Processes.Processes
 
                 if (brandRankingData.Any())
                 {
+                    if (request.startWeek != "4")
+                    {
+                        brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                    }
+
                     var brandRankingStartYear = brandRankingData.Where(w => w.Sales_Year == request.startYear);
 
                     groupMonthStartYear = brandRankingStartYear.GroupBy(
@@ -924,6 +990,11 @@ namespace MarketData.Processes.Processes
                        || !request.departmentStoreList.Any()
                        || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id))));
 
+                    if (request.startWeek != "4")
+                    {
+                        brandRankingDataOlpCompare = brandRankingDataOlpCompare.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                    }
+
                     groupMonthCompareOldYear = brandRankingDataOlpCompare.GroupBy(
                       x => new
                       {
@@ -956,6 +1027,11 @@ namespace MarketData.Processes.Processes
                    && c.Sales_Week == request.startWeek
                    && (c.Time_Keyin >= timeFilterStart && c.Time_Keyin <= timeFilterEnd));
 
+                if (request.startWeek != "4")
+                {
+                    brandRankingData = brandRankingData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
+
                 groupMonthStartYear = brandRankingData.GroupBy(
                     x => new
                     {
@@ -984,6 +1060,11 @@ namespace MarketData.Processes.Processes
                    && c.Sales_Week == request.startWeek
                    && (c.Time_Keyin >= timeFilterCompareStart && c.Time_Keyin <= timeFilterCompareEnd));
 
+                if (request.startWeek != "4")
+                {
+                    brandRankingCompareData = brandRankingCompareData.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
+
                 groupMonthCompareYear = brandRankingCompareData.GroupBy(
                    x => new
                    {
@@ -1011,6 +1092,11 @@ namespace MarketData.Processes.Processes
                    || (request.departmentStoreList != null && request.departmentStoreList.Contains(c.Store_Id)))
                    && c.Sales_Week == request.startWeek
                    && (c.Time_Keyin >= timeFilterOldCompareStart && c.Time_Keyin <= timeFilterOldCompareEnd));
+
+                if (request.startWeek != "4")
+                {
+                    brandRankingDataOlpCompare = brandRankingDataOlpCompare.Where(c => c.Brand_Type_Name != "Fragrances").ToList();
+                }
 
                 groupMonthCompareOldYear = brandRankingDataOlpCompare.GroupBy(
                   x => new
@@ -2819,6 +2905,44 @@ namespace MarketData.Processes.Processes
 
                         worksheet.Cell(rowData, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
+                        int countStoreBrandCompare = 0;
+                        int countStoreBrand = 0;
+
+
+                        if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
+                        {
+                            if (!addFrangance)
+                            {
+                                addFrangance = true;
+                                if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                {
+                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                }
+                                else
+                                {
+                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                }
+
+                                totalStore += countStoreBrand;
+
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrWhiteSpace(request.endWeek))
+                            {
+                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                            }
+                            else
+                            {
+                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                            }
+
+                            totalStore += countStoreBrand;
+                        }
+
+
+
                         // Check Brand Fragance
                         if (brandCompare != null)
                         {
@@ -2827,17 +2951,35 @@ namespace MarketData.Processes.Processes
                                 if (!addFranganceCompare)
                                 {
                                     addFranganceCompare = true;
-                                    totalStoreCompare += brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count();
+                                    if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                    {
+                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                    }
+                                    else
+                                    {
+                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                    }
+                                    totalStoreCompare += countStoreBrandCompare;
+
                                 }
                             }
                             else
                             {
-                                totalStoreCompare += brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count();
+                                if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                {
+                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                }
+                                else
+                                {
+                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                }
+                                totalStoreCompare += countStoreBrandCompare;
+
                             }
                         }
 
                         worksheet.Cell(rowData, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                        worksheet.Cell(rowData, 5).SetValue(brandCompare != null ? brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count() : 0);
+                        worksheet.Cell(rowData, 5).SetValue(countStoreBrandCompare);
                         worksheet.Cell(rowData, 5).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
@@ -2867,24 +3009,12 @@ namespace MarketData.Processes.Processes
 
                         worksheet.Cell(rowData, 9).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                        worksheet.Cell(rowData, 10).SetValue(itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count());
+                        worksheet.Cell(rowData, 10).SetValue(countStoreBrand);
                         worksheet.Cell(rowData, 10).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 10).DataType = XLDataType.Number;
                         worksheet.Cell(rowData, 10).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
 
-                        if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
-                        {
-                            if (!addFrangance)
-                            {
-                                addFrangance = true;
-                                totalStore += itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count();
-                            }
-                        }
-                        else
-                        {
-                            totalStore += itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count();
-                        }
 
                     }
                     else if (request.saleType == "Net")
@@ -2902,6 +3032,39 @@ namespace MarketData.Processes.Processes
 
                         worksheet.Cell(rowData, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
+                        int countStoreBrandCompare = 0;
+                        int countStoreBrand = 0;
+
+                        if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
+                        {
+                            if (!addFrangance)
+                            {
+                                addFrangance = true;
+                                if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                {
+                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                }
+                                else
+                                {
+                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                }
+                                totalStore += countStoreBrand;
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrWhiteSpace(request.endWeek))
+                            {
+                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                            }
+                            else
+                            {
+                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                            }
+                            totalStore += countStoreBrand;
+                        }
+
+
                         // Check Brand Fragance
                         if (brandCompare != null)
                         {
@@ -2910,17 +3073,33 @@ namespace MarketData.Processes.Processes
                                 if (!addFranganceCompare)
                                 {
                                     addFranganceCompare = true;
-                                    totalStoreCompare += brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count();
+                                    if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                    {
+                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                    }
+                                    else
+                                    {
+                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                    }
+                                    totalStoreCompare += countStoreBrandCompare;
                                 }
                             }
                             else
                             {
-                                totalStoreCompare += brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count();
+                                if (!string.IsNullOrWhiteSpace(request.endWeek))
+                                {
+                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                                }
+                                else
+                                {
+                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                                }
+                                totalStoreCompare += countStoreBrandCompare;
                             }
                         }
 
                         worksheet.Cell(rowData, 5).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                        worksheet.Cell(rowData, 5).SetValue(brandCompare != null ? brandCompare.storeDetail.GroupBy(c => c.Store_Id).Count() : 0);
+                        worksheet.Cell(rowData, 5).SetValue(countStoreBrandCompare);
                         worksheet.Cell(rowData, 5).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
@@ -2948,18 +3127,7 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
                         worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
-                        if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
-                        {
-                            if (!addFrangance)
-                            {
-                                addFrangance = true;
-                                totalStore += itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count();
-                            }
-                        }
-                        else
-                        {
-                            totalStore += itemGroup.storeDetail.GroupBy(c => c.Store_Id).Count();
-                        }
+
                     }
                     else
                     {
@@ -3058,7 +3226,7 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 10).SetValue(totalStore);
                     worksheet.Cell(rowData, 10).Style.NumberFormat.Format = currencyFormat;
                 }
-                else if(request.saleType == "Net")
+                else if (request.saleType == "Net")
                 {
                     worksheet.Cell(rowData, 3).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                     worksheet.Cell(rowData, 3).SetValue(sumTotalCompare);
