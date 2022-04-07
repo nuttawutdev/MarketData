@@ -187,7 +187,7 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-
+        var messageError = "";
         $("#container").removeClass("container");
         $('#btnSubmit').hide();
 
@@ -561,86 +561,165 @@
         };
 
         function validate_AmountSale_Rank(data) {
-            var isNullAmount = data.data.some(function (i) {
-                return (i.amountSale == null && i.rank != null) ||
-                    (i.amountSale != null && i.rank == null);
-            })
-            if (isNullAmount) {
-                showWarningAlert('NullAmount');
-                return 0;
-            } else return 1;
+            for (var i = 0; i < data.data.length; i++) {
+                var detailData = data.data[i];
+                if ((detailData.amountSale == 0 && detailData.rank != null) ||
+                    (detailData.amountSale != 0 && detailData.rank == null)) {
+                    messageError = "*Brand " + detailData.brandName + " " + detailData.departmentStoreName+"*";
+                    showWarningAlert('NullAmount');
+                    return 0;
+                }
+            }
+
+            return 1;
+            //var isNullAmount = data.data.some(function (i) {
+            //    return (i.amountSale == null && i.rank != null) ||
+            //        (i.amountSale != null && i.rank == null);
+            //})
+            //if (isNullAmount) {
+            //    showWarningAlert('NullAmount');
+            //    return 0;
+            //} else return 1;
         }
 
         function validate_Sum_Percent(data) {
 
-            var validateData = data.data.some(function (i) {
-                var sk = i.sk != null ? parseFloat(i.sk) : 0;
-                var mu = i.mu != null ? parseFloat(i.mu) : 0;
-                var fg = i.fg != null ? parseFloat(i.fg) : 0;
-                var ot = i.ot != null ? parseFloat(i.ot) : 0;
+            for (var i = 0; i < data.data.length; i++) {
+                var detailData = data.data[i];
+                if (detailData.sk != null || detailData.mu != null || detailData.fg != null || detailData.ot != null) {
+                    var sk = detailData.sk != null ? parseFloat(detailData.sk) : 0;
+                    var mu = detailData.mu != null ? parseFloat(detailData.mu) : 0;
+                    var fg = detailData.fg != null ? parseFloat(detailData.fg) : 0;
+                    var ot = detailData.ot != null ? parseFloat(detailData.ot) : 0;
 
-                var sum = sk + mu + fg + ot;
-                return sum != 0 && sum != 100;
-            })
-            if (validateData) {
-                showWarningAlert('100Percent');
-                return 0;
-            } else return 1;
+                    var sum = sk + mu + fg + ot;
+                    if (sum != 0 && sum != 100) {
+                        messageError = "*Brand " + detailData.brandName + " " + detailData.departmentStoreName + "*";
+                        showWarningAlert('100Percent');
+                        return 0;
+                    }
+                }
+            }
+
+            return 1;
+
+            //var validateData = data.data.some(function (i) {
+            //    var sk = i.sk != null ? parseFloat(i.sk) : 0;
+            //    var mu = i.mu != null ? parseFloat(i.mu) : 0;
+            //    var fg = i.fg != null ? parseFloat(i.fg) : 0;
+            //    var ot = i.ot != null ? parseFloat(i.ot) : 0;
+
+            //    var sum = sk + mu + fg + ot;
+            //    return sum != 0 && sum != 100;
+            //})
+            //if (validateData) {
+            //    showWarningAlert('100Percent');
+            //    return 0;
+            //} else return 1;
         }
 
         function validate_WholeSales_AmountSales(data) {
 
-            var validateData = data.data.some(function (i) {
-                var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
-                var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
-                return amountSale < wholeSale;
-            })
+            var dataHaveValue = data.data.filter(c => c.amountSale > 0 && c.wholeSale > 0);
+            for (var i = 0; i < dataHaveValue.length; i++) {
+                var dataValidate = dataHaveValue[i];
+                if (dataValidate.amountSale < dataValidate.wholeSale) {
+                    messageError = "*Brand " + dataValidate.brandName + " " + dataValidate.departmentStoreName + "*";
+                    showWarningAlert('NullWholeSales_AmountSales');
+                    return 0;
+                }
+            }
 
-            if (validateData) {
-                showWarningAlert('NullWholeSales_AmountSales');
-                return 0;
-            } else return 1;
+            return 1;
+
+            //var validateData = data.data.some(function (i) {
+            //    var wholeSale = i.wholeSale != null && i.wholeSale != '' ? parseFloat(i.wholeSale) : 0;
+            //    var amountSale = i.amountSale != null && i.amountSale != '' ? parseFloat(i.amountSale) : 0;
+            //    return amountSale < wholeSale;
+            //})
+
+            //if (validateData) {
+            //    showWarningAlert('NullWholeSales_AmountSales');
+            //    return 0;
+            //} else return 1;
         }
 
         function validate_Rank_AmountSales(data) {
-
             var number = 0;
             var duplicateRank = false;
-            for (var i = 0; i < data.data.length; i++) {
-
-                if (data.data[i].rank != null && data.data[i].rank != '' && number == data.data[i].rank) {
+            var sortRank = data.data.filter(c => c.rank != null).sort((a, b) => (a.rank > b.rank) ? 1 : -1)
+            for (var i = 0; i < sortRank.length; i++) {
+                if (sortRank[i].rank != null && sortRank[i].rank != '' && number == sortRank[i].rank) {
                     duplicateRank = true;
+                    var rankDuplicate = sortRank.find(c => c.rank == number);
+                    messageError = "*Brand " + sortRank[i].brandName + " " + sortRank[i].departmentStoreName + " และ Brand " + rankDuplicate.brandName + " " + rankDuplicate.departmentStoreName + "*";
                     break;
                 } else {
-                    number = data.data[i].rank
+                    number = sortRank[i].rank
                 }
             }
 
             if (duplicateRank) {
-                showWarningAlert('DuplicateRank');
+                showWarningAlert('DuplicateRank', messageError);
                 return 0;
             }
 
-            var sortAmount = data.data.sort((a, b) => (a.amountSale > b.amountSale) ? -1 : 1)
-
             var inCorrectAmountRank = false;
-            var sort = 1;
-            for (var i = 0; i < sortAmount.length; i++) {
-                if (sortAmount[i].amountSale != null && sortAmount[i].rank != null) {
-                    if (sortAmount[i].rank == sort) {
-                        sort++;
-                    } else {
-                        inCorrectAmountRank = true;
-                        break;
+            for (var i = 0; i < sortRank.length; i++) {
+                if (sortRank[i].amountSale != null && sortRank[i].rank != null) {
+                    if (sortRank[i + 1] != null) {
+                        if (sortRank[i].amountSale > sortRank[i + 1].amountSale) {
+                        } else {
+                            messageError = "ค่า Amount Sales ของ Brand " + sortRank[i].brandName + " " + sortRank[i].departmentStoreName + " ควรมากกว่าค่า Amount Sales ของ Brand " + sortRank[i + 1].brandName + " " + sortRank[i+1].departmentStoreName;
+                            inCorrectAmountRank = true;
+                            break;
+                        }
                     }
                 }
             }
             if (inCorrectAmountRank) {
-                showWarningAlert('IncorrectAmountRank');
+                showWarningAlert('IncorrectAmountRank', messageError);
                 return 0;
             } else {
                 return 1;
             }
+            //var number = 0;
+            //var duplicateRank = false;
+            //for (var i = 0; i < data.data.length; i++) {
+
+            //    if (data.data[i].rank != null && data.data[i].rank != '' && number == data.data[i].rank) {
+            //        duplicateRank = true;
+            //        break;
+            //    } else {
+            //        number = data.data[i].rank
+            //    }
+            //}
+
+            //if (duplicateRank) {
+            //    showWarningAlert('DuplicateRank');
+            //    return 0;
+            //}
+
+            //var sortAmount = data.data.sort((a, b) => (a.amountSale > b.amountSale) ? -1 : 1)
+
+            //var inCorrectAmountRank = false;
+            //var sort = 1;
+            //for (var i = 0; i < sortAmount.length; i++) {
+            //    if (sortAmount[i].amountSale != null && sortAmount[i].rank != null) {
+            //        if (sortAmount[i].rank == sort) {
+            //            sort++;
+            //        } else {
+            //            inCorrectAmountRank = true;
+            //            break;
+            //        }
+            //    }
+            //}
+            //if (inCorrectAmountRank) {
+            //    showWarningAlert('IncorrectAmountRank');
+            //    return 0;
+            //} else {
+            //    return 1;
+            //}
 
         }
 
@@ -669,8 +748,8 @@
             $('#warningModal').modal('show');
 
             $('#myModalWarningResult').text(msg);
-
-
+            $('#myModalWarningMessage').text(messageError);
+            messageError = "";
         }
 
         $('#channelList').on('change', function (e) {

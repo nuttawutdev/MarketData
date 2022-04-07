@@ -2908,73 +2908,52 @@ namespace MarketData.Processes.Processes
                         int countStoreBrandCompare = 0;
                         int countStoreBrand = 0;
 
+                        if (!string.IsNullOrWhiteSpace(request.endWeek))
+                        {
+                            countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                        }
+                        else
+                        {
+                            countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                        }
 
                         if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
                         {
                             if (!addFrangance)
                             {
                                 addFrangance = true;
-                                if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                {
-                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                }
-                                else
-                                {
-                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                }
 
                                 totalStore += countStoreBrand;
-
                             }
                         }
                         else
                         {
-                            if (!string.IsNullOrWhiteSpace(request.endWeek))
-                            {
-                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                            }
-                            else
-                            {
-                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                            }
-
                             totalStore += countStoreBrand;
                         }
-
-
 
                         // Check Brand Fragance
                         if (brandCompare != null)
                         {
+                            if (!string.IsNullOrWhiteSpace(request.endWeek))
+                            {
+                                countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                            }
+                            else
+                            {
+                                countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                            }
+
                             if (brandFragrances.Select(e => e.Brand_ID).Contains(brandCompare.brandID))
                             {
                                 if (!addFranganceCompare)
                                 {
                                     addFranganceCompare = true;
-                                    if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                    {
-                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                    }
-                                    else
-                                    {
-                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                    }
                                     totalStoreCompare += countStoreBrandCompare;
-
                                 }
                             }
                             else
                             {
-                                if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                {
-                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                }
-                                else
-                                {
-                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Amount_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                }
                                 totalStoreCompare += countStoreBrandCompare;
-
                             }
                         }
 
@@ -3035,32 +3014,25 @@ namespace MarketData.Processes.Processes
                         int countStoreBrandCompare = 0;
                         int countStoreBrand = 0;
 
+                        if (!string.IsNullOrWhiteSpace(request.endWeek))
+                        {
+                            countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                        }
+                        else
+                        {
+                            countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                        }
+
                         if (brandFragrances.Select(e => e.Brand_ID).Contains(itemGroup.brandID))
                         {
                             if (!addFrangance)
                             {
                                 addFrangance = true;
-                                if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                {
-                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                }
-                                else
-                                {
-                                    countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                }
                                 totalStore += countStoreBrand;
                             }
                         }
                         else
                         {
-                            if (!string.IsNullOrWhiteSpace(request.endWeek))
-                            {
-                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                            }
-                            else
-                            {
-                                countStoreBrand = itemGroup.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                            }
                             totalStore += countStoreBrand;
                         }
 
@@ -3068,32 +3040,25 @@ namespace MarketData.Processes.Processes
                         // Check Brand Fragance
                         if (brandCompare != null)
                         {
+                            if (!string.IsNullOrWhiteSpace(request.endWeek))
+                            {
+                                countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
+                            }
+                            else
+                            {
+                                countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
+                            }
+
                             if (brandFragrances.Select(e => e.Brand_ID).Contains(brandCompare.brandID))
                             {
                                 if (!addFranganceCompare)
                                 {
                                     addFranganceCompare = true;
-                                    if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                    {
-                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                    }
-                                    else
-                                    {
-                                        countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                    }
                                     totalStoreCompare += countStoreBrandCompare;
                                 }
                             }
                             else
                             {
-                                if (!string.IsNullOrWhiteSpace(request.endWeek))
-                                {
-                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0 && e.Sales_Month == request.endMonth).GroupBy(c => c.Store_Id).Count();
-                                }
-                                else
-                                {
-                                    countStoreBrandCompare = brandCompare.storeDetail.Where(e => e.Net_Sales > 0).GroupBy(c => c.Store_Id).Count();
-                                }
                                 totalStoreCompare += countStoreBrandCompare;
                             }
                         }
