@@ -46,6 +46,18 @@
     <None Update="EmailTemplateResetPassword.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TemplateImportData\ImportBrand.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TemplateImportData\ImportCounter.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TemplateImportData\ImportDepartmentStore.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TemplateImportData\ImportUser.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Views\Email\EmailTemplateConfirmRegister.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

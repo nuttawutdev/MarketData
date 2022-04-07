@@ -416,34 +416,16 @@ namespace MarketData.Controllers
             }
         }
 
-        public async Task<IActionResult> Test()
+        [HttpGet]
+        public ActionResult DownloadUserTemplate()
         {
-            //ChangePasswordRequest internalRequest = new ChangePasswordRequest
-            //{
-            //    urlID = new Guid("c3f34114-3777-442d-9f0e-4fc4194074c2"),
-            //    userID = new Guid("3B1E4B7D-F75D-4A27-A707-8676F112814D"),
-            //    password = "1234"
-            //};
-
-            //var response = await process.user.ChangePasssword(internalRequest);
-
-            //var reset = process.user.ResetPassword("nuttawut.ppb@gmail.com", $"{Request.Scheme}://{Request.Host.Value}");
-            //SaveUserDataRequest request = new SaveUserDataRequest
-            //{
-            //    email = "nuttawut.ppb@gmail.com",
-            //    firstName = "Nutt",
-            //    lastName = "Pool",
-            //    displayName = "PPB",
-            //    actionBy = Guid.NewGuid(),
-            //    active = false,
-            //    approveData = true
-            //};
-
-            //var saceUser = process.user.SaveUserData(request, $"{Request.Scheme}://{Request.Host.Value}");
-
-            //var resendWelcome = process.user.ResendWelcomeEmail(new Guid("3B1E4B7D-F75D-4A27-A707-8676F112814D"), $"{Request.Scheme}://{Request.Host.Value}");
-
-            return View();
+            var path = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
+            string fullPath = path + @"\TemplateImportData\ImportUser.xlsx";
+            byte[] byteArray = System.IO.File.ReadAllBytes(fullPath);
+            return File(
+                    byteArray,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"ImportUser.xlsx");
         }
     }
 }

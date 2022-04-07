@@ -453,6 +453,41 @@ namespace MarketData.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult DownloadBrandTemplate()
+        {
+            var path = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
+            string fullPath = path + @"\TemplateImportData\ImportBrand.xlsx";
+            byte[] byteArray = System.IO.File.ReadAllBytes(fullPath);
+            return File(
+                    byteArray,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"ImportBrand.xlsx");
+        }
+
+        [HttpGet]
+        public ActionResult DownloadCounterTemplate()
+        {
+            var path = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
+            string fullPath = path + @"\TemplateImportData\ImportCounter.xlsx";
+            byte[] byteArray = System.IO.File.ReadAllBytes(fullPath);
+            return File(
+                    byteArray,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"ImportCounter.xlsx");
+        }
+
+        [HttpGet]
+        public ActionResult DownloadStoreTemplate()
+        {
+            var path = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
+            string fullPath = path + @"\TemplateImportData\ImportDepartmentStore.xlsx";
+            byte[] byteArray = System.IO.File.ReadAllBytes(fullPath);
+            return File(
+                    byteArray,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"ImportDepartmentStore.xlsx");
+        }
         #endregion
 
         #region BrandType Function

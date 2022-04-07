@@ -69,6 +69,7 @@
 
     <hr />
 
+   
     <div style="padding-bottom:10px;">
         <div class="row">
             <div class="col text-end d-flex justify-content-end align-items-center">
@@ -80,11 +81,11 @@
                 </select>
                 @if (editMaster)
                 {
-                    <form id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
+                    <form style="margin-top:-15px" id="uploadFile" action="@Url.Action("ImportBrand", "MasterData")" method="post"
                           enctype="multipart/form-data">
                         <div class="filter-group ">
+                            @Html.ActionLink("Download Template", "DownloadBrandTemplate", "MasterData")
                             <div class="custom-file-upload" style="margin-top: 6px; height: 35px;">
-
                                 <label for="file-upload" class="custom-file-upload1">
                                     <i class="ion-android-document"></i> Import by Excel
                                 </label>
