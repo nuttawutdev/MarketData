@@ -66,7 +66,7 @@ namespace MarketData.Processes.Processes
                 {
                     var adjustStatusData = listAdjustData.FirstOrDefault(
                         c => c.DistributionChannel_ID == itemDepartment.distributionChannelID
-                        && c.RetailerGroup_ID == itemDepartment.retailerGroupID
+                        //&& c.RetailerGroup_ID == itemDepartment.retailerGroupID
                         && c.DepartmentStore_ID == itemDepartment.departmentStoreID);
 
                     string statusName = string.Empty;
@@ -300,7 +300,7 @@ namespace MarketData.Processes.Processes
                     && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
                     && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
                     && c.Universe == adjustData.Universe
-                    && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
+                    //&& c.RetailerGroup_ID == adjustData.RetailerGroup_ID
                     && c.Status_ID == adjustStatusAdjusted.ID);
 
                 var adjustDataPreviousYear = repository.adjust.FindAdjustDataBy(
@@ -310,7 +310,7 @@ namespace MarketData.Processes.Processes
                    && c.DistributionChannel_ID == adjustData.DistributionChannel_ID
                    && c.DepartmentStore_ID == adjustData.DepartmentStore_ID
                    && c.Universe == adjustData.Universe
-                   && c.RetailerGroup_ID == adjustData.RetailerGroup_ID
+                   //&& c.RetailerGroup_ID == adjustData.RetailerGroup_ID
                    && c.Status_ID == adjustStatusAdjusted.ID);
 
                 var baKeyInIDApprove = baKeyInDataApprove.Select(t => t.ID);
@@ -655,7 +655,7 @@ namespace MarketData.Processes.Processes
                 var adjustData = repository.adjust.FindAdjustDataBy(
                     c => c.DistributionChannel_ID == request.distributionChannelID
                     && c.DepartmentStore_ID == request.departmentStoreID
-                    && c.RetailerGroup_ID == request.retailerGroupID
+                    //&& c.RetailerGroup_ID == request.retailerGroupID
                     && c.Year == request.year
                     && c.Month == request.month
                     && c.Week == request.week

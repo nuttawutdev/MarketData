@@ -1005,7 +1005,7 @@ namespace MarketData.Processes.Processes
                 htmlBody = htmlBody.Replace("TXTPASSWORD", passwordUser);
                 htmlBody = htmlBody.Replace("linkRegister", url);
                 MailMessage m = new MailMessage();
-                m.From = new MailAddress("developernuttawut@gmail", "Admin Market Data");
+                m.From = new MailAddress("market_data01@outlook.com", "Admin Market Data");
                 m.To.Add(emailTo);
                 m.Subject = "Market Data Confirm email​";
                 m.Body = htmlBody;// $"{url} {passwordUser}";
@@ -1015,7 +1015,7 @@ namespace MarketData.Processes.Processes
                 {
                     smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = 587;
+                    smtp.Port = 25;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);
@@ -1044,7 +1044,7 @@ namespace MarketData.Processes.Processes
 
                 htmlBody = htmlBody.Replace("linkChangePassword", url);
                 MailMessage m = new MailMessage();
-                m.From = new MailAddress("developernuttawut@gmail", "Admin Market Data");
+                m.From = new MailAddress("market_data01@outlook.com", "Admin Market Data");
                 m.To.Add(emailTo);
                 m.Subject = "Market Data Reset Password​";
                 m.Body = htmlBody;
@@ -1054,7 +1054,7 @@ namespace MarketData.Processes.Processes
                 {
                     smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = 587;
+                    smtp.Port = 25;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);

@@ -1530,7 +1530,8 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 2;
                 }
 
-                var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100, 2);
+                var percentGrowthTotal = Math.Round(sumAllStoreCompare > 0 ? ((sumAllStore / sumAllStoreCompare) - 1) * 100 : -100, 2);
+
                 var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
                 var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
                 var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);

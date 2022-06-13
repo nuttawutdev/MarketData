@@ -190,7 +190,7 @@ namespace MarketData.Processes.Processes
                                 c => c.DepartmentStore_ID == request.departmentStoreID
                                 && c.DistributionChannel_ID == request.distributionChannelID
                                 && c.Brand_ID == request.brandID
-                                && c.RetailerGroup_ID == request.retailerGroupID
+                                //&& c.RetailerGroup_ID == request.retailerGroupID
                                 && c.Universe == request.universe
                                 && c.Year == request.year
                                 && c.Month == request.month
@@ -393,7 +393,8 @@ namespace MarketData.Processes.Processes
                   && c.DistributionChannel_ID == BAKeyInData.DistributionChannel_ID
                   && c.DepartmentStore_ID == BAKeyInData.DepartmentStore_ID
                   && c.Universe == BAKeyInData.Universe
-                  && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);          
+                  //&& c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID
+                  );          
 
                 if (adjustDataPreviousYearWeek4 != null)
                 {
@@ -672,7 +673,7 @@ namespace MarketData.Processes.Processes
                         && c.Month == itemRequest.month
                         && c.Week == itemRequest.week
                         && c.DistributionChannel_ID == itemRequest.distributionChannelID
-                        && c.RetailerGroup_ID == itemRequest.retailerGroupID
+                       // && c.RetailerGroup_ID == itemRequest.retailerGroupID
                         && c.DepartmentStore_ID == itemRequest.departmentStoreID
                         && c.Brand_ID == itemRequest.brandID
                         && c.Universe == itemRequest.universe);
@@ -969,8 +970,9 @@ namespace MarketData.Processes.Processes
         {
 
             var adminKeyInData = allAdminKeyInData.FirstOrDefault(
-                c => c.RetailerGroup_ID == itemCounter.retailerGroupID
-                && c.DepartmentStore_ID == itemCounter.departmentStoreID
+                c => 
+                //c.RetailerGroup_ID == itemCounter.retailerGroupID
+                 c.DepartmentStore_ID == itemCounter.departmentStoreID
                 && c.DistributionChannel_ID == itemCounter.distributionChannelID
                 && c.Brand_ID == itemCounter.brandID);
 

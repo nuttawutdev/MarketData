@@ -154,8 +154,8 @@ namespace MarketData.Processes.Processes
 
                 var brandBAData = repository.masterData.FindBrandBy(c => c.Brand_ID == BAKeyInData.Brand_ID);
                 var departmentStoreData = repository.masterData.FindDepartmentStoreBy(c => c.Department_Store_ID == BAKeyInData.DepartmentStore_ID);
-                var retailerGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == BAKeyInData.RetailerGroup_ID);
-                var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID);
+                var retailerGroupData = repository.masterData.FindRetailerGroupBy(c => c.Retailer_Group_ID == departmentStoreData.Retailer_Group_ID);
+                var channelBAData = repository.masterData.FindDistributionChannelBy(c => c.Distribution_Channel_ID == departmentStoreData.Distribution_Channel_ID);
 
                 response.baRemark = approveData.BA_Remark;
                 response.remark = approveData.Remark;

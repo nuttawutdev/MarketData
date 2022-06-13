@@ -647,9 +647,11 @@
         function validate_Rank_AmountSales(data) {
             var number = 0;
             var duplicateRank = false;
+            var previousRank = {};
             var sortRank = data.data.filter(c => c.rank != null).sort((a, b) => (a.rank > b.rank) ? 1 : -1)
+
             for (var i = 0; i < sortRank.length; i++) {
-                if (sortRank[i].rank != null && sortRank[i].rank != '' && number == sortRank[i].rank) {
+                if (sortRank[i].rank != null && sortRank[i].rank != '' && number == sortRank[i].rank && previousRank.departmentStoreName == sortRank[i].departmentStoreName) {
                     duplicateRank = true;
                     var rankDuplicate = sortRank.find(c => c.rank == number);
                     messageError = "*Brand " + sortRank[i].brandName + " " + sortRank[i].departmentStoreName + " และ Brand " + rankDuplicate.brandName + " " + rankDuplicate.departmentStoreName + "*";
@@ -657,6 +659,8 @@
                 } else {
                     number = sortRank[i].rank
                 }
+
+                previousRank = sortRank[i];
             }
 
             if (duplicateRank) {
@@ -668,9 +672,8 @@
             for (var i = 0; i < sortRank.length; i++) {
                 if (sortRank[i].amountSale != null && sortRank[i].rank != null) {
                     if (sortRank[i + 1] != null) {
-                        if (sortRank[i].amountSale > sortRank[i + 1].amountSale) {
-                        } else {
-                            messageError = "ค่า Amount Sales ของ Brand " + sortRank[i].brandName + " " + sortRank[i].departmentStoreName + " ควรมากกว่าค่า Amount Sales ของ Brand " + sortRank[i + 1].brandName + " " + sortRank[i+1].departmentStoreName;
+                        if (sortRank[i].amountSale < sortRank[i + 1].amountSale && sortRank[i].departmentStoreName == sortRank[i + 1].departmentStoreName) {
+                            messageError = "ค่า Amount Sales ของ Brand " + sortRank[i].brandName + " " + sortRank[i].departmentStoreName + " ควรมากกว่าค่า Amount Sales ของ Brand " + sortRank[i + 1].brandName + " " + sortRank[i + 1].departmentStoreName;
                             inCorrectAmountRank = true;
                             break;
                         }
