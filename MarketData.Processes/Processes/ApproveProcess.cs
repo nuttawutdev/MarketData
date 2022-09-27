@@ -305,33 +305,43 @@ namespace MarketData.Processes.Processes
 
                     if (updateApproveResult)
                     {
-                        var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.BAKeyIn_ID == approveData.BAKeyIn_ID);
+                        var approveDetail = repository.approve.GetApproveKeyInDetail(c => c.ApproveKeyIn_ID == approveData.ID);
 
-                        List<TTApproveKeyInDetail> approveKeyInDetail = baKeyInDetail.Select(c => new TTApproveKeyInDetail
+                        if (approveDetail.Any())
                         {
-                            ID = Guid.NewGuid(),
-                            DepartmentStore_ID = c.DepartmentStore_ID,
-                            DistributionChannel_ID = c.DistributionChannel_ID,
-                            FG = c.FG,
-                            MU = c.MU,
-                            OT = c.OT,
-                            SK = c.SK,
-                            Amount_Sales = c.Amount_Sales,
-                            ApproveKeyIn_ID = request.approveKeyInID,
-                            Brand_ID = c.Brand_ID,
-                            Counter_ID = c.Counter_ID,
-                            Month = c.Month,
-                            Year = c.Year,
-                            Week = c.Week,
-                            Rank = c.Rank,
-                            Remark = c.Remark,
-                            Whole_Sales = c.Whole_Sales,
-                            Created_By = request.userID,
-                            Created_Date = Utility.GetDateNowThai()
-                        }).ToList();
+                            response.isSuccess = true;
+                        }
+                        else
+                        {
+                            var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.BAKeyIn_ID == approveData.BAKeyIn_ID);
+
+                            List<TTApproveKeyInDetail> approveKeyInDetail = baKeyInDetail.Select(c => new TTApproveKeyInDetail
+                            {
+                                ID = Guid.NewGuid(),
+                                DepartmentStore_ID = c.DepartmentStore_ID,
+                                DistributionChannel_ID = c.DistributionChannel_ID,
+                                FG = c.FG,
+                                MU = c.MU,
+                                OT = c.OT,
+                                SK = c.SK,
+                                Amount_Sales = c.Amount_Sales,
+                                ApproveKeyIn_ID = request.approveKeyInID,
+                                Brand_ID = c.Brand_ID,
+                                Counter_ID = c.Counter_ID,
+                                Month = c.Month,
+                                Year = c.Year,
+                                Week = c.Week,
+                                Rank = c.Rank,
+                                Remark = c.Remark,
+                                Whole_Sales = c.Whole_Sales,
+                                Created_By = request.userID,
+                                Created_Date = Utility.GetDateNowThai()
+                            }).ToList();
 
 
-                        response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
+                            response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
+                        }
+                        
                     }
                     else
                     {

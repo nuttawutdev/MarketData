@@ -5293,9 +5293,9 @@ namespace MarketData.Processes.Processes
 
                                 PeriodTime time = new PeriodTime
                                 {
-                                    year = startYear,
+                                    year = yearStart.ToString(),
                                     month = monthText.Length == 1 ? $"0{monthText}" : monthText,
-                                    yearDisplay = startYear,
+                                    yearDisplay = yearStart.ToString(),
                                     monthDisplay = monthList[i]
                                 };
 

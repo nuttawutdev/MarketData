@@ -397,12 +397,12 @@ namespace MarketData.Processes.Processes
                             remark = adjustBrandData.Remark;
                         }
                         // ถ้า Admin กรอกมาใช้ค่าของ Admin
-                        else if (adminKeyInData != null && (adminKeyInData.Amount_Sales.HasValue
-                            || adminKeyInData.Whole_Sales.HasValue
-                            || adminKeyInData.FG.HasValue
-                            || adminKeyInData.MU.HasValue
-                            || adminKeyInData.OT.HasValue
-                            || adminKeyInData.SK.HasValue
+                        else if (adminKeyInData != null && (adminKeyInData.Amount_Sales > 0
+                            || adminKeyInData.Whole_Sales > 0
+                            || adminKeyInData.FG > 0
+                            || adminKeyInData.MU > 0
+                            || adminKeyInData.OT > 0
+                            || adminKeyInData.SK > 0
                             || !string.IsNullOrWhiteSpace(adminKeyInData.Remark)))
                         {
                             adminAmountSale = adminKeyInData.Amount_Sales;
