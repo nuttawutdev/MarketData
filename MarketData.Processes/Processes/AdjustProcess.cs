@@ -257,7 +257,7 @@ namespace MarketData.Processes.Processes
                         {
                             var brandTypeData = brandTypeList.FirstOrDefault(c => c.Brand_Type_ID == brandData.Brand_Type_ID);
 
-                            if (brandTypeData?.Brand_Type_Name != "Fragrances" 
+                            if (brandTypeData?.Brand_Type_Name != "Fragrances"
                                 //|| itemCounter.Alway_Show_Current_Year == true
                                 )
                             {
@@ -342,6 +342,10 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandInDepartment in allBrandByCounterListData)
                 {
+                    if(itemBrandInDepartment.Brand_ID == new Guid("9FF25F69-9359-4037-9E8E-8154DC7232E0"))
+                    {
+
+                    }
                     decimal? adminAmountSale = null;
                     decimal? amountPreviousYear = null;
                     decimal? amountPreviousYearWeek = null;
@@ -356,78 +360,103 @@ namespace MarketData.Processes.Processes
                     // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว Week 4
                     var adjustKeyDataPreviousYearWeek4 = adjustDetailPreviousYearWeek4.Where(
                         c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
-                        .OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+                        .OrderByDescending(e => e.Adjust_AmountSale).ToList();
 
-                    if (adjustKeyDataPreviousYearWeek4 != null)
+                    if (adjustKeyDataPreviousYearWeek4 != null && adjustKeyDataPreviousYearWeek4.Any())
                     {
-                        amountPreviousYear = adjustKeyDataPreviousYearWeek4.Adjust_AmountSale;
+                        amountPreviousYear = adjustKeyDataPreviousYearWeek4.Sum(c => c.Adjust_AmountSale);
                     }
 
                     // ค่าที่ผ่านการ Adjust เมื่อปีที่แล้ว Week 4
                     var adjustKeyDataPreviousYear = adjustDetailPreviousYear.Where(
                         c => c.Brand_ID == itemBrandInDepartment.Brand_ID)
-                        .OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+                        .OrderByDescending(e => e.Adjust_AmountSale).ToList();
 
-                    if (adjustKeyDataPreviousYear != null)
+                    if (adjustKeyDataPreviousYear != null && adjustKeyDataPreviousYear.Any())
                     {
-                        amountPreviousYearWeek = adjustKeyDataPreviousYear.Adjust_AmountSale;
+                        amountPreviousYearWeek = adjustKeyDataPreviousYear.Sum(c => c.Adjust_AmountSale);
                     }
 
                     // ค่าที่ Admin กรอก
-                    var adminKeyInData = adminKeyInDetailData.FirstOrDefault(a => a.Brand_ID == itemBrandInDepartment.Brand_ID);
+                    var adminKeyInData = adminKeyInDetailData.Where(a => a.Brand_ID == itemBrandInDepartment.Brand_ID);
 
                     // ค่าที่ BA ใน Store นั้นกรอกมาและถูก Approve แล้ว
                     var baKeyInBrand = baKeyInDetailApprove.Where(b => b.Brand_ID == itemBrandInDepartment.Brand_ID);
 
                     // ค่าที่เคยทำการ Save Adjust
-                    var adjustBrandData = adjustDetail.FirstOrDefault(e => e.Brand_ID == itemBrandInDepartment.Brand_ID);
+                    var adjustBrandData = adjustDetail.Where(e => e.Brand_ID == itemBrandInDepartment.Brand_ID);
 
                     // ถ้ายังไม่ Submit ยังเอาค่าของ Counter ที่ถูก Approve มาหาค่ามากสุดอยู่ ?
                     if (!isAdjusted)
                     {
-                        if (adjustBrandData != null)
+                        if (adjustBrandData != null && adjustBrandData.Any())
                         {
-                            adminAmountSale = adjustBrandData.Admin_AmountSale;
-                            adjustAmountSale = adjustBrandData.Adjust_AmountSale;
-                            adjustWholeSale = adjustBrandData.Adjust_WholeSale;
-                            sk = adjustBrandData.SK;
-                            mu = adjustBrandData.MU;
-                            fg = adjustBrandData.FG;
-                            ot = adjustBrandData.OT;
-                            remark = adjustBrandData.Remark;
+                            var adjustBrandDataMostValue = adjustBrandData.OrderByDescending(c => c.Adjust_AmountSale).FirstOrDefault();
+
+                            adminAmountSale = adjustBrandData.Sum(c => c.Admin_AmountSale);
+                            adjustAmountSale = adjustBrandData.Sum(c => c.Adjust_AmountSale);
+                            adjustWholeSale = adjustBrandData.Sum(c => c.Adjust_WholeSale);
+                            sk = adjustBrandDataMostValue.SK;
+                            mu = adjustBrandDataMostValue.MU;
+                            fg = adjustBrandDataMostValue.FG;
+                            ot = adjustBrandDataMostValue.OT;
+                            remark = adjustBrandDataMostValue.Remark;
                         }
                         // ถ้า Admin กรอกมาใช้ค่าของ Admin
-                        else if (adminKeyInData != null && (adminKeyInData.Amount_Sales > 0
-                            || adminKeyInData.Whole_Sales > 0
-                            || adminKeyInData.FG > 0
-                            || adminKeyInData.MU > 0
-                            || adminKeyInData.OT > 0
-                            || adminKeyInData.SK > 0
-                            || !string.IsNullOrWhiteSpace(adminKeyInData.Remark)))
+                        else if (adminKeyInData != null && adminKeyInData.Any() && (adminKeyInData.Sum(c => c.Amount_Sales) > 0
+                            || adminKeyInData.Sum(c => c.Whole_Sales) > 0
+                            || adminKeyInData.Sum(c => c.FG) > 0
+                            || adminKeyInData.Sum(c => c.MU) > 0
+                            || adminKeyInData.Sum(c => c.OT) > 0
+                            || adminKeyInData.Sum(c => c.SK) > 0
+                            || !string.IsNullOrWhiteSpace(adminKeyInData.OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Remark)))
                         {
-                            adminAmountSale = adminKeyInData.Amount_Sales;
-                            adjustAmountSale = adminKeyInData.Amount_Sales;
-                            adjustWholeSale = adminKeyInData.Whole_Sales;
-                            sk = adminKeyInData.SK;
-                            mu = adminKeyInData.MU;
-                            fg = adminKeyInData.FG;
-                            ot = adminKeyInData.OT;
-                            remark = adminKeyInData.Remark;
+
+                            var adminKeyInMostValue = adminKeyInData.OrderByDescending(c => c.Amount_Sales).FirstOrDefault();
+
+                            adminAmountSale = adminKeyInData.Sum(c => c.Amount_Sales);
+                            adjustAmountSale = adminKeyInData.Sum(c => c.Amount_Sales);
+                            adjustWholeSale = adminKeyInData.Sum(c => c.Whole_Sales);
+                            sk = adminKeyInMostValue.SK;
+                            mu = adminKeyInMostValue.MU;
+                            fg = adminKeyInMostValue.FG;
+                            ot = adminKeyInMostValue.OT;
+                            remark = adminKeyInMostValue.Remark;
                         }
                         else if (baKeyInBrand.Any())
                         {
                             // มีค่า Amount Sale และ Whole Sale
                             if (baKeyInBrand.Any(c => c.Amount_Sales.HasValue))
                             {
+                                decimal? mostAmountSale = null;
+                                decimal? mostWholeSale = null;
                                 // ค่า Amount Sale มากที่สุดของแต่ละ Counter
-                                var mostAmountSale = baKeyInBrand.Where(
+                                var mostAmountSaleBrand = baKeyInBrand.Where(
                                     e => e.Amount_Sales.HasValue)
-                                    .OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Amount_Sales;
+                                    .OrderByDescending(c => c.Amount_Sales).FirstOrDefault();
+
+                                if (baKeyInBrand.Where(c => c.BAKeyIn_ID == mostAmountSaleBrand?.BAKeyIn_ID).Count() > 1)
+                                {
+                                    mostAmountSale = baKeyInBrand.Where(c => c.BAKeyIn_ID == mostAmountSaleBrand?.BAKeyIn_ID).Sum(d => d.Amount_Sales);
+                                }
+                                else
+                                {
+                                    mostAmountSale = mostAmountSaleBrand?.Amount_Sales;
+                                }
 
                                 // ค่า Whole Sale มากที่สุดของแต่ละ Counter
-                                var mostWholeSale = baKeyInBrand.Where(
+                                var mostWholeSaleBrand = baKeyInBrand.Where(
                                     e => e.Whole_Sales.HasValue)
-                                    .OrderByDescending(c => c.Whole_Sales).FirstOrDefault()?.Whole_Sales;
+                                    .OrderByDescending(c => c.Whole_Sales).FirstOrDefault();
+
+                                if (baKeyInBrand.Where(c => c.BAKeyIn_ID == mostWholeSaleBrand?.BAKeyIn_ID).Count() > 1)
+                                {
+                                    mostWholeSale = baKeyInBrand.Where(c => c.BAKeyIn_ID == mostWholeSaleBrand?.BAKeyIn_ID).Sum(d => d.Whole_Sales);
+                                }
+                                else
+                                {
+                                    mostWholeSale = mostWholeSaleBrand?.Whole_Sales;
+                                }
 
                                 adjustAmountSale = mostAmountSale;
                                 adjustWholeSale = mostWholeSale;
@@ -435,11 +464,11 @@ namespace MarketData.Processes.Processes
                                 // หาค่า sk mu fg ot จาก Brand ที่ Rank สูงที่สุดของ Loreal
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
-                                    var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
+                                    var brandLorealKeyIn = baKeyInDataApprove.Where(t => t.Brand_ID == itemBrandLoreal.brandID).ToList();
 
-                                    if (brandLorealKeyIn != null)
+                                    if (brandLorealKeyIn != null && brandLorealKeyIn.Any())
                                     {
-                                        var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+                                        var keyInDetailBrandLoreal = baKeyInBrand.OrderByDescending(r => r.Amount_Sales).FirstOrDefault(c => c.BAKeyIn_ID == brandLorealKeyIn[0].ID);
 
                                         if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
                                             || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
@@ -459,11 +488,11 @@ namespace MarketData.Processes.Processes
                                 // หาค่า Remark จาก Brand ที่ Rank สูงที่สุดของ Loreal
                                 foreach (var itemBrandLoreal in onlyBrandLorel.OrderBy(c => c.lorealBrandRank))
                                 {
-                                    var brandLorealKeyIn = baKeyInDataApprove.FirstOrDefault(t => t.Brand_ID == itemBrandLoreal.brandID);
+                                    var brandLorealKeyIn = baKeyInDataApprove.Where(t => t.Brand_ID == itemBrandLoreal.brandID).ToList();
 
-                                    if (brandLorealKeyIn != null)
+                                    if (brandLorealKeyIn != null && brandLorealKeyIn.Any())
                                     {
-                                        var keyInDetailBrandLoreal = baKeyInBrand.FirstOrDefault(r => r.BAKeyIn_ID == brandLorealKeyIn.ID);
+                                        var keyInDetailBrandLoreal = baKeyInBrand.OrderByDescending(r => r.Amount_Sales).FirstOrDefault(c => c.BAKeyIn_ID == brandLorealKeyIn[0].ID);
 
                                         if (!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
                                         {
@@ -478,16 +507,18 @@ namespace MarketData.Processes.Processes
                     else
                     {
                         // ถ้า Submit ไปแล้วใช้ค่าจากที่เคยทำการ Adjust
-                        if (adjustBrandData != null)
+                        if (adjustBrandData != null && adjustBrandData.Any())
                         {
-                            adminAmountSale = adjustBrandData.Admin_AmountSale;
-                            adjustAmountSale = adjustBrandData.Adjust_AmountSale;
-                            adjustWholeSale = adjustBrandData.Adjust_WholeSale;
-                            sk = adjustBrandData.SK;
-                            mu = adjustBrandData.MU;
-                            fg = adjustBrandData.FG;
-                            ot = adjustBrandData.OT;
-                            remark = adjustBrandData.Remark;
+                            var adjustBrandDataMostValue = adjustBrandData.OrderByDescending(c => c.Adjust_AmountSale).FirstOrDefault();
+
+                            adminAmountSale = adjustBrandData.Sum(c => c.Admin_AmountSale);
+                            adjustAmountSale = adjustBrandData.Sum(c => c.Adjust_AmountSale);
+                            adjustWholeSale = adjustBrandData.Sum(c => c.Adjust_WholeSale);
+                            sk = adjustBrandDataMostValue.SK;
+                            mu = adjustBrandDataMostValue.MU;
+                            fg = adjustBrandDataMostValue.FG;
+                            ot = adjustBrandDataMostValue.OT;
+                            remark = adjustBrandDataMostValue.Remark;
                         }
                     }
 
@@ -529,14 +560,20 @@ namespace MarketData.Processes.Processes
 
                         if (baBrandKeyIn != null)
                         {
-                            var baBrandKeyInDetail = baKeyInDetailApprove.FirstOrDefault(
+                            var baBrandKeyInDetail = baKeyInDetailApprove.Where(
                               e => e.Brand_ID == itemBrandInDepartment.Brand_ID
-                              && e.BAKeyIn_ID == baBrandKeyIn.ID);
+                              && e.BAKeyIn_ID == baBrandKeyIn.ID).ToList();
 
-                            if (baBrandKeyInDetail != null && baBrandKeyInDetail.Amount_Sales.HasValue && baBrandKeyInDetail.Rank.HasValue)
+                            if (baBrandKeyInDetail != null && baBrandKeyInDetail.Count() == 1 && baBrandKeyInDetail[0].Amount_Sales.HasValue && baBrandKeyInDetail[0].Rank.HasValue)
                             {
-                                amountSale = baBrandKeyInDetail.Amount_Sales;
-                                rank = baBrandKeyInDetail.Rank.Value.ToString();
+                                amountSale = baBrandKeyInDetail[0].Amount_Sales;
+                                rank = baBrandKeyInDetail[0].Rank.Value.ToString();
+                            }
+                            else if (baBrandKeyInDetail != null && baBrandKeyInDetail.Count() > 1)
+                            {
+                               var rankBrand = baBrandKeyInDetail.OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Rank;
+                                amountSale = baBrandKeyInDetail.Sum(c => c.Amount_Sales) > 0 ? baBrandKeyInDetail.Sum(c => c.Amount_Sales) : null;
+                                rank = rankBrand.HasValue ? rankBrand.ToString() : null;
                             }
                         }
 
