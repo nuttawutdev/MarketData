@@ -223,6 +223,11 @@ namespace MarketData.Processes.Processes
                     {
                         var BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == baKeyInData.ID);
 
+                        BAKeyInDetailList = BAKeyInDetailList
+                          .GroupBy(c => new { c.brandID, c.departmentStoreID, c.channelID, c.amountSale })
+                          .Select(g => g.FirstOrDefault())
+                          .ToList();
+
                         if (!BAKeyInDetailList.Any())
                         {
                             (bool createDetailResult, List<TTBAKeyInDetail> listDetail) = await CreateBAKeyInDetail(request, baKeyInData.ID);
@@ -333,35 +338,7 @@ namespace MarketData.Processes.Processes
                   .Select(g => g.FirstOrDefault())
                   .ToList();
 
-                List<BAKeyInDetailData> BAKeyInDetailList = new List<BAKeyInDetailData>();
-
-                foreach (var itemBaKeyin in listBAKeyInDetail.OrderByDescending(c => c.amountSale))
-                {
-                    if (BAKeyInDetailList.FirstOrDefault(c => c.brandID == itemBaKeyin.brandID) == null)
-                    {
-                        var itemDuplicate = listBAKeyInDetail.FirstOrDefault(d => d.brandID == itemBaKeyin.brandID && d.ID != itemBaKeyin.ID);
-
-                        if (itemDuplicate != null)
-                        {
-                            if (itemBaKeyin.amountSale.HasValue || itemDuplicate.amountSale.HasValue)
-                            {
-                                itemBaKeyin.amountSale = itemBaKeyin.amountSale.GetValueOrDefault() + itemDuplicate.amountSale.GetValueOrDefault();
-                            }
-
-                            if (itemBaKeyin.wholeSale.HasValue || itemDuplicate.wholeSale.HasValue)
-                            {
-                                itemBaKeyin.wholeSale = itemBaKeyin.wholeSale.GetValueOrDefault() + itemDuplicate.wholeSale.GetValueOrDefault();
-                            }
-
-                            itemBaKeyin.remark = !itemBaKeyin.amountSale.HasValue ? !string.IsNullOrWhiteSpace(itemBaKeyin.remark) ? itemBaKeyin.remark : itemDuplicate.remark : null;
-                            BAKeyInDetailList.Add(itemBaKeyin);
-                        }
-                        else
-                        {
-                            BAKeyInDetailList.Add(itemBaKeyin);
-                        }
-                    }
-                }
+                List<BAKeyInDetailData> BAKeyInDetailList = GroupBAKeyInDetailData(listBAKeyInDetail);
 
                 var counterList = repository.masterData.GetCounterListBy(
                         e => e.Distribution_Channel_ID == BAKeyInData.DistributionChannel_ID
@@ -417,6 +394,12 @@ namespace MarketData.Processes.Processes
 
                     await repository.baKeyIn.CreateBAKeyInDetail(listBAKeyInDetailInsert);
                     BAKeyInDetailList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == BAKeyInData.ID);
+                    BAKeyInDetailList = BAKeyInDetailList
+                      .GroupBy(c => new { c.brandID, c.departmentStoreID, c.channelID, c.amountSale })
+                      .Select(g => g.FirstOrDefault())
+                      .ToList();
+
+                    BAKeyInDetailList = GroupBAKeyInDetailData(BAKeyInDetailList);
                 }
 
                 string previousYear = (Int32.Parse(BAKeyInData.Year) - 1).ToString();
@@ -587,6 +570,42 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+
+        private List<BAKeyInDetailData> GroupBAKeyInDetailData(List<BAKeyInDetailData> listBAKeyInDetail)
+        {
+
+            List<BAKeyInDetailData> BAKeyInDetailList = new List<BAKeyInDetailData>();
+
+            foreach (var itemBaKeyin in listBAKeyInDetail.OrderByDescending(c => c.amountSale))
+            {
+                if (BAKeyInDetailList.FirstOrDefault(c => c.brandID == itemBaKeyin.brandID) == null)
+                {
+                    var itemDuplicate = listBAKeyInDetail.FirstOrDefault(d => d.brandID == itemBaKeyin.brandID && d.ID != itemBaKeyin.ID);
+
+                    if (itemDuplicate != null)
+                    {
+                        if (itemBaKeyin.amountSale.HasValue || itemDuplicate.amountSale.HasValue)
+                        {
+                            itemBaKeyin.amountSale = itemBaKeyin.amountSale.GetValueOrDefault() + itemDuplicate.amountSale.GetValueOrDefault();
+                        }
+
+                        if (itemBaKeyin.wholeSale.HasValue || itemDuplicate.wholeSale.HasValue)
+                        {
+                            itemBaKeyin.wholeSale = itemBaKeyin.wholeSale.GetValueOrDefault() + itemDuplicate.wholeSale.GetValueOrDefault();
+                        }
+
+                        itemBaKeyin.remark = !itemBaKeyin.amountSale.HasValue ? !string.IsNullOrWhiteSpace(itemBaKeyin.remark) ? itemBaKeyin.remark : itemDuplicate.remark : null;
+                        BAKeyInDetailList.Add(itemBaKeyin);
+                    }
+                    else
+                    {
+                        BAKeyInDetailList.Add(itemBaKeyin);
+                    }
+                }
+            }
+
+            return BAKeyInDetailList;
+        }
         #endregion
 
         #region Admin KeyIn

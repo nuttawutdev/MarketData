@@ -121,6 +121,13 @@ namespace MarketData.Processes.Processes
                 if (!baKeyInList.Any())
                 {
                     baKeyInList = repository.baKeyIn.GetBAKeyInDetailBy(c => c.BAKeyIn_ID == BAKeyInData.ID);
+
+                    baKeyInList = baKeyInList
+                      .GroupBy(c => new { c.brandID, c.departmentStoreID, c.channelID, c.amountSale })
+                      .Select(g => g.FirstOrDefault())
+                      .ToList();
+
+                    baKeyInList = GroupBAKeyInDetailData(baKeyInList);
                 }
 
                 string previousYear = (Int32.Parse(BAKeyInData.Year) - 1).ToString();
@@ -134,7 +141,7 @@ namespace MarketData.Processes.Processes
                        && c.Universe == BAKeyInData.Universe
                        && c.RetailerGroup_ID == BAKeyInData.RetailerGroup_ID);
 
-               
+
 
                 if (adjustDataPreviousYearWeek4 != null)
                 {
@@ -143,11 +150,11 @@ namespace MarketData.Processes.Processes
                     foreach (var itemBADetail in baKeyInList)
                     {
                         var adjustDataPreviousYear = adjustDetailPreviousYearList
-                            .Where(p => p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).FirstOrDefault();
+                            .Where(p => p.Brand_ID == itemBADetail.brandID).OrderByDescending(e => e.Adjust_AmountSale).ToList();
 
-                        if (adjustDataPreviousYear != null)
+                        if (adjustDataPreviousYear != null && adjustDataPreviousYear.Any())
                         {
-                            itemBADetail.amountSalePreviousYear = adjustDataPreviousYear.Adjust_AmountSale;
+                            itemBADetail.amountSalePreviousYear = adjustDataPreviousYear.Sum(c => c.Adjust_AmountSale);
                         }
                     }
                 }
@@ -341,7 +348,7 @@ namespace MarketData.Processes.Processes
 
                             response.isSuccess = await repository.approve.InsertApproveKeyInDetail(approveKeyInDetail);
                         }
-                        
+
                     }
                     else
                     {
@@ -377,7 +384,7 @@ namespace MarketData.Processes.Processes
                     worksheet.Range(worksheet.Cell(1, 1), worksheet.Cell(1, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                     worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Merge();
-                    worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Value = "MARKET SHARE AND GROWTH";                  
+                    worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Value = "MARKET SHARE AND GROWTH";
                     worksheet.Range(worksheet.Cell(2, 1), worksheet.Cell(2, 30)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                     worksheet.Range(worksheet.Cell(3, 1), worksheet.Cell(3, 30)).Merge();
@@ -518,11 +525,47 @@ namespace MarketData.Processes.Processes
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
             return null;
+        }
+
+        private List<BAKeyInDetailData> GroupBAKeyInDetailData(List<BAKeyInDetailData> listBAKeyInDetail)
+        {
+
+            List<BAKeyInDetailData> BAKeyInDetailList = new List<BAKeyInDetailData>();
+
+            foreach (var itemBaKeyin in listBAKeyInDetail.OrderByDescending(c => c.amountSale))
+            {
+                if (BAKeyInDetailList.FirstOrDefault(c => c.brandID == itemBaKeyin.brandID) == null)
+                {
+                    var itemDuplicate = listBAKeyInDetail.FirstOrDefault(d => d.brandID == itemBaKeyin.brandID && d.ID != itemBaKeyin.ID);
+
+                    if (itemDuplicate != null)
+                    {
+                        if (itemBaKeyin.amountSale.HasValue || itemDuplicate.amountSale.HasValue)
+                        {
+                            itemBaKeyin.amountSale = itemBaKeyin.amountSale.GetValueOrDefault() + itemDuplicate.amountSale.GetValueOrDefault();
+                        }
+
+                        if (itemBaKeyin.wholeSale.HasValue || itemDuplicate.wholeSale.HasValue)
+                        {
+                            itemBaKeyin.wholeSale = itemBaKeyin.wholeSale.GetValueOrDefault() + itemDuplicate.wholeSale.GetValueOrDefault();
+                        }
+
+                        itemBaKeyin.remark = !itemBaKeyin.amountSale.HasValue ? !string.IsNullOrWhiteSpace(itemBaKeyin.remark) ? itemBaKeyin.remark : itemDuplicate.remark : null;
+                        BAKeyInDetailList.Add(itemBaKeyin);
+                    }
+                    else
+                    {
+                        BAKeyInDetailList.Add(itemBaKeyin);
+                    }
+                }
+            }
+
+            return BAKeyInDetailList;
         }
     }
 }
