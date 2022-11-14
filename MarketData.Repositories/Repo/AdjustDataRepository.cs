@@ -81,7 +81,7 @@ namespace MarketData.Repositories.Repo
 
                 _dbContext.TTAdjustData.Add(newAdjustData);
 
-                if(await _dbContext.SaveChangesAsync() > 0)
+                if (await _dbContext.SaveChangesAsync() > 0)
                 {
                     return newAdjustData;
                 }
@@ -108,8 +108,30 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
-    
-        public async Task<bool> UpdateAdjustData(Guid adjustDataID,Guid userID,Guid statusID)
+
+        public async Task<bool> UpdateBrandAdjustDetail(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var adjustDataDetailByOldBrand = GetAdjustDataDetaillBy(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var item in adjustDataDetailByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                }
+
+                _dbContext.TTAdjustDataDetail.UpdateRange(adjustDataDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateAdjustData(Guid adjustDataID, Guid userID, Guid statusID)
         {
             try
             {
@@ -121,7 +143,7 @@ namespace MarketData.Repositories.Repo
                 _dbContext.TTAdjustData.Update(adjustData);
                 return await _dbContext.SaveChangesAsync() > 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -131,7 +153,7 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-                var adjustDataDetail = _dbContext.TTAdjustDataDetail.Where(c=>c.AdjustData_ID == adjustDataID);   
+                var adjustDataDetail = _dbContext.TTAdjustDataDetail.Where(c => c.AdjustData_ID == adjustDataID);
                 _dbContext.TTAdjustDataDetail.RemoveRange(adjustDataDetail);
                 return await _dbContext.SaveChangesAsync() > 0;
             }
@@ -186,6 +208,41 @@ namespace MarketData.Repositories.Repo
             try
             {
                 _dbContext.TTAdjustDataBrandDetail.AddRange(adjustDataBrandDetailList);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TTAdjustDataBrandDetail> GetAdjustDataBrandDetaillBy(Expression<Func<TTAdjustDataBrandDetail, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TTAdjustDataBrandDetail.Where(expression).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandAdjustDataBrandDetail(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var adjustDataBrandDetailByOldBrand = GetAdjustDataBrandDetaillBy(c => c.Brand_ID.HasValue && oldBrandList.Contains(c.Brand_ID.Value));
+
+                foreach (var item in adjustDataBrandDetailByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                }
+
+                _dbContext.TTAdjustDataBrandDetail.UpdateRange(adjustDataBrandDetailByOldBrand);
+
                 return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)

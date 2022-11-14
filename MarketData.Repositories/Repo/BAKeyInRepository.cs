@@ -116,6 +116,30 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> UpdateBrandBAKeyIn(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var baKeyInByOldBrand = GetBAKeyInBy(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var item in baKeyInByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTBAKeyIn.UpdateRange(baKeyInByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TTBAKeyIn FindBAKeyInBy(Expression<Func<TTBAKeyIn, bool>> expression)
         {
             try
@@ -254,6 +278,30 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TTBAKeyInDetail.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandBAKeyInDetail(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var baKeyInDetailByOldBrand = GetBAKeyInDetailListData(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var item in baKeyInDetailByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTBAKeyInDetail.UpdateRange(baKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

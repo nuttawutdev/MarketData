@@ -416,6 +416,110 @@ namespace MarketData.Processes.Processes
             return response;
         }
 
+        public async Task<SaveDataResponse> InsertBrand(InsertBrandRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                request.brandName = request.brandName.Trim();
+
+                var brandByName = repository.masterData.GetBrandListBy(
+                    c => c.Brand_Name.ToLower() == request.brandName.ToLower() && c.Delete_Flag != true);
+
+                var brrandGroupSelect = repository.masterData.FindBrandGroupBy(c => c.Brand_Group_ID == request.brandGroupID);
+
+                if (brrandGroupSelect.Is_Loreal_Brand)
+                {
+                    if (string.IsNullOrWhiteSpace(request.brandShortName))
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "กรุณาระบุ Brand Short Name ใน Brand Group ของ Loreal";
+                        return response;
+                    }
+
+                    if (!request.lorealBrandRank.HasValue)
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "กรุณาระบุ Loreal Brand Rank ใน Brand Group ของ Loreal";
+                        return response;
+                    }
+                }
+
+
+                TMBrand brandByShortName = null;
+
+                if (!string.IsNullOrWhiteSpace(request.brandShortName))
+                {
+                    request.brandShortName = request.brandShortName.Trim();
+
+                    brandByShortName = repository.masterData.FindBrandBy(
+                                        c => c.Brand_Short_Name != null
+                                        && c.Brand_Short_Name.ToLower() == request.brandShortName.ToLower()
+                                        && c.Delete_Flag != true);
+                }
+
+                if (request.brandIDList != null && request.brandIDList.Any())
+                {
+                    if (brandByName.Any() && request.brandIDList.Contains(brandByName.FirstOrDefault().Brand_ID))
+                    {
+                        brandByName = new List<TMBrand>();
+                    }
+
+                    if (brandByShortName != null && request.brandIDList.Contains(brandByShortName.Brand_ID))
+                    {
+                        brandByShortName = null;
+                    }
+                }
+
+                // Brand name not exist Or Update old Brand
+                if ((!brandByName.Any() || (brandByName != null && brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault())))
+                    && (brandByShortName == null || (brandByShortName != null && brandByShortName.Brand_ID == request.brandID))
+                    )
+                {
+                    var saveResult = await repository.masterData.InsertBrand(request);
+                    if (saveResult != null)
+                    {
+                        if (request.brandIDList != null && request.brandIDList.Any())
+                        {
+                            request.brandID = saveResult.Brand_ID;
+                            response = await SummaryBrand(request);
+                        }
+                        else
+                        {
+                            response.isSuccess = true;
+                        }
+                    }
+                    else
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "บันทึกข้อมูลไม่สำเร็จ กรุณาติดต่อผู้ดูแลระบบ";
+                    }
+                }
+                else
+                {
+                    if (brandByName != null && !brandByName.Select(c => c.Brand_ID).Contains(request.brandID.GetValueOrDefault()))
+                    {
+                        response.responseError = "Brand Name ซ้ำกับที่มีอยู่ในระบบ";
+                    }
+                    else if (brandByShortName != null && brandByShortName.Brand_ID != request.brandID)
+                    {
+                        response.responseError = "Brand Short Name ซ้ำกับที่มีอยู่ในระบบ";
+                    }
+
+                    response.isSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+        }
+
+
         public async Task<SaveDataResponse> SaveBrand(SaveBrandRequest request)
         {
             SaveDataResponse response = new SaveDataResponse();
@@ -840,6 +944,51 @@ namespace MarketData.Processes.Processes
                 response.isSuccess = false;
             }
 
+            return response;
+        }
+
+        private async Task<SaveDataResponse> SummaryBrand(InsertBrandRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            await repository.masterData.UpdateBrandCounter(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+            await repository.user.UpdateBrandOfficeUser(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+            await repository.user.UpdateBrandUserCounter(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+            await repository.adjust.UpdateBrandAdjustDetail(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+            await repository.adjust.UpdateBrandAdjustDataBrandDetail(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+            await repository.adminKeyIn.UpdateBrandAdminKeyInDetail(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+            await repository.approve.UpdateBrandApproveKeyInDetail(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+            await repository.baKeyIn.UpdateBrandBAKeyIn(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+            await repository.baKeyIn.UpdateBrandBAKeyInDetail(request.brandIDList, request.brandID.GetValueOrDefault(), request.userID);
+
+
+            List<TMBrandSummary> brandSummary = request.brandIDList.Select(c => new TMBrandSummary
+            {
+                Brand_ID = request.brandID.GetValueOrDefault(),
+                Brand_ID_Include = c,
+                ID = Guid.NewGuid()
+            }).ToList();
+
+            await repository.masterData.InsertBrandSummary(brandSummary);
+
+
+            foreach (var itemBrand in request.brandIDList)
+            {
+                DeleteBrandRequest deleteBrand = new DeleteBrandRequest
+                {
+                    brandID = itemBrand,
+                    userID = request.userID
+                };
+
+                repository.masterData.DeleteBrand(deleteBrand);
+            }
+
+            response.isSuccess = true;
             return response;
         }
 

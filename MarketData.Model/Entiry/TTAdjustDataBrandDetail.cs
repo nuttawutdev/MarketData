@@ -14,5 +14,6 @@ namespace MarketData.Model.Entiry
         public Guid? Brand_ID { get; set; }
         public decimal? Amount_Sale { get; set; }
         public int? Rank { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

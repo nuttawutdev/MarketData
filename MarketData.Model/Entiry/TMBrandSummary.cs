@@ -5,14 +5,11 @@ using System.Text;
 
 namespace MarketData.Model.Entiry
 {
-    public class TMUserCounter
+    public class TMBrandSummary
     {
         [Key]
         public Guid ID { get; set; }
-        public Guid User_ID { get; set; }
-        public Guid DepartmentStore_ID { get; set; }
         public Guid Brand_ID { get; set; }
-        public Guid DistributionChannel_ID { get; set; }
-        public Guid? Previous_BrandID { get; set; }
+        public Guid Brand_ID_Include { get; set; }
     }
 }

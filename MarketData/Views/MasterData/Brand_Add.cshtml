@@ -4,7 +4,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Add Brand";
+    ViewData["Title"] = Model.brandName == null ? "Add Brand" : "Edit Brand";
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
 }
@@ -92,6 +92,16 @@
 
         </div>
     </div>
+
+    <div class="row col-md-12 col-sm-12">
+        <div class="form-group col-md-6 col-sm-6">
+            <label>Brand ที่ต้องการรวม</label>
+            @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control ", multiple = "multiple", style = "height: 200px;" })
+
+        </div>
+
+    </div>
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>
@@ -150,7 +160,8 @@
                  universe: $('#iduniverseList').val() ?  $('#iduniverseList').val() : null,
                  active: $("#flagactive").prop("checked"),
                  showInAdjust: $("#flagShowInAdjust").prop("checked"),
-                 userID: $('#iduserID').val()
+                 userID: $('#iduserID').val(),
+                 brandIDList: $('#brandList').val(),
             };
 
 
@@ -159,7 +170,7 @@
                 $("#blocker").show();
                 $.ajax({
                     type: "POST",
-                    url: '@Url.Action("SaveBrand", "MasterData")',
+                    url: '@Url.Action("InsertBrand", "MasterData")',
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(frmdata),
                     datatype: "json",

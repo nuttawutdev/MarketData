@@ -49,6 +49,14 @@ namespace MarketData.Controllers
 
         [ServiceFilter(typeof(AuthorizeFilter))]
         [ServiceFilter(typeof(PermissionFilter))]
+        public ActionResult Brand_Add(Guid brandID)
+        {
+            var viewData = GetBrandDetail(brandID);
+            return View(viewData);
+        }
+
+        [ServiceFilter(typeof(AuthorizeFilter))]
+        [ServiceFilter(typeof(PermissionFilter))]
         public ActionResult Brand_Edit_View(Guid brandID)
         {
             var viewData = GetBrandDetail(brandID, true);
@@ -382,10 +390,13 @@ namespace MarketData.Controllers
             var brandTypeList = process.masterData.GetBrandTypeList();
             var brandGroupList = process.masterData.GetBrandGroupList();
             var brandSegmentList = process.masterData.GetBrandSegmentList();
+            var brandList = process.masterData.GetBrandList();
 
             var brandTypeSelect = brandTypeList != null && brandTypeList.data != null ? viewOnly ? brandTypeList.data : brandTypeList.data.Where(c => c.active).ToList() : new List<BrandTypeData>();
             var brandGroupSelect = brandGroupList != null && brandGroupList.data != null ? viewOnly ? brandGroupList.data : brandGroupList.data.Where(c => c.active).ToList() : new List<BrandGroupData>();
             var brandSegmentSelect = brandSegmentList != null && brandSegmentList.data != null ? viewOnly ? brandSegmentList.data : brandSegmentList.data.Where(c => c.active).ToList() : new List<BrandSegmentData>();
+
+            var brandSelect = brandList != null && brandList.data != null ? viewOnly ? brandList.data : brandList.data.Where(c => c.active).ToList() : new List<BrandData>();
 
             data.brandTypeList = brandTypeSelect.Select(e => new BrandTypeViewModel
             {
@@ -402,6 +413,11 @@ namespace MarketData.Controllers
             {
                 brandSegmentID = e.brandSegmentID,
                 brandSegmentName = e.brandSegmentName
+            }).ToList();
+            data.brandList = brandSelect.Select(e => new BrandViewModel
+            {
+                brandID = e.brandID,
+                brandName = e.brandName
             }).ToList();
 
             if (response != null)
@@ -430,6 +446,15 @@ namespace MarketData.Controllers
             SaveDataResponse response;
             request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
             response = await process.masterData.SaveBrand(request);
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> InsertBrand([FromBody] InsertBrandRequest request)
+        {
+            SaveDataResponse response;
+            request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
+            response = await process.masterData.InsertBrand(request);
             return Json(response);
         }
 

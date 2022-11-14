@@ -26,5 +26,6 @@ namespace MarketData.Model.Entiry
         public DateTime? Approved_Date { get; set; }
         public DateTime? Submited_Date { get; set; }
         public string Remark { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

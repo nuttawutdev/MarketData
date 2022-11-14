@@ -523,6 +523,52 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<TMBrand> InsertBrand(InsertBrandRequest request)
+        {
+            string today = Utility.GetDateNowThai().ToString();
+            DateTime dateNow;
+            IFormatProvider thaiCulture = CultureInfo.CreateSpecificCulture("en-US");
+            DateTime.TryParse(today, thaiCulture, DateTimeStyles.None, out dateNow);
+
+            try
+            {
+                TMBrand insertBrand = new TMBrand
+                {
+                    Brand_ID = Guid.NewGuid(),
+                    Brand_Name = request.brandName,
+                    Brand_Short_Name = request.brandShortName,
+                    Brand_Color = request.brandColor,
+                    Brand_Segment_ID = request.brandSegmentID,
+                    Brand_Type_ID = request.brandTypeID,
+                    Delete_Flag = false,
+                    Loreal_Brand_Rank = request.lorealBrandRank,
+                    Universe = request.universe,
+                    Brand_Group_ID = request.brandGroupID,
+                    Active_Flag = request.active,
+                    FlagShowInAdjust = request.showInAdjust,
+                    Created_By = request.userID,
+                    Created_Date = dateNow
+                };
+
+                _dbContext.TMBrand.Add(insertBrand);
+
+                if (await _dbContext.SaveChangesAsync() > 0)
+                {
+                    return insertBrand;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
         public async Task<bool> SaveBrand(SaveBrandRequest request)
         {
             string today = Utility.GetDateNowThai().ToString();
@@ -606,6 +652,19 @@ namespace MarketData.Repositories.Repo
                 }
 
                 return _dbContext.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> InsertBrandSummary(List<TMBrandSummary> data)
+        {
+            try
+            {
+                _dbContext.TMBrandSummary.AddRange(data);
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
@@ -1182,6 +1241,30 @@ namespace MarketData.Repositories.Repo
             try
             {
                 return _dbContext.TMCounter.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandCounter(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var counterByOldBrand = GetCounterListBy(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var itemCounter in counterByOldBrand)
+                {
+                    itemCounter.Previous_BrandID = itemCounter.Brand_ID;
+                    itemCounter.Brand_ID = newBrandID;
+                    itemCounter.Updated_By = userID;
+                    itemCounter.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TMCounter.UpdateRange(counterByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

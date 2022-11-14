@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Data;
+﻿using MarketData.Helper;
+using MarketData.Model.Data;
 using MarketData.Model.Entiry;
 using MarketData.Model.Response.Approve;
 using Microsoft.EntityFrameworkCore;
@@ -126,6 +127,30 @@ namespace MarketData.Repositories.Repo
             {
                 return _dbContext.TTApproveKeyInDetail.Where(expression).ToList();
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandApproveKeyInDetail(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var approveKeyInDetailByOldBrand = GetApproveKeyInDetail(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var item in approveKeyInDetailByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTApproveKeyInDetail.UpdateRange(approveKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

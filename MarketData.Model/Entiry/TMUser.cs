@@ -33,5 +33,6 @@ namespace MarketData.Model.Entiry
         public Guid? Update_By { get; set; }
         public DateTime? Update_Date { get; set; }
         public bool? Delete_Flag { get; set; }
+        public Guid? Previous_BrandOfficeID { get; set; }
     }
 }

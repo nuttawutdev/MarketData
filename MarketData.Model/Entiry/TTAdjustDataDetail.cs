@@ -22,5 +22,6 @@ namespace MarketData.Model.Entiry
         public string Remark { get; set; }
         public decimal? Percent_Growth { get; set; }
         public decimal? Adjust_WholeSale { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

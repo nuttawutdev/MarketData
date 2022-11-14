@@ -1,4 +1,5 @@
-﻿using MarketData.Model.Entiry;
+﻿using MarketData.Helper;
+using MarketData.Model.Entiry;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,30 @@ namespace MarketData.Repositories.Repo
             {
                 return _dbContext.TTAdminKeyInDetail.Where(expression).ToList();
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandAdminKeyInDetail(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var adminKeyInDetailByOldBrand = GetAdminKeyInDetailBy(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var item in adminKeyInDetailByOldBrand)
+                {
+                    item.Previous_BrandID = item.Brand_ID;
+                    item.Brand_ID = newBrandID;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTAdminKeyInDetail.UpdateRange(adminKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {

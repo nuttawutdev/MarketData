@@ -29,5 +29,6 @@ namespace MarketData.Model.Entiry
         public DateTime Created_Date { get; set; }
         public Guid? Updated_By { get; set; }
         public DateTime? Updated_Date { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

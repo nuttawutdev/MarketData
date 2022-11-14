@@ -42,11 +42,57 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> UpdateBrandOfficeUser(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var userByOldBrand = GetUserBy(c => c.BrandOfficeID.HasValue && oldBrandList.Contains(c.BrandOfficeID.Value));
+
+                foreach (var itemCounter in userByOldBrand)
+                {
+                    itemCounter.Previous_BrandOfficeID = itemCounter.BrandOfficeID;
+                    itemCounter.BrandOfficeID = newBrandID;
+                    itemCounter.Update_By = new Guid(userID);
+                    itemCounter.Update_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TMUser.UpdateRange(userByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public List<TMUserCounter> GetUserCounterBy(Expression<Func<TMUserCounter, bool>> expression)
         {
             try
             {
                 return _dbContext.TMUserCounter.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> UpdateBrandUserCounter(List<Guid> oldBrandList, Guid newBrandID, string userID)
+        {
+            try
+            {
+                var brandCounterByOldBrand = GetUserCounterBy(c => oldBrandList.Contains(c.Brand_ID));
+
+                foreach (var itemCounter in brandCounterByOldBrand)
+                {
+                    itemCounter.Previous_BrandID = itemCounter.Brand_ID;
+                    itemCounter.Brand_ID = newBrandID;
+                }
+
+                _dbContext.TMUserCounter.UpdateRange(brandCounterByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
