@@ -89,6 +89,30 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RestoreBrandAdminKeyInDetail(Guid brandID, string userID)
+        {
+            try
+            {
+                var adminKeyInDetailByOldBrand = GetAdminKeyInDetailBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in adminKeyInDetailByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID.GetValueOrDefault();
+                    item.Previous_BrandID = null;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTAdminKeyInDetail.UpdateRange(adminKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public IEnumerable<TTAdminKeyInDetail> GetAllAdminKeyInDetailBy()
         {
             try

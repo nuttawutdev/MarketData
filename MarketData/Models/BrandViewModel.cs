@@ -28,5 +28,6 @@ namespace MarketData.Models
         public List<BrandGroupViewModel> brandGroupList { get; set; }
         public List<BrandSegmentViewModel> brandSegmentList { get; set; }
         public List<BrandViewModel> brandList { get; set; }
+        public List<string> brandInclude { get; set; }
     }
 }

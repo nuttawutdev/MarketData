@@ -516,7 +516,7 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-                return _dbContext.TMBrand.Where(expression).AsNoTracking().ToList();
+                return _dbContext.TMBrand.Where(expression).ToList();
             }
             catch (Exception ex)
             {
@@ -664,6 +664,56 @@ namespace MarketData.Repositories.Repo
             try
             {
                 _dbContext.TMBrandSummary.AddRange(data);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<TMBrandSummary> GetBrandSummaryListBy(Expression<Func<TMBrandSummary, bool>> expression)
+        {
+            try
+            {
+                return _dbContext.TMBrandSummary.Where(expression).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> DeleteBrandSummary(Guid brandID)
+        {
+            try
+            {
+                var brnadSummary = GetBrandSummaryListBy(c => c.Brand_ID == brandID);
+                _dbContext.TMBrandSummary.RemoveRange(brnadSummary);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RestoreBrand(List<Guid> brandID,string userID)
+        {
+            try
+            {
+                var brnadList = GetBrandListBy(c => brandID.Contains(c.Brand_ID));
+
+                foreach(var itemBrand in brnadList)
+                {
+                    itemBrand.Delete_Flag = false;
+                    itemBrand.Active_Flag = true;
+                    itemBrand.Updated_By = userID;
+                    itemBrand.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TMBrand.UpdateRange(brnadList);
                 return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
@@ -1258,6 +1308,30 @@ namespace MarketData.Repositories.Repo
                 {
                     itemCounter.Previous_BrandID = itemCounter.Brand_ID;
                     itemCounter.Brand_ID = newBrandID;
+                    itemCounter.Updated_By = userID;
+                    itemCounter.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TMCounter.UpdateRange(counterByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RestoreBrandCounter(Guid brandID, string userID)
+        {
+            try
+            {
+                var counterByOldBrand = GetCounterListBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var itemCounter in counterByOldBrand)
+                {
+                    itemCounter.Brand_ID = itemCounter.Previous_BrandID.GetValueOrDefault();
+                    itemCounter.Previous_BrandID = itemCounter.Brand_ID;
                     itemCounter.Updated_By = userID;
                     itemCounter.Updated_Date = Utility.GetDateNowThai();
                 }

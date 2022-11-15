@@ -158,6 +158,30 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RestoreBrandApproveKeyInDetail(Guid brandID, string userID)
+        {
+            try
+            {
+                var approveKeyInDetailByOldBrand = GetApproveKeyInDetail(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in approveKeyInDetailByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID.GetValueOrDefault();
+                    item.Previous_BrandID = null;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTApproveKeyInDetail.UpdateRange(approveKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TTApproveKeyIn FindApproveKeyInBy(Expression<Func<TTApproveKeyIn, bool>> expression)
         {
             try

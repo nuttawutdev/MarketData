@@ -911,6 +911,39 @@ namespace MarketData.Processes.Processes
                 }
             }
 
+            if (data.Any())
+            {
+                data = data.GroupBy(
+                         x => new
+                         {
+                             x.Store_Id,
+                             x.Sales_Week,
+                             x.Brand_Name,
+                             x.Sales_Month,
+                             x.Sales_Year,
+                             x.Universe
+                         })
+                     .Select(e => new Data_Exporting
+                     {
+                         ID = Guid.NewGuid(),
+                         Sales_Month = e.FirstOrDefault().Sales_Month,
+                         Amount_Sales = e.Sum(c => c.Amount_Sales.GetValueOrDefault()),
+                         BrandG_Name = e.FirstOrDefault().BrandG_Name,
+                         Brand_Name = e.FirstOrDefault().Brand_Name,
+                         Brand_Segment_Name = e.FirstOrDefault().Brand_Segment_Name,
+                         Brand_Type_Name = e.FirstOrDefault().Brand_Type_Name,
+                         Region_Name = e.FirstOrDefault().Region_Name,
+                         Sales_Week = e.FirstOrDefault().Sales_Week,
+                         Sales_Year = e.FirstOrDefault().Sales_Year,
+                         StoreG_Name = e.FirstOrDefault().StoreG_Name,
+                         Store_Id = e.FirstOrDefault().Store_Id,
+                         Store_Name = e.FirstOrDefault().Store_Name,
+                         Store_Rank = e.FirstOrDefault().Store_Rank,
+                         Time_Keyin = e.FirstOrDefault().Time_Keyin,
+                         Universe = e.FirstOrDefault().Universe,
+                         Whole_Sales = e.Sum(c => c.Whole_Sales.GetValueOrDefault())
+                     }).OrderBy(s => s.Store_Name).ToList();
+            }
             return data;
         }
 

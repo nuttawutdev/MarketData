@@ -131,6 +131,29 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RestoreBrandAdjustDetail(Guid brandID, string userID)
+        {
+            try
+            {
+                var adjustDataDetailByOldBrand = GetAdjustDataDetaillBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in adjustDataDetailByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID.GetValueOrDefault();
+                    item.Previous_BrandID = null;
+                    
+                }
+
+                _dbContext.TTAdjustDataDetail.UpdateRange(adjustDataDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> UpdateAdjustData(Guid adjustDataID, Guid userID, Guid statusID)
         {
             try
@@ -239,6 +262,28 @@ namespace MarketData.Repositories.Repo
                 {
                     item.Previous_BrandID = item.Brand_ID;
                     item.Brand_ID = newBrandID;
+                }
+
+                _dbContext.TTAdjustDataBrandDetail.UpdateRange(adjustDataBrandDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RestoreBrandAdjustDataBrandDetail(Guid brandID, string userID)
+        {
+            try
+            {
+                var adjustDataBrandDetailByOldBrand = GetAdjustDataBrandDetaillBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in adjustDataBrandDetailByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID;
+                    item.Previous_BrandID = null;            
                 }
 
                 _dbContext.TTAdjustDataBrandDetail.UpdateRange(adjustDataBrandDetailByOldBrand);

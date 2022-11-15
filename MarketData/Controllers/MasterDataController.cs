@@ -419,6 +419,7 @@ namespace MarketData.Controllers
                 brandID = e.brandID,
                 brandName = e.brandName
             }).ToList();
+            
 
             if (response != null)
             {
@@ -433,7 +434,7 @@ namespace MarketData.Controllers
                 data.universe = response.universe;
                 data.active = response.active;
                 data.showInAdjust = response.showInAdjust;
-
+                data.brandInclude = response.brandInclude;
             }
 
             return data;
@@ -466,6 +467,26 @@ namespace MarketData.Controllers
             if (ModelState.IsValid)
             {
                 response = process.masterData.DeleteBrand(request);
+                return Json(response);
+            }
+            else
+            {
+                response = new SaveDataResponse
+                {
+                    isSuccess = false
+                };
+                return Json(response);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelBrand([FromBody] CancelBrandSummaryRequest request)
+        {
+            SaveDataResponse response;
+
+            if (ModelState.IsValid)
+            {
+                response = await  process.masterData.CanCelSummaryBrand(request);
                 return Json(response);
             }
             else

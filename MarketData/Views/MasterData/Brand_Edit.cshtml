@@ -4,9 +4,10 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Add Brand";
+    ViewData["Title"] = "Edit Brand";
     Html.RenderPartial("_SuccessModal");
     Html.RenderPartial("_FailedModal");
+    Html.RenderPartial("_ConfirmModalWithText");
 }
 
 <style>
@@ -92,6 +93,23 @@
 
         </div>
     </div>
+
+    @if (Model.brandInclude != null && Model.brandInclude.Any())
+    {
+
+        <div class="row col-md-12 col-sm-12">
+            <div class="form-group col-md-6 col-sm-6">
+                <label>Brand ที่ทำการรวม</label>
+                @foreach (var itemBrand in Model.brandInclude)
+                {
+                    <input style="margin-bottom:5px" type="text" value="@itemBrand" class="form-control input-sm" disabled placeholder="">
+                }
+            </div>
+
+        </div>
+    }
+
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>
@@ -122,6 +140,11 @@
 
     </div>
     <div class="modal-footer">
+        @if (Model.brandInclude != null && Model.brandInclude.Any())
+        {
+        <button id="cancelbrand" class="btn btn-danger " type="button">ยกเลิกรวม Brand</button>
+        }
+
         <button id="save" class="btn btn-danger " type="button">Save</button>
         <a href="Brand" class="btn btn-outline-danger">Cancel</a>
 
@@ -206,6 +229,56 @@
 
 
         });
+
+
+        $("#cancelbrand").click(function () {
+            $('#confirmWithTextID').val('CalCelBrand');
+            $('#myModalConfirmWithText').text('คุณต้องการยกเลิกรวม Brand ใช่หรือไม่?');
+            $('#myModalConfirmWithTextResult').text('หมายเหตุ : การยกเลิกการรวม Brand จะทำการเรียกคืนค่ายอดขายของทุก Brand ก่อนหน้าที่จะทำการรวม ส่วนค่ายอดขายของ Brand นี้หลังจากการรวม Brand จะยังคงอยู่เช่นเดิม');
+            $('#ConfirmModalWithText').modal('show');
+
+        })
+
+      $(".btnConfirmModalWithText").click(function () {
+
+        $('#ConfirmModalWithText').modal('hide');
+        $("#blocker").show();
+        var model = @Html.Raw(Json.Serialize(Model));
+
+            var frmdata = {
+                userID: $('#iduserID').val(),
+                brandID: model.brandID
+             };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancelBrand", "MasterData")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(frmdata),
+                datatype: "json",
+                success: function (data) {
+                    $("#blocker").hide();
+                    if (data.isSuccess) {
+                        $('#successModalHref').attr("href", "Brand");
+                        $('#successModal').modal('show');
+                    }
+                     else {
+                         $('#failedModal').modal('show');
+                         $('#myModalFailedResult').text(data.responseError != ""
+                             && data.responseError != null ? data.responseError : 'ยกเลิกรวม Brand ไม่สำเร็จ');
+                     }
+
+                     $('#myModalFailedResult').val('');
+                    $('#confirmWithTextID').val('');
+                     $('#ConfirmModalWithText').val('');
+                     $('#myModalConfirmWithTextResult').val('');
+                     $('#myModalWarningResult').text('');
+                },
+                error: function () {
+                    $("#blocker").hide();
+                }
+            });
+          });
 
  });
 </script>

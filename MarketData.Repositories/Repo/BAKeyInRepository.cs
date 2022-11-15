@@ -140,6 +140,30 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RestoreBrandBAKeyIn(Guid brandID, string userID)
+        {
+            try
+            {
+                var baKeyInByOldBrand = GetBAKeyInBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in baKeyInByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID.GetValueOrDefault();
+                    item.Previous_BrandID = null;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTBAKeyIn.UpdateRange(baKeyInByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public TTBAKeyIn FindBAKeyInBy(Expression<Func<TTBAKeyIn, bool>> expression)
         {
             try
@@ -295,6 +319,30 @@ namespace MarketData.Repositories.Repo
                 {
                     item.Previous_BrandID = item.Brand_ID;
                     item.Brand_ID = newBrandID;
+                    item.Updated_By = new Guid(userID);
+                    item.Updated_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TTBAKeyInDetail.UpdateRange(baKeyInDetailByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RestoreBrandBAKeyInDetail(Guid brandID, string userID)
+        {
+            try
+            {
+                var baKeyInDetailByOldBrand = GetBAKeyInDetailListData(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var item in baKeyInDetailByOldBrand)
+                {
+                    item.Brand_ID = item.Previous_BrandID.GetValueOrDefault();
+                    item.Previous_BrandID = null;
                     item.Updated_By = new Guid(userID);
                     item.Updated_Date = Utility.GetDateNowThai();
                 }

@@ -406,6 +406,13 @@ namespace MarketData.Processes.Processes
                         lorealBrandRank = brandData.Loreal_Brand_Rank,
                         universe = brandData.Universe
                     };
+
+                    var brandSummary = repository.masterData.GetBrandSummaryListBy(c => c.Brand_ID == brandID);
+                    if (brandSummary.Any())
+                    {
+                        var allBrand = repository.masterData.GetBrandListBy(c => c.Brand_ID != Guid.Empty);
+                        response.brandInclude = brandSummary.Select(c => allBrand.Find(e => e.Brand_ID == c.Brand_ID_Include)?.Brand_Name).ToList();
+                    }
                 }
             }
             catch (Exception ex)
@@ -945,6 +952,44 @@ namespace MarketData.Processes.Processes
             }
 
             return response;
+        }
+
+        public async Task<SaveDataResponse> CanCelSummaryBrand(CancelBrandSummaryRequest request)
+        {
+            SaveDataResponse response = new SaveDataResponse();
+
+            try
+            {
+                var brandSummary = repository.masterData.GetBrandSummaryListBy(c => c.Brand_ID == request.brandID);
+                var brandRestore = brandSummary.Select(c => c.Brand_ID_Include).ToList();
+                await repository.masterData.RestoreBrandCounter(request.brandID, request.userID);
+
+                await repository.user.RestoreBrandOfficeUser(request.brandID, request.userID);
+                await repository.user.RestoreBrandUserCounter(request.brandID, request.userID);
+
+                await repository.adjust.RestoreBrandAdjustDataBrandDetail(request.brandID, request.userID);
+                await repository.adjust.RestoreBrandAdjustDetail(request.brandID, request.userID);
+
+                await repository.adminKeyIn.RestoreBrandAdminKeyInDetail(request.brandID, request.userID);
+
+                await repository.approve.RestoreBrandApproveKeyInDetail(request.brandID, request.userID);
+
+                await repository.baKeyIn.RestoreBrandBAKeyIn(request.brandID, request.userID);
+                await repository.baKeyIn.RestoreBrandBAKeyInDetail(request.brandID, request.userID);
+
+                await repository.masterData.DeleteBrandSummary(request.brandID);
+                await repository.masterData.RestoreBrand(brandRestore, request.userID);
+
+                response.isSuccess = true;
+            }
+            catch(Exception ex)
+            {
+                response.isSuccess = false;
+                response.responseError = ex.Message ?? ex.InnerException?.Message;
+            }
+
+            return response;
+
         }
 
         private async Task<SaveDataResponse> SummaryBrand(InsertBrandRequest request)

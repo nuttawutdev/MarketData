@@ -66,6 +66,30 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RestoreBrandOfficeUser(Guid brandID, string userID)
+        {
+            try
+            {
+                var userByOldBrand = GetUserBy(c => c.BrandOfficeID.HasValue && c.BrandOfficeID == brandID && c.Previous_BrandOfficeID != null);
+
+                foreach (var itemCounter in userByOldBrand)
+                {
+                    itemCounter.BrandOfficeID = itemCounter.Previous_BrandOfficeID;
+                    itemCounter.Previous_BrandOfficeID = null;
+                    itemCounter.Update_By = new Guid(userID);
+                    itemCounter.Update_Date = Utility.GetDateNowThai();
+                }
+
+                _dbContext.TMUser.UpdateRange(userByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public List<TMUserCounter> GetUserCounterBy(Expression<Func<TMUserCounter, bool>> expression)
         {
             try
@@ -88,6 +112,29 @@ namespace MarketData.Repositories.Repo
                 {
                     itemCounter.Previous_BrandID = itemCounter.Brand_ID;
                     itemCounter.Brand_ID = newBrandID;
+                }
+
+                _dbContext.TMUserCounter.UpdateRange(brandCounterByOldBrand);
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RestoreBrandUserCounter(Guid brandID, string userID)
+        {
+            try
+            {
+                var brandCounterByOldBrand = GetUserCounterBy(c => c.Brand_ID == brandID && c.Previous_BrandID != null);
+
+                foreach (var itemCounter in brandCounterByOldBrand)
+                {
+                    itemCounter.Brand_ID = itemCounter.Previous_BrandID.GetValueOrDefault();
+                    itemCounter.Previous_BrandID = null;
+                    
                 }
 
                 _dbContext.TMUserCounter.UpdateRange(brandCounterByOldBrand);
