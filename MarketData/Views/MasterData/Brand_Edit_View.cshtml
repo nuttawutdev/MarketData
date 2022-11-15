@@ -81,6 +81,22 @@
 
         </div>
     </div>
+
+    @if (Model.brandInclude != null && Model.brandInclude.Any())
+    {
+
+        <div class="row col-md-12 col-sm-12">
+            <div class="form-group col-md-6 col-sm-6">
+                <label>Brand ที่ทำการรวม</label>
+                @foreach (var itemBrand in Model.brandInclude)
+                {
+                    <input style="margin-bottom:5px" type="text" value="@itemBrand" class="form-control input-sm" disabled placeholder="">
+                }
+            </div>
+
+        </div>
+    }
+
     <div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>

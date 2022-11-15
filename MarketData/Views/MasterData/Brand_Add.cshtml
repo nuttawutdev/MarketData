@@ -93,16 +93,94 @@
         </div>
     </div>
 
-    <div class="row col-md-12 col-sm-12">
-        <div class="form-group col-md-6 col-sm-6">
-            <label>Brand ที่ต้องการรวม</label>
-            @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control ", multiple = "multiple", style = "height: 200px;" })
+    @*<div class="row col-md-12 col-sm-12">
+            <div class="form-group col-md-6 col-sm-6">
+                <label>Brand ที่ต้องการรวม</label>
+                @Html.DropDownListFor(n => n.brandID, new MultiSelectList(Model.brandList, "brandID", "brandName"), new { id = "brandList", @class = "form-control ", multiple = "multiple", style = "height: 200px;" })
 
-        </div>
+            </div>
+
+        </div>*@
+
+<div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+        <label>Brand ที่ต้องการรวม</label>
+        @Html.DropDownList("brandList", new SelectList(Model.brandList, "brandID", "brandName"), "Please select", new { id = "brandList", @class = "form-control col-sm-12" })
 
     </div>
 
-    <div class="row col-md-12 col-sm-12">
+    <div class="form-group col-md-3 col-sm-3" style=" align-self: flex-end;">
+        <button id="Add" class="btn btn-danger " type="button">Add</button>
+    </div>
+    <div style="margin-top:30px" class="form-group col-md-3 col-sm-3">
+        <label>
+            @if (Model.active)
+            {
+                <input value="" id="flagactive" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagactive" type="checkbox" data-toggle="toggle">
+            }
+            Active
+        </label>
+    </div>
+    <div style="margin-top:30px" class="form-group col-md-3 col-sm-3">
+        <label>
+            @if (Model.showInAdjust)
+            {
+                <input value="" id="flagShowInAdjust" checked type="checkbox" data-toggle="toggle">
+            }
+            else
+            {
+                <input value="" id="flagShowInAdjust" type="checkbox" data-toggle="toggle">
+            }
+            Show in adjust
+        </label>
+    </div>
+</div>
+
+    <div class="container-xl" style="overflow-x:auto; padding-top:20px;padding-left:20px;padding-right:20px">
+        <div class="table-responsive table-sm">
+            <div class="table-wrapper">
+                <div style=" overflow-x: auto;">
+                    <table class="table  table-hover " id="tblDetails">
+                        <thead class="table-secondary">
+                            <tr class="row m-0">
+                                <th class="col-10">Brand</th>
+                                <th class="col-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @*@{
+                                foreach (var item in Model.brandInclude)
+                                {
+                                    <tr class="row m-0">
+                                        <td class="userCounterID" hidden>@item.userCounterID</td>
+                                        <td class="col-4 departmentStoreName">@item.departmentStoreName</td>
+                                        <td class="col-2 departmentStoreID" hidden>@item.departmentStoreID</td>
+                                        <td class="col-4 brandName">@item.brandName</td>
+                                        <td class="col-2 brandID" hidden>@item.brandID</td>
+                                        <td class="col-2 channelName">@item.channelName</td>
+                                        <td class="col-2 channelID" hidden>@item.channelID</td>
+                                        <td class="col-2">
+                                            <a data-id="@item.userCounterID" class="delete-user buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            }*@
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*<div class="row col-md-12 col-sm-12">
         <div class="form-group col-md-6 col-sm-6">
             <label>
                 @if (Model.active)
@@ -130,7 +208,7 @@
             </label>
         </div>
 
-    </div>
+    </div>*@
     <div class="modal-footer">
         <button id="save" class="btn btn-danger " type="button">Save</button>
         <a href="Brand" class="btn btn-outline-danger">Cancel</a>
@@ -144,6 +222,13 @@
     $(document).ready(function () {
         $("#save").click(function () {
             var model = @Html.Raw(Json.Serialize(Model));
+
+
+            var memberDetails = new Array();
+            $("#tblDetails tbody tr").each(function (index, el) {
+                memberDetails.push($(el).find(".brandID").text());
+
+            })
 
              var frmdata = {
                  brandID: model.brandID,
@@ -161,7 +246,7 @@
                  active: $("#flagactive").prop("checked"),
                  showInAdjust: $("#flagShowInAdjust").prop("checked"),
                  userID: $('#iduserID').val(),
-                 brandIDList: $('#brandList').val(),
+                 brandIDList: memberDetails,
             };
 
 
@@ -218,5 +303,23 @@
 
         });
 
+        $(document).on('click', '.delete-brand', function () {
+            $(this).closest('tr').remove();
+        })
+
+        $("#Add").click(function () {
+            if ( $('#brandList').val() != "") {
+                //check duplicate user
+                var newRow = '<tr class="row m-0">'
+                    + '<td class="col-10 brandName">' + $('#brandList option:selected').text() + '</td>'
+                    + '<td class="brandID" hidden>' + $('#brandList').val() + '</td>'
+                    + '<td class="col-2"><a class="delete-brand buttonIcon btn btn-danger btn-sm" data-toggle="modal"><i class="ion-android-delete text-white"></i></a></td>'
+                    + ' </tr>';
+                $('#tblDetails tbody').append(newRow);
+
+            } else {
+
+            }
+        });
  });
 </script>

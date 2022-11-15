@@ -453,7 +453,7 @@ namespace MarketData.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertBrand([FromBody] InsertBrandRequest request)
         {
-            SaveDataResponse response;
+            SaveDataResponse response = new SaveDataResponse();
             request.brandID = request.brandID == Guid.Empty ? null : request.brandID;
             response = await process.masterData.InsertBrand(request);
             return Json(response);

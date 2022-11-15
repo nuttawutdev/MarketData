@@ -468,6 +468,15 @@ namespace MarketData.Processes.Processes
 
                 if (request.brandIDList != null && request.brandIDList.Any())
                 {
+                    var brandDuplicate = request.brandIDList.GroupBy(c => c).Where(e => e.Count() > 1).Select(x => x.Key);
+
+                    if (brandDuplicate.Any())
+                    {
+                        response.isSuccess = false;
+                        response.responseError = "Brand ที่ต้องการรวมซ้ำกัน";
+                        return response;
+                    }
+
                     if (brandByName.Any() && request.brandIDList.Contains(brandByName.FirstOrDefault().Brand_ID))
                     {
                         brandByName = new List<TMBrand>();

@@ -286,7 +286,7 @@
 
         $("#Add").click(function () {
             if ($('#departmentStoreList').val() != "" && $('#brandList').val() != "" && $('#channelList').val() != "") {
-                 //check duplicate user
+                //check duplicate user
                 var newRow = '<tr class="row m-0">'
                     + '<td class="col-4 departmentStoreName">' + $('#departmentStoreList option:selected').text() + '</td>'
                     + '<td class="departmentStoreID" hidden>' + $('#departmentStoreList').val() + '</td>'
@@ -301,7 +301,7 @@
             } else {
 
             }
-        })
+        });
 
         $("#save").click(function () {
             $("#blocker").show();
