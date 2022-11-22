@@ -1357,14 +1357,14 @@ namespace MarketData.Processes.Processes
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).Style.NumberFormat.Format = currencyFormat;
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).DataType = XLDataType.Number;
 
-                    var percentGrowth = Math.Round(storeCompare != null && storeCompare.sumStore != 0 ? ((itemGroup.sumStore / storeCompare.sumStore) - 1) * 100 : -100, 2);
+                    var percentGrowth = Math.Round(storeCompare != null && storeCompare.sumStore != 0 ? ((itemGroup.sumStore / storeCompare.sumStore) - 1) * 100 : itemGroup.sumStore > 0 ? 100: - 100);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).SetValue(percentGrowth / 100);
-                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).DataType = XLDataType.Number;
 
-                    var percentShare = Math.Round((itemGroup.sumStore / sumAllStore) * 100, 2);
+                    var percentShare = Math.Round((itemGroup.sumStore / sumAllStore) * 100);
                     worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).SetValue(percentShare / 100);
-                    worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).DataType = XLDataType.Number;
 
                     int columnBrandDetail = 6;
@@ -1444,7 +1444,7 @@ namespace MarketData.Processes.Processes
                             var brandCompare = listBrandCompareSelect.FirstOrDefault(c => c.brandID == itemBrand.brandID);
                             decimal percentGrowthBrand = -100;
                             percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0
-                                    ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                    ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemBrand.sumBrand > 0 ? 100 : itemBrand.sumBrand > 0 ? 100 : - 100);
 
                             worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(percentGrowthBrand / 100);
                         }
@@ -1453,7 +1453,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandDetail + 1).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -1464,12 +1464,12 @@ namespace MarketData.Processes.Processes
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).SetValue(itemBrand.brandName);
 
                         decimal percentShareBrand = 0;
-                        percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+                        percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.sumBrand / itemGroup.sumStore) * 100) : 0;
 
                         worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                         worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
                         columnBrandDetail = columnBrandDetail + 2;
@@ -1520,10 +1520,10 @@ namespace MarketData.Processes.Processes
                                 worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Merge();
 
                                 decimal percentShareBrand = 0;
-                                percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+                                percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.sumBrand / itemGroup.sumStore) * 100) : 0;
 
                                 worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(percentShareBrand / 100);
-                                worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -1533,7 +1533,7 @@ namespace MarketData.Processes.Processes
                                     var brandCompare = listBrandCompareSelect.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
                                     decimal percentGrowthBrand = Math.Round(-100M, 2);
 
-                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : brandNotTopDetail.sumBrand > 0 ? 100 : - 100);
 
                                     worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(percentGrowthBrand / 100);
                                 }
@@ -1542,7 +1542,7 @@ namespace MarketData.Processes.Processes
                                     worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(-1);
                                 }
 
-                                worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).DataType = XLDataType.Number;
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -1563,7 +1563,7 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 2;
                 }
 
-                var percentGrowthTotal = Math.Round(sumAllStoreCompare > 0 ? ((sumAllStore / sumAllStoreCompare) - 1) * 100 : -100, 2);
+                var percentGrowthTotal = Math.Round(sumAllStoreCompare > 0 ? ((sumAllStore / sumAllStoreCompare) - 1) * 100 : sumAllStore > 0 ? 100 : - 100);
 
                 var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
                 var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
@@ -1652,11 +1652,11 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).DataType = XLDataType.Number;
 
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).SetValue(percentGrowthTotal / 100);
-                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(10);
+               worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(9);
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).DataType = XLDataType.Number;
 
                 worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).SetValue(1);
-                worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.NumberFormat.SetNumberFormatId(10);
+               worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).Style.NumberFormat.SetNumberFormatId(9);
                 worksheet.Range(worksheet.Cell(rowData, 5), worksheet.Cell(rowData + 1, 5)).DataType = XLDataType.Number;
 
                 int columnBrandTotal = 6;
@@ -1681,9 +1681,9 @@ namespace MarketData.Processes.Processes
                         brandTotalSelect.Add(brandDetail.brandName);
                         var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
-                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStore) * 100, 2);
+                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStore) * 100);
                         worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandTotal).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -1693,7 +1693,7 @@ namespace MarketData.Processes.Processes
 
                         if (brandCompare != null)
                         {
-                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandDetail.sumTotalBrand > 0 ? 100 : - 100);
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
                         }
                         else
@@ -1701,7 +1701,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandTotal + 1).DataType = XLDataType.Number;
                         worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -1751,21 +1751,21 @@ namespace MarketData.Processes.Processes
                             worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Merge();
                             worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllStore) * 100, 2);
+                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllStore) * 100);
                             worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(percentShareBrand / 100);
 
                             worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 1, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
-                            worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandTotal).DataType = XLDataType.Number;
 
                             var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
 
                             if (brandCompare != null)
                             {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumTotalBrand > 0 ? 100 : - 100);
                                 worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
                             }
                             else
@@ -1773,7 +1773,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).DataType = XLDataType.Number;
                             break;
                         }
@@ -1836,9 +1836,9 @@ namespace MarketData.Processes.Processes
 
                         var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
-                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
+                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllStoreCompare) * 100);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(10);
+                       worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -1848,7 +1848,7 @@ namespace MarketData.Processes.Processes
 
                         if (brandCompare != null)
                         {
-                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandDetail.sumTotalBrand > 0 ? 100 : - 100);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(percentGrowthBrand / 100);
                         }
                         else
@@ -1856,7 +1856,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).DataType = XLDataType.Number;
                         worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -1903,9 +1903,9 @@ namespace MarketData.Processes.Processes
                             worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Merge();
                             worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllStoreCompare) * 100, 2);
+                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllStoreCompare) * 100);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).DataType = XLDataType.Number;
 
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -1917,7 +1917,7 @@ namespace MarketData.Processes.Processes
 
                             if (brandCompare != null)
                             {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumTotalBrand > 0 ? 100 : - 100);
                                 worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(percentGrowthBrand / 100);
                             }
                             else
@@ -1925,7 +1925,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).DataType = XLDataType.Number;
                             break;
                         }
@@ -2204,13 +2204,13 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
-                        percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+                        percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((itemBrand.sumBrand / itemGroup.sumStore) * 100) : 0;
 
                         worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                         worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                         worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                         worksheet.Cell(rowData + 2, columnBrandDetail).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 2, columnBrandDetail).DataType = XLDataType.Number;
 
                         worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
@@ -2235,7 +2235,7 @@ namespace MarketData.Processes.Processes
                             decimal percentGrowthBrand = -100;
 
                             percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0
-                                   ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                   ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemBrand.sumBrand > 0 ? 100 : - 100);
 
 
                             worksheet.Cell(rowData, columnBrandDetail).SetValue(percentGrowthBrand / 100);
@@ -2245,7 +2245,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData, columnBrandDetail).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, columnBrandDetail).DataType = XLDataType.Number;
                         worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                         worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -2315,7 +2315,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.Format = currencyFormat;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
-                                percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.sumBrand / itemGroup.sumStore) * 100, 2) : 0;
+                                percentShareBrand = itemGroup.sumStore > 0 ? Math.Round((brandNotTopDetail.sumBrand / itemGroup.sumStore) * 100) : 0;
 
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -2323,7 +2323,7 @@ namespace MarketData.Processes.Processes
 
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                                 worksheet.Cell(rowData + 2, columnBrandDetail).SetValue(percentShareBrand / 100);
-                                worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 2, columnBrandDetail).DataType = XLDataType.Number;
 
                                 columnBrandDetail++;
@@ -2335,7 +2335,7 @@ namespace MarketData.Processes.Processes
                                     var brandCompare = listBrandSelectCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
                                     decimal percentGrowthBrand = Math.Round(-100M, 2);
 
-                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : brandNotTopDetail.sumBrand > 0 ? 100 : - 100);
 
                                     worksheet.Cell(rowData, columnBrandDetail).SetValue(percentGrowthBrand / 100);
                                 }
@@ -2344,7 +2344,7 @@ namespace MarketData.Processes.Processes
                                     worksheet.Cell(rowData, columnBrandDetail).SetValue(-1);
                                 }
 
-                                worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData, columnBrandDetail).DataType = XLDataType.Number;
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -2375,7 +2375,7 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 3;
                 }
 
-                var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100, 2);
+                var percentGrowthTotal = Math.Round(((sumAllStore / sumAllStoreCompare) - 1) * 100);
                 var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
                 var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
                 var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
@@ -2488,7 +2488,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 2, columnBrandTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 2, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandDetail.sumTotalBrand > 0 ? 100 : - 100);
                             worksheet.Cell(rowData, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
                         }
                         else
@@ -2496,7 +2496,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData, columnBrandTotal + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, columnBrandTotal + 1).DataType = XLDataType.Number;
                         worksheet.Cell(rowData, columnBrandTotal + 1).Style.Fill.BackgroundColor = percentTotalColorXL;
                         worksheet.Cell(rowData, columnBrandTotal + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -2550,7 +2550,7 @@ namespace MarketData.Processes.Processes
 
                             if (brandCompare != null)
                             {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumTotalBrand > 0 ? 100 : - 100);
                                 worksheet.Cell(rowData, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
 
                                 worksheet.Cell(rowData + 2, columnBrandTotal).SetValue(brandCompare.sumTotalBrand);
@@ -2565,7 +2565,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData, columnBrandTotal + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData, columnBrandTotal + 1).DataType = XLDataType.Number;
 
                             worksheet.Cell(rowData, columnBrandTotal + 1).Style.Fill.BackgroundColor = percentTotalColorXL;
@@ -2932,9 +2932,9 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 3).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 3).DataType = XLDataType.Number;
 
-                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 ? Math.Round((brandCompare.sumBrand / sumTotalCompare) * 100, 2) : 0;
+                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 ? Math.Round((brandCompare.sumBrand / sumTotalCompare) * 100) : 0;
                         worksheet.Cell(rowData, 4).SetValue(percentShareBrandCompare / 100);
-                        worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -3002,22 +3002,22 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 6).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 6).DataType = XLDataType.Number;
 
-                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / sumTotalCurrent) * 100, 2) : 0;
+                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / sumTotalCurrent) * 100) : 0;
                         worksheet.Cell(rowData, 7).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemGroup.sumBrand > 0 ? 100: - 100);
                         worksheet.Cell(rowData, 8).SetValue(percentGrowthBrand / 100);
-                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 8).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
                         worksheet.Cell(rowData, 9).SetValue((percentShareBrand - percentShareBrandCompare) / 100);
-                        worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 9).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 9).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -3038,9 +3038,9 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 3).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 3).DataType = XLDataType.Number;
 
-                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 ? Math.Round((brandCompare.sumBrand / sumTotalCompare) * 100, 2) : 0;
+                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 ? Math.Round((brandCompare.sumBrand / sumTotalCompare) * 100) : 0;
                         worksheet.Cell(rowData, 4).SetValue(percentShareBrandCompare / 100);
-                        worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 4).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -3108,22 +3108,22 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 5).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
-                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / sumTotalCurrent) * 100, 2) : 0;
+                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / sumTotalCurrent) * 100) : 0;
                         worksheet.Cell(rowData, 6).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData, 6).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 6).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 6).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemGroup.sumBrand > 0 ? 100 : -100);
                         worksheet.Cell(rowData, 7).SetValue(percentGrowthBrand / 100);
-                        worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
                         worksheet.Cell(rowData, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
 
                         worksheet.Cell(rowData, 8).SetValue((percentShareBrand - percentShareBrandCompare) / 100);
-                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
 
@@ -3143,9 +3143,9 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 4).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
-                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 && totalCompareBrandAmount > 0 ? Math.Round((brandCompare.sumBrand / totalCompareBrandAmount) * 100, 2) : 0;
+                        var percentShareBrandCompare = brandCompare != null && brandCompare.sumBrand > 0 && totalCompareBrandAmount > 0 ? Math.Round((brandCompare.sumBrand / totalCompareBrandAmount) * 100) : 0;
                         worksheet.Cell(rowData, 5).SetValue(percentShareBrandCompare / 100);
-                        worksheet.Cell(rowData, 5).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 5).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData, 6).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -3158,14 +3158,14 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, 7).Style.NumberFormat.Format = currencyFormat;
                         worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
 
-                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / totalBrandAmount) * 100, 2) : 0;
+                        var percentShareBrand = itemGroup.sumBrand > 0 ? Math.Round((itemGroup.sumBrand / totalBrandAmount) * 100) : 0;
                         worksheet.Cell(rowData, 8).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
-                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                        var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand > 0 ? ((itemGroup.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemGroup.sumBrand > 0 ? 100 : -100);
                         worksheet.Cell(rowData, 9).SetValue(percentGrowthBrand / 100);
-                        worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData, 9).DataType = XLDataType.Number;
 
                     }
@@ -3197,7 +3197,7 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 3).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 4).SetValue(1);
-                    worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 5).SetValue(totalStoreCompare);
@@ -3210,16 +3210,16 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 6).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 7).SetValue(1);
-                    worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
 
-                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : -100, 2);
+                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : sumTotalCurrent > 0 ? 100 : - 100);
                     worksheet.Cell(rowData, 8).SetValue(percentGrowthTotal / 100);
-                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 9).SetValue(0);
-                    worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 9).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 10).SetValue(totalStore);
@@ -3233,7 +3233,7 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 3).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 4).SetValue(1);
-                    worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 4).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 5).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -3242,16 +3242,16 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 6).SetValue(1);
-                    worksheet.Cell(rowData, 6).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 6).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 6).DataType = XLDataType.Number;
 
-                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : -100, 2);
+                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : sumTotalCurrent > 0 ? 100 : -100);
                     worksheet.Cell(rowData, 7).SetValue(percentGrowthTotal / 100);
-                    worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 7).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 8).SetValue(0);
-                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
                 }
                 else
@@ -3269,9 +3269,9 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 4).Style.NumberFormat.Format = currencyFormat;
                     worksheet.Cell(rowData, 4).DataType = XLDataType.Number;
 
-                    var percentShareTotalCompare = totalAmountSaleCompare > 0 ? Math.Round(sumTotalCompare / totalAmountSaleCompare * 100, 2) : 0;
+                    var percentShareTotalCompare = totalAmountSaleCompare > 0 ? Math.Round(sumTotalCompare / totalAmountSaleCompare * 100) : 0;
                     worksheet.Cell(rowData, 5).SetValue(percentShareTotalCompare / 100);
-                    worksheet.Cell(rowData, 5).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 5).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 5).DataType = XLDataType.Number;
 
                     worksheet.Cell(rowData, 6).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -3284,14 +3284,14 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData, 7).Style.NumberFormat.Format = currencyFormat;
                     worksheet.Cell(rowData, 7).DataType = XLDataType.Number;
 
-                    var percentShareTotal = sumTotalCurrent > 0 ? Math.Round(sumTotalCurrent / totalAmountSale * 100, 2) : 0;
+                    var percentShareTotal = sumTotalCurrent > 0 ? Math.Round(sumTotalCurrent / totalAmountSale * 100) : 0;
                     worksheet.Cell(rowData, 8).SetValue(percentShareTotal / 100);
-                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 8).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 8).DataType = XLDataType.Number;
 
-                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : -100, 2);
+                    var percentGrowthTotal = Math.Round(sumTotalCompare > 0 ? ((sumTotalCurrent / sumTotalCompare) - 1) * 100 : sumTotalCurrent > 0 ? 100 : -100);
                     worksheet.Cell(rowData, 9).SetValue(percentGrowthTotal / 100);
-                    worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, 9).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, 9).DataType = XLDataType.Number;
                 }
 
@@ -3887,9 +3887,9 @@ namespace MarketData.Processes.Processes
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).Style.NumberFormat.Format = currencyFormat;
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).DataType = XLDataType.Number;
 
-                    var percentgrowth = Math.Round(dataCompare != null && dataCompare.sumTotal != 0 ? dataCurrent != null ? ((dataCurrent.sumTotal / dataCompare.sumTotal) - 1) * 100 : -100 : -100, 2);
+                    var percentgrowth = Math.Round(dataCompare != null && dataCompare.sumTotal != 0 ? dataCurrent != null ? ((dataCurrent.sumTotal / dataCompare.sumTotal) - 1) * 100 : dataCurrent.sumTotal > 0 ? 100 : - 100 : -100);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).SetValue(percentgrowth / 100);
-                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).DataType = XLDataType.Number;
 
                     int columnBrandDetail = 5;
@@ -3973,7 +3973,7 @@ namespace MarketData.Processes.Processes
                                 var brandCompare = groupBrandDataCompare.FirstOrDefault(c => c.brandID == itemBrand.brandID);
                                 decimal percentGrowthBrand = -100;
                                 percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0
-                                        ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                        ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemBrand.sumBrand > 0 ? 100 : - 100);
 
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(percentGrowthBrand / 100);
                             }
@@ -3982,7 +3982,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandDetail + 1).DataType = XLDataType.Number;
 
                             worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -3993,12 +3993,12 @@ namespace MarketData.Processes.Processes
                             worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).SetValue(itemBrand.brandName);
 
                             decimal percentShareBrand = 0;
-                            percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((itemBrand.sumBrand / dataCurrent.sumTotal) * 100, 2) : 0;
+                            percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((itemBrand.sumBrand / dataCurrent.sumTotal) * 100) : 0;
 
                             worksheet.Cell(rowData + 1, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
                             columnBrandDetail = columnBrandDetail + 2;
@@ -4050,10 +4050,10 @@ namespace MarketData.Processes.Processes
                                 worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                                 worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData, columnBrandDetail + 1)).Merge();
 
-                                decimal percentShareBrand = dataCurrent != null && dataCurrent.sumTotal > 0 ? Math.Round((brandNotTopDetail.sumBrand / dataCurrent.sumTotal) * 100, 2) : 0;
+                                decimal percentShareBrand = dataCurrent != null && dataCurrent.sumTotal > 0 ? Math.Round((brandNotTopDetail.sumBrand / dataCurrent.sumTotal) * 100) : 0;
 
                                 worksheet.Cell(rowData + 1, columnBrandDetail).SetValue(percentShareBrand / 100);
-                                worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -4062,7 +4062,7 @@ namespace MarketData.Processes.Processes
                                 if (groupBrandDataCompare.Any())
                                 {
                                     var brandCompare = groupBrandDataCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
-                                    decimal percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                    decimal percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : brandNotTopDetail.sumBrand > 0 ? 100 : - 100);
                                     worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(percentGrowthBrand / 100);
                                 }
                                 else
@@ -4070,7 +4070,7 @@ namespace MarketData.Processes.Processes
                                     worksheet.Cell(rowData + 1, columnBrandDetail + 1).SetValue(-1);
                                 }
 
-                                worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).DataType = XLDataType.Number;
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 1, columnBrandDetail + 1).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
@@ -4091,7 +4091,7 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 2;
                 }
 
-                var percentGrowthTotal = Math.Round(((sumAllMonth / sumAllMonthCompare) - 1) * 100, 2);
+                var percentGrowthTotal = Math.Round(((sumAllMonth / sumAllMonthCompare) - 1) * 100);
                 var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
                 var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
                 var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
@@ -4176,7 +4176,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 1, 3)).DataType = XLDataType.Number;
 
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).SetValue(percentGrowthTotal / 100);
-                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(10);
+                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).Style.NumberFormat.SetNumberFormatId(9);
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 1, 4)).DataType = XLDataType.Number;
 
                 int columnBrandTotal = 5;
@@ -4201,9 +4201,9 @@ namespace MarketData.Processes.Processes
                         brandTotalSelect.Add(brandDetail.brandName);
                         var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
-                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllMonth) * 100, 2);
+                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllMonth) * 100);
                         worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandTotal).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -4213,7 +4213,7 @@ namespace MarketData.Processes.Processes
 
                         if (brandCompare != null)
                         {
-                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandDetail.sumTotalBrand > 0 ? 100 : - 100);
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
                         }
                         else
@@ -4221,7 +4221,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 1, columnBrandTotal + 1).DataType = XLDataType.Number;
                         worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -4272,9 +4272,9 @@ namespace MarketData.Processes.Processes
                             worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Merge();
                             worksheet.Range(worksheet.Cell(rowData, columnBrandTotal), worksheet.Cell(rowData, columnBrandTotal + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllMonth) * 100, 2);
+                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllMonth) * 100);
                             worksheet.Cell(rowData + 1, columnBrandTotal).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandTotal).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandTotal).DataType = XLDataType.Number;
 
                             worksheet.Cell(rowData + 1, columnBrandTotal).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -4286,7 +4286,7 @@ namespace MarketData.Processes.Processes
 
                             if (brandCompare != null)
                             {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumTotalBrand > 0 ? 100 : - 100);
                                 worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(percentGrowthBrand / 100);
                             }
                             else
@@ -4294,7 +4294,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 1, columnBrandTotal + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 1, columnBrandTotal + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 1, columnBrandTotal + 1).DataType = XLDataType.Number;
 
                             break;
@@ -4356,9 +4356,9 @@ namespace MarketData.Processes.Processes
 
                         var brandCompare = groupBrandDetailOldCompare.FirstOrDefault(c => c.brandID == brandDetail.brandID);
 
-                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllMonthCompare) * 100, 2);
+                        var percentShareBrand = Math.Round((brandDetail.sumTotalBrand / sumAllMonthCompare) * 100);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue(percentShareBrand / 100);
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).DataType = XLDataType.Number;
 
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -4368,7 +4368,7 @@ namespace MarketData.Processes.Processes
 
                         if (brandCompare != null)
                         {
-                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                            var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandDetail.sumTotalBrand > 0 ? 100 : - 100);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(percentGrowthBrand / 100);
                         }
                         else
@@ -4376,7 +4376,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(-1);
                         }
 
-                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(10);
+                        worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(9);
                         worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).DataType = XLDataType.Number;
                         worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -4423,9 +4423,9 @@ namespace MarketData.Processes.Processes
                             worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Merge();
                             worksheet.Range(worksheet.Cell(rowData + 2, columnBrandTotalCompare), worksheet.Cell(rowData + 2, columnBrandTotalCompare + 1)).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllMonthCompare) * 100, 2);
+                            var percentShareBrand = Math.Round((brandNotTopDetail.sumTotalBrand / sumAllMonthCompare) * 100);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).DataType = XLDataType.Number;
 
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -4437,7 +4437,7 @@ namespace MarketData.Processes.Processes
 
                             if (brandCompare != null)
                             {
-                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                var percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand > 0 ? ((brandNotTopDetail.sumTotalBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumTotalBrand > 0 ? 100 : - 100);
                                 worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(percentGrowthBrand / 100);
                             }
                             else
@@ -4445,7 +4445,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 3, columnBrandTotalCompare + 1).DataType = XLDataType.Number;
 
                             break;
@@ -4728,9 +4728,9 @@ namespace MarketData.Processes.Processes
                     worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 2, 3)).DataType = XLDataType.Number;
 
 
-                    var percentgrowth = Math.Round(dataCompare != null && dataCompare.sumTotal != 0 ? dataCurrent != null ? ((dataCurrent.sumTotal / dataCompare.sumTotal) - 1) * 100 : -100 : -100, 2);
+                    var percentgrowth = Math.Round(dataCompare != null && dataCompare.sumTotal != 0 ? dataCurrent != null ? ((dataCurrent.sumTotal / dataCompare.sumTotal) - 1) * 100 : dataCurrent.sumTotal > 0 ? 100 : - 100 : -100);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).SetValue(percentgrowth / 100);
-                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).DataType = XLDataType.Number;
 
                     int columnBrandDetail = 5;
@@ -4808,13 +4808,13 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.Format = currencyFormat;
                             worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
-                            percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((itemBrand.sumBrand / dataCurrent.sumTotal) * 100, 2) : 0;
+                            percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((itemBrand.sumBrand / dataCurrent.sumTotal) * 100) : 0;
 
                             worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 2, columnBrandDetail).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 2, columnBrandDetail).DataType = XLDataType.Number;
 
                             worksheet.Range(worksheet.Cell(rowData, columnBrandDetail), worksheet.Cell(rowData + 2, columnBrandDetail)).Style.Fill.BackgroundColor = whiteXL;
@@ -4838,7 +4838,7 @@ namespace MarketData.Processes.Processes
                                 var brandCompare = groupBrandDataCompare.FirstOrDefault(c => c.brandID == itemBrand.brandID);
                                 decimal percentGrowthBrand = -100;
                                 percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0
-                                        ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                        ? ((itemBrand.sumBrand / brandCompare.sumBrand) - 1) * 100 : itemBrand.sumBrand > 0 ? 100 : - 100);
 
                                 worksheet.Cell(rowData, columnBrandDetail).SetValue(percentGrowthBrand / 100);
                             }
@@ -4847,7 +4847,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData, columnBrandDetail).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData, columnBrandDetail).DataType = XLDataType.Number;
                             worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -4919,7 +4919,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData + 1, columnBrandDetail).Style.NumberFormat.Format = currencyFormat;
                                 worksheet.Cell(rowData + 1, columnBrandDetail).DataType = XLDataType.Number;
 
-                                percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((brandNotTopDetail.sumBrand / dataCurrent.sumTotal) * 100, 2) : 0;
+                                percentShareBrand = dataCurrent.sumTotal > 0 ? Math.Round((brandNotTopDetail.sumBrand / dataCurrent.sumTotal) * 100) : 0;
 
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -4927,7 +4927,7 @@ namespace MarketData.Processes.Processes
 
                                 worksheet.Cell(rowData + 2, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                                 worksheet.Cell(rowData + 2, columnBrandDetail).SetValue(percentShareBrand / 100);
-                                worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData + 2, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData + 2, columnBrandDetail).DataType = XLDataType.Number;
 
                                 columnBrandDetail++;
@@ -4939,7 +4939,7 @@ namespace MarketData.Processes.Processes
                                     var brandCompare = groupBrandDataCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
                                     decimal percentGrowthBrand = Math.Round(-100M, 2);
 
-                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : -100, 2);
+                                    percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumBrand) - 1) * 100 : brandNotTopDetail.sumBrand > 0 ? 100 : - 100);
 
                                     worksheet.Cell(rowData, columnBrandDetail).SetValue(percentGrowthBrand / 100);
                                 }
@@ -4948,7 +4948,7 @@ namespace MarketData.Processes.Processes
                                     worksheet.Cell(rowData, columnBrandDetail).SetValue(-1);
                                 }
 
-                                worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(10);
+                                worksheet.Cell(rowData, columnBrandDetail).Style.NumberFormat.SetNumberFormatId(9);
                                 worksheet.Cell(rowData, columnBrandDetail).DataType = XLDataType.Number;
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                                 worksheet.Cell(rowData, columnBrandDetail).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -4979,7 +4979,7 @@ namespace MarketData.Processes.Processes
                     rowData = rowData + 3;
                 }
 
-                var percentGrowthTotal = Math.Round(((sumAllMonth / sumAllMonthCompare) - 1) * 100, 2);
+                var percentGrowthTotal = Math.Round(((sumAllMonth / sumAllMonthCompare) - 1) * 100);
                 var allBrandDetail = listGroup.SelectMany(c => c.brandDetail);
                 var allBrandDetailCompare = listGroupCompare.SelectMany(c => c.brandDetail);
                 var allBrandDetailOldCompare = listGroupOldCompare.SelectMany(c => c.brandDetail);
@@ -5045,7 +5045,7 @@ namespace MarketData.Processes.Processes
                 worksheet.Range(worksheet.Cell(rowData, 3), worksheet.Cell(rowData + 2, 3)).DataType = XLDataType.Number;
 
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).SetValue(percentGrowthTotal / 100);
-                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).Style.NumberFormat.SetNumberFormatId(10);
+                worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).Style.NumberFormat.SetNumberFormatId(9);
                 worksheet.Range(worksheet.Cell(rowData, 4), worksheet.Cell(rowData + 2, 4)).DataType = XLDataType.Number;
 
 
@@ -5092,13 +5092,13 @@ namespace MarketData.Processes.Processes
                     worksheet.Cell(rowData + 1, columnBrandDetailTotal).Style.NumberFormat.Format = currencyFormat;
                     worksheet.Cell(rowData + 1, columnBrandDetailTotal).DataType = XLDataType.Number;
 
-                    percentShareBrand = sumAllMonth > 0 ? Math.Round((itemBrand.sumBrand / sumAllMonth) * 100, 2) : 0;
+                    percentShareBrand = sumAllMonth > 0 ? Math.Round((itemBrand.sumBrand / sumAllMonth) * 100) : 0;
 
                     worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                     worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                     worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                     worksheet.Cell(rowData + 2, columnBrandDetailTotal).SetValue(percentShareBrand / 100);
-                    worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData + 2, columnBrandDetailTotal).DataType = XLDataType.Number;
 
                     worksheet.Range(worksheet.Cell(rowData, columnBrandDetailTotal), worksheet.Cell(rowData + 2, columnBrandDetailTotal)).Style.Fill.BackgroundColor = whiteXL;
@@ -5122,7 +5122,7 @@ namespace MarketData.Processes.Processes
                         var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == itemBrand.brandID);
                         decimal percentGrowthBrand = -100;
                         percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand != 0
-                                ? ((itemBrand.sumBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                ? ((itemBrand.sumBrand / brandCompare.sumTotalBrand) - 1) * 100 : itemBrand.sumBrand > 0 ? 100 : - 100);
 
                         worksheet.Cell(rowData, columnBrandDetailTotal).SetValue(percentGrowthBrand / 100);
                     }
@@ -5131,7 +5131,7 @@ namespace MarketData.Processes.Processes
                         worksheet.Cell(rowData, columnBrandDetailTotal).SetValue(-1);
                     }
 
-                    worksheet.Cell(rowData, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(10);
+                    worksheet.Cell(rowData, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(9);
                     worksheet.Cell(rowData, columnBrandDetailTotal).DataType = XLDataType.Number;
                     worksheet.Cell(rowData, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                     worksheet.Cell(rowData, columnBrandDetailTotal).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -5211,7 +5211,7 @@ namespace MarketData.Processes.Processes
                             worksheet.Cell(rowData + 1, columnBrandDetailTotal).Style.NumberFormat.Format = currencyFormat;
                             worksheet.Cell(rowData + 1, columnBrandDetailTotal).DataType = XLDataType.Number;
 
-                            var percentShareBrand = sumAllMonth > 0 ? Math.Round((brandNotTopDetail.sumBrand / sumAllMonth) * 100, 2) : 0;
+                            var percentShareBrand = sumAllMonth > 0 ? Math.Round((brandNotTopDetail.sumBrand / sumAllMonth) * 100) : 0;
 
                             worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Border.RightBorder = XLBorderStyleValues.Thin;
@@ -5219,7 +5219,7 @@ namespace MarketData.Processes.Processes
 
                             worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData + 2, columnBrandDetailTotal).SetValue(percentShareBrand / 100);
-                            worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData + 2, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData + 2, columnBrandDetailTotal).DataType = XLDataType.Number;
 
                             columnBrandDetailTotal++;
@@ -5231,7 +5231,7 @@ namespace MarketData.Processes.Processes
                                 var brandCompare = groupBrandDetailCompare.FirstOrDefault(c => c.brandID == brandNotTopDetail.brandID);
                                 decimal percentGrowthBrand = Math.Round(-100M, 2);
 
-                                percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumTotalBrand) - 1) * 100 : -100, 2);
+                                percentGrowthBrand = Math.Round(brandCompare != null && brandCompare.sumTotalBrand != 0 ? ((brandNotTopDetail.sumBrand / brandCompare.sumTotalBrand) - 1) * 100 : brandNotTopDetail.sumBrand > 0 ? 100 : - 100);
 
                                 worksheet.Cell(rowData, columnBrandDetailTotal).SetValue(percentGrowthBrand / 100);
                             }
@@ -5240,7 +5240,7 @@ namespace MarketData.Processes.Processes
                                 worksheet.Cell(rowData, columnBrandDetailTotal).SetValue(-1);
                             }
 
-                            worksheet.Cell(rowData, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(10);
+                            worksheet.Cell(rowData, columnBrandDetailTotal).Style.NumberFormat.SetNumberFormatId(9);
                             worksheet.Cell(rowData, columnBrandDetailTotal).DataType = XLDataType.Number;
                             worksheet.Cell(rowData, columnBrandDetailTotal).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
                             worksheet.Cell(rowData, columnBrandDetailTotal).Style.Border.RightBorder = XLBorderStyleValues.Thin;

@@ -494,7 +494,7 @@ namespace MarketData.Processes.Processes
                                     {
                                         var keyInDetailBrandLoreal = baKeyInBrand.OrderByDescending(r => r.Amount_Sales).FirstOrDefault(c => c.BAKeyIn_ID == brandLorealKeyIn[0].ID);
 
-                                        if (!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
+                                        if (keyInDetailBrandLoreal != null &&!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
                                         {
                                             remark = keyInDetailBrandLoreal.Remark;
                                             break;
