@@ -584,7 +584,8 @@ namespace MarketData.Processes.Processes
                     listAdjustDetailData.Add(adjustDetailData);
                 }
 
-                if (adjustData.Year == GetDateNowThai().Year.ToString())
+                if (adjustData.Year == GetDateNowThai().Year.ToString()
+                    || (adjustData.Year == (GetDateNowThai().Year - 1).ToString() && adjustData.Month == "12"))
                 {
                     listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0
                     || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year

@@ -445,7 +445,8 @@ namespace MarketData.Processes.Processes
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
 
-                if (BAKeyInData.Year == GetDateNowThai().Year.ToString())
+                if (BAKeyInData.Year == GetDateNowThai().Year.ToString() 
+                    || (BAKeyInData.Year == (GetDateNowThai().Year - 1).ToString() && BAKeyInData.Month == "12"))
                 {
                     response.data = BAKeyInDetailList
                        .Where(e => e.amountSalePreviousYear > 0
@@ -672,7 +673,8 @@ namespace MarketData.Processes.Processes
                     itemAdmin.brandColor = brandDataList.FirstOrDefault(c => c.Brand_ID == itemAdmin.brandID).Brand_Color;
                 }
 
-                if (request.year == GetDateNowThai().Year.ToString())
+                if (request.year == GetDateNowThai().Year.ToString()
+                    || (request.year == (GetDateNowThai().Year - 1).ToString() && request.month == "12"))
                 {
                     response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0
                          || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year

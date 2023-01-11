@@ -176,7 +176,8 @@ namespace MarketData.Processes.Processes
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
 
-                if (BAKeyInData.Year == GetDateNowThai().Year.ToString())
+                if (BAKeyInData.Year == GetDateNowThai().Year.ToString()
+                    || (BAKeyInData.Year == (GetDateNowThai().Year - 1).ToString() && BAKeyInData.Month == "12"))
                 {
                     response.data = baKeyInList
                        .Where(e => e.amountSalePreviousYear > 0
