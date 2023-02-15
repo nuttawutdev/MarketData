@@ -33,28 +33,29 @@ namespace MarketData.Repositories.Repo
                             x.Sales_Year,
                             x.Brand_Type_ID,
                             x.Store_Id,
-                            x.Time_Keyin
+                            x.Time_Keyin,
+                            x.Previous_BrandID
                         })
                     .Select(e => new Brand_Ranking
                     {
-                        ID = e.FirstOrDefault().ID,
+                        ID = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().ID,
                         Brand_ID = e.Key.Brand_ID,
-                        Brand_Name = e.FirstOrDefault().Brand_Name,
+                        Brand_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Brand_Name,
                         BrandG_Id = e.Key.BrandG_Id,
                         Universe = e.Key.Universe,
-                        Amount_Sales = e.FirstOrDefault().Amount_Sales,
+                        Amount_Sales = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Amount_Sales,
                         Brand_Type_ID = e.Key.Brand_Type_ID,
-                        Brand_Type_Name = e.FirstOrDefault().Brand_Type_Name,
-                        Department_Store_Name = e.FirstOrDefault().Department_Store_Name,
-                        Is_Loreal_Brand = e.FirstOrDefault().Is_Loreal_Brand,
-                        Net_Sales = e.FirstOrDefault().Net_Sales,
-                        Report_Color = e.FirstOrDefault().Report_Color,
+                        Brand_Type_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Brand_Type_Name,
+                        Department_Store_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Department_Store_Name,
+                        Is_Loreal_Brand = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Is_Loreal_Brand,
+                        Net_Sales = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Net_Sales,
+                        Report_Color = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Report_Color,
                         Sales_Month = e.Key.Sales_Month,
                         Sales_Week = e.Key.Sales_Week,
                         Sales_Year = e.Key.Sales_Year,
                         Store_Id = e.Key.Store_Id,
                         Time_Keyin = e.Key.Time_Keyin,
-                        Whole_Sales = e.FirstOrDefault().Whole_Sales
+                        Whole_Sales = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Whole_Sales
                     }).ToList();
                 return result;
 

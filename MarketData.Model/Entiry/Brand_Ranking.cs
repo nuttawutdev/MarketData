@@ -26,5 +26,7 @@ namespace MarketData.Model.Entiry
         public bool Is_Loreal_Brand { get; set; }
         public int Time_Keyin { get; set; }
         public string Department_Store_Name { get; set; }
+        public DateTime? Update_Date { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

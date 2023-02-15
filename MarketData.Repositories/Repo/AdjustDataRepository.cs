@@ -36,7 +36,7 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-                return _dbContext.TTAdjustData.Where(expression).FirstOrDefault();
+                return _dbContext.TTAdjustData.Where(expression).OrderByDescending(r=>r.Update_Date).FirstOrDefault();
 
             }
             catch (Exception ex)

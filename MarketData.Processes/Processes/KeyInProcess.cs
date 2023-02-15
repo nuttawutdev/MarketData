@@ -445,7 +445,7 @@ namespace MarketData.Processes.Processes
                 response.month = Enum.GetName(typeof(MonthEnum), Int32.Parse(BAKeyInData.Month));
                 response.week = BAKeyInData.Week;
 
-                if (BAKeyInData.Year == GetDateNowThai().Year.ToString() 
+                if (BAKeyInData.Year == GetDateNowThai().Year.ToString()
                     || (BAKeyInData.Year == (GetDateNowThai().Year - 1).ToString() && BAKeyInData.Month == "12"))
                 {
                     response.data = BAKeyInDetailList
@@ -639,7 +639,33 @@ namespace MarketData.Processes.Processes
                         && c.Month == request.month
                         && c.Week == "4"
                         && c.Universe == request.universe);
-                var adjustDataIDList = adjustDataPreviousYearWeek4.Select(e => e.ID);
+                var groupDataPreviousYearWeek4 = adjustDataPreviousYearWeek4.GroupBy(
+                        x => new
+                        {
+                            x.Year,
+                            x.Month,
+                            x.Universe,
+                            x.Week,
+                            x.DepartmentStore_ID,
+                            x.DistributionChannel_ID,
+                            x.RetailerGroup_ID
+                        }).Select(c => new TTAdjustData()
+                        {
+                            ID = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().ID,
+                            Create_By = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().Create_By,
+                            Create_Date = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().Create_Date,
+                            DepartmentStore_ID = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().DepartmentStore_ID,
+                            DistributionChannel_ID = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().DistributionChannel_ID,
+                            Month = c.Key.Month,
+                            RetailerGroup_ID = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().RetailerGroup_ID,
+                            Status_ID = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().Status_ID,
+                            Universe = c.Key.Universe,
+                            Update_By = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().Update_By,
+                            Update_Date = c.OrderByDescending(e => e.Update_Date).FirstOrDefault().Update_Date,
+                            Week = c.Key.Week,
+                            Year = c.Key.Year
+                        }).ToList();
+                var adjustDataIDList = groupDataPreviousYearWeek4.Select(e => e.ID);
 
                 var allAdjustDataDetail = repository.adjust.GetAdjustDataDetaillBy(c => adjustDataIDList.Contains(c.AdjustData_ID));
 
@@ -656,13 +682,13 @@ namespace MarketData.Processes.Processes
                             // || itemCounter.alwayShow
                             )
                         {
-                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
+                            AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, groupDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                             adminKeyInDetailList.Add(dataDetail);
                         }
                     }
                     else
                     {
-                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, adjustDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
+                        AdminKeyInDetailData dataDetail = GetAdminKeyInDetailData(itemCounter, request, allAdminKeyInData, groupDataPreviousYearWeek4, allAdjustDataDetail, allBAKeyInData);
                         adminKeyInDetailList.Add(dataDetail);
                     }
                 }

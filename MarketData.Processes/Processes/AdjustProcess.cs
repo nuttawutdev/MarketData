@@ -64,7 +64,7 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemDepartment in departmentStoreByFilter)
                 {
-                    var adjustStatusData = listAdjustData.FirstOrDefault(
+                    var adjustStatusData = listAdjustData.OrderByDescending(d=>d.Update_Date).FirstOrDefault(
                         c => c.DistributionChannel_ID == itemDepartment.distributionChannelID
                         //&& c.RetailerGroup_ID == itemDepartment.retailerGroupID
                         && c.DepartmentStore_ID == itemDepartment.departmentStoreID);
