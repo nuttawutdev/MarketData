@@ -25,5 +25,7 @@ namespace MarketData.Model.Entiry
         public string Universe { get; set; }
         public Guid Store_Id { get; set; }
         public int? Time_Keyin { get; set; }
+        public DateTime? Update_Date { get; set; }
+        public Guid? Previous_BrandID { get; set; }
     }
 }

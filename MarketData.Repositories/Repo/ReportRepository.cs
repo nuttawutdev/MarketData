@@ -96,7 +96,46 @@ namespace MarketData.Repositories.Repo
         {
             try
             {
-                return _dbContext.Data_Exporting.AsNoTracking().Where(expression).ToList();
+                var queryResult = _dbContext.Data_Exporting.AsNoTracking().Where(expression).ToList();
+                var result = queryResult.GroupBy(
+                        x => new
+                        {
+                            x.BrandG_Name,
+                            x.StoreG_Name,
+                            x.Brand_Segment_Name,
+                            x.Store_Id,
+                            x.Universe,
+                            x.Sales_Week,
+                            x.Sales_Month,
+                            x.Sales_Year,
+                            x.Brand_Type_Name,
+                            x.Brand_Name,
+                            x.Time_Keyin,
+                            x.Previous_BrandID
+                        })
+                    .Select(e => new Data_Exporting
+                    {
+                        ID = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().ID,
+                        BrandG_Name = e.Key.BrandG_Name,
+                        Brand_Name = e.Key.Brand_Name,
+                        Brand_Segment_Name = e.Key.Brand_Segment_Name,
+                        Universe = e.Key.Universe,
+                        Amount_Sales = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Amount_Sales,
+                        Previous_BrandID = e.Key.Previous_BrandID,
+                        Brand_Type_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Brand_Type_Name,
+                        Region_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Region_Name,
+                        Store_Rank = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Store_Rank,
+                        StoreG_Name = e.Key.StoreG_Name,
+                        Store_Name = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Store_Name,
+                        Update_Date = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Update_Date,
+                        Sales_Month = e.Key.Sales_Month,
+                        Sales_Week = e.Key.Sales_Week,
+                        Sales_Year = e.Key.Sales_Year,
+                        Store_Id = e.Key.Store_Id,
+                        Time_Keyin = e.Key.Time_Keyin,
+                        Whole_Sales = e.OrderByDescending(c => c.Update_Date).FirstOrDefault().Whole_Sales
+                    }).ToList();
+                return result;
 
             }
             catch (Exception ex)
