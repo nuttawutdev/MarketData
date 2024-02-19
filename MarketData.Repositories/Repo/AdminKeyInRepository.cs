@@ -151,5 +151,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> RemoveAdminKeyInDetai(List<TTAdminKeyInDetail> listDetail)
+        {
+            try
+            {
+                _dbContext.TTAdminKeyInDetail.RemoveRange(listDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

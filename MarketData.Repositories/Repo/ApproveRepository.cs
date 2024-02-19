@@ -263,5 +263,31 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> RemoveApproveKeyInDetai(List<TTApproveKeyInDetail> dataDetail)
+        {
+            try
+            {
+                _dbContext.TTApproveKeyInDetail.RemoveRange(dataDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RemoveApproveKeyIn(List<TTApproveKeyIn> dataDetail)
+        {
+            try
+            {
+                _dbContext.TTApproveKeyIn.RemoveRange(dataDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

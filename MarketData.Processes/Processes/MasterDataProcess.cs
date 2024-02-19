@@ -989,9 +989,42 @@ namespace MarketData.Processes.Processes
                 await repository.masterData.DeleteBrandSummary(request.brandID);
                 await repository.masterData.RestoreBrand(brandRestore, request.userID);
 
+                // ลบยอดขายทั้งหมดของ Brand ที่ทำการยกเลิก
+                var adjustDataBrandDetail = repository.adjust.GetAdjustDataBrandDetaillBy(c => c.Brand_ID == request.brandID);
+                var adjustDataDetail = repository.adjust.GetAdjustDataDetaillBy(c => c.Brand_ID == request.brandID);
+
+                await repository.adjust.RemoveAdjustDetai(adjustDataDetail);
+                await repository.adjust.RemoveAdjustDataBrandDetai(adjustDataBrandDetail);
+
+                var adminKeyInDetail = repository.adminKeyIn.GetAdminKeyInDetailBy(c => c.Brand_ID == request.brandID);
+                await repository.adminKeyIn.RemoveAdminKeyInDetai(adminKeyInDetail);
+
+                var baKeyInDetail = repository.baKeyIn.GetBAKeyInDetailListData(c => c.Brand_ID == request.brandID);
+                var baKeyIn = repository.baKeyIn.GetBAKeyInBy(c => c.Brand_ID == request.brandID);
+
+                var baKeyInIDRemove = baKeyIn.Select(c => c.ID);
+
+                var approveeKeyIn = repository.approve.GetApproveKeyInBy(c => baKeyInIDRemove.Contains(c.BAKeyIn_ID));
+                var approveKeyInDetail = repository.approve.GetApproveKeyInDetail(c => c.Brand_ID == request.brandID);
+                await repository.approve.RemoveApproveKeyInDetai(approveKeyInDetail);
+                await repository.approve.RemoveApproveKeyIn(approveeKeyIn);
+
+
+                await repository.baKeyIn.RemoveBAKeyInDetai(baKeyInDetail);
+                await repository.baKeyIn.RemoveBAKeyIn(baKeyIn);
+
+
+                var userCounter = repository.user.GetUserCounterBy(c => c.Brand_ID == request.brandID);
+                await repository.user.RemoveUserCounter(userCounter);
+
+                var counter = repository.masterData.GetCounterListBy(c => c.Brand_ID == request.brandID);
+                await repository.masterData.RemoveCounter(counter);
+
+                repository.masterData.DeleteBrand(new DeleteBrandRequest { brandID = request.brandID, userID = request.userID });
+
                 response.isSuccess = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.isSuccess = false;
                 response.responseError = ex.Message ?? ex.InnerException?.Message;

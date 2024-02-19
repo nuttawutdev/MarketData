@@ -399,5 +399,18 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> RemoveUserCounter(List<TMUserCounter> listDetail)
+        {
+            try
+            {
+                _dbContext.TMUserCounter.RemoveRange(listDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

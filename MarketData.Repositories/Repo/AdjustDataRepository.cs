@@ -199,6 +199,19 @@ namespace MarketData.Repositories.Repo
             }
         }
 
+        public async Task<bool> RemoveAdjustDataBrandDetai(List<TTAdjustDataBrandDetail> adjustDataBrandDetail)
+        {
+            try
+            {
+                _dbContext.TTAdjustDataBrandDetail.RemoveRange(adjustDataBrandDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<bool> RemoveAllAdjustBrandDetailByID(Guid adjustDataID)
         {
             try

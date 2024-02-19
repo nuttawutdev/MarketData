@@ -474,5 +474,31 @@ namespace MarketData.Repositories.Repo
                 throw ex;
             }
         }
+
+        public async Task<bool> RemoveBAKeyInDetai(List<TTBAKeyInDetail> listDetail)
+        {
+            try
+            {
+                _dbContext.TTBAKeyInDetail.RemoveRange(listDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<bool> RemoveBAKeyIn(List<TTBAKeyIn> listDetail)
+        {
+            try
+            {
+                _dbContext.TTBAKeyIn.RemoveRange(listDetail);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
