@@ -46,5 +46,6 @@ namespace MarketData.Model.Response.AdjustData
         public decimal? percentGrowth { get; set; }
         public DateTime? counterCreateDate { get; set; }
         public bool alwayShow { get; set; }
+        public bool alwayShowKeyIn { get; set; }
     }
 }

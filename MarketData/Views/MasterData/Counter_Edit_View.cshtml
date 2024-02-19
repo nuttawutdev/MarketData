@@ -60,6 +60,17 @@
                 }
                 Alway show in current year
             </label>
+            <label style="margin-left:4rem">
+                @if (Model.alwayShowKeyIn)
+                {
+                    <input value="" id="flagalwaykeyin" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagalwaykeyin" type="checkbox" data-toggle="toggle">
+                }
+                Alway Show Keyin
+            </label>
         </div>
 
     </div>

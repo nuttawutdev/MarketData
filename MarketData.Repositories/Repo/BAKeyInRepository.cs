@@ -286,7 +286,8 @@ namespace MarketData.Repositories.Repo
                          wholeSale = e.Whole_Sales,
                          year = e.Year,
                          counterCreateDate = counter?.Created_Date,
-                         alwayShow = counter.Alway_Show_Current_Year.GetValueOrDefault()
+                         alwayShow = counter.Alway_Show_Current_Year.GetValueOrDefault(),
+                         alwayShowKeyIn = counter.Alway_Show_Key_In.GetValueOrDefault(),
                      }).ToList();
 
                 return baKeyInDetailDataList;

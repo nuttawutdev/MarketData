@@ -20,5 +20,6 @@ namespace MarketData.Model.Entiry
         public string Updated_By { get; set; }
         public bool? Alway_Show_Current_Year { get; set; }
         public Guid? Previous_BrandID { get; set; }
+        public bool? Alway_Show_Key_In { get; set; }
     }
 }

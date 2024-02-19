@@ -18,6 +18,7 @@ namespace MarketData.Models
         public string brandName { get; set; }
         public bool active { get; set; }
         public bool alwayShow { get; set; }
+        public bool alwayShowKeyIn { get; set; }
         public List<DepartmentStoreViewModel> departmentStoreList { get; set; }
         public List<BrandViewModel> brandList { get; set; }
         public List<DistributionChannelViewModel> channelList { get; set; }

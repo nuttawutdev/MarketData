@@ -28,5 +28,6 @@ namespace MarketData.Model.Data
         public string remark { get; set; }
         public DateTime? counterCreateDate { get; set; }
         public bool alwayShow { get; set; }
+        public bool alwayShowKeyIn { get; set; }
     }
 }

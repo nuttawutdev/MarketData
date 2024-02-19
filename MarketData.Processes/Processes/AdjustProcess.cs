@@ -342,7 +342,7 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandInDepartment in allBrandByCounterListData)
                 {
-                    if(itemBrandInDepartment.Brand_ID == new Guid("9FF25F69-9359-4037-9E8E-8154DC7232E0"))
+                    if(itemBrandInDepartment.Brand_ID == new Guid("15c9eb58-40b8-4d85-a02a-b08f2a1f9ee9"))
                     {
 
                     }
@@ -548,7 +548,8 @@ namespace MarketData.Processes.Processes
                         ot = ot,
                         remark = remark,
                         counterCreateDate = counterData?.Created_Date,
-                        alwayShow = counterData != null ? counterData.Alway_Show_Current_Year.GetValueOrDefault() : false
+                        alwayShow = counterData != null ? counterData.Alway_Show_Current_Year.GetValueOrDefault() : false,
+                        alwayShowKeyIn = counterData != null ? counterData.Alway_Show_Key_In.GetValueOrDefault() : false
                     };
 
                     foreach (var itemBrandLoreal in onlyBrandLorel)
@@ -589,11 +590,12 @@ namespace MarketData.Processes.Processes
                 {
                     listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0
                     || c.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
-                    || c.alwayShow).ToList();
+                    || c.alwayShow
+                    || c.alwayShowKeyIn).ToList();
                 }
                 else
                 {
-                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0).ToList();
+                     listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0 || c.alwayShowKeyIn).ToList();
                 }
 
                 int rankAdjust = 1;

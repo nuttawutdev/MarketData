@@ -1729,6 +1729,7 @@ namespace MarketData.Processes.Processes
                     response.distributionChannelID = counterData.Distribution_Channel_ID;
                     response.active = counterData.Active_Flag;
                     response.alwayShow = counterData.Alway_Show_Current_Year.GetValueOrDefault();
+                    response.alwayShowKeyIn = counterData.Alway_Show_Key_In.GetValueOrDefault();
                 }
             }
             catch (Exception ex)
@@ -1814,6 +1815,7 @@ namespace MarketData.Processes.Processes
                         counterID = request.counterID,
                         active = request.active,
                         alwayShow = request.alwayShow,
+                        alwayShowKeyIn = request.alwayShowKeyIn,
                         brandName = request.brandName,
                         departmentStoreID = request.departmentStoreID,
                         departmentStoreName = request.departmentStoreName,

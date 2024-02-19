@@ -182,13 +182,14 @@ namespace MarketData.Processes.Processes
                     response.data = baKeyInList
                        .Where(e => e.amountSalePreviousYear > 0
                        || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
-                       || e.alwayShow)
+                       || e.alwayShow
+                       || e.alwayShowKeyIn)
                        .OrderBy(c => c.brandName).ToList();
                 }
                 else
                 {
                     response.data = baKeyInList
-                    .Where(e => e.amountSalePreviousYear > 0)
+                    .Where(e => e.amountSalePreviousYear > 0 || e.alwayShowKeyIn)
                     .OrderBy(c => c.brandName).ToList();
                 }
             }

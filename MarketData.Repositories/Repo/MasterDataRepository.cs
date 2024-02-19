@@ -1187,7 +1187,8 @@ namespace MarketData.Repositories.Repo
                        distributionChannelName = channel != null ? channel.Distribution_Channel_Name : string.Empty,
                        active = e.Active_Flag,
                        createDate = e.Created_Date,
-                       alwayShow = e.Alway_Show_Current_Year.GetValueOrDefault()
+                       alwayShow = e.Alway_Show_Current_Year.GetValueOrDefault(),
+                       alwayShowKeyIn = e.Alway_Show_Key_In.GetValueOrDefault(),
                    }).OrderBy(c => c.departmentStoreName).ToList();
 
                 return counterList;
@@ -1226,6 +1227,7 @@ namespace MarketData.Repositories.Repo
                         Delete_Flag = false,
                         Active_Flag = request.active,
                         Alway_Show_Current_Year = request.alwayShow,
+                        Alway_Show_Key_In = request.alwayShowKeyIn,
                         Created_By = request.userID,
                         Created_Date = Utility.GetDateNowThai()
                     };
@@ -1243,6 +1245,7 @@ namespace MarketData.Repositories.Repo
                         counterUpdate.Department_Store_ID = request.departmentStoreID;
                         counterUpdate.Active_Flag = request.active;
                         counterUpdate.Alway_Show_Current_Year = request.alwayShow;
+                        counterUpdate.Alway_Show_Key_In = request.alwayShowKeyIn;
                         counterUpdate.Updated_By = request.userID;
                         counterUpdate.Updated_Date = Utility.GetDateNowThai();
 

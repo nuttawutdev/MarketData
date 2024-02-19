@@ -74,6 +74,17 @@
                 }
                 Alway show in current year
             </label>
+            <label style="margin-left:4rem">
+                @if (Model.alwayShowKeyIn)
+                {
+                    <input value="" id="flagalwaykeyin" checked type="checkbox" data-toggle="toggle">
+                }
+                else
+                {
+                    <input value="" id="flagalwaykeyin" type="checkbox" data-toggle="toggle">
+                }
+                Alway Show Keyin
+            </label>
         </div>
     </div>
     <div class="modal-footer">
@@ -102,6 +113,7 @@
                  brandName: $('#brandList option:selected').text(),
                  active: $("#flagactive").prop("checked"),
                  alwayShow: $("#flagalway").prop("checked"),
+                 alwayShowKeyIn: $("#flagalwaykeyin").prop("checked"),
                  userID: $('#iduserID').val()
             };
 
@@ -171,6 +183,21 @@
             getDepartmentStoreList()
         });
 
+        $('#flagalway').on('change', function (e) {
+            const isChecked = $('#flagalway').is(":checked");
+            if (isChecked) {
+                $("#flagalwaykeyin").prop('checked', false);
+            }
+
+        });
+
+        $('#flagalwaykeyin').on('change', function (e) {
+            const isChecked = $('#flagalwaykeyin').is(":checked");
+            if (isChecked) {
+                $("#flagalway").prop('checked', false);
+            }
+
+        });
 
            function getDepartmentStoreList() {
             var distributionChannelID = $("#channelList").val();

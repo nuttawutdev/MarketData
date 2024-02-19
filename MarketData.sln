@@ -5,13 +5,18 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketData", "MarketData\MarketData.csproj", "{5E3838EE-E142-41CD-A637-24C62DC642C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketData.Processes", "MarketData.Processes\MarketData.Processes.csproj", "{F6FD283F-E5B1-43A9-843F-F23CCCFA37EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketData.Processes", "MarketData.Processes\MarketData.Processes.csproj", "{F6FD283F-E5B1-43A9-843F-F23CCCFA37EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketData.Model", "MarketData.Model\MarketData.Model.csproj", "{B0761E6A-2433-405C-A381-839741462375}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketData.Model", "MarketData.Model\MarketData.Model.csproj", "{B0761E6A-2433-405C-A381-839741462375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketData.Helper", "MarketData.Helper\MarketData.Helper.csproj", "{DD90D207-9C91-4C53-9190-209CA1E179EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketData.Helper", "MarketData.Helper\MarketData.Helper.csproj", "{DD90D207-9C91-4C53-9190-209CA1E179EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketData.Repositories", "MarketData.Repositories\MarketData.Repositories.csproj", "{57D1A4A4-C93F-44A4-B7AA-AD4F1E96F976}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketData.Repositories", "MarketData.Repositories\MarketData.Repositories.csproj", "{57D1A4A4-C93F-44A4-B7AA-AD4F1E96F976}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD515602-F1FC-42CB-BA0C-6E8597A26F70}"
+	ProjectSection(SolutionItems) = preProject
+		nuget.config = nuget.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

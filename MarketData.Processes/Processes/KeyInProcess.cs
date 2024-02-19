@@ -451,13 +451,14 @@ namespace MarketData.Processes.Processes
                     response.data = BAKeyInDetailList
                        .Where(e => e.amountSalePreviousYear > 0
                        || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
-                       || e.alwayShow == true)
+                       || e.alwayShow == true
+                       || e.alwayShowKeyIn == true)
                        .OrderBy(c => c.brandName).ToList();
                 }
                 else
                 {
                     response.data = BAKeyInDetailList
-                    .Where(e => e.amountSalePreviousYear > 0)
+                    .Where(e => e.amountSalePreviousYear > 0 || e.alwayShowKeyIn)
                     .OrderBy(c => c.brandName).ToList();
                 }
 
@@ -704,13 +705,14 @@ namespace MarketData.Processes.Processes
                 {
                     response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0
                          || e.counterCreateDate.GetValueOrDefault().Year == GetDateNowThai().Year
-                         || e.alwayShow)
+                         || e.alwayShow
+                         || e.alwayShowKeyIn)
                          .OrderBy(c => c.brandName).ToList();
                 }
                 else
                 {
-                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0)
-                         .OrderBy(c => c.brandName).ToList();
+                    response.data = adminKeyInDetailList.Where(e => e.amountSalePreviousYear > 0 || e.alwayShowKeyIn)
+                       .OrderBy(c => c.brandName).ToList();
                 }
 
 
@@ -1104,7 +1106,8 @@ namespace MarketData.Processes.Processes
                 remark = adminKeyInMostValue != null ? adminKeyInMostValue.Remark : null,
                 universe = request.universe,
                 amountSalePreviousYear = amountPreviousYear,
-                alwayShow = itemCounter.alwayShow
+                alwayShow = itemCounter.alwayShow,
+                alwayShowKeyIn = itemCounter.alwayShowKeyIn
             };
 
             return dataDetail;

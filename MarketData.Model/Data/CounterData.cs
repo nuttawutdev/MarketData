@@ -17,6 +17,7 @@ namespace MarketData.Model.Data
         public string brandName { get; set; }
         public bool active { get; set; }
         public bool alwayShow { get; set; }
+        public bool alwayShowKeyIn { get; set; }
         public DateTime? createDate { get; set; }
     }
 }

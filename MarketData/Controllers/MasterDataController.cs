@@ -1014,6 +1014,7 @@ namespace MarketData.Controllers
                 data.distributionChannelName = response.distributionChannelName;
                 data.active = response.active;
                 data.alwayShow = response.alwayShow;
+                data.alwayShowKeyIn = response.alwayShowKeyIn;
             }
 
             return data;
