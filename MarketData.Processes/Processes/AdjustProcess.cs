@@ -64,7 +64,7 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemDepartment in departmentStoreByFilter)
                 {
-                    var adjustStatusData = listAdjustData.OrderByDescending(d=>d.Update_Date).FirstOrDefault(
+                    var adjustStatusData = listAdjustData.OrderByDescending(d => d.Update_Date).FirstOrDefault(
                         c => c.DistributionChannel_ID == itemDepartment.distributionChannelID
                         //&& c.RetailerGroup_ID == itemDepartment.retailerGroupID
                         && c.DepartmentStore_ID == itemDepartment.departmentStoreID);
@@ -204,7 +204,7 @@ namespace MarketData.Processes.Processes
                     yearList.AddRange(olldYearList);
                 }
 
-                response.year = yearList;
+                response.year = yearList.DistinctBy(c => c).ToList();
             }
             catch (Exception ex)
             {
@@ -342,7 +342,7 @@ namespace MarketData.Processes.Processes
 
                 foreach (var itemBrandInDepartment in allBrandByCounterListData)
                 {
-                    if(itemBrandInDepartment.Brand_ID == new Guid("15c9eb58-40b8-4d85-a02a-b08f2a1f9ee9"))
+                    if (itemBrandInDepartment.Brand_ID == new Guid("15c9eb58-40b8-4d85-a02a-b08f2a1f9ee9"))
                     {
 
                     }
@@ -494,7 +494,7 @@ namespace MarketData.Processes.Processes
                                     {
                                         var keyInDetailBrandLoreal = baKeyInBrand.OrderByDescending(r => r.Amount_Sales).FirstOrDefault(c => c.BAKeyIn_ID == brandLorealKeyIn[0].ID);
 
-                                        if (keyInDetailBrandLoreal != null &&!string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
+                                        if (keyInDetailBrandLoreal != null && !string.IsNullOrWhiteSpace(keyInDetailBrandLoreal.Remark))
                                         {
                                             remark = keyInDetailBrandLoreal.Remark;
                                             break;
@@ -572,7 +572,7 @@ namespace MarketData.Processes.Processes
                             }
                             else if (baBrandKeyInDetail != null && baBrandKeyInDetail.Count() > 1)
                             {
-                               var rankBrand = baBrandKeyInDetail.OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Rank;
+                                var rankBrand = baBrandKeyInDetail.OrderByDescending(c => c.Amount_Sales).FirstOrDefault().Rank;
                                 amountSale = baBrandKeyInDetail.Sum(c => c.Amount_Sales) > 0 ? baBrandKeyInDetail.Sum(c => c.Amount_Sales) : null;
                                 rank = rankBrand.HasValue ? rankBrand.ToString() : null;
                             }
@@ -595,7 +595,7 @@ namespace MarketData.Processes.Processes
                 }
                 else
                 {
-                     listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0 || c.alwayShowKeyIn).ToList();
+                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0 || c.alwayShowKeyIn).ToList();
                 }
 
                 int rankAdjust = 1;

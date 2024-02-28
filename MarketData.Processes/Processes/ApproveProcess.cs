@@ -93,7 +93,7 @@ namespace MarketData.Processes.Processes
                     yearList.AddRange(olldYearList);
                 }
 
-                response.year = yearList;
+                response.year = yearList.DistinctBy(c => c).ToList();
             }
             catch (Exception ex)
             {
