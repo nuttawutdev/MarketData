@@ -783,6 +783,7 @@ namespace MarketData.Processes.Processes
                     }).OrderByDescending(s => s.sumBrand).ToList();
             }
 
+            groupBrandStartYear = groupBrandStartYear.Where(c => c.sumBrand > 0 || groupBrandCompareYear.Where(d => d.brandID == c.brandID).Sum(e => e.sumBrand) > 0).ToList();
             return (groupBrandStartYear, groupBrandCompareYear);
         }
 

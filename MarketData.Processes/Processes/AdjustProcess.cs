@@ -470,15 +470,19 @@ namespace MarketData.Processes.Processes
                                     {
                                         var keyInDetailBrandLoreal = baKeyInBrand.OrderByDescending(r => r.Amount_Sales).FirstOrDefault(c => c.BAKeyIn_ID == brandLorealKeyIn[0].ID);
 
-                                        if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
-                                            || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
+                                        if (keyInDetailBrandLoreal != null)
                                         {
-                                            sk = keyInDetailBrandLoreal.SK;
-                                            mu = keyInDetailBrandLoreal.MU;
-                                            fg = keyInDetailBrandLoreal.FG;
-                                            ot = keyInDetailBrandLoreal.OT;
-                                            break;
+                                            if (keyInDetailBrandLoreal.FG.HasValue || keyInDetailBrandLoreal.SK.HasValue
+                                       || keyInDetailBrandLoreal.MU.HasValue || keyInDetailBrandLoreal.OT.HasValue)
+                                            {
+                                                sk = keyInDetailBrandLoreal.SK;
+                                                mu = keyInDetailBrandLoreal.MU;
+                                                fg = keyInDetailBrandLoreal.FG;
+                                                ot = keyInDetailBrandLoreal.OT;
+                                                break;
+                                            }
                                         }
+
                                     }
 
                                 }
@@ -593,10 +597,11 @@ namespace MarketData.Processes.Processes
                     || c.alwayShow
                     || c.alwayShowKeyIn).ToList();
                 }
-                else
-                {
-                    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0 || c.alwayShowKeyIn).ToList();
-                }
+                // เอาออกไปก่อน 16/3/2024
+                //else
+                //{
+                //    listAdjustDetailData = listAdjustDetailData.Where(c => c.amountPreviousYear > 0 || c.alwayShowKeyIn).ToList();
+                //}
 
                 int rankAdjust = 1;
 
