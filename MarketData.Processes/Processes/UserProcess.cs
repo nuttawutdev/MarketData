@@ -1013,11 +1013,13 @@ namespace MarketData.Processes.Processes
 
                 using (var smtp = new SmtpClient())
                 {
+                    System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                     smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = 25;
+                    smtp.Port = port;
+                    smtp.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
-                    smtp.EnableSsl = true;
+                    //smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);
                 }
 
@@ -1052,11 +1054,13 @@ namespace MarketData.Processes.Processes
 
                 using (var smtp = new SmtpClient())
                 {
+                    System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                     smtp.UseDefaultCredentials = true;
                     smtp.Host = smtpHost;
-                    smtp.Port = 25;
+                    smtp.Port = port;
+                    smtp.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
                     smtp.Credentials = new System.Net.NetworkCredential(userName, password);
-                    smtp.EnableSsl = true;
+                    //smtp.EnableSsl = true;
                     await smtp.SendMailAsync(m);
                 }
 
